@@ -1,0 +1,29 @@
+# Claude Code local state
+.claude/settings.local.json
+
+# macOS
+.DS_Store
+._*
+
+# Editor
+.vscode/
+.idea/
+
+# Local env
+.env
+.env.local
+
+# Dependencies and generated output
+node_modules/
+dist/
+.react-router/
+.cache/
+.shopify/
+.wrangler/
+*.tsbuildinfo
+
+# Test and component-workbench output
+coverage/
+playwright-report/
+test-results/
+storybook-static/
