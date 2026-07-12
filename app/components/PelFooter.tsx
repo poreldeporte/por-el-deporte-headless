@@ -22,9 +22,9 @@ const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
   {
     h: 'Club',
     items: [
-      {t: 'Our Mission', to: '/pages/about'},
-      {t: 'Gallery', to: '/pages/about'},
-      {t: 'Join the Revolution', to: '/pages/about'},
+      {t: 'Our Mission', to: '/about'},
+      {t: 'Gallery', to: '/about'},
+      {t: 'Join the Revolution', to: '/about'},
     ],
   },
   {

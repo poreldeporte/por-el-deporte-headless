@@ -19,7 +19,7 @@ export function PelHeader() {
           <NavLink to="/" end className={navClass}>
             Home
           </NavLink>
-          <NavLink to="/pages/about" className={navClass}>
+          <NavLink to="/about" className={navClass}>
             About
           </NavLink>
           <NavLink to="/collections/all-products" className={navClass}>

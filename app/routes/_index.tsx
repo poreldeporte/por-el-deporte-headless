@@ -159,7 +159,7 @@ function Hero() {
           <Link to="/" className="is-active">
             Home
           </Link>
-          <Link to="/pages/about">About</Link>
+          <Link to="/about">About</Link>
           <Link to="/collections/all-products">Shop</Link>
         </div>
         <div className="pel-nav__logo">

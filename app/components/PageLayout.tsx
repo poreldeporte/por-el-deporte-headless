@@ -34,10 +34,11 @@ export function PageLayout({
   header,
   publicStoreDomain,
 }: PageLayoutProps) {
-  // The homepage carries its own transparent nav layered over the hero; every
-  // other page gets the solid branded PelHeader. The branded footer, cart FAB,
-  // and cloud clip-path defs are global.
-  const isHome = useLocation().pathname === '/';
+  // The homepage and About page carry their own transparent nav over a hero;
+  // every other page gets the solid branded PelHeader. The branded footer, cart
+  // FAB, and cloud clip-path defs are global.
+  const {pathname} = useLocation();
+  const ownsHero = pathname === '/' || pathname === '/about';
 
   return (
     <Aside.Provider>
@@ -45,7 +46,7 @@ export function PageLayout({
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
-      {!isHome && <PelHeader />}
+      {!ownsHero && <PelHeader />}
       <main>{children}</main>
       <PelFooter />
       <CommunityPanel />
