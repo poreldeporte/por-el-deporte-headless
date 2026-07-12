@@ -1,0 +1,496 @@
+/* Por El Deporte — Product (PDP) page, from Product Page.dc.html */
+
+.pel-pdp {
+  background: var(--pel-cream);
+  overflow-x: clip;
+}
+
+/* ===== Main: gallery | stats | buy ===== */
+.pel-pdp__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) 168px minmax(0, 1.06fr);
+  gap: 30px;
+  align-items: start;
+  padding: 24px 48px 0;
+  max-width: 1680px;
+  margin: 0 auto;
+}
+
+/* Gallery */
+.pel-pdp__gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.pel-pdp__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.02;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--pel-sand);
+}
+.pel-pdp__stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pel-pdp__thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.pel-pdp__thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--pel-sand);
+  border: var(--border-width) solid var(--border-soft);
+  cursor: pointer;
+  transition: border-color var(--dur-fast);
+}
+.pel-pdp__thumb.is-active {
+  border-color: var(--pel-ink);
+}
+.pel-pdp__thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Stat cards */
+.pel-pdp__stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.pel-pdp__stat {
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-cream);
+  padding: 24px 16px 20px;
+  text-align: center;
+}
+.pel-pdp__stat-value {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--pel-ink);
+}
+.pel-pdp__stat-rule {
+  height: 1px;
+  background: rgba(23, 23, 23, 0.25);
+  margin: 16px 12px;
+}
+.pel-pdp__stat-label {
+  font: 700 11px/1.4 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+
+/* Buy panel */
+.pel-pdp__buy {
+  min-width: 0;
+}
+.pel-pdp__review {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pel-pdp__stars {
+  display: flex;
+  gap: 4px;
+  color: var(--pel-orange);
+}
+.pel-pdp__review-txt {
+  font: 700 12px/1.4 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-pdp__title {
+  margin: 20px 0 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: clamp(46px, 5.6vw, 96px);
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-pdp__price {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 16px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.2;
+  color: var(--pel-ink);
+}
+.pel-pdp__compare {
+  color: var(--text-muted);
+}
+.pel-pdp__opt {
+  margin-top: 32px;
+}
+.pel-pdp__opt-label {
+  margin: 0 0 12px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pel-pdp__swatches {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pel-home .pel-pdp__swatch,
+.pel-pdp__swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 128px;
+  padding: 18px 12px 14px;
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast),
+    border-color var(--dur-fast);
+}
+.pel-pdp__swatch.is-active {
+  border-color: var(--pel-orange);
+  background: var(--pel-orange);
+  color: var(--pel-cream);
+}
+.pel-pdp__swatch-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: var(--border-width) solid rgba(23, 23, 23, 0.25);
+  display: block;
+}
+.pel-pdp__swatch-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1;
+}
+.pel-pdp__sizes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pel-home .pel-pdp__size,
+.pel-pdp__size {
+  min-width: 64px;
+  padding: 16px 20px;
+  border-radius: var(--radius-pill);
+  border: var(--border-width) solid var(--pel-ink);
+  background: transparent;
+  color: var(--pel-ink);
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.pel-pdp__size.is-active {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+.pel-pdp__fabric {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--pel-orange);
+  border-radius: var(--radius-md);
+  padding: 16px 24px;
+  margin: 32px 0 0;
+  color: var(--pel-cream);
+  flex-wrap: wrap;
+  font: 700 11px/1.5 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.pel-pdp__fabric-lead {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 18px;
+  line-height: 1;
+}
+.pel-pdp__fabric-div {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(247, 240, 222, 0.4);
+}
+.pel-pdp__cart {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  margin: 20px 0 0;
+}
+.pel-pdp__qty {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-pill);
+  padding: 8px 16px;
+  background: var(--pel-cream);
+}
+.pel-pdp__qty button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--pel-ink);
+  font: 700 20px/1 var(--font-body);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pel-pdp__qty span {
+  min-width: 32px;
+  text-align: center;
+  font: 700 14px/1 var(--font-body);
+}
+.pel-pdp__cart form {
+  flex: 1;
+  margin: 0;
+  display: flex;
+}
+.pel-pdp__cta {
+  flex: 1;
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  padding: 22px 32px;
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.pel-pdp__cta:hover:not(:disabled) {
+  background: var(--pel-orange);
+}
+.pel-pdp__cta:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.pel-pdp__note {
+  margin: 20px 0 0;
+  font: 600 11px/1.7 var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ===== Info cards ===== */
+.pel-pdp__info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  padding: 96px 48px;
+  max-width: 1680px;
+  margin: 0 auto;
+}
+.pel-pdp__card {
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-cream);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+.pel-pdp__card-title {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 32px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-pdp__card-body,
+.pel-pdp__card-body p {
+  margin: 0;
+  font: 600 14px/1.6 var(--font-body);
+  color: var(--pel-ink);
+}
+.pel-pdp__card-foot {
+  margin-top: auto;
+  padding-top: 24px;
+  font: 700 12px/1.7 var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-pdp__specs {
+  display: flex;
+  flex-direction: column;
+}
+.pel-pdp__spec {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px dotted rgba(23, 23, 23, 0.25);
+}
+.pel-pdp__spec:last-child {
+  border-bottom: none;
+}
+.pel-pdp__spec-k {
+  font: 700 13px/1.4 var(--font-body);
+  color: var(--pel-ink);
+}
+.pel-pdp__spec-v {
+  font: 600 13px/1.4 var(--font-body);
+  color: var(--pel-ink);
+}
+
+/* ===== Beyond the Game ===== */
+.pel-pdp__beyond {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 96px 0 120px;
+  background: var(--pel-cream);
+  overflow: hidden;
+}
+.pel-pdp__beyond-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--pel-ink);
+  text-align: center;
+  margin: 0 0 40px;
+}
+.pel-pdp__beyond-words {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px 24px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 48px;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: clamp(34px, 4.6vw, 66px);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--pel-ink);
+}
+.pel-pdp__beyond-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pel-pdp__cloudchip {
+  flex: none;
+  position: relative;
+  display: inline-block;
+  width: clamp(52px, 5.2vw, 84px);
+  aspect-ratio: 200 / 128;
+  color: var(--pel-orange);
+}
+.pel-pdp__cloudchip svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.pel-pdp__cloudchip-star {
+  left: 50%;
+  top: 53%;
+  transform: translate(-50%, -50%);
+  width: 36%;
+  height: auto;
+  inset: auto;
+}
+.pel-pdp__moments {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 64px;
+}
+.pel-pdp__moments-track {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation: pel-ml 70s linear infinite;
+}
+.pel-pdp__moment {
+  flex: none;
+  width: clamp(240px, 25vw, 352px);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--pel-sand);
+}
+.pel-pdp__moment img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pel-pdp__moments-track {
+    animation: none !important;
+  }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 60em) {
+  .pel-pdp__main {
+    grid-template-columns: 1fr;
+    padding: 20px 20px 0;
+  }
+  .pel-pdp__stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .pel-pdp__stat {
+    flex: 1 1 40%;
+  }
+  .pel-pdp__info {
+    grid-template-columns: 1fr;
+    padding: 56px 20px;
+  }
+  .pel-pdp__beyond-words {
+    padding: 0 20px;
+  }
+}

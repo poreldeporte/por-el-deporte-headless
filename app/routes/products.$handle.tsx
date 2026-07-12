@@ -8,10 +8,9 @@ import {
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
-import {ProductForm} from '~/components/ProductForm';
+import {ProductPage} from '~/components/product/ProductPage';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import productStyles from '~/styles/product.css?url';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -22,6 +21,10 @@ export const meta: Route.MetaFunction = ({data}) => {
     },
   ];
 };
+
+export const links: Route.LinksFunction = () => [
+  {rel: 'stylesheet', href: productStyles},
+];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -95,31 +98,13 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml} = product;
-
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
-        />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
-      </div>
+    <>
+      <ProductPage
+        product={product}
+        selectedVariant={selectedVariant}
+        productOptions={productOptions}
+      />
       <Analytics.ProductView
         data={{
           products: [
@@ -135,7 +120,7 @@ export default function Product() {
           ],
         }}
       />
-    </div>
+    </>
   );
 }
 
@@ -184,6 +169,15 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    images(first: 10) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
