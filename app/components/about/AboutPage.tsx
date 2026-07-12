@@ -57,7 +57,7 @@ function HeroNav() {
         </Link>
       </div>
       <div className="pel-nav__actions">
-        <button type="button" className="pel-pill" title="Accounts — coming soon">
+        <button type="button" className="pel-pill pel-hide-mobile" title="Accounts — coming soon">
           Account
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <circle cx="12" cy="8" r="3.4" />

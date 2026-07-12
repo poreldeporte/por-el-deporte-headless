@@ -1140,11 +1140,31 @@ a.pel-footer__link:hover {
     padding: 18px 20px;
   }
   .pel-nav__links {
-    gap: 18px;
+    gap: 16px;
     font-size: 11px;
   }
+  .pel-nav__logo {
+    display: none;
+  }
   .pel-hero__content {
-    padding: 110px 20px 48px;
+    padding: 104px 16px 48px;
+    align-items: center;
+  }
+  .pel-hero__title {
+    font-size: clamp(20px, 6vw, 32px);
+    max-width: 330px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-wrap: anywhere;
+  }
+  .pel-hero__lede {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .pel-hero__sub {
+    font-size: 11px;
+    overflow-wrap: anywhere;
   }
   .pel-rail__inner {
     padding: 60px 0 64px;
@@ -1187,6 +1207,12 @@ a.pel-footer__link:hover {
     width: 300px;
     min-height: 320px;
     padding: 24px;
+  }
+  .pel-footer {
+    overflow-x: clip;
+  }
+  .pel-footer__big {
+    font-size: clamp(34px, 12vw, 58px);
   }
   .pel-footer__body {
     padding: 28px 20px 40px;

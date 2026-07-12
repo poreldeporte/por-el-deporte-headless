@@ -30,7 +30,7 @@ export function PelHeader() {
           Por El Deporte
         </Link>
         <div className="pel-siteheader__actions">
-          <Link to="/account" className="pel-pill">
+          <Link to="/account" className="pel-pill pel-hide-mobile">
             Account
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="12" cy="8" r="3.4" />

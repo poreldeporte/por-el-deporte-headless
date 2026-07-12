@@ -479,6 +479,14 @@ main h1 {
 
 /* ===== Mobile ===== */
 @media (max-width: 48em) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .pel-hide-mobile {
+    display: none !important;
+  }
   .pel-siteheader__inner {
     padding: 14px 20px;
   }
