@@ -1,5 +1,6 @@
 import {Link, NavLink} from 'react-router';
 import {CartButton} from '~/components/home/CartButton';
+import {PelMarquee, MARQUEE_ITEMS} from '~/components/PelMarquee';
 
 /**
  * The global site header for non-home pages — a solid branded bar. (The homepage
@@ -12,6 +13,7 @@ const navClass = ({isActive}: {isActive: boolean}) =>
 export function PelHeader() {
   return (
     <header className="pel-siteheader">
+      <PelMarquee items={MARQUEE_ITEMS} />
       <div className="pel-siteheader__inner">
         <nav className="pel-siteheader__links" aria-label="Primary">
           <NavLink to="/" end className={navClass}>

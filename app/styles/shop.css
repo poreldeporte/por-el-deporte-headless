@@ -1,0 +1,297 @@
+/* Por El Deporte — Shop (collection) page, from Shop.dc.html */
+
+.pel-shop {
+  background: var(--pel-cream);
+}
+
+/* Banner */
+.pel-shop__banner {
+  position: relative;
+  min-height: min(48vh, 520px);
+  background: var(--pel-black) center / cover no-repeat;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pel-shop__banner-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.42),
+    rgba(10, 10, 10, 0.3) 45%,
+    rgba(10, 10, 10, 0.55)
+  );
+}
+.pel-shop__banner-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 64px 48px;
+}
+.pel-shop__eyebrow {
+  margin: 0 0 20px;
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pel-cream);
+}
+.pel-shop__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  color: var(--pel-cream);
+  font-size: clamp(52px, 8vw, 132px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-shadow: 0 3px 26px rgba(0, 0, 0, 0.3);
+}
+.pel-shop__sub {
+  margin: 26px auto 0;
+  max-width: 560px;
+  font: 700 13px/1.7 var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pel-cream);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* Filter bar */
+.pel-shop__filter {
+  padding: 46px 48px 10px;
+}
+.pel-shop__filter-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.pel-shop__count {
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 9px;
+}
+.pel-shop__count span {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 22px;
+  color: var(--pel-orange);
+  letter-spacing: 0;
+}
+.pel-shop__chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pel-chip {
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  border: var(--border-width) solid var(--pel-ink);
+  background: transparent;
+  color: var(--pel-ink);
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+.pel-chip.is-active {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+
+/* Grid */
+.pel-shop__grid-wrap {
+  padding: 30px 48px 100px;
+}
+.pel-shop__grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: 34px 26px;
+}
+.pel-shopcard {
+  position: relative;
+  transition: transform 0.25s var(--ease-out);
+}
+.pel-shopcard:hover {
+  transform: translateY(-6px);
+}
+.pel-home .pel-shopcard__link,
+.pel-shopcard__link {
+  display: block;
+  color: var(--pel-ink);
+  text-decoration: none;
+}
+.pel-shopcard__well {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--pel-sand);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+.pel-shopcard__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.pel-shopcard__meta {
+  margin: 16px 4px 0;
+}
+.pel-shopcard__cat {
+  margin-bottom: 9px;
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pel-shopcard__name {
+  margin: 0 0 7px;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 23px;
+  line-height: 1.04;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-shopcard__price {
+  display: flex;
+  align-items: baseline;
+  font: 700 14px/1 var(--font-body);
+  letter-spacing: 0.02em;
+  color: var(--pel-ink);
+}
+/* the AddToCartButton renders a <form>; float it into the card corner */
+.pel-shopcard form {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  margin: 0;
+}
+.pel-shopcard__add {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast),
+    border-color var(--dur-fast);
+}
+.pel-shopcard__add:hover:not(:disabled) {
+  background: var(--pel-orange);
+  color: #fff;
+  border-color: var(--pel-orange);
+}
+
+/* Core values */
+.pel-values {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--pel-cream);
+  min-height: min(100vh, 900px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 48px;
+}
+.pel-values__inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  width: 100%;
+}
+.pel-values__eyebrow {
+  margin: 0 0 34px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pel-orange);
+  text-align: center;
+}
+.pel-values__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+.pel-value {
+  background: var(--pel-cream);
+  border-radius: var(--radius-lg);
+  padding: 34px 32px 36px;
+  min-height: 260px;
+  box-shadow: 0 8px 0 var(--pel-orange);
+  border: var(--border-width) solid var(--pel-ink);
+  display: flex;
+  flex-direction: column;
+}
+.pel-value__n {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--pel-orange);
+  letter-spacing: 0.02em;
+}
+.pel-value__t {
+  margin: 16px 0 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 32px;
+  line-height: 1.02;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-value__b {
+  margin: auto 0 0;
+  padding-top: 22px;
+  font: 600 14px/1.6 var(--font-body);
+  color: var(--pel-ink);
+}
+
+@media (max-width: 48em) {
+  .pel-shop__filter {
+    padding: 28px 20px 6px;
+  }
+  .pel-shop__grid-wrap {
+    padding: 20px 20px 64px;
+  }
+  .pel-shop__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px 14px;
+  }
+  .pel-values {
+    padding: 56px 20px;
+    min-height: 0;
+  }
+  .pel-values__grid {
+    grid-template-columns: 1fr;
+  }
+}
