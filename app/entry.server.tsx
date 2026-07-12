@@ -19,6 +19,17 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    // Merged with Hydrogen's defaults. Needed for our brand assets:
+    // - Google Fonts stylesheet (googleapis) + font files (gstatic)
+    // - hero/editorial imagery served from the primary domain poreldeporte.com
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+    fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+    imgSrc: [
+      "'self'",
+      'data:',
+      'https://cdn.shopify.com',
+      'https://poreldeporte.com',
+    ],
   });
 
   const body = await renderToReadableStream(

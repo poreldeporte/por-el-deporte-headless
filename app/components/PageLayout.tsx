@@ -1,4 +1,4 @@
-import {Await, Link} from 'react-router';
+import {Await, Link, useLocation} from 'react-router';
 import {Suspense, useId} from 'react';
 import type {
   CartApiQueryFragment,
@@ -6,8 +6,11 @@ import type {
   HeaderQuery,
 } from 'storefrontapi.generated';
 import {Aside} from '~/components/Aside';
-import {Footer} from '~/components/Footer';
-import {Header, HeaderMenu} from '~/components/Header';
+import {HeaderMenu} from '~/components/Header';
+import {PelHeader} from '~/components/PelHeader';
+import {PelFooter} from '~/components/PelFooter';
+import {CloudDefs} from '~/components/home/CloudDefs';
+import {CartButton} from '~/components/home/CartButton';
 import {CartMain} from '~/components/CartMain';
 import {
   SEARCH_ENDPOINT,
@@ -27,30 +30,24 @@ interface PageLayoutProps {
 export function PageLayout({
   cart,
   children = null,
-  footer,
   header,
-  isLoggedIn,
   publicStoreDomain,
 }: PageLayoutProps) {
+  // The homepage carries its own transparent nav layered over the hero; every
+  // other page gets the solid branded PelHeader. The branded footer, cart FAB,
+  // and cloud clip-path defs are global.
+  const isHome = useLocation().pathname === '/';
+
   return (
     <Aside.Provider>
+      <CloudDefs />
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
-      {header && (
-        <Header
-          header={header}
-          cart={cart}
-          isLoggedIn={isLoggedIn}
-          publicStoreDomain={publicStoreDomain}
-        />
-      )}
+      {!isHome && <PelHeader />}
       <main>{children}</main>
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
+      <PelFooter />
+      <CartButton variant="fab" />
     </Aside.Provider>
   );
 }

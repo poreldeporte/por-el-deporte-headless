@@ -5,14 +5,25 @@ Hydrogen stack: React Router, strict TypeScript, Tailwind, and Oxygen.
 
 ## Current status
 
-- Official Hydrogen `2026.4.3` TypeScript scaffold installed.
-- GraphQL code generation, TypeScript, ESLint, and the Oxygen production build pass.
-- Local server-side rendering returns `HTTP 200` against Mock.shop.
-- Shopify CLI is authenticated to `por-el-deporte.myshopify.com`.
-- Real Shopify connection is the next gate. The Hydrogen sales channel must be
-  installed before this repository can be linked to a Hydrogen storefront.
-- Homepage implementation starts after the design source is added to the project
-  or shared as a viewable link.
+- Official Hydrogen `2026.4.3` TypeScript scaffold; GraphQL codegen, TypeScript,
+  ESLint, and the Oxygen production build all pass.
+- **Connected to the real store** `por-el-deporte.myshopify.com` (Hydrogen sales
+  channel installed, storefront linked, env pulled). Live product/collection/cart
+  data throughout.
+- **Homepage** built from the Claude Design source: marquees, hero, live product
+  rail, About collage, Moods, the Artisan-Hoodie Function section, testimonials,
+  and the scallop-edged footer. Scroll/entrance motion via anime.js
+  (npm-bundled, client-only, reduced-motion aware).
+- **Commerce path works end to end**: Quick Add / product page → server-side cart
+  → branded cart drawer → Shopify-hosted checkout (`checkoutUrl`).
+- **Branded across all routes**: global `PelHeader` (non-home) + `PelFooter`, and
+  the collection (PLP), product (PDP), and cart pages styled to the design system.
+- CI runs lint + typecheck + build on every push/PR (`.github/workflows/ci.yml`).
+- **Next: deploy.** The app is not yet on Oxygen — see "Deploy to Oxygen" below.
+  This step needs Shopify CLI auth and is a go-live decision.
+
+See [docs/BUILD_GUIDE.md](docs/BUILD_GUIDE.md) for the architecture + a
+concept-by-concept tour of how it was built.
 
 See [the project plan](docs/PROJECT_PLAN.md) for delivery phases and definitions
 of done.

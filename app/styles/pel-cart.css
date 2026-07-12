@@ -1,0 +1,188 @@
+/*
+ * Por El Deporte — cart / drawer branding (global).
+ * Restyles the skeleton Aside drawer + cart contents to the design system.
+ * Loaded after app.css so these win on equal specificity. Positioning/slide
+ * mechanism from app.css is left intact; this is a visual layer only.
+ */
+
+:root {
+  --aside-width: 460px;
+}
+
+.overlay {
+  background: var(--scrim);
+}
+
+aside {
+  background: var(--pel-cream);
+  box-shadow: var(--shadow-drawer);
+  border-top-left-radius: var(--radius-lg);
+  border-bottom-left-radius: var(--radius-lg);
+  font-family: var(--font-body);
+  color: var(--pel-ink);
+}
+
+aside header {
+  border-bottom: var(--border-width) solid var(--pel-ink);
+  height: auto;
+  padding: 26px 24px 18px;
+}
+aside header h3 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+aside header .close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--pel-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--pel-ink);
+  background: transparent;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+aside header .close:hover {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  opacity: 1;
+}
+
+/* ── Cart lines ── */
+.cart-line {
+  padding: 18px 4px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.cart-line-inner {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.cart-line img {
+  flex: none;
+  width: 104px;
+  height: 132px;
+  object-fit: cover;
+  background: var(--pel-sand);
+  border-radius: var(--radius-sm);
+}
+.cart-line strong {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 18px;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.cart-line a {
+  color: var(--pel-ink);
+  text-decoration: none;
+}
+.cart-line small {
+  color: var(--text-muted);
+}
+.cart-line ul {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0;
+}
+
+/* Quantity stepper */
+.cart-line-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.cart-line-quantity button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--pel-ink);
+  background: transparent;
+  color: var(--pel-ink);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.cart-line-quantity button:hover:not(:disabled) {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+.cart-line-quantity button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.cart-line-quantity a[href],
+.cart-line-quantity button[type='submit']:last-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Summary + checkout ── */
+.cart-summary-aside {
+  position: sticky;
+  bottom: 0;
+  background: var(--pel-cream);
+  border-top: var(--border-width) solid var(--pel-ink);
+  padding: 20px 4px 10px;
+  margin-top: 8px;
+}
+.cart-summary-aside h4 {
+  margin: 0 0 12px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cart-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 22px;
+  color: var(--pel-ink);
+}
+.cart-summary-aside a[href] {
+  display: block;
+  margin-top: 14px;
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  border-radius: var(--radius-pill);
+  text-align: center;
+  text-decoration: none;
+  transition: background var(--dur-fast);
+}
+.cart-summary-aside a[href]:hover {
+  background: var(--pel-orange);
+}
+.cart-summary-aside a[href] p {
+  margin: 0;
+  padding: 18px;
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Discount / gift-card inputs */
+.cart-summary-aside input[type='text'] {
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  padding: 10px 16px;
+  font: 600 12px/1 var(--font-body);
+  background: var(--pel-white);
+}
