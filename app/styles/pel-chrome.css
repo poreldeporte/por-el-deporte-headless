@@ -237,10 +237,257 @@ main h1 {
   padding: 44px 48px 90px;
 }
 
+/* ===== Community panel (What Makes Us Special) ===== */
+.pel-fab--community {
+  right: 98px; /* sits just left of the cart FAB */
+}
+.pel-community__scrim {
+  position: fixed;
+  inset: 0;
+  border: none;
+  padding: 0;
+  cursor: default;
+  background: var(--scrim);
+  z-index: 70;
+  animation: pel-fade 0.3s ease;
+}
+.pel-community {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  bottom: 14px;
+  width: min(580px, 94vw);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-drawer);
+  overflow: hidden;
+  animation: pel-slide-l 0.38s var(--ease-out);
+}
+@keyframes pel-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pel-slide-l {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.pel-community__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 34px 36px 20px;
+}
+.pel-community__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 44px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-community__close {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--pel-ink);
+  background: transparent;
+  color: var(--pel-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.pel-community__close:hover {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+.pel-community__tabs {
+  display: flex;
+  gap: 14px;
+  padding: 6px 36px 20px;
+}
+.pel-community__tabs button {
+  flex: 1;
+  border-radius: var(--radius-pill);
+  padding: 16px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: var(--border-width) solid var(--pel-ink);
+  background: transparent;
+  color: var(--pel-ink);
+}
+.pel-community__tabs button.is-active {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+.pel-community__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 36px 20px;
+}
+.pel-community__app {
+  text-align: center;
+  margin-bottom: 6px;
+}
+.pel-community__badge {
+  position: relative;
+  width: 200px;
+  aspect-ratio: 200 / 128;
+  margin: 4px auto 20px;
+}
+.pel-community__badge-shadow {
+  position: absolute;
+  inset: 0;
+  clip-path: url(#pelCloud);
+  background: var(--pel-orange);
+  transform: translate(4%, 5.5%);
+}
+.pel-community__badge-border {
+  position: absolute;
+  inset: 0;
+  clip-path: url(#pelCloud);
+  background: var(--pel-ink);
+}
+.pel-community__badge-body {
+  position: absolute;
+  inset: 3px;
+  clip-path: url(#pelCloud);
+  background: var(--pel-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pel-community__badge-body span {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 40px;
+  letter-spacing: 0.04em;
+  color: var(--pel-ink);
+}
+.pel-community__apptitle {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 30px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-community__appdesc {
+  margin: 0 auto 20px;
+  max-width: 40ch;
+  font: 600 14px/1.6 var(--font-body);
+  color: var(--pel-ink);
+}
+.pel-community__dl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 28px;
+}
+.pel-community__dl a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: var(--radius-pill);
+  padding: 16px 26px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.pel-community__dl a.primary {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+.pel-community__dl a.primary:hover {
+  background: var(--pel-orange);
+}
+.pel-community__dl a.secondary {
+  background: transparent;
+  color: var(--pel-ink);
+  border: var(--border-width) solid var(--pel-ink);
+}
+.pel-community__dl a.secondary:hover {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+.pel-community__label {
+  margin-bottom: 22px;
+  font: 700 12px/1.4 var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-community__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 20px;
+}
+.pel-community__ing {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.pel-community__ing--full {
+  margin-top: 22px;
+}
+.pel-community__ico {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 50%;
+  border: var(--border-width) solid var(--pel-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pel-ink);
+}
+.pel-community__ing span {
+  font: 700 11px/1.3 var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-community__foot {
+  padding: 20px 36px 30px;
+  border-top: 1px solid rgba(23, 23, 23, 0.2);
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+
 /* ===== Mobile ===== */
 @media (max-width: 48em) {
   .pel-siteheader__inner {
     padding: 14px 20px;
+  }
+  .pel-community__title {
+    font-size: 34px;
+  }
+  .pel-community__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   .pel-siteheader__logo {
     display: none;
@@ -260,5 +507,11 @@ main h1 {
   }
   .product-main {
     position: static;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pel-community,
+  .pel-community__scrim {
+    animation: none !important;
   }
 }

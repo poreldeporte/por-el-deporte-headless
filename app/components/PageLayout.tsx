@@ -11,6 +11,7 @@ import {PelHeader} from '~/components/PelHeader';
 import {PelFooter} from '~/components/PelFooter';
 import {CloudDefs} from '~/components/home/CloudDefs';
 import {CartButton} from '~/components/home/CartButton';
+import {CommunityPanel} from '~/components/home/CommunityPanel';
 import {CartMain} from '~/components/CartMain';
 import {
   SEARCH_ENDPOINT,
@@ -47,6 +48,7 @@ export function PageLayout({
       {!isHome && <PelHeader />}
       <main>{children}</main>
       <PelFooter />
+      <CommunityPanel />
       <CartButton variant="fab" />
     </Aside.Provider>
   );
