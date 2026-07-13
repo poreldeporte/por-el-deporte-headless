@@ -1,5 +1,6 @@
 import {Link, NavLink} from 'react-router';
 import {CartButton} from '~/components/home/CartButton';
+import {PelLogoMark} from '~/components/PelLogo';
 import {PelMarquee, MARQUEE_ITEMS} from '~/components/PelMarquee';
 
 /**
@@ -27,7 +28,7 @@ export function PelHeader() {
           </NavLink>
         </nav>
         <Link to="/" className="pel-siteheader__logo" aria-label="Por El Deporte — home">
-          Por El Deporte
+          <PelLogoMark height={46} />
         </Link>
         <div className="pel-siteheader__actions">
           <Link to="/account" className="pel-pill pel-hide-mobile">

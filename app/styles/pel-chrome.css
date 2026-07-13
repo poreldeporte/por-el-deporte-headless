@@ -609,3 +609,278 @@ summary:focus-visible,
   outline: 3px solid var(--pel-blue);
   outline-offset: 2px;
 }
+
+/* Dynamic brand logo image (shop.brand.logo) — replaces the text wordmark. */
+.pel-logo-img {
+  display: block;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── Legal / prose pages (policies, CMS pages) ───────────────────────── */
+.pel-legal {
+  min-height: 60vh;
+  padding: 64px 24px 96px;
+  background: var(--pel-cream);
+}
+.pel-legal__inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.pel-legal__eyebrow {
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pel-orange);
+  margin-bottom: 10px;
+}
+.pel-legal__title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.02;
+  color: var(--pel-ink);
+  margin-bottom: 28px;
+}
+.pel-legal__back {
+  display: inline-block;
+  margin-bottom: 20px;
+  font: 600 14px/1 var(--font-body);
+  color: var(--pel-blue);
+  text-decoration: none;
+}
+.pel-legal__back:hover {
+  text-decoration: underline;
+}
+.pel-legal__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pel-legal__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #fff;
+  border: 2px solid var(--pel-ink);
+  border-radius: 16px;
+  font: 700 17px/1 var(--font-body);
+  color: var(--pel-ink);
+  text-decoration: none;
+  transition: transform 0.2s var(--ease-out), background 0.2s;
+}
+.pel-legal__link:hover {
+  transform: translateY(-2px);
+  background: var(--pel-sand);
+}
+.pel-legal__link svg {
+  color: var(--pel-orange);
+  flex: none;
+}
+
+/* Rich text coming from Shopify (policy/page body). */
+.pel-prose {
+  color: color-mix(in srgb, var(--pel-ink) 88%, transparent);
+  line-height: 1.7;
+  font-size: 16px;
+}
+.pel-prose > * + * {
+  margin-top: 1em;
+}
+.pel-prose h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--pel-ink);
+  margin-top: 1.6em;
+}
+.pel-prose h3 {
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--pel-ink);
+  margin-top: 1.4em;
+}
+.pel-prose a {
+  color: var(--pel-blue);
+  text-decoration: underline;
+}
+.pel-prose ul,
+.pel-prose ol {
+  padding-left: 1.4em;
+}
+.pel-prose li + li {
+  margin-top: 0.4em;
+}
+.pel-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* ── Collections index ───────────────────────────────────────────────── */
+.pel-collections {
+  padding: 56px 48px 96px;
+  background: var(--pel-cream);
+}
+.pel-collections__head {
+  max-width: var(--container);
+  margin: 0 auto 30px;
+}
+.pel-collections__title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 6vw, 56px);
+  color: var(--pel-ink);
+}
+.pel-collections__grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 30px 26px;
+}
+.pel-collections__card {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.25s var(--ease-out);
+}
+.pel-collections__card:hover {
+  transform: translateY(-6px);
+}
+.pel-collections__well {
+  border: 2px solid var(--pel-ink);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--pel-sand);
+  aspect-ratio: 1;
+}
+.pel-collections__well img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pel-collections__name {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--pel-ink);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .pel-collections {
+    padding: 40px 20px 72px;
+  }
+}
+
+/* ── Search page ─────────────────────────────────────────────────────── */
+.pel-search {
+  min-height: 60vh;
+  padding: 56px 24px 96px;
+  background: var(--pel-cream);
+}
+.pel-search__inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.pel-search__title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 6vw, 52px);
+  color: var(--pel-ink);
+  margin-bottom: 24px;
+}
+.pel-search__form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.pel-search__input {
+  flex: 1;
+  padding: 14px 18px;
+  border: 2px solid var(--pel-ink);
+  border-radius: 999px;
+  background: #fff;
+  font: 500 16px/1 var(--font-body);
+  color: var(--pel-ink);
+}
+.pel-search__input::placeholder {
+  color: color-mix(in srgb, var(--pel-ink) 45%, transparent);
+}
+.pel-search__btn {
+  padding: 14px 26px;
+  border: 2px solid var(--pel-ink);
+  border-radius: 999px;
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  font: 700 14px/1 var(--font-body);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-out);
+}
+.pel-search__btn:hover {
+  transform: translateY(-2px);
+}
+.pel-search__error {
+  color: var(--pel-orange);
+  font-weight: 600;
+  margin: 8px 0;
+}
+.pel-search__empty {
+  margin-top: 40px;
+  padding: 48px 32px;
+  text-align: center;
+  background: var(--pel-sand);
+  border: 2px solid var(--pel-ink);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.pel-search__empty-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--pel-ink);
+}
+.pel-search__empty-sub {
+  color: color-mix(in srgb, var(--pel-ink) 68%, transparent);
+  margin-bottom: 10px;
+}
+.pel-search__results {
+  margin-top: 28px;
+}
+/* Rebrand the stock SearchResults markup that renders inside our shell. */
+.pel-search__results .search-result {
+  margin-bottom: 32px;
+}
+.pel-search__results .search-result h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--pel-ink);
+  margin-bottom: 12px;
+}
+.pel-search__results .search-results-item {
+  border-top: 1px solid color-mix(in srgb, var(--pel-ink) 15%, transparent);
+}
+.pel-search__results .search-results-item a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 4px;
+  color: var(--pel-ink);
+  text-decoration: none;
+}
+.pel-search__results .search-results-item a:hover {
+  color: var(--pel-orange);
+}
+.pel-search__results .search-results-item img {
+  border-radius: 10px;
+  border: 1.5px solid var(--pel-ink);
+  background: var(--pel-sand);
+}
+.pel-search__results .search-results-item p {
+  font-weight: 700;
+}
+.pel-search__results .search-results-item small {
+  color: color-mix(in srgb, var(--pel-ink) 65%, transparent);
+}

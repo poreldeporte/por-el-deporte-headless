@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import {PelMarquee} from '~/components/PelMarquee';
+import {PelLogoMark} from '~/components/PelLogo';
 import {CartButton} from '~/components/home/CartButton';
 import {useAboutScene} from './useAboutScene';
 
@@ -72,7 +73,7 @@ function HeroNav() {
       </div>
       <div className="pel-nav__logo">
         <Link to="/" aria-label="Por El Deporte — home">
-          Por El Deporte
+          <PelLogoMark height={46} />
         </Link>
       </div>
       <div className="pel-nav__actions">

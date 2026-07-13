@@ -3,6 +3,15 @@ import type {Route} from './+types/collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {seoMeta, siteOrigin} from '~/lib/seo';
+
+export const meta: Route.MetaFunction = ({location, matches}) =>
+  seoMeta({
+    title: 'Por El Deporte | Collections',
+    description:
+      'Browse Por El Deporte collections — original club apparel and gear.',
+    url: `${siteOrigin(matches)}${location.pathname}`,
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -46,11 +55,14 @@ export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collections">
-      <h1>Collections</h1>
+    <div className="pel-collections">
+      <div className="pel-collections__head">
+        <div className="pel-legal__eyebrow">Browse</div>
+        <h1 className="pel-collections__title">Collections</h1>
+      </div>
       <PaginatedResourceSection<CollectionFragment>
         connection={collections}
-        resourcesClassName="collections-grid"
+        resourcesClassName="pel-collections__grid"
       >
         {({node: collection, index}) => (
           <CollectionItem
@@ -73,21 +85,23 @@ function CollectionItem({
 }) {
   return (
     <Link
-      className="collection-item"
+      className="pel-collections__card"
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
     >
-      {collection?.image && (
-        <Image
-          alt={collection.image.altText || collection.title}
-          aspectRatio="1/1"
-          data={collection.image}
-          loading={index < 3 ? 'eager' : undefined}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h5>{collection.title}</h5>
+      <div className="pel-collections__well">
+        {collection?.image && (
+          <Image
+            alt={collection.image.altText || collection.title}
+            aspectRatio="1/1"
+            data={collection.image}
+            loading={index < 3 ? 'eager' : undefined}
+            sizes="(min-width: 45em) 400px, 100vw"
+          />
+        )}
+      </div>
+      <h3 className="pel-collections__name">{collection.title}</h3>
     </Link>
   );
 }

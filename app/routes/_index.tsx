@@ -9,6 +9,7 @@ import {FunctionSection} from '~/components/home/FunctionSection';
 import {InstagramFeed} from '~/components/home/InstagramFeed';
 import {Testimonials} from '~/components/home/Testimonials';
 import {useHomeReveal} from '~/components/home/useHomeReveal';
+import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({matches}) => {
@@ -167,7 +168,7 @@ function Hero() {
         </div>
         <div className="pel-nav__logo">
           <Link to="/" aria-label="Por El Deporte — home">
-            Por El Deporte
+            <PelLogoMark height={46} />
           </Link>
         </div>
         <div className="pel-nav__actions">

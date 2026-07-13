@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {Link} from 'react-router';
+import {PelLogoMark} from '~/components/PelLogo';
 
 /**
  * The Por El Deporte site footer: scallop top edge, the big "Become Part of the
@@ -97,7 +98,7 @@ export function PelFooter() {
       <div className="pel-footer__body">
         <div className="pel-footer__lead">
           <Link to="/" className="pel-footer__logo" aria-label="Por El Deporte — home">
-            Por El Deporte
+            <PelLogoMark height={70} />
           </Link>
           <div className="pel-footer__hero">
             <h2 className="pel-footer__big" data-reveal>
