@@ -1,15 +1,29 @@
 /* Por El Deporte — About page, from About Page.dc.html */
 
-/* Built by the Community — card collage */
-.pel-community-scene {
+/* Built by the Community — pinned scroll scene (cards fly up on scroll;
+   the useAboutScene hook drives transforms and the reduced-motion fallback). */
+.pel-scene {
+  position: relative;
+  height: 440vh;
   background: var(--pel-cream);
-  padding: 90px 48px 100px;
 }
-.pel-community-scene__head {
+.pel-scene__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pel-scene__center {
+  position: relative;
+  z-index: 1;
   text-align: center;
-  margin: 0 auto 48px;
+  max-width: 1400px;
+  padding: 0 48px;
 }
-.pel-community-scene__badge {
+.pel-scene__badge {
   width: 66px;
   height: 66px;
   border-radius: 50%;
@@ -20,7 +34,7 @@
   justify-content: center;
   margin: 0 auto 26px;
 }
-.pel-community-scene__title {
+.pel-scene__title {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 650;
@@ -30,78 +44,86 @@
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
-.pel-community-scene__grid {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 28px;
+.pel-scene__cards {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
 }
-.pel-cc {
-  aspect-ratio: 4 / 5;
+.pel-scene-card {
+  position: absolute;
+  top: 0;
+  width: 322px;
+  height: 410px;
   border-radius: 26px;
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.17);
+  transform: translate(-50%, 120vh);
+  opacity: 0;
   overflow: hidden;
-  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.14);
   background: var(--pel-sand);
+  will-change: transform, opacity;
 }
-.pel-cc__img {
+.pel-scene-card--say {
+  width: 344px;
+  height: 434px;
+}
+.pel-scene-card__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
-.pel-cc__img--product {
+.pel-scene-card__img--product {
   object-fit: contain;
   padding: 26px;
+  box-sizing: border-box;
 }
-.pel-cc--say {
-  display: flex;
-}
-.pel-cc--dark {
+.pel-scene-card--dark {
   background: var(--pel-green);
-  border: var(--border-width) solid var(--pel-ink);
 }
-.pel-cc--light {
+.pel-scene-card--light {
   background: var(--pel-cream);
   border: var(--border-width) solid var(--pel-ink);
 }
-.pel-cc__say {
+.pel-scene-card__say {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
   padding: 30px;
+  box-sizing: border-box;
 }
-.pel-cc__title {
+.pel-scene-card__title {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 650;
-  font-size: clamp(24px, 2.3vw, 34px);
+  font-size: clamp(28px, 2.3vw, 42px);
   line-height: 1;
   letter-spacing: -0.01em;
   text-transform: uppercase;
 }
-.pel-cc__label {
+.pel-scene-card__label {
   margin: 0 0 8px;
   font: 700 13px/1.3 var(--font-body);
   letter-spacing: 0.04em;
 }
-.pel-cc__body {
+.pel-scene-card__body {
+  margin: 0;
   font: 700 13px/1.5 var(--font-body);
   letter-spacing: 0.01em;
 }
-.pel-cc--dark .pel-cc__title,
-.pel-cc--dark .pel-cc__label {
+.pel-scene-card--dark .pel-scene-card__title,
+.pel-scene-card--dark .pel-scene-card__label {
   color: var(--pel-cream);
 }
-.pel-cc--dark .pel-cc__body {
+.pel-scene-card--dark .pel-scene-card__body {
   color: rgba(247, 240, 222, 0.86);
 }
-.pel-cc--light .pel-cc__title,
-.pel-cc--light .pel-cc__label {
+.pel-scene-card--light .pel-scene-card__title,
+.pel-scene-card--light .pel-scene-card__label {
   color: var(--pel-ink);
 }
-.pel-cc--light .pel-cc__body {
+.pel-scene-card--light .pel-scene-card__body {
   color: rgba(23, 23, 23, 0.66);
 }
 
@@ -177,12 +199,15 @@
 }
 
 @media (max-width: 60em) {
-  .pel-community-scene {
-    padding: 56px 20px 64px;
+  .pel-scene-card {
+    width: min(280px, 78vw);
+    height: auto;
+    aspect-ratio: 322 / 410;
   }
-  .pel-community-scene__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+  .pel-scene-card--say {
+    width: min(300px, 86vw);
+    height: auto;
+    aspect-ratio: 344 / 434;
   }
   .pel-mission {
     grid-template-columns: 1fr;

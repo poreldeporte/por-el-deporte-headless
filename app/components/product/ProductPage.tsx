@@ -302,9 +302,12 @@ export function ProductPage({
         </div>
         <div className="pel-pdp__moments">
           <div className="pel-pdp__moments-track">
-            {[...MOMENTS, ...MOMENTS].map((m, i) => (
-              <div key={`${m.id}-${i}`} className="pel-pdp__moment">
-                <img src={m.src} alt={i < MOMENTS.length ? m.alt : ''} loading="lazy" />
+            {[
+              ...MOMENTS.map((m) => ({...m, key: `a-${m.id}`, dup: false})),
+              ...MOMENTS.map((m) => ({...m, key: `b-${m.id}`, dup: true})),
+            ].map((m) => (
+              <div key={m.key} className="pel-pdp__moment">
+                <img src={m.src} alt={m.dup ? '' : m.alt} loading="lazy" />
               </div>
             ))}
           </div>
