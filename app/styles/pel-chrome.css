@@ -484,6 +484,15 @@ main h1 {
     max-width: 100%;
     overflow-x: hidden;
   }
+  /* Hard-cap the layout containers so no over-wide section inflates page width
+     and pushes hero content off-center. */
+  main,
+  main > .pel-home,
+  .pel-hero,
+  .pel-hero__content {
+    max-width: 100vw;
+    overflow-x: clip;
+  }
   .pel-hide-mobile {
     display: none !important;
   }
