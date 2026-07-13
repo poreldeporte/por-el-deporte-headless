@@ -135,7 +135,6 @@ export function CommunityPanel() {
                 <div className="pel-community__app">
                   <div className="pel-community__badge">
                     <div className="pel-community__badge-shadow" />
-                    <div className="pel-community__badge-border" />
                     <div className="pel-community__badge-body">
                       <span>PED</span>
                     </div>

@@ -18,7 +18,7 @@ const COLLAGE: {
   backer: string;
 }[] = [
   {
-    pos: {left: '0', top: '0', width: '50%', aspectRatio: '1.6'},
+    pos: {left: '0', top: '0', width: '48.5%', aspectRatio: '1.5'},
     dx: -70,
     dy: 0,
     img: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=900',
@@ -26,7 +26,7 @@ const COLLAGE: {
     backer: '#d8cdbb',
   },
   {
-    pos: {left: '53%', top: '5%', width: '33%', aspectRatio: '1.25'},
+    pos: {left: '51.5%', top: '0', width: '48.5%', aspectRatio: '1.5'},
     dx: 70,
     dy: -34,
     img: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=800',
@@ -34,7 +34,7 @@ const COLLAGE: {
     backer: '#cfe3f2',
   },
   {
-    pos: {left: '1%', bottom: '0', width: '95%', aspectRatio: '1.42'},
+    pos: {left: '0', bottom: '0', width: '100%', aspectRatio: '1.55'},
     dx: 0,
     dy: 80,
     img: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=1200',

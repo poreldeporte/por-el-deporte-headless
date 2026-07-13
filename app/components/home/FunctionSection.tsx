@@ -119,7 +119,6 @@ export function FunctionSection() {
         <div key={cloud.text} className="pel-cloud" style={cloud.pos} data-reveal>
           <div className="pel-cloud__float">
             <div className="pel-cloud__shadow" />
-            <div className="pel-cloud__border" />
             <div className="pel-cloud__body">
               <span>{cloud.text}</span>
             </div>

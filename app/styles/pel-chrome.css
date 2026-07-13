@@ -355,21 +355,15 @@ main h1 {
 .pel-community__badge-shadow {
   position: absolute;
   inset: 0;
-  clip-path: url(#pelCloud);
+  border-radius: 24px;
   background: var(--pel-orange);
   transform: translate(4%, 5.5%);
 }
-.pel-community__badge-border {
-  position: absolute;
-  inset: 0;
-  clip-path: url(#pelCloud);
-  background: var(--pel-ink);
-}
 .pel-community__badge-body {
   position: absolute;
-  inset: 3px;
-  clip-path: url(#pelCloud);
-  background: var(--pel-cream);
+  inset: 0;
+  border-radius: 24px;
+  background: var(--pel-sand);
   display: flex;
   align-items: center;
   justify-content: center;

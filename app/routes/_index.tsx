@@ -6,6 +6,7 @@ import {CartButton} from '~/components/home/CartButton';
 import {About} from '~/components/home/About';
 import {Moods} from '~/components/home/Moods';
 import {FunctionSection} from '~/components/home/FunctionSection';
+import {InstagramFeed} from '~/components/home/InstagramFeed';
 import {Testimonials} from '~/components/home/Testimonials';
 import {useHomeReveal} from '~/components/home/useHomeReveal';
 
@@ -60,6 +61,7 @@ export default function Homepage() {
       <About />
       <Moods />
       <FunctionSection />
+      <InstagramFeed />
       <Testimonials />
     </div>
   );
