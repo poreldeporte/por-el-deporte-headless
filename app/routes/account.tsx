@@ -40,58 +40,51 @@ export default function AccountLayout() {
   const heading = customer
     ? customer.firstName
       ? `Welcome, ${customer.firstName}`
-      : `Welcome to your account.`
-    : 'Account Details';
+      : 'Welcome to your account'
+    : 'Account';
 
   return (
-    <div className="account">
-      <h1>{heading}</h1>
-      <br />
-      <AccountMenu />
-      <br />
-      <br />
-      <Outlet context={{customer}} />
+    <div className="pel-account">
+      <div className="pel-account__inner">
+        <div className="pel-account__head">
+          <div>
+            <div className="pel-legal__eyebrow">Your Account</div>
+            <h1 className="pel-account__title">{heading}</h1>
+          </div>
+          <Logout />
+        </div>
+        <AccountMenu />
+        <div className="pel-account__body">
+          <Outlet context={{customer}} />
+        </div>
+      </div>
     </div>
   );
 }
 
 function AccountMenu() {
-  function isActiveStyle({
-    isActive,
-    isPending,
-  }: {
-    isActive: boolean;
-    isPending: boolean;
-  }) {
-    return {
-      fontWeight: isActive ? 'bold' : undefined,
-      color: isPending ? 'grey' : 'black',
-    };
-  }
+  const cls = ({isActive}: {isActive: boolean}) =>
+    `pel-account__tab${isActive ? ' is-active' : ''}`;
 
   return (
-    <nav role="navigation">
-      <NavLink to="/account/orders" style={isActiveStyle}>
-        Orders &nbsp;
+    <nav className="pel-account__nav" role="navigation" aria-label="Account">
+      <NavLink to="/account/orders" className={cls}>
+        Orders
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/profile" style={isActiveStyle}>
-        &nbsp; Profile &nbsp;
+      <NavLink to="/account/profile" className={cls}>
+        Profile
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/addresses" style={isActiveStyle}>
-        &nbsp; Addresses &nbsp;
+      <NavLink to="/account/addresses" className={cls}>
+        Addresses
       </NavLink>
-      &nbsp;|&nbsp;
-      <Logout />
     </nav>
   );
 }
 
 function Logout() {
   return (
-    <Form className="account-logout" method="POST" action="/account/logout">
-      &nbsp;<button type="submit">Sign out</button>
+    <Form className="pel-account__logout" method="POST" action="/account/logout">
+      <button type="submit">Sign out</button>
     </Form>
   );
 }

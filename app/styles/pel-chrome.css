@@ -884,3 +884,167 @@ summary:focus-visible,
 .pel-search__results .search-results-item small {
   color: color-mix(in srgb, var(--pel-ink) 65%, transparent);
 }
+
+/* ── Account area (layout + all sub-pages) ───────────────────────────── */
+.pel-account {
+  min-height: 60vh;
+  padding: 48px 24px 96px;
+  background: var(--pel-cream);
+}
+.pel-account__inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.pel-account__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.pel-account__title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5.5vw, 46px);
+  color: var(--pel-ink);
+}
+.pel-account__logout button {
+  padding: 10px 20px;
+  border: 2px solid var(--pel-ink);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pel-ink);
+  font: 700 13px/1 var(--font-body);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s var(--ease-out);
+}
+.pel-account__logout button:hover {
+  background: var(--pel-sand);
+  transform: translateY(-2px);
+}
+.pel-account__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--pel-ink) 15%, transparent);
+  margin-bottom: 28px;
+}
+.pel-account__tab {
+  padding: 10px 20px;
+  border-radius: 999px;
+  font: 700 14px/1 var(--font-body);
+  color: var(--pel-ink);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.pel-account__tab:hover {
+  background: var(--pel-sand);
+}
+.pel-account__tab.is-active {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+
+/* Brand the (stock) sub-page markup rendered inside the account body. */
+.pel-account__body h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--pel-ink);
+  margin-bottom: 18px;
+}
+.pel-account__body fieldset {
+  border: 2px solid var(--pel-ink);
+  border-radius: 16px;
+  background: #fff;
+  padding: 22px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pel-account__body legend {
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pel-orange);
+  padding: 0 6px;
+}
+.pel-account__body label {
+  font-weight: 600;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--pel-ink) 75%, transparent);
+}
+.pel-account__body input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid color-mix(in srgb, var(--pel-ink) 30%, transparent);
+  border-radius: 10px;
+  background: var(--pel-cream);
+  font: 500 15px/1 var(--font-body);
+  color: var(--pel-ink);
+}
+.pel-account__body input:focus {
+  border-color: var(--pel-blue);
+  outline: none;
+}
+.pel-account__body button {
+  align-self: flex-start;
+  padding: 12px 26px;
+  border: 2px solid var(--pel-ink);
+  border-radius: 999px;
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  font: 700 14px/1 var(--font-body);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-out);
+}
+.pel-account__body button:hover {
+  transform: translateY(-2px);
+}
+.pel-account__body button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+.pel-account__body a {
+  color: var(--pel-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+.pel-account__body a:hover {
+  text-decoration: underline;
+}
+.pel-account__body mark {
+  background: color-mix(in srgb, var(--pel-orange) 20%, transparent);
+  color: var(--pel-ink);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.pel-account__body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.pel-account__body th,
+.pel-account__body td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--pel-ink) 12%, transparent);
+}
+/* Order search filter row */
+.pel-account__body .order-search-inputs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pel-account__body .order-search-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .pel-account {
+    padding: 32px 18px 72px;
+  }
+}
