@@ -3,10 +3,19 @@ import type {Route} from './+types/collections.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ShopPage} from '~/components/shop/ShopPage';
+import {seoMeta, siteOrigin} from '~/lib/seo';
 import shopStyles from '~/styles/shop.css?url';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Por El Deporte | ${data?.collection.title ?? 'Shop'}`}];
+export const meta: Route.MetaFunction = ({data, location, matches}) => {
+  const collection = data?.collection;
+  return seoMeta({
+    title: `Por El Deporte | ${collection?.title ?? 'Shop'}`,
+    description:
+      collection?.description ||
+      'Shop Por El Deporte apparel — original club designs, 100% cotton, free shipping.',
+    url: `${siteOrigin(matches)}${location.pathname}`,
+    image: collection?.image?.url,
+  });
 };
 
 export const links: Route.LinksFunction = () => [
@@ -28,7 +37,11 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   const [{collection}] = await Promise.all([
     storefront.query(SHOP_COLLECTION_QUERY, {
-      variables: {handle, first: 60},
+      // The Shop page filters client-side across the whole catalog (category
+      // chips), which is incompatible with server pagination. Fetch up to the
+      // Storefront API max (250) so nothing is silently dropped for a boutique
+      // catalog while preserving instant filtering.
+      variables: {handle, first: 250},
     }),
   ]);
 
@@ -79,6 +92,12 @@ const SHOP_PRODUCT_FRAGMENT = `#graphql
       maxVariantPrice {
         amount
         currencyCode
+      }
+    }
+    options {
+      name
+      optionValues {
+        name
       }
     }
     selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {

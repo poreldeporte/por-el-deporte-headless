@@ -1,9 +1,14 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {seoMeta, siteOrigin} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Por El Deporte | ${data?.page.title ?? ''}`}];
+export const meta: Route.MetaFunction = ({data, location, matches}) => {
+  return seoMeta({
+    title: `Por El Deporte | ${data?.page.title ?? ''}`,
+    description: data?.page.seo?.description,
+    url: `${siteOrigin(matches)}${location.pathname}`,
+  });
 };
 
 export async function loader(args: Route.LoaderArgs) {

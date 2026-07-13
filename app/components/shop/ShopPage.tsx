@@ -107,11 +107,35 @@ export function ShopPage({
       </section>
 
       <section className="pel-shop__grid-wrap" aria-label="Products">
-        <div className="pel-shop__grid">
-          {visible.map((product) => (
-            <ShopCard key={product.id} product={product} />
-          ))}
-        </div>
+        {visible.length ? (
+          <div className="pel-shop__grid">
+            {visible.map((product) => (
+              <ShopCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="pel-shop__empty">
+            <p className="pel-shop__empty-title">Nothing here yet.</p>
+            <p className="pel-shop__empty-sub">
+              {filter === 'All'
+                ? 'This collection has no products right now — check back soon.'
+                : `No ${filter.toLowerCase()} in this collection yet.`}
+            </p>
+            {filter === 'All' ? (
+              <Link to="/collections/all-products" className="pel-btn-outline">
+                Browse all gear
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className="pel-btn-outline"
+                onClick={() => setFilter('All')}
+              >
+                Show all styles
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="pel-values" aria-label="Core values">
@@ -141,6 +165,14 @@ function ShopCard({product}: {product: ShopProductFragment}) {
   const min = product.priceRange.minVariantPrice;
   const max = product.priceRange.maxVariantPrice;
   const varies = min.amount !== max.amount;
+  // Products with a real choice (size/color) can't be blind-added — the "+"
+  // takes the shopper to the PDP to pick. Single-variant items quick-add.
+  const needsChoice = product.options.some((o) => o.optionValues.length > 1);
+  const plusIcon = (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
 
   return (
     <div className="pel-shopcard">
@@ -164,15 +196,21 @@ function ShopCard({product}: {product: ShopProductFragment}) {
           </div>
         </div>
       </Link>
-      {variant?.availableForSale ? (
+      {needsChoice ? (
+        <Link
+          className="pel-shopcard__add"
+          to={to}
+          aria-label={`Choose options for ${product.title}`}
+        >
+          {plusIcon}
+        </Link>
+      ) : variant?.availableForSale ? (
         <AddToCartButton
           className="pel-shopcard__add"
           onClick={() => open('cart')}
           lines={[{merchandiseId: variant.id, quantity: 1}]}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
+          {plusIcon}
         </AddToCartButton>
       ) : null}
     </div>

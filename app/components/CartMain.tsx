@@ -1,5 +1,5 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import {Link, useFetchers} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
@@ -55,6 +55,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
       aria-label={layout === 'page' ? 'Cart page' : 'Cart drawer'}
     >
       <CartEmpty hidden={linesCount} layout={layout} />
+      <CartMessages />
       {layout === 'aside' && cartHasItems ? (
         <CartProgress
           subtotal={Number(cart?.cost?.subtotalAmount?.amount ?? 0)}
@@ -141,16 +142,56 @@ function CartEmpty({
 }) {
   const {close} = useAside();
   return (
-    <div hidden={hidden}>
-      <br />
-      <p>
-        Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-        started!
+    <div className="pel-cart-empty" hidden={hidden}>
+      <div className="pel-cart-empty__icon" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+          <path d="M6 8h12l-1 11H7z" />
+          <path d="M9 8V7a3 3 0 0 1 6 0v1" />
+        </svg>
+      </div>
+      <p className="pel-cart-empty__title">Your cart is empty</p>
+      <p className="pel-cart-empty__sub">
+        Looks like you haven&rsquo;t added anything yet — let&rsquo;s get you
+        kitted out.
       </p>
-      <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
-        Continue shopping →
+      <Link
+        to="/collections/all-products"
+        onClick={close}
+        prefetch="viewport"
+        className="pel-cart-empty__cta"
+      >
+        Shop all gear
       </Link>
+    </div>
+  );
+}
+
+type CartMsg = {message?: string | null};
+
+/**
+ * Surfaces cart mutation errors and warnings that the cart action returns
+ * ({errors, warnings}) but that were previously swallowed — e.g. an item that
+ * sold out mid-session, a quantity Shopify had to adjust, or an invalid
+ * discount code. Reads them off the active cart fetchers.
+ */
+function CartMessages() {
+  const fetchers = useFetchers();
+  const messages: string[] = [];
+  for (const fetcher of fetchers) {
+    const data = fetcher.data as
+      | {errors?: CartMsg[]; warnings?: CartMsg[]}
+      | undefined;
+    for (const item of [...(data?.errors ?? []), ...(data?.warnings ?? [])]) {
+      if (item?.message) messages.push(item.message);
+    }
+  }
+  const unique = Array.from(new Set(messages));
+  if (!unique.length) return null;
+  return (
+    <div className="pel-cart-msg" role="alert">
+      {unique.map((m) => (
+        <p key={m}>{m}</p>
+      ))}
     </div>
   );
 }

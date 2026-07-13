@@ -61,7 +61,7 @@ function CartButtonView({
         onClick={() => open('cart')}
       >
         {cartIcon}
-        <span className="pel-fab__badge">{count}</span>
+        {count > 0 ? <span className="pel-fab__badge">{count}</span> : null}
       </button>
     );
   }
@@ -71,7 +71,7 @@ function CartButtonView({
       Cart
       <span className="pel-cart">
         {cartIcon}
-        <span className="pel-cart-badge">{count}</span>
+        {count > 0 ? <span className="pel-cart-badge">{count}</span> : null}
       </span>
     </button>
   );

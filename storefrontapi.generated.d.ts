@@ -548,6 +548,11 @@ export type ShopProductFragment = Pick<
     minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
     maxVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
   };
+  options: Array<
+    Pick<StorefrontAPI.ProductOption, 'name'> & {
+      optionValues: Array<Pick<StorefrontAPI.ProductOptionValue, 'name'>>;
+    }
+  >;
   selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
   >;
@@ -591,6 +596,13 @@ export type ShopCollectionQuery = {
                 'amount' | 'currencyCode'
               >;
             };
+            options: Array<
+              Pick<StorefrontAPI.ProductOption, 'name'> & {
+                optionValues: Array<
+                  Pick<StorefrontAPI.ProductOptionValue, 'name'>
+                >;
+              }
+            >;
             selectedOrFirstAvailableVariant?: StorefrontAPI.Maybe<
               Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'>
             >;
@@ -1275,7 +1287,7 @@ interface GeneratedQueryTypes {
     return: BlogsQuery;
     variables: BlogsQueryVariables;
   };
-  '#graphql\n  #graphql\n  fragment ShopProduct on Product {\n    id\n    title\n    handle\n    productType\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n      maxVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n      id\n      availableForSale\n    }\n  }\n\n  query ShopCollection(\n    $handle: String!\n    $first: Int!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      products(first: $first) {\n        nodes {\n          ...ShopProduct\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  #graphql\n  fragment ShopProduct on Product {\n    id\n    title\n    handle\n    productType\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n      maxVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    options {\n      name\n      optionValues {\n        name\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n      id\n      availableForSale\n    }\n  }\n\n  query ShopCollection(\n    $handle: String!\n    $first: Int!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      image {\n        id\n        url\n        altText\n        width\n        height\n      }\n      products(first: $first) {\n        nodes {\n          ...ShopProduct\n        }\n      }\n    }\n  }\n': {
     return: ShopCollectionQuery;
     variables: ShopCollectionQueryVariables;
   };

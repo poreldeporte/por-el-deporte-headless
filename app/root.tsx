@@ -72,11 +72,21 @@ export function links() {
       href: 'https://fonts.gstatic.com',
       crossOrigin: 'anonymous',
     },
+    // Preload the self-hosted display font — it drives the above-the-fold hero
+    // H1, so fetching it early avoids the late CSS-discovered swap (FOUT).
+    {
+      rel: 'preload',
+      href: '/fonts/TAYFlapjack.woff2',
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous',
+    },
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Montserrat:wght@500;600;700;800&display=swap',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'apple-touch-icon', href: favicon},
   ];
 }
 
@@ -92,6 +102,7 @@ export async function loader(args: Route.LoaderArgs) {
   return {
     ...deferredData,
     ...criticalData,
+    origin: new URL(args.request.url).origin,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     shop: getShopAnalytics({
       storefront,
@@ -164,6 +175,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="theme-color" content="#F7F0DE" />
         <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
@@ -205,25 +217,36 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  let errorMessage = 'Unknown error';
   let errorStatus = 500;
 
   if (isRouteErrorResponse(error)) {
-    errorMessage = error?.data?.message ?? error.data;
     errorStatus = error.status;
-  } else if (error instanceof Error) {
-    errorMessage = error.message;
   }
 
+  const is404 = errorStatus === 404;
+
   return (
-    <div className="route-error">
-      <h1>Oops</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
-      )}
+    <div className="pel-error">
+      <a href="/" className="pel-error__logo" aria-label="Por El Deporte — home">
+        Por El Deporte
+      </a>
+      <div className="pel-error__code">{errorStatus}</div>
+      <h1 className="pel-error__title">
+        {is404 ? 'Off the pitch' : 'Something went wrong'}
+      </h1>
+      <p className="pel-error__msg">
+        {is404
+          ? "We couldn't find that page — but there's plenty of gear waiting for you."
+          : 'An unexpected error occurred. Try again in a moment, or head back home.'}
+      </p>
+      <div className="pel-error__cta">
+        <a href="/" className="pel-error__btn">
+          Back home
+        </a>
+        <a href="/collections/all-products" className="pel-error__btn pel-error__btn--ghost">
+          Shop all gear
+        </a>
+      </div>
     </div>
   );
 }

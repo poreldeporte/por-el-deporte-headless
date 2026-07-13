@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router';
 import {Image, Money, type MappedProductOptions} from '@shopify/hydrogen';
 import type {ProductFragment} from 'storefrontapi.generated';
@@ -61,11 +61,26 @@ export function ProductPage({
         ? [selectedVariant.image]
         : [];
   const [activeImg, setActiveImg] = useState(0);
+
+  // Keep the gallery in sync with the selected variant: when the shopper picks a
+  // different color/variant, jump the stage to that variant's image (if it's in
+  // the gallery) instead of leaving the previous image showing.
+  const variantImageId = selectedVariant?.image?.id;
+  const variantIndex = variantImageId
+    ? images.findIndex((im) => im.id === variantImageId)
+    : -1;
+  useEffect(() => {
+    if (variantIndex >= 0) setActiveImg(variantIndex);
+  }, [variantImageId, variantIndex]);
+
   const main = images[activeImg] ?? selectedVariant?.image ?? images[0];
 
   const available = Boolean(selectedVariant?.availableForSale);
   const unitAmount = Number(selectedVariant?.price?.amount ?? 0);
-  const totalLabel = `$${(unitAmount * qty).toFixed(0)}`;
+  const currencyCode = selectedVariant?.price?.currencyCode ?? 'USD';
+  // Real total: keep cents and honor the variant's currency (was `$${…toFixed(0)}`
+  // which rounded $29.99 → "$30" and hardcoded the dollar sign).
+  const totalMoney = {amount: (unitAmount * qty).toFixed(2), currencyCode};
 
   return (
     <div className="pel-pdp">
@@ -223,7 +238,13 @@ export function ProductPage({
                   : []
               }
             >
-              {available ? `Add to Cart — ${totalLabel}` : 'Sold Out'}
+              {available ? (
+                <>
+                  Add to Cart — <Money data={totalMoney} as="span" />
+                </>
+              ) : (
+                'Sold Out'
+              )}
             </AddToCartButton>
           </div>
 

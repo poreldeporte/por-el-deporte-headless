@@ -10,14 +10,50 @@ import {
 } from '@shopify/hydrogen';
 import {ProductPage} from '~/components/product/ProductPage';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {seoMeta, siteOrigin} from '~/lib/seo';
 import productStyles from '~/styles/product.css?url';
 
-export const meta: Route.MetaFunction = ({data}) => {
+export const meta: Route.MetaFunction = ({data, location, matches}) => {
+  const product = data?.product;
+  if (!product) return seoMeta({title: 'Por El Deporte'});
+
+  const origin = siteOrigin(matches);
+  const variant = product.selectedOrFirstAvailableVariant;
+  const description =
+    product.seo?.description ||
+    product.description ||
+    `Shop the ${product.title} from Por El Deporte.`;
+
   return [
-    {title: `Por El Deporte | ${data?.product.title ?? ''}`},
+    ...seoMeta({
+      title: `Por El Deporte | ${product.seo?.title || product.title}`,
+      description,
+      url: `${origin}${location.pathname}`,
+      image: product.images.nodes[0]?.url,
+      type: 'product',
+    }),
+    // schema.org/Product JSON-LD → price & availability rich results in Google.
     {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.title,
+        description,
+        image: product.images.nodes.map((n) => n.url),
+        brand: {'@type': 'Brand', name: product.vendor || 'Por El Deporte'},
+        sku: variant?.sku || undefined,
+        offers: variant
+          ? {
+              '@type': 'Offer',
+              price: variant.price.amount,
+              priceCurrency: variant.price.currencyCode,
+              availability: variant.availableForSale
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+              url: `${origin}${location.pathname}`,
+            }
+          : undefined,
+      },
     },
   ];
 };

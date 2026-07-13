@@ -9,7 +9,6 @@ import {Aside} from '~/components/Aside';
 import {HeaderMenu} from '~/components/Header';
 import {PelHeader} from '~/components/PelHeader';
 import {PelFooter} from '~/components/PelFooter';
-import {CloudDefs} from '~/components/home/CloudDefs';
 import {CartButton} from '~/components/home/CartButton';
 import {CommunityPanel} from '~/components/home/CommunityPanel';
 import {CartMain} from '~/components/CartMain';
@@ -42,7 +41,6 @@ export function PageLayout({
 
   return (
     <Aside.Provider>
-      <CloudDefs />
       <CartAside cart={cart} />
       <SearchAside />
       <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />

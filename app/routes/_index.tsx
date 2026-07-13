@@ -9,16 +9,17 @@ import {FunctionSection} from '~/components/home/FunctionSection';
 import {InstagramFeed} from '~/components/home/InstagramFeed';
 import {Testimonials} from '~/components/home/Testimonials';
 import {useHomeReveal} from '~/components/home/useHomeReveal';
+import {seoMeta, siteOrigin} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Por El Deporte | Miami Soccer Apparel & Community'},
-    {
-      name: 'description',
-      content:
-        'Beyond the game — building community and creating memories in Key Biscayne since 2014. Shop Por El Deporte apparel.',
-    },
-  ];
+export const meta: Route.MetaFunction = ({matches}) => {
+  return seoMeta({
+    title: 'Por El Deporte | Miami Soccer Apparel & Community',
+    description:
+      'Beyond the game — building community and creating memories in Key Biscayne since 2014. Shop Por El Deporte apparel.',
+    url: siteOrigin(matches) || undefined,
+    image:
+      'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=1200',
+  });
 };
 
 // The rail is merchant-controlled: point this at any collection you curate in
@@ -170,13 +171,13 @@ function Hero() {
           </Link>
         </div>
         <div className="pel-nav__actions">
-          <button type="button" className="pel-pill pel-hide-mobile" title="Accounts — coming soon">
+          <Link to="/account" className="pel-pill pel-hide-mobile">
             Account
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="12" cy="8" r="3.4" />
               <path d="M5.5 20c.5-3.5 3.5-5 6.5-5s6 1.5 6.5 5" />
             </svg>
-          </button>
+          </Link>
           <CartButton variant="pill" />
         </div>
       </nav>
