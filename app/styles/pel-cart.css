@@ -186,3 +186,66 @@ aside header .close:hover {
   font: 600 12px/1 var(--font-body);
   background: var(--pel-white);
 }
+
+/* ── Spend-more discount progress bar (drawer top) ── */
+.pel-cartprog {
+  padding: 22px 24px 8px;
+  border-bottom: 1px solid var(--border-soft);
+  margin: 0 4px;
+}
+.pel-cartprog__line {
+  margin-bottom: 20px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.pel-cartprog__bar {
+  position: relative;
+  height: 5px;
+  background: rgba(23, 23, 23, 0.15);
+  border-radius: var(--radius-pill);
+  margin: 0 8px 40px;
+}
+.pel-cartprog__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--pel-orange);
+  border-radius: var(--radius-pill);
+  transition: width var(--dur-med);
+}
+.pel-cartprog__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+}
+.pel-cartprog__dot {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur-fast);
+}
+.pel-cartprog__dot.is-hit {
+  background: var(--pel-orange);
+}
+.pel-cartprog__dot span {
+  position: absolute;
+  top: 44px;
+  white-space: nowrap;
+  font: 700 9px/1 var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}

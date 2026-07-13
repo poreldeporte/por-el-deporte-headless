@@ -55,6 +55,11 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
       aria-label={layout === 'page' ? 'Cart page' : 'Cart drawer'}
     >
       <CartEmpty hidden={linesCount} layout={layout} />
+      {layout === 'aside' && cartHasItems ? (
+        <CartProgress
+          subtotal={Number(cart?.cost?.subtotalAmount?.amount ?? 0)}
+        />
+      ) : null}
       <div className="cart-details">
         <p id="cart-lines" className="sr-only">
           Line items
@@ -83,6 +88,48 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
         {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
     </section>
+  );
+}
+
+const CART_MILESTONES = [
+  {at: 75, off: '5%'},
+  {at: 150, off: '10%'},
+  {at: 225, off: '15%'},
+  {at: 300, off: '20%'},
+  {at: 400, off: '25%'},
+];
+
+/** Free-shipping / spend-more discount progress bar shown atop the cart drawer. */
+function CartProgress({subtotal}: {subtotal: number}) {
+  const last = CART_MILESTONES[CART_MILESTONES.length - 1].at;
+  const pct = Math.min(100, (subtotal / last) * 100);
+  const next = CART_MILESTONES.find((m) => m.at > subtotal);
+  const away = next ? Math.ceil(next.at - subtotal) : 0;
+  return (
+    <div className="pel-cartprog">
+      <div className="pel-cartprog__line">
+        {next
+          ? `You are $${away} away from getting ${next.off} off!`
+          : 'You unlocked 25% off your order!'}
+      </div>
+      <div className="pel-cartprog__bar">
+        <div className="pel-cartprog__fill" style={{width: `${pct}%`}} />
+        <div className="pel-cartprog__dots">
+          {CART_MILESTONES.map((m) => (
+            <div
+              key={m.at}
+              className={`pel-cartprog__dot${subtotal >= m.at ? ' is-hit' : ''}`}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                <path d="M11 4H5a1 1 0 0 0-1 1v6l9 9 7-7-9-9z" />
+                <path d="M7.5 8.5h.01" />
+              </svg>
+              <span>{m.off} off</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
