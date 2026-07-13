@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {useOptimisticCart} from '@shopify/hydrogen';
 import {Link, useFetchers} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
@@ -176,6 +177,10 @@ type CartMsg = {message?: string | null};
  */
 function CartMessages() {
   const fetchers = useFetchers();
+  // The cart drawer stays mounted for the whole session, so fetcher.data (and
+  // its errors/warnings) persists after a problem is resolved. Track dismissed
+  // messages so a resolved issue can be cleared and doesn't nag on every reopen.
+  const [dismissed, setDismissed] = useState<string[]>([]);
   const messages: string[] = [];
   for (const fetcher of fetchers) {
     const data = fetcher.data as
@@ -185,12 +190,24 @@ function CartMessages() {
       if (item?.message) messages.push(item.message);
     }
   }
-  const unique = Array.from(new Set(messages));
-  if (!unique.length) return null;
+  const visible = Array.from(new Set(messages)).filter(
+    (m) => !dismissed.includes(m),
+  );
+  if (!visible.length) return null;
   return (
     <div className="pel-cart-msg" role="alert">
-      {unique.map((m) => (
-        <p key={m}>{m}</p>
+      {visible.map((m) => (
+        <p key={m}>
+          <span>{m}</span>
+          <button
+            type="button"
+            className="pel-cart-msg__close"
+            aria-label="Dismiss message"
+            onClick={() => setDismissed((d) => [...d, m])}
+          >
+            ×
+          </button>
+        </p>
       ))}
     </div>
   );

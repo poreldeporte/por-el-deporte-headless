@@ -54,18 +54,25 @@ export function ProductPage({
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
 
+  const variantImage = selectedVariant?.image;
+  const baseImages = product.images?.nodes?.length ? product.images.nodes : [];
+  // Always include the selected variant's image in the gallery — it can sit
+  // beyond the fetched product media, in which case findIndex would miss it and
+  // the stage would keep showing the wrong colour. Prepending guarantees the
+  // gallery can follow the variant.
   const images =
-    product.images?.nodes?.length
-      ? product.images.nodes
-      : selectedVariant?.image
-        ? [selectedVariant.image]
-        : [];
+    variantImage && !baseImages.some((im) => im.id === variantImage.id)
+      ? [variantImage, ...baseImages]
+      : baseImages.length
+        ? baseImages
+        : variantImage
+          ? [variantImage]
+          : [];
   const [activeImg, setActiveImg] = useState(0);
 
   // Keep the gallery in sync with the selected variant: when the shopper picks a
-  // different color/variant, jump the stage to that variant's image (if it's in
-  // the gallery) instead of leaving the previous image showing.
-  const variantImageId = selectedVariant?.image?.id;
+  // different color/variant, jump the stage to that variant's image.
+  const variantImageId = variantImage?.id;
   const variantIndex = variantImageId
     ? images.findIndex((im) => im.id === variantImageId)
     : -1;
@@ -73,7 +80,7 @@ export function ProductPage({
     if (variantIndex >= 0) setActiveImg(variantIndex);
   }, [variantImageId, variantIndex]);
 
-  const main = images[activeImg] ?? selectedVariant?.image ?? images[0];
+  const main = images[activeImg] ?? variantImage ?? images[0];
 
   const available = Boolean(selectedVariant?.availableForSale);
   const unitAmount = Number(selectedVariant?.price?.amount ?? 0);

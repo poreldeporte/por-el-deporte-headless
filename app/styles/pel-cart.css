@@ -305,10 +305,28 @@ aside header .close:hover {
   border: 1.5px solid var(--pel-orange);
 }
 .pel-cart-msg p {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
   font-size: 13px;
   line-height: 1.45;
   color: var(--pel-ink);
 }
 .pel-cart-msg p + p {
   margin-top: 6px;
+}
+.pel-cart-msg__close {
+  flex: none;
+  border: 0;
+  background: transparent;
+  color: var(--pel-ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.6;
+}
+.pel-cart-msg__close:hover {
+  opacity: 1;
 }

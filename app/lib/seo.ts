@@ -61,7 +61,12 @@ export function seoMeta({
   }
 
   if (url) {
-    tags.push({rel: 'canonical', href: url}, {property: 'og:url', content: url});
+    // `tagName: 'link'` is required — without it React Router's <Meta /> emits
+    // `<meta rel="canonical">`, which crawlers ignore. og:url stays a meta.
+    tags.push(
+      {tagName: 'link', rel: 'canonical', href: url},
+      {property: 'og:url', content: url},
+    );
   }
 
   if (image) {
