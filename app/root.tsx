@@ -72,15 +72,6 @@ export function links() {
       href: 'https://fonts.gstatic.com',
       crossOrigin: 'anonymous',
     },
-    // Preload the self-hosted display font — it drives the above-the-fold hero
-    // H1, so fetching it early avoids the late CSS-discovered swap (FOUT).
-    {
-      rel: 'preload',
-      href: '/fonts/TAYFlapjack.woff2',
-      as: 'font',
-      type: 'font/woff2',
-      crossOrigin: 'anonymous',
-    },
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Montserrat:wght@500;600;700;800&display=swap',

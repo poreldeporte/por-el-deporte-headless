@@ -24,7 +24,15 @@ export default async function handleRequest(
     // - Google Fonts stylesheet (googleapis) + font files (gstatic)
     // - hero/editorial imagery served from the primary domain poreldeporte.com
     styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-    fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+    // In production Vite/Oxygen rewrites the self-hosted Flapjack @font-face URL
+    // to cdn.shopify.com, so it must be allowed here or the browser blocks the
+    // font (CSP violation) and falls back to the serif.
+    fontSrc: [
+      "'self'",
+      'data:',
+      'https://fonts.gstatic.com',
+      'https://cdn.shopify.com',
+    ],
     imgSrc: [
       "'self'",
       'data:',
