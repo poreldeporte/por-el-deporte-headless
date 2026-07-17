@@ -3,6 +3,7 @@ import {isbot} from 'isbot';
 import {renderToReadableStream} from 'react-dom/server';
 import {
   createContentSecurityPolicy,
+  storefrontRedirect,
   type HydrogenRouterContextProvider,
 } from '@shopify/hydrogen';
 import type {EntryContext} from 'react-router';
@@ -57,8 +58,17 @@ export default async function handleRequest(
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
 
-  return new Response(body, {
+  const response = new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,
+  });
+
+  // On a 404, fall back to Shopify's admin URL Redirects (Settings → Navigation)
+  // so legacy online-store links and backlinks 301 to the new storefront instead
+  // of dead-ending — important when migrating an existing store.
+  return storefrontRedirect({
+    request,
+    response,
+    storefront: context.storefront,
   });
 }
