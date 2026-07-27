@@ -49,6 +49,22 @@ Last updated: 2026-07-27.
   - [ ] Bad URL (e.g. `/nope`) → branded **404**
 - [ ] Note & fix anything still off (the "couple other things").
 
+## Automated verification
+
+```bash
+./scripts/verify-launch.sh                      # production env URL (default)
+./scripts/verify-launch.sh https://poreldeporte.com   # after the cutover
+```
+
+Covers every HTTP-checkable item: route statuses, the Flapjack CSP fix + the
+actual font file, canonical/OG/JSON-LD, robots + sitemap, add-to-cart → checkout
+URL, branded 404. Exits non-zero if anything fails. On an `*.o2.myshopify.dev`
+host it reports the suppressed robots/sitemap as INFO rather than FAIL.
+
+As of `bf6874e`, pre-redeploy, it reports **26 pass / 2 fail / 2 info** — and
+both failures are exactly what the pending redeploy fixes (CSP `font-src`, and
+the `/policies` `<title>`). After the redeploy both should flip to PASS.
+
 ## Smoke-test results (2026-07-27, HTTP level)
 
 ### Verified working
