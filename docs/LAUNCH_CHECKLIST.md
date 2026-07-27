@@ -8,9 +8,13 @@ Last updated: 2026-07-27.
   Production Oxygen environment.** `poreldeporte.com` is **still the old themed
   store — untouched.**
 - **Blocking the smoke-test:** a CSP font bug was found and fixed in code
-  (`cd5b640`, on `main`) but **needs a redeploy** to take effect.
+  (`cd5b640`, on `main`) but **needs a redeploy** to take effect. The fix has
+  since been **verified correct at the build + CDN level** — see
+  "Smoke-test results" below.
+- The **HTTP-level smoke-test is done**; two small real bugs were found and
+  fixed (uncommitted). Only browser-visual checks remain.
 - **Next action (you):** `npx shopify hydrogen deploy --env production`, then
-  hard-refresh the env URL and finish the smoke-test.
+  hard-refresh the env URL and do the browser-visual pass.
 
 ## Key URLs & commands
 - **Repo:** `github.com/poreldeporte/por-el-deporte-headless` — working branch `main`.
@@ -32,14 +36,74 @@ Last updated: 2026-07-27.
 - [x] Deploy to **Production** Oxygen environment.
 - [x] Make the **Production environment Public** (Storefront settings →
       Environments → Production → URL privacy → Public).
-- [ ] **Redeploy** to pick up the font CSP fix (`cd5b640`). ← DO THIS NEXT
-- [ ] Smoke-test on the env URL (desktop + phone):
-  - [ ] Home renders with **real logo + Flapjack** headings
+- [ ] **Redeploy** to pick up the font CSP fix (`cd5b640`) **+ the two fixes
+      below**. ← DO THIS NEXT
+- [x] **HTTP-level smoke-test done** (33-route sweep vs the live env URL, plus a
+      local `npm run preview` control to separate app bugs from Oxygen
+      preview-domain behaviour). Findings recorded below.
+- [ ] Smoke-test on the env URL (desktop + phone) — **browser-only items left**:
+  - [ ] Home renders with **real logo + Flapjack** headings ← the redeploy fix
   - [ ] Product → color swatches (gallery follows) → Add to Cart → drawer →
         **checkout reaches Shopify**
   - [ ] `/collections/all-products`, `/search?q=tee`, `/policies`, `/account`
   - [ ] Bad URL (e.g. `/nope`) → branded **404**
 - [ ] Note & fix anything still off (the "couple other things").
+
+## Smoke-test results (2026-07-27, HTTP level)
+
+### Verified working
+- **Font CSP fix is correct and sufficient.** Oxygen rewrites the `@font-face`
+  URL at **deploy** time (not in the local Vite build, which keeps `/fonts/…`)
+  to `cdn.shopify.com/oxygen-v2/<ids>/fonts/TAYFlapjack.woff2` — that URL
+  returns **200**, and the live `font-src` is still the pre-fix value. So the
+  only thing standing between us and Flapjack is the redeploy.
+- **Cart → checkout works end-to-end.** `LinesAdd` → cart holds "El Clásico Tee
+  / Bay / S" qty 1 with a live `checkoutUrl` (verified against the Storefront
+  API, then re-verified rendering on the cart page).
+- **Search works** — `?q=tee` returns the 9 tees, relevance-ordered; results are
+  brand-styled via `.pel-search__results .search-result*` descendant rules.
+- **Branded 404** — `pel-error__*` with the wordmark logo (the header `<img>`
+  is absent by design; it falls back to the wordmark).
+- Real logo from `shop.brand.logo`, canonical `<link>`, OG/Twitter, and Product
+  JSON-LD (`Product`/`Offer`/`Brand`) all present. 33-route sweep: no unexpected
+  statuses. No password protection on the store.
+
+### Fixed in this pass (⚠️ uncommitted — included in your next deploy)
+- `/policies` had **no `<title>`** — `policies._index.tsx` was the only route
+  missing a `meta` export. Added one via `seoMeta()` (title + description +
+  canonical + OG/Twitter), matching its sibling routes.
+- `/cart` page `<h1>` was falling back to `reset.css` (generic 1.6rem bold)
+  instead of the eyebrow + display-title pattern every other page uses. Added
+  `.cart__eyebrow` / `.cart__title`.
+- `typecheck`, `lint`, `build` all green after both.
+
+### Not bugs — verified, do not "fix"
+- **`robots.txt` serves `Disallow: /` and `/sitemap.xml` 404s on the env URL.**
+  This is Shopify suppressing SEO surfaces on a preview domain (same reason
+  `x-robots-tag: none` is set). Locally both are correct: a 2125-byte robots.txt
+  with a `Sitemap:` line, and a valid `<sitemapindex>`.
+  **→ Re-verify both on `poreldeporte.com` right after the Phase C cutover.**
+- A nonsense query (`?q=zzzznomatch`) returns 8 unrelated products. This is
+  Shopify's own search API returning a fallback set — reproduced identically for
+  three different random strings straight against the API. Side effect: the
+  "No results for …" empty state can never trigger for product searches.
+- `/favicon.ico` 404s — the app ships an SVG favicon, which is fine for modern
+  browsers. Adding an `.ico` is optional.
+- Canonical currently points at the `o2.myshopify.dev` origin; it is derived
+  from the request origin, so it becomes `poreldeporte.com` after cutover.
+
+### Needs your action in Shopify admin (not code)
+- **`/policies/shipping-policy` and `/policies/terms-of-service` 404** because
+  they are not defined in the store — only Privacy and Refund exist, and the
+  `/policies` index correctly lists just those two. For a store shipping
+  physical goods, a Shipping Policy and Terms of Service are worth adding
+  before launch (Settings → Policies).
+
+### Known, left alone deliberately
+- The branded 404 has no `<title>` (browser tab shows the URL). Root's
+  `ErrorBoundary` bypasses route `meta`, and React is 18.3 so `<title>` does not
+  hoist from the body. Fixing it means touching root meta for every page —
+  disproportionate risk mid-launch. Backlog.
 
 ### Phase C — The cutover (⚠️ irreversible / customer-facing — DO NOT start until B passes)
 - [ ] Online Store → Preferences → confirm **password protection is OFF**

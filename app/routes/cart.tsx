@@ -106,7 +106,8 @@ export default function Cart() {
 
   return (
     <div className="cart">
-      <h1>Cart</h1>
+      <div className="cart__eyebrow">Por El Deporte</div>
+      <h1 className="cart__title">Your Cart</h1>
       <CartMain layout="page" cart={cart} />
     </div>
   );
