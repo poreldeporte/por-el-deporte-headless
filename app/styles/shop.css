@@ -245,11 +245,14 @@
   top: 0;
   z-index: 1;
   background: var(--pel-cream);
-  min-height: min(100vh, 900px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 80px 48px;
+  /* Height comes from the 3-column card row, not a reserved viewport. The
+     bottom pad has to clear .pel-footer__scallop, which rises 7.2vw up into
+     this section — without it the scalloped edge crops the cards. (That used
+     to be hidden by ~445px of dead space from a min-height of min(100vh,900px).) */
+  padding: 80px 48px calc(7.2vw + 48px);
 }
 .pel-values__inner {
   max-width: var(--container);
@@ -315,8 +318,7 @@
     gap: 22px 14px;
   }
   .pel-values {
-    padding: 56px 20px;
-    min-height: 0;
+    padding: 56px 20px calc(7.2vw + 34px);
   }
   .pel-values__grid {
     grid-template-columns: 1fr;
