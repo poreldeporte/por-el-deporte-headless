@@ -54,7 +54,13 @@ export function useHomeReveal() {
           const s = el.dataset.scale ?? '0.9';
           const rot = el.dataset.rot ?? '0';
           el.style.opacity = '0';
-          el.style.transform = `translate(${dx}px, ${dy}px) scale(${s}) rotate(${rot}deg)`;
+          // Must use translateX/translateY, NOT the translate(x, y) shorthand.
+          // anime.js parses the existing transform into a Map keyed by function
+          // name, then rebuilds the string from that Map on every frame. It
+          // animates `translateX`/`translateY`, so a `translate` entry is a key
+          // it never writes to — it survives to the end and permanently offsets
+          // the element (the reveal fades in but never slides home).
+          el.style.transform = `translateX(${dx}px) translateY(${dy}px) scale(${s}) rotate(${rot}deg)`;
           el.style.willChange = 'opacity, transform';
         });
       });

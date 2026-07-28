@@ -204,8 +204,13 @@
   letter-spacing: 0.02em;
   color: var(--pel-ink);
 }
-/* the AddToCartButton renders a <form>; float it into the card corner */
-.pel-shopcard form {
+/* Float the "+" affordance into the card corner, per the design (top/right 14px).
+   It comes in two shapes: a <form>-wrapped button for single-variant products,
+   and a bare <Link> to the PDP for multi-variant ones. Match both, but only as
+   DIRECT children — otherwise the single-variant <button> inside the positioned
+   <form> would get offset a second 14px from the form's own corner. */
+.pel-shopcard > form,
+.pel-shopcard > .pel-shopcard__add {
   position: absolute;
   top: 14px;
   right: 14px;

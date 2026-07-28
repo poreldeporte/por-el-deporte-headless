@@ -16,6 +16,8 @@ const COLLAGE: {
   img: string;
   alt: string;
   backer: string;
+  /** Orange backer offset. The design gives the big bottom frame a deeper one. */
+  shadow: string;
 }[] = [
   {
     pos: {left: '0', top: '0', width: '48.5%', aspectRatio: '1.5'},
@@ -24,6 +26,7 @@ const COLLAGE: {
     img: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=900',
     alt: 'El Clásico Tee on the pitch',
     backer: '#d8cdbb',
+    shadow: 'translate(10px, 12px)',
   },
   {
     pos: {left: '51.5%', top: '0', width: '48.5%', aspectRatio: '1.5'},
@@ -32,6 +35,7 @@ const COLLAGE: {
     img: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=800',
     alt: 'The Island Bucket hat',
     backer: '#cfe3f2',
+    shadow: 'translate(10px, 12px)',
   },
   {
     pos: {left: '0', bottom: '0', width: '100%', aspectRatio: '1.55'},
@@ -40,6 +44,7 @@ const COLLAGE: {
     img: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=1200',
     alt: 'The Por El Deporte community',
     backer: '#e7ded0',
+    shadow: 'translate(12px, 14px)',
   },
 ];
 
@@ -66,7 +71,10 @@ export function About() {
               data-dy={c.dy}
               data-scale="0.9"
             >
-              <div className="pel-collage__shadow" />
+              <div
+                className="pel-collage__shadow"
+                style={{transform: c.shadow}}
+              />
               <div className="pel-collage__frame" style={{background: c.backer}}>
                 <img src={c.img} alt={c.alt} loading="lazy" />
               </div>
