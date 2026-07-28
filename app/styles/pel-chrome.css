@@ -230,6 +230,94 @@ main h1 {
   cursor: default;
 }
 
+/* ===== Subpage banner =====
+   The design uses one "SUBPAGE BANNER" pattern for the interior pages — same
+   geometry, gradient and type on About as on the Shop banner. It lives in this
+   global sheet (not a route stylesheet) so any route can use it; `shop.css` is
+   only loaded on the shop route, so About could never have reused it there.
+   About additionally crossfades between several frames; a single static frame
+   just renders the first slide. */
+.pel-subhero {
+  position: relative;
+  min-height: min(48vh, 520px);
+  background: var(--pel-black);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pel-subhero__slides {
+  position: absolute;
+  inset: 0;
+}
+.pel-subhero__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.pel-subhero__slide.is-active {
+  opacity: 1;
+}
+.pel-subhero__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.42),
+    rgba(10, 10, 10, 0.3) 45%,
+    rgba(10, 10, 10, 0.55)
+  );
+}
+.pel-subhero__inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 64px 48px;
+}
+.pel-subhero__eyebrow {
+  margin: 0 0 20px;
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pel-cream);
+}
+.pel-subhero__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  color: var(--pel-cream);
+  font-size: clamp(52px, 8vw, 132px);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-shadow: 0 3px 26px rgba(0, 0, 0, 0.3);
+}
+.pel-subhero__sub {
+  margin: 26px auto 0;
+  max-width: 560px;
+  font: 700 13px/1.7 var(--font-body);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pel-cream);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* The rotation itself is also disabled in JS; this covers the first paint. */
+  .pel-subhero__slide {
+    transition: none;
+  }
+}
+@media (max-width: 60em) {
+  .pel-subhero__inner {
+    padding: 48px 20px;
+  }
+}
+
 /* ===== Cart page (/cart) ===== */
 .cart {
   max-width: var(--container);

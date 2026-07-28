@@ -33,11 +33,13 @@ export function PageLayout({
   header,
   publicStoreDomain,
 }: PageLayoutProps) {
-  // The homepage and About page carry their own transparent nav over a hero;
-  // every other page gets the solid branded PelHeader. The branded footer, cart
-  // FAB, and cloud clip-path defs are global.
+  // Only the homepage carries its own transparent nav over a full-bleed hero;
+  // every other page gets the solid branded PelHeader. (About used to be in this
+  // list because it cloned that hero — it now uses the design's subpage banner,
+  // which sits BELOW the standard header, same as the Shop banner.) The branded
+  // footer, cart FAB, and cloud clip-path defs are global.
   const {pathname} = useLocation();
-  const ownsHero = pathname === '/' || pathname === '/about';
+  const ownsHero = pathname === '/';
 
   return (
     <Aside.Provider>

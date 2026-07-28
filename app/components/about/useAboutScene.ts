@@ -21,9 +21,6 @@ export function useAboutScene() {
     const cards = scene
       ? Array.from(scene.querySelectorAll<HTMLElement>('.pel-scene-card'))
       : [];
-    const heroImg = document.querySelector<HTMLElement>(
-      '.pel-about-page .pel-hero__img',
-    );
     let reveals = Array.from(
       document.querySelectorAll<HTMLElement>('[data-reveal]'),
     );
@@ -77,11 +74,8 @@ export function useAboutScene() {
       ticking = false;
       const vh = window.innerHeight || 800;
 
-      if (heroImg) {
-        const y = Math.min(vh * 0.07, Math.max(0, window.scrollY) * 0.12);
-        heroImg.style.transform = `translateY(${y}px)`;
-      }
-
+      // (No hero parallax: the subpage banner crossfades its frames, and moving
+      // them would fight that opacity transition.)
       const rect = scene.getBoundingClientRect();
       const dist = scene.offsetHeight - vh;
       const p = clamp(dist > 0 ? -rect.top / dist : 0, 0, 1);

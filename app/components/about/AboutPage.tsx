@@ -1,17 +1,6 @@
+import {useEffect, useState} from 'react';
 import {Link} from 'react-router';
-import {PelMarquee} from '~/components/PelMarquee';
-import {PelLogoMark} from '~/components/PelLogo';
-import {CartButton} from '~/components/home/CartButton';
 import {useAboutScene} from './useAboutScene';
-
-const TOP_ITEMS = [
-  {id: 'btg', text: 'Beyond the Game'},
-  {id: 'bc', text: 'Building Community'},
-  {id: 'cm', text: 'Creating Memories'},
-  {id: 'btg2', text: 'Beyond the Game'},
-  {id: 'bc2', text: 'Building Community'},
-  {id: 'cm2', text: 'Creating Memories'},
-];
 
 const ORANGE_ITEMS = [
   'Beyond the Game',
@@ -61,32 +50,70 @@ const Spark = ({size = 28}: {size?: number}) => (
   </svg>
 );
 
-function HeroNav() {
+/**
+ * The design's "SUBPAGE BANNER" — the same pattern the Shop banner uses, with a
+ * slow crossfade between four frames instead of one static image. The page nav
+ * sits above it (PelHeader), exactly as on Shop; this page used to clone the
+ * homepage's full-bleed hero, which is why it didn't match.
+ */
+// Full-bleed, so these need the design's 2400px source — not the 700px that the
+// A()/A2() scene helpers emit for the small collage cards.
+const HERO_SLIDES = [
+  {
+    src: `${CDN}20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=2400`,
+    alt: 'The Por El Deporte community',
+  },
+  {
+    src: `${CDN}20240609_PorElDeporteFinal_ACajiga-1151.jpg?v=1755704513&width=2400`,
+    alt: 'Kickabout in Key Biscayne',
+  },
+  {
+    src: `${CDN}20240609_PorElDeporteFinal_ACajiga-1294.jpg?v=1755702679&width=2400`,
+    alt: 'Por El Deporte on match day',
+  },
+  {
+    src: `${CDN}20241117_PorElDeporte_acajiga-7.jpg?v=1755707182&width=2400`,
+    alt: 'Sharing mate on the sideline',
+  },
+];
+
+function SubHero() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const id = window.setInterval(
+      () => setActive((i) => (i + 1) % HERO_SLIDES.length),
+      5000,
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
-    <nav className="pel-nav" aria-label="Primary">
-      <div className="pel-nav__links">
-        <Link to="/">Home</Link>
-        <Link to="/about" className="is-active">
-          About
-        </Link>
-        <Link to="/collections/all-products">Shop</Link>
+    <section className="pel-subhero" aria-label="Our story">
+      <div className="pel-subhero__slides">
+        {HERO_SLIDES.map((s, i) => (
+          <img
+            key={s.src}
+            className={`pel-subhero__slide${i === active ? ' is-active' : ''}`}
+            src={s.src}
+            // Only the first frame is described; the rest rotate decoratively.
+            alt={i === 0 ? s.alt : ''}
+            aria-hidden={i === 0 ? undefined : true}
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        ))}
       </div>
-      <div className="pel-nav__logo">
-        <Link to="/" aria-label="Por El Deporte — home">
-          <PelLogoMark height={46} />
-        </Link>
+      <div className="pel-subhero__overlay" />
+      <div className="pel-subhero__inner">
+        <div className="pel-subhero__eyebrow">Our Story &bull; Est. 2014</div>
+        <h1 className="pel-subhero__title">Beyond the Game</h1>
+        <p className="pel-subhero__sub">
+          Founded in Key Biscayne in 2014 — a community built on friendship, fair
+          play, and a shared love for the beautiful game.
+        </p>
       </div>
-      <div className="pel-nav__actions">
-        <Link to="/account" className="pel-pill pel-hide-mobile">
-          Account
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <circle cx="12" cy="8" r="3.4" />
-            <path d="M5.5 20c.5-3.5 3.5-5 6.5-5s6 1.5 6.5 5" />
-          </svg>
-        </Link>
-        <CartButton variant="pill" />
-      </div>
-    </nav>
+    </section>
   );
 }
 
@@ -94,46 +121,7 @@ export function AboutPage() {
   useAboutScene();
   return (
     <div className="pel-home pel-about-page">
-      <PelMarquee items={TOP_ITEMS} />
-
-      <section className="pel-hero" aria-label="Hero">
-        <img
-          className="pel-hero__img"
-          style={{top: '-7%', height: '114%'}}
-          src="https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=2400"
-          alt="Por El Deporte match day"
-        />
-        <div className="pel-hero__overlay" />
-        <HeroNav />
-        <div className="pel-hero__content">
-          <h1 className="pel-hero__title">
-            Miami Soccer
-            <br />
-            Apparel &amp; Community
-          </h1>
-          <div className="pel-hero__lede">
-            <p className="pel-hero__sub">
-              Beyond the game — building community and creating memories in Key
-              Biscayne since 2014.
-            </p>
-            <div className="pel-cta-row">
-              <Link to="/collections/all-products" className="pel-btn">
-                Shop Now
-              </Link>
-              <Link to="/collections/all-products" className="pel-btn pel-btn--icon" aria-label="Shop now">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path d="M7 17L17 7M8.5 7H17v8.5" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-        <div className="pel-scroll-cue" aria-hidden="true">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M6 9l6 6 6-6" />
-          </svg>
-        </div>
-      </section>
+      <SubHero />
 
       <div className="pel-marquee pel-marquee--orange">
         <div className="pel-marquee__track">
