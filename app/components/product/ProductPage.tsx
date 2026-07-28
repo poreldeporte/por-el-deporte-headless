@@ -14,14 +14,6 @@ const STATS = [
   {value: '2014', label: 'Est. Key Biscayne'},
 ];
 
-const BEYOND_WORDS = [
-  'Matchday rituals',
-  'Weekend kickabouts',
-  'Your new favorite piece',
-  'Built by supporters',
-  'Toes in the sand',
-];
-
 const MOMENTS = [
   {id: 'm1', src: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=800', alt: 'Supporters together on match day'},
   {id: 'm2', src: 'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=800', alt: 'Por El Deporte community'},
@@ -32,14 +24,6 @@ const MOMENTS = [
   {id: 'm7', src: 'https://poreldeporte.com/cdn/shop/files/20241117_PorElDeporte_acajiga-483.jpg?v=1755707645&width=800', alt: 'Beyond the game'},
   {id: 'm8', src: 'https://poreldeporte.com/cdn/shop/files/20241117_PorElDeporte_acajiga-808.jpg?v=1755707867&width=800', alt: 'Building community'},
 ];
-
-function Star() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z" />
-    </svg>
-  );
-}
 
 export function ProductPage({
   product,
@@ -129,19 +113,6 @@ export function ProductPage({
 
         {/* Buy panel */}
         <div className="pel-pdp__buy">
-          <div className="pel-pdp__review">
-            <div className="pel-pdp__stars">
-              <Star />
-              <Star />
-              <Star />
-              <Star />
-              <Star />
-            </div>
-            <span className="pel-pdp__review-txt">
-              &ldquo;Iconic design, insane comfort&rdquo; — supporter review
-            </span>
-          </div>
-
           <h1 className="pel-pdp__title">{product.title}</h1>
           <div className="pel-pdp__price">
             {selectedVariant?.price ? <Money data={selectedVariant.price} /> : null}
@@ -149,9 +120,7 @@ export function ProductPage({
               <s className="pel-pdp__compare">
                 <Money data={selectedVariant.compareAtPrice} />
               </s>
-            ) : (
-              <span>&nbsp;&bull;&nbsp;100% Cotton</span>
-            )}
+            ) : null}
           </div>
 
           {productOptions.map((option) => {
@@ -218,7 +187,7 @@ export function ProductPage({
           })}
 
           <div className="pel-pdp__fabric">
-            <span className="pel-pdp__fabric-lead">Plastic-Free</span>
+            <span>Plastic-Free</span>
             <span className="pel-pdp__fabric-div" />
             <span>100% ring-spun cotton</span>
             <span className="pel-pdp__fabric-div" />
@@ -309,25 +278,7 @@ export function ProductPage({
       </section>
 
       {/* Beyond the Game */}
-      <section className="pel-pdp__beyond" aria-label="Beyond the game">
-        <div className="pel-pdp__beyond-eyebrow">Beyond the Game</div>
-        <div className="pel-pdp__beyond-words">
-          {BEYOND_WORDS.map((w, i) => (
-            <span key={w} className="pel-pdp__beyond-word">
-              <span>{w}</span>
-              {i < BEYOND_WORDS.length - 1 ? (
-                <span className="pel-pdp__cloudchip" aria-hidden="true">
-                  <svg viewBox="0 0 1 1" preserveAspectRatio="none">
-                    <path d="M0.2,0.9 L0.774,0.9 C0.879,0.9 0.914,0.76 0.862,0.636 C0.94,0.558 0.923,0.356 0.827,0.356 C0.835,0.184 0.705,0.091 0.618,0.216 C0.583,0.076 0.452,0.06 0.409,0.216 C0.348,0.107 0.226,0.138 0.226,0.324 C0.121,0.293 0.077,0.464 0.147,0.589 C0.06,0.667 0.086,0.853 0.2,0.9 Z" fill="var(--pel-cream)" stroke="var(--pel-ink)" strokeWidth="0.03" />
-                  </svg>
-                  <svg className="pel-pdp__cloudchip-star" viewBox="0 0 100 100">
-                    <path d="M50 0C54 30 70 46 100 50C70 54 54 70 50 100C46 70 30 54 0 50C30 46 46 30 50 0Z" fill="currentColor" />
-                  </svg>
-                </span>
-              ) : null}
-            </span>
-          ))}
-        </div>
+      <section className="pel-pdp__beyond" aria-label="Community moments">
         <div className="pel-pdp__moments">
           <div className="pel-pdp__moments-track">
             {[
