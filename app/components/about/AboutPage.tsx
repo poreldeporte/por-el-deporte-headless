@@ -60,8 +60,8 @@ const Spark = ({size = 28}: {size?: number}) => (
 // A()/A2() scene helpers emit for the small collage cards.
 const HERO_SLIDES = [
   {
-    src: `${CDN}20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=2400`,
-    alt: 'The Por El Deporte community',
+    src: `${CDN}20241117_PorElDeporte_acajiga-441.jpg?v=1749483589&width=2400`,
+    alt: 'Striking the ball in the golden hour',
   },
   {
     src: `${CDN}20240609_PorElDeporteFinal_ACajiga-1151.jpg?v=1755704513&width=2400`,
@@ -72,8 +72,8 @@ const HERO_SLIDES = [
     alt: 'Por El Deporte on match day',
   },
   {
-    src: `${CDN}20241117_PorElDeporte_acajiga-7.jpg?v=1755707182&width=2400`,
-    alt: 'Sharing mate on the sideline',
+    src: `${CDN}20241117_PorElDeporte_acajiga-763.jpg?v=1755707473&width=2400`,
+    alt: 'Supporters along the fence on match day',
   },
 ];
 

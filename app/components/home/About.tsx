@@ -5,9 +5,6 @@ import {Stars} from './Stars';
  * "Founded in 2014…" — a cloud-clipped photo collage + brand statement.
  * Photos are editorial brand imagery (Shopify-hosted). They can later move to a
  * metaobject so the team can swap them without a deploy.
- *
- * NOTE: the large community photo reuses a match-day shot for now; drop the real
- * team photo into /public and point `img` at it to replace.
  */
 const COLLAGE: {
   pos: CSSProperties;
@@ -23,8 +20,8 @@ const COLLAGE: {
     pos: {left: '0', top: '0', width: '48.5%', aspectRatio: '1.5'},
     dx: -70,
     dy: 0,
-    img: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=900',
-    alt: 'El Clásico Tee on the pitch',
+    img: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-196.jpg?v=1755719337&width=900',
+    alt: 'Match day at the cage in Brickell',
     backer: '#d8cdbb',
     shadow: 'translate(10px, 12px)',
   },
@@ -32,8 +29,8 @@ const COLLAGE: {
     pos: {left: '51.5%', top: '0', width: '48.5%', aspectRatio: '1.5'},
     dx: 70,
     dy: -34,
-    img: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=800',
-    alt: 'The Island Bucket hat',
+    img: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-26.jpg?v=1755707174&width=900',
+    alt: 'The squad between games',
     backer: '#cfe3f2',
     shadow: 'translate(10px, 12px)',
   },
@@ -41,8 +38,8 @@ const COLLAGE: {
     pos: {left: '0', bottom: '0', width: '100%', aspectRatio: '1.55'},
     dx: 0,
     dy: 80,
-    img: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=1200',
-    alt: 'The Por El Deporte community',
+    img: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-406_1.jpg?v=1755707550&width=1400',
+    alt: 'The Por El Deporte squad in the goal',
     backer: '#e7ded0',
     shadow: 'translate(12px, 14px)',
   },
