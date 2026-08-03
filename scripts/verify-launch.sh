@@ -102,13 +102,25 @@ if [[ "$canon" == "$BASE"* ]]; then ok "canonical points at this host ($canon)"
 else note "canonical is $canon (expected to start with $BASE)"; fi
 
 robots=$(get "$BASE/robots.txt")
-if grep -qE '^Disallow: /$' <<<"$robots"; then
+# Only a bare `Disallow: /` inside the `User-agent: *` group blocks everyone.
+# Shopify's standard robots.txt also contains `User-agent: Nutch` + `Disallow: /`,
+# which blocks that one crawler by design — grepping the file as a whole for
+# '^Disallow: /$' matches it and cries wolf on a perfectly healthy site.
+blocks_all_crawlers() {
+  awk '
+    /^[Uu]ser-agent:[[:space:]]*/ { ua = $2; next }
+    ua == "*" && /^[Dd]isallow:[[:space:]]*\/[[:space:]]*$/ { found = 1 }
+    END { exit(found ? 0 : 1) }
+  ' <<<"$1"
+}
+if blocks_all_crawlers "$robots"; then
   if [[ $is_preview -eq 1 ]]; then
-    note "robots.txt is 'Disallow: /' — expected on a preview domain, NOT an app bug"
+    note "robots.txt disallows all for 'User-agent: *' — expected on a preview domain, NOT an app bug"
   else
-    bad "robots.txt is 'Disallow: /' on a LIVE domain — this blocks all crawlers!"
+    bad "robots.txt disallows ALL crawlers for 'User-agent: *' on a LIVE domain!"
   fi
 else
+  ok "robots.txt does not block crawlers for 'User-agent: *'"
   grep -q '^Sitemap:' <<<"$robots" && ok "robots.txt has a Sitemap: line" \
                                    || bad "robots.txt has no Sitemap: line"
 fi
@@ -122,6 +134,38 @@ elif [[ $is_preview -eq 1 ]]; then
   note "sitemap.xml -> $sm — expected on a preview domain, NOT an app bug"
 else
   bad "sitemap.xml -> $sm on a LIVE domain"
+fi
+
+# ------------------------------------------------------- editorial imagery
+# The cutover trap: brand photos were hardcoded to
+# `https://poreldeporte.com/cdn/shop/files/…`, a path only the OLD themed store
+# served. On the preview domain they loaded fine (poreldeporte.com was still the
+# themed store); the moment the domain pointed at Oxygen they all 404'd. So check
+# that every absolute image the homepage references actually resolves.
+hdr "Editorial imagery"
+img_urls=$(grep -oE 'src="https://[^"]+\.(jpg|jpeg|png|webp)[^"]*"' <<<"$home" \
+  | sed 's/^src="//; s/"$//; s/&amp;/\&/g' | sort -u)
+if [[ -z "$img_urls" ]]; then
+  bad "no absolute images found on the homepage — markup changed?"
+else
+  n_img=0; n_bad=0
+  while IFS= read -r u; do
+    [[ -z "$u" ]] && continue
+    n_img=$((n_img + 1))
+    code=$(status_of "$u")
+    if [[ "$code" != "200" ]]; then
+      n_bad=$((n_bad + 1))
+      bad "image $code  ${u#https://}"
+    fi
+  done <<<"$img_urls"
+  [[ $n_bad -eq 0 ]] && ok "all $n_img homepage images resolve (200)"
+fi
+# Self-hosted /cdn/shop/* is the specific shape that breaks post-cutover.
+selfcdn=$(grep -cE "src=\"$BASE/cdn/shop/" <<<"$home" || true)
+if [[ "${selfcdn:-0}" -gt 0 ]]; then
+  bad "$selfcdn image(s) point at $BASE/cdn/shop/… — that path is not served by Oxygen"
+else
+  ok "no images rely on the old /cdn/shop/ storefront path"
 fi
 
 # --------------------------------------------------------------- commerce
