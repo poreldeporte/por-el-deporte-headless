@@ -7,7 +7,7 @@ import {Link} from 'react-router';
  * Product images are brand PNGs (Shopify-hosted); the cluster reveals with a
  * stagger and the clouds gently float (CSS) + fade in (anime.js via useHomeReveal).
  */
-const CDN = 'https://poreldeporte.com/cdn/shop/files';
+const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files';
 
 const CLUSTER: {
   img: string;

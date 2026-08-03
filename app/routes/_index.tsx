@@ -19,7 +19,7 @@ export const meta: Route.MetaFunction = ({matches}) => {
       'Beyond the game — building community and creating memories in Key Biscayne since 2014. Shop Por El Deporte apparel.',
     url: siteOrigin(matches) || undefined,
     image:
-      'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=1200',
+      'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=1200',
   });
 };
 
@@ -153,7 +153,7 @@ function Hero() {
     <section className="pel-hero" aria-label="Hero">
       <img
         className="pel-hero__img"
-        src="https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=2400"
+        src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=2400"
         alt="Por El Deporte match day"
       />
       <div className="pel-hero__overlay" />

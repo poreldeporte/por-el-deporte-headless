@@ -7,7 +7,7 @@ import {useAside} from '~/components/Aside';
 import {useHomeReveal} from '~/components/home/useHomeReveal';
 
 const BANNER_IMG =
-  'https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-1216.jpg?v=1755705211&width=2000';
+  'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1216.jpg?v=1755705211&width=2000';
 
 // The store doesn't consistently set productType, so derive a category from the
 // product title (matching how the design groups: Tees / Jerseys / Hoodies / etc.).

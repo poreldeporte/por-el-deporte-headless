@@ -111,7 +111,7 @@ export function PelFooter() {
               <div className="pel-footer__cloud-shadow" />
               <div className="pel-footer__cloud-frame">
                 <img
-                  src="https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-888.jpg?v=1755704548&width=700"
+                  src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-888.jpg?v=1755704548&width=700"
                   alt="La Isla Tee"
                   loading="lazy"
                 />
@@ -121,7 +121,7 @@ export function PelFooter() {
               <div className="pel-footer__cloud-shadow" />
               <div className="pel-footer__cloud-frame">
                 <img
-                  src="https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-1017_1.jpg?v=1755704655&width=700"
+                  src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1017_1.jpg?v=1755704655&width=700"
                   alt="Por El Deporte Cap"
                   loading="lazy"
                 />

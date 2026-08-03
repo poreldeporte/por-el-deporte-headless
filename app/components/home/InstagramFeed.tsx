@@ -1,5 +1,5 @@
 const IG = 'https://www.instagram.com/poreldeporte/';
-const CDN = 'https://poreldeporte.com/cdn/shop/files/';
+const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/';
 const A = (id: string, v: string) =>
   `${CDN}20240609_PorElDeporteFinal_ACajiga-${id}.jpg?v=${v}&width=700`;
 

@@ -22,7 +22,11 @@ export default async function handleRequest(
     },
     // Merged with Hydrogen's defaults. Needed for our brand assets:
     // - Google Fonts stylesheet (googleapis) + font files (gstatic)
-    // - hero/editorial imagery served from the primary domain poreldeporte.com
+    // - editorial imagery, which comes from cdn.shopify.com. (poreldeporte.com
+    //   stays listed but is now just 'self' — before the domain cutover these
+    //   images were addressed as poreldeporte.com/cdn/shop/files/…, a path only
+    //   the old themed store served. It 404s on Oxygen, so they were rewritten
+    //   to their real cdn.shopify.com/s/files/… URLs.)
     styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
     // In production Vite/Oxygen rewrites the self-hosted Flapjack @font-face URL
     // to cdn.shopify.com, so it must be allowed here or the browser blocks the

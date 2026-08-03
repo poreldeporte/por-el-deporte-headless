@@ -9,7 +9,7 @@ const ORANGE_ITEMS = [
   'Creating Memories',
 ];
 
-const CDN = 'https://poreldeporte.com/cdn/shop/files/';
+const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/';
 const A = (id: string, v: string) =>
   `${CDN}20240609_PorElDeporteFinal_ACajiga-${id}.jpg?v=${v}&width=700`;
 const A2 = (id: string, v: string) =>
@@ -187,7 +187,7 @@ export function AboutPage() {
       <section className="pel-mission" aria-label="Our mission">
         <div className="pel-mission__photo">
           <img
-            src="https://poreldeporte.com/cdn/shop/files/20240609_PorElDeporteFinal_ACajiga-888.jpg?v=1755704548&width=1400"
+            src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-888.jpg?v=1755704548&width=1400"
             alt="Por El Deporte community member"
           />
           <svg className="pel-mission__cloud pel-mission__cloud--l" viewBox="0 0 100 100" aria-hidden="true">
