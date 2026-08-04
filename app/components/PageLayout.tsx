@@ -49,8 +49,15 @@ export function PageLayout({
       {!ownsHero && <PelHeader />}
       <main>{children}</main>
       <PelFooter />
-      <CommunityPanel />
-      <CartButton variant="fab" />
+      {/* `pel-fabs` marks the floating buttons so mobile CSS can hide them on
+          pages that keep a sticky header (its CART pill is always reachable, so
+          the FAB is redundant there and only ends up covering content). The
+          homepage keeps them: its nav is absolutely positioned over the hero and
+          scrolls away, so the FAB is the only cart access once you scroll. */}
+      <div className={ownsHero ? 'pel-fabs' : 'pel-fabs pel-fabs--redundant'}>
+        <CommunityPanel />
+        <CartButton variant="fab" />
+      </div>
     </Aside.Provider>
   );
 }

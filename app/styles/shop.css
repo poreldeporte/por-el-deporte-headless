@@ -320,6 +320,10 @@
   .pel-values {
     padding: 56px 20px calc(7.2vw + 34px);
   }
+  /* no type under 12px on a phone */
+  .pel-shopcard__cat {
+    font-size: 12px;
+  }
   .pel-values__grid {
     grid-template-columns: 1fr;
   }

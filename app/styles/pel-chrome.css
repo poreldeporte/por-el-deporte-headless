@@ -609,7 +609,7 @@ main h1 {
   }
   .pel-siteheader__links {
     gap: 16px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .collection,
   .product,
@@ -623,6 +623,27 @@ main h1 {
   .product-main {
     position: static;
   }
+
+  /* ===== Mobile ergonomics (from the Playwright audit) ===== */
+
+  /* Pages with the sticky header already expose a CART pill at all times, so
+     the floating buttons are redundant there — and being fixed bottom-right
+     they sit on top of whatever is beneath them (they were covering a shop
+     card's add button and a PDP stat card). The homepage keeps its FABs: its
+     nav is absolute over the hero and scrolls away. */
+  .pel-fabs--redundant .pel-fab {
+    display: none;
+  }
+
+  /* Nav links were 40x11 hit areas. Give them a full-height target without
+     moving anything: the row is already tall enough to absorb the padding. */
+  .pel-siteheader__links a,
+  .pel-home .pel-nav__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
 }
 @media (prefers-reduced-motion: reduce) {
   .pel-community,

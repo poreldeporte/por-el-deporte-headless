@@ -243,8 +243,8 @@
   background: var(--pel-cream);
 }
 .pel-pdp__qty button {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   color: var(--pel-ink);
@@ -415,4 +415,11 @@
     grid-template-columns: 1fr;
     padding: 56px 20px;
   }
+  /* no type under 12px on a phone */
+  .pel-pdp__stat-label,
+  .pel-pdp__note,
+  .pel-pdp__fabric {
+    font-size: 12px;
+  }
+
 }

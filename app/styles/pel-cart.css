@@ -284,6 +284,7 @@ aside header .close:hover {
   margin-top: 14px;
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   padding: 13px 28px;
   border-radius: 999px;
   background: var(--pel-ink);

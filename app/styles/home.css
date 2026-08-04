@@ -1242,7 +1242,7 @@ a.pel-footer__link:hover {
   }
   .pel-nav__links {
     gap: 16px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .pel-nav__logo {
     display: none;
@@ -1334,6 +1334,36 @@ a.pel-footer__link:hover {
     width: 100%;
     margin: 24px auto 0;
   }
+  /* ===== Mobile ergonomics (Playwright audit) =====
+     These live here rather than pel-chrome.css because home.css is linked last,
+     and the `font:` shorthands below set font-size — an earlier sheet's
+     font-size at equal specificity loses. */
+  .pel-footer__legal,
+  .pel-footer__link,
+  .pel-hero__sub,
+  .pel-shopcard__cat,
+  .pel-pdp__stat-label,
+  .pel-pdp__note {
+    font-size: 12px;
+  }
+  /* 44px minimum touch target. */
+  .pel-pill,
+  .pel-chip,
+  .pel-footer__link,
+  .pel-newsletter__input,
+  .pel-ig__handle,
+  .pel-follow,
+  .pel-qty button,
+  .pel-pdp__qty button {
+    min-height: 44px;
+  }
+  .pel-footer__link,
+  .pel-ig__handle,
+  .pel-follow {
+    display: inline-flex;
+    align-items: center;
+  }
+
 }
 @media (max-width: 30em) {
   .pel-moods__grid {
