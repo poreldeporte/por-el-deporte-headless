@@ -10,38 +10,34 @@ const ORANGE_ITEMS = [
 ];
 
 const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/';
-const A = (id: string, v: string) =>
-  `${CDN}20240609_PorElDeporteFinal_ACajiga-${id}.jpg?v=${v}&width=700`;
-const A2 = (id: string, v: string) =>
-  `${CDN}20241117_PorElDeporte_acajiga-${id}.jpg?v=${v}&width=700`;
 
-type SceneCard =
-  | {kind: 'photo'; id: string; x: number; rot: number; src: string; alt: string; product?: boolean}
-  | {kind: 'say'; id: string; x: number; rot: number; tone: 'dark' | 'light'; title: string; label: string; body: string};
+type SceneCard = {id: string; x: number; rot: number; src: string; alt: string};
 
-// The community scroll scene — same set + positions as About Page.dc.html.
+// Every card is a photograph — no product mockups, no quote cards — and every
+// frame is unique across the whole site. Positions/rotations are unchanged so
+// the scroll choreography still reads the same.
 const SCENE: SceneCard[] = [
-  {kind: 'photo', id: 'p1', x: 18, rot: -3, src: A('888', '1755704548'), alt: 'Community members together'},
-  {kind: 'photo', id: 'p2', x: 82, rot: 3, src: A('1207', '1755704396'), alt: 'Supporters on match day'},
-  {kind: 'photo', id: 'p3', x: 58, rot: 2, src: `${CDN}palmas-kit-462846.png?v=1736430527&width=700`, alt: '“Palmas” Jersey', product: true},
-  {kind: 'say', id: 's1', x: 30, rot: 2, tone: 'dark', title: 'Feels like family', label: 'Tomás R.', body: 'Wore the crest to a match and got stopped twice asking where it was from.'},
-  {kind: 'photo', id: 'p4', x: 74, rot: -3, src: A('856', '1755701316'), alt: 'Por El Deporte community'},
-  {kind: 'photo', id: 'p5', x: 36, rot: -3, src: `${CDN}artisan-ped-hoodie-9133088.png?v=1757600942&width=700`, alt: 'Artisan PED Hoodie', product: true},
-  {kind: 'photo', id: 'p6', x: 18, rot: 2, src: A2('7', '1755707182'), alt: 'Weekend match day'},
-  {kind: 'photo', id: 'p7', x: 86, rot: 2, src: A('1216', '1755705211'), alt: 'Club gear laid out'},
-  {kind: 'photo', id: 'p8', x: 64, rot: 3, src: `${CDN}la-isla-tee-511237.png?v=1713839421&width=700`, alt: 'La Isla Tee', product: true},
-  {kind: 'photo', id: 'p9', x: 13, rot: -2, src: A('335', '1750173740'), alt: 'Match day in Key Biscayne'},
-  {kind: 'photo', id: 'p10', x: 50, rot: 1, src: A('1151', '1755704513'), alt: 'Key Biscayne kickabout'},
-  {kind: 'photo', id: 'p11', x: 12, rot: -2, src: `${CDN}the-island-bucket-9731644.png?v=1755720072&width=700`, alt: 'The Island Bucket', product: true},
-  {kind: 'photo', id: 'p12', x: 82, rot: -2, src: A2('483', '1755707645'), alt: 'Beyond the game'},
-  {kind: 'photo', id: 'p13', x: 80, rot: -3, src: A('1017_1', '1755704655'), alt: 'Por El Deporte cap'},
-  {kind: 'photo', id: 'p14', x: 20, rot: 3, src: A('225', '1755706151'), alt: 'On the pitch in Miami'},
-  {kind: 'photo', id: 'p15', x: 88, rot: -3, src: `${CDN}el-clasico-tote-3651006.png?v=1765300446&width=700`, alt: 'El Clásico Tote', product: true},
-  {kind: 'say', id: 's2', x: 68, rot: 2, tone: 'light', title: 'We give back', label: 'Por el deporte', body: 'Every purchase funds local matches, events, and youth soccer.'},
-  {kind: 'photo', id: 'p16', x: 40, rot: -2, src: A('687', '1755706282'), alt: 'Club supporters'},
-  {kind: 'photo', id: 'p17', x: 46, rot: 2, src: `${CDN}ocean-sunset-tee-382023.png?v=1736430528&width=700`, alt: 'The Ocean Tee', product: true},
-  {kind: 'photo', id: 'p18', x: 24, rot: 3, src: A2('808', '1755707867'), alt: 'Building community'},
-  {kind: 'photo', id: 'p19', x: 84, rot: 3, src: A('1294', '1755702679'), alt: 'The Por El Deporte team'},
+  {id: 'p1', x: 18, rot: -3, src: `${CDN}ped-2025-cluster-of-three-teammates-seated.jpg?v=1785854205&width=700`, alt: 'Teammates on the bench between games'},
+  {id: 'p2', x: 82, rot: 3, src: `${CDN}ped-2025-player-in-orange-bib-striking.jpg?v=1785854205&width=700`, alt: 'Striking the ball in front of goal'},
+  {id: 'p3', x: 58, rot: 2, src: `${CDN}ped-2025-woman-laughing-between-two-players.jpg?v=1785854205&width=700`, alt: 'Laughing together on the sideline'},
+  {id: 'p4', x: 30, rot: 2, src: `${CDN}ped-2025-player-in-orange-patterned-ocean.jpg?v=1785854205&width=700`, alt: 'The club shirt in the afternoon sun'},
+  {id: 'p5', x: 74, rot: -3, src: `${CDN}ped-2025-smiling-player-in-cream-crest.jpg?v=1785854205&width=700`, alt: 'A smile in the cream crest tee'},
+  {id: 'p6', x: 36, rot: -3, src: `${CDN}ped-2025-three-players-in-kit-and.jpg?v=1785854205&width=700`, alt: 'Three players before kickoff'},
+  {id: 'p7', x: 18, rot: 2, src: `${CDN}ped-2025-player-in-patterned-home-kit.jpg?v=1785854205&width=700`, alt: 'On the ball in the home kit'},
+  {id: 'p8', x: 86, rot: 2, src: `${CDN}ped-2025-player-drinking-from-an-orange.jpg?v=1785854409&width=700`, alt: 'Cooling off between games'},
+  {id: 'p9', x: 64, rot: 3, src: `${CDN}ped-2025-player-in-orange-patterned-ped.jpg?v=1785854409&width=700`, alt: 'The club shirt on the sideline'},
+  {id: 'p10', x: 13, rot: -2, src: `${CDN}ped-2025-player-in-orange-bib-dribbling.jpg?v=1785854409&width=700`, alt: 'Driving forward with the ball'},
+  {id: 'p11', x: 50, rot: 1, src: `${CDN}ped-2025-player-striking-the-ball-with.jpg?v=1785854409&width=700`, alt: 'Full swing at the ball'},
+  {id: 'p12', x: 12, rot: -2, src: `${CDN}ped-2025-teammates-embracing-after-a-goal.jpg?v=1785854409&width=700`, alt: 'Celebrating a goal together'},
+  {id: 'p13', x: 82, rot: -2, src: `${CDN}ped-2025-player-walking-in-sage-crest.jpg?v=1785854409&width=700`, alt: 'Walking on in the sage crest tee'},
+  {id: 'p14', x: 80, rot: -3, src: `${CDN}ped-2025-player-walking-in-from-the.jpg?v=1785854409&width=700`, alt: 'Coming in from the pitch'},
+  {id: 'p15', x: 20, rot: 3, src: `${CDN}ped-2025-player-standing-in-cream-crest.jpg?v=1785854850&width=700`, alt: 'Standing in the cream crest tee'},
+  {id: 'p16', x: 88, rot: -3, src: `${CDN}ped-2025-walking-away-in-cream-por.jpg?v=1785854850&width=700`, alt: 'Walking off in the Por El Deporte tee'},
+  {id: 'p17', x: 68, rot: 2, src: `${CDN}ped-2025-player-in-white-tee-and.jpg?v=1785854849&width=700`, alt: 'Sideline in a white tee and cap'},
+  {id: 'p18', x: 40, rot: -2, src: `${CDN}ped-2025-back-view-of-the-number.jpg?v=1785854850&width=700`, alt: 'Back of the shirt, number showing'},
+  {id: 'p19', x: 46, rot: 2, src: `${CDN}ped-2025-goalkeeper-in-patterned-gk-shirt.jpg?v=1785854850&width=700`, alt: 'The keeper in the patterned shirt'},
+  {id: 'p20', x: 24, rot: 3, src: `${CDN}ped-2025-number-7-in-the-patterned.jpg?v=1785854850&width=700`, alt: 'Number 7 in the patterned kit'},
+  {id: 'p21', x: 84, rot: 3, src: `${CDN}ped-2025-player-standing-over-the-ball.jpg?v=1785854850&width=700`, alt: 'Standing over the ball before a restart'},
 ];
 
 const Spark = ({size = 28}: {size?: number}) => (
@@ -157,26 +153,16 @@ export function AboutPage() {
             {SCENE.map((c) => (
               <div
                 key={c.id}
-                className={`pel-scene-card${c.kind === 'say' ? ` pel-scene-card--say pel-scene-card--${c.tone}` : ''}`}
+                className="pel-scene-card"
                 data-rot={c.rot}
                 style={{left: `${c.x}%`}}
               >
-                {c.kind === 'photo' ? (
-                  <img
-                    className={c.product ? 'pel-scene-card__img pel-scene-card__img--product' : 'pel-scene-card__img'}
-                    src={c.src}
-                    alt={c.alt}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="pel-scene-card__say">
-                    <h3 className="pel-scene-card__title">{c.title}</h3>
-                    <div>
-                      <div className="pel-scene-card__label">{c.label}</div>
-                      <div className="pel-scene-card__body">{c.body}</div>
-                    </div>
-                  </div>
-                )}
+                <img
+                  className="pel-scene-card__img"
+                  src={c.src}
+                  alt={c.alt}
+                  loading="lazy"
+                />
               </div>
             ))}
           </div>
@@ -187,7 +173,7 @@ export function AboutPage() {
       <section className="pel-mission" aria-label="Our mission">
         <div className="pel-mission__photo">
           <img
-            src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-888.jpg?v=1755704548&width=1400"
+            src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-780.jpg?v=1755707862&width=1400"
             alt="Por El Deporte community member"
           />
           <svg className="pel-mission__cloud pel-mission__cloud--l" viewBox="0 0 100 100" aria-hidden="true">

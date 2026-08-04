@@ -17,7 +17,7 @@ const STATS = [
 const MOMENTS = [
   {id: 'm1', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=800', alt: 'Supporters together on match day'},
   {id: 'm2', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=800', alt: 'Por El Deporte community'},
-  {id: 'm3', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1151.jpg?v=1755704513&width=800', alt: 'Key Biscayne kickabout'},
+  {id: 'm3', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-693-2.jpg?v=1755707473&width=800', alt: 'Key Biscayne kickabout'},
   {id: 'm4', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-225.jpg?v=1755706151&width=800', alt: 'On the pitch in Miami'},
   {id: 'm5', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-687.jpg?v=1755706282&width=800', alt: 'Club supporters'},
   {id: 'm6', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-7.jpg?v=1755707182&width=800', alt: 'Weekend match'},

@@ -28,7 +28,7 @@ export function Moods() {
       <img
         className="pel-moods__bg"
         data-bg-parallax
-        src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1294.jpg?v=1755702679&width=2400"
+        src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=2400"
         alt=""
         aria-hidden="true"
       />
