@@ -577,10 +577,16 @@ main h1 {
 
 /* ===== Mobile ===== */
 @media (max-width: 48em) {
+  /* `clip`, never `hidden`. overflow-x:hidden turns html/body into a scroll
+     container, and `position: sticky` inside a scroll container sticks to that
+     container instead of the viewport — which silently killed the About page's
+     pinned scroll scene on mobile: the sticky pane scrolled away and left its
+     440vh section as a blank cream void. `clip` prevents the horizontal scroll
+     just the same but creates no scroll container, so sticky keeps working. */
   html,
   body {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   /* Hard-cap the layout containers so no over-wide section inflates page width
      and pushes hero content off-center. */

@@ -38,7 +38,7 @@ const VIEWPORTS = [
 
 const probe = () => {
   const vw = document.documentElement.clientWidth;
-  const out = {vw, scrollWidth: document.documentElement.scrollWidth, offenders: [], taps: [], small: [], imgs: []};
+  const out = {vw, scrollWidth: document.documentElement.scrollWidth, offenders: [], taps: [], small: [], imgs: [], sticky: []};
   const label = (el) => {
     const id = el.id ? `#${el.id}` : '';
     const cls = typeof el.className === 'string' && el.className
@@ -79,6 +79,20 @@ const probe = () => {
     if (fs && fs < 12 && el.textContent && el.textContent.trim().length > 3 && el.children.length === 0) {
       out.small.push({el: label(el), px: +fs.toFixed(1), text: el.textContent.trim().slice(0, 34)});
     }
+    // position:sticky that can never pin. A sticky element sticks to its nearest
+    // SCROLL CONTAINER, not the viewport — so a single `overflow-x: hidden` on
+    // html/body silently disables every sticky on the page. That is exactly how
+    // the About page's pinned scroll scene died on mobile while this audit
+    // reported "no layout problems": an unpinned scene is just empty space.
+    if (cs.position === 'sticky') {
+      for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement) {
+        const ncs = getComputedStyle(n);
+        if (/hidden|auto|scroll/.test(ncs.overflowX) || /hidden|auto|scroll/.test(ncs.overflowY)) {
+          out.sticky.push({el: label(el), blockedBy: label(n), overflow: `${ncs.overflowX}/${ncs.overflowY}`});
+          break;
+        }
+      }
+    }
     // Images wider than their parent
     if (el.tagName === 'IMG' && el.parentElement) {
       const pr = el.parentElement.getBoundingClientRect();
@@ -98,6 +112,7 @@ const probe = () => {
     const seen = new Set();
     return a.filter((x) => (seen.has(x[k]) ? false : seen.add(x[k])));
   };
+  out.sticky = dedupe(out.sticky, 'el').slice(0, 6);
   out.offenders = dedupe(out.offenders.sort((a, b) => b.over - a.over), 'el').slice(0, 12);
   out.taps = dedupe(out.taps, 'el').slice(0, 10);
   out.small = dedupe(out.small, 'el').slice(0, 8);
@@ -140,6 +155,11 @@ for (const [vname, w, h] of VIEWPORTS) {
       if (!r.offenders.length) console.log('     (no unclipped offender — likely a margin/negative-offset)');
     } else {
       console.log('  ok  no horizontal overflow');
+    }
+    if (r.sticky.length) {
+      problems++;
+      console.log('  ⚠ position:sticky cannot pin (trapped in a scroll container):');
+      r.sticky.forEach((x) => console.log(`     ${x.el}  blocked by ${x.blockedBy} [overflow ${x.overflow}]`));
     }
     if (r.imgs.length) { problems++; console.log('  ⚠ images wider than parent:'); r.imgs.forEach((i) => console.log(`     ${i.el}  ${i.w} > ${i.parent}`)); }
     if (r.taps.length) console.log(`  · ${r.taps.length} small tap target(s): ` + r.taps.slice(0, 4).map((t) => `${t.el}(${t.w}x${t.h})`).join(', '));
