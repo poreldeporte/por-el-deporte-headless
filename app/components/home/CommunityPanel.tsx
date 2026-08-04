@@ -30,12 +30,12 @@ const ING_APP: [string, string][] = [
 const ING_CLUB: [string, string][] = [
   ['Founded in 2014', 'sparkle'],
   ['Key Biscayne, FL Roots', 'leaf'],
-  ['A Vibrant Miami Soccer Community', 'citrus'],
+  ['A Miami Soccer Community', 'citrus'],
   ['Featured on CBS Golazo', 'molecule'],
   ['Shared Events & Matches', 'grapes'],
   ['Respect & Fair Play', 'salt'],
   ['Original Club Designs', 'pill'],
-  ['Eco-Friendly 100% Cotton', 'droplet'],
+  ['100% Cotton', 'droplet'],
   ['Free Shipping on All Orders', 'flask'],
   ['Sizes S to 2XL', 'sparkle'],
 ];
@@ -56,11 +56,11 @@ export function CommunityPanel() {
   const isApp = tab === 'app';
   const items = isApp ? ING_APP : ING_CLUB;
   const full: [string, string] = isApp
-    ? ['Build the Squad. Track the Story. Keep Your Community Moving.', 'sparkle']
-    : ['More Than a Team — A Community of Camaraderie & Mutual Support', 'sparkle'];
+    ? ['Sort the teams, keep the scores, see who is playing.', 'sparkle']
+    : ['More Than a Team. A Community That Looks Out for Each Other', 'sparkle'];
   const serving = isApp
-    ? 'Full Details — poreldeporte.com/pages/app'
-    : 'Est. 2014 — Key Biscayne, Florida';
+    ? 'Full details at poreldeporte.com/pages/app'
+    : 'Est. 2014 Key Biscayne, Florida';
 
   return (
     <>
@@ -145,8 +145,8 @@ export function CommunityPanel() {
                     in Your Pocket
                   </h3>
                   <p className="pel-community__appdesc">
-                    Schedule runs, fill rosters, and keep everyone aligned from
-                    kickoff to recap — games, scores, and community in one place.
+                    Set up games, fill the roster, and see who is in. Scores and
+                    results stay in one place so nobody has to chase them.
                   </p>
                   <div className="pel-community__dl">
                     <a
@@ -173,7 +173,7 @@ export function CommunityPanel() {
               ) : null}
 
               <div className="pel-community__label">
-                {isApp ? 'In the App' : 'Beyond the Game — What We’re About'}
+                {isApp ? 'In the App' : 'Beyond the Game'}
               </div>
               <div className="pel-community__grid">
                 {items.map(([label, icon]) => (

@@ -216,7 +216,7 @@ export function ProductPage({
             >
               {available ? (
                 <>
-                  Add to Cart — <Money data={totalMoney} as="span" />
+                  Add to Cart <Money data={totalMoney} as="span" />
                 </>
               ) : (
                 'Sold Out'
@@ -239,12 +239,12 @@ export function ProductPage({
             />
           ) : (
             <p className="pel-pdp__card-body">
-              Rep the core of Por El Deporte FC — your ultimate support badge,
-              channeling Miami soccer fire.
+              Club gear made by people who actually play. Wear it to the game
+              or anywhere else.
             </p>
           )}
           <div className="pel-pdp__card-foot">
-            <div>Est. 2014 — Key Biscayne</div>
+            <div>Est. 2014 Key Biscayne</div>
             <div>Every order supports local soccer</div>
           </div>
         </div>
@@ -252,9 +252,9 @@ export function ProductPage({
         <div className="pel-pdp__card">
           <h2 className="pel-pdp__card-title">Fabric &amp; Fit</h2>
           <p className="pel-pdp__card-body">
-            100% ring-spun cotton — no plastic. Super-soft, breathable heavyweight
-            that feels like a hug. Pre-shrunk relaxed fit with a double-needle
-            collar and twill-taped neck for unbeatable toughness.
+            100% ring-spun cotton, no plastic. Soft, breathable and heavy enough
+            to feel good. Pre-shrunk relaxed fit with a double-needle collar and
+            twill-taped neck so it holds up.
           </p>
         </div>
 

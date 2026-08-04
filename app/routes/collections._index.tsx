@@ -9,7 +9,7 @@ export const meta: Route.MetaFunction = ({location, matches}) =>
   seoMeta({
     title: 'Por El Deporte | Collections',
     description:
-      'Browse Por El Deporte collections — original club apparel and gear.',
+      'Browse Por El Deporte collections. Original club apparel and gear.',
     url: `${siteOrigin(matches)}${location.pathname}`,
   });
 

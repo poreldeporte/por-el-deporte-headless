@@ -6,19 +6,19 @@
 const MOODS = [
   {
     t: 'Community',
-    b: 'Building a vibrant Miami soccer community where fans connect through shared events, matches, and passion for the game since 2014.',
+    b: 'A place to play, watch, and hang out. We have been putting on games and events in Miami since 2014.',
   },
   {
     t: 'Respect',
-    b: 'Honoring the spirit of fair play — valuing opponents, teammates, and soccer traditions in every aspect of our club.',
+    b: 'Play hard, shake hands after. We look after our teammates and the people we play against.',
   },
   {
     t: 'Lifestyle',
-    b: 'Embracing an active, healthy lifestyle inspired by tropical Miami vibes, blending soccer passion with everyday comfort in our gear.',
+    b: 'Football, the beach, and gear you can wear all week. That is pretty much the whole idea.',
   },
   {
     t: 'Beyond the Game',
-    b: 'Pickup matches, beach days, and watch parties — the moments in between where teammates become lifelong friends.',
+    b: 'Pickup games, beach days, watch parties. The bits in between are where the friendships happen.',
   },
 ];
 

@@ -7,7 +7,7 @@ export const meta: Route.MetaFunction = ({location, matches}) =>
   seoMeta({
     title: 'Por El Deporte | Policies',
     description:
-      'Store policies for Por El Deporte — privacy, refunds, shipping, and terms.',
+      'Store policies for Por El Deporte: privacy, refunds, shipping, and terms.',
     url: `${siteOrigin(matches)}${location.pathname}`,
   });
 

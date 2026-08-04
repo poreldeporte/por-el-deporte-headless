@@ -4,7 +4,7 @@ import {useAboutScene} from './useAboutScene';
 
 const ORANGE_ITEMS = [
   'Beyond the Game',
-  'Est. 2014 — Key Biscayne',
+  'Est. 2014 Key Biscayne',
   'Powered by Community',
   'Creating Memories',
 ];
@@ -105,8 +105,8 @@ function SubHero() {
         <div className="pel-subhero__eyebrow">Our Story &bull; Est. 2014</div>
         <h1 className="pel-subhero__title">Beyond the Game</h1>
         <p className="pel-subhero__sub">
-          Founded in Key Biscayne in 2014 — a community built on friendship, fair
-          play, and a shared love for the beautiful game.
+          Started in Key Biscayne in 2014. Friends, football, and everyone who
+          keeps showing up.
         </p>
       </div>
     </section>
@@ -136,7 +136,7 @@ export function AboutPage() {
         </div>
       </div>
 
-      {/* Built by the Community — pinned scroll scene */}
+      {/* Built by the Community: pinned scroll scene */}
       <section id="pel-scene" className="pel-scene" aria-label="Built by the community">
         <div id="pel-scene-sticky" className="pel-scene__sticky">
           <div className="pel-scene__center">
@@ -185,10 +185,9 @@ export function AboutPage() {
             <span>Bringing people together through the game.</span>
           </h2>
           <p className="pel-mission__body" data-reveal>
-            Since 2014, Por El Deporte has been more than a club — it&rsquo;s a
-            community built in Key Biscayne. Every jersey, tee, and hat funds local
-            matches, unites fans, and keeps our sunny soccer passion alive, on and
-            off the pitch.
+            Since 2014 we have been putting on games in Key Biscayne and making
+            room for whoever wants to play. Every jersey, tee, and hat helps pay
+            for the next match.
           </p>
           <svg className="pel-mission__cloud pel-mission__cloud--r" viewBox="0 0 100 100" aria-hidden="true">
             <path d="M50 0C54 30 70 46 100 50C70 54 54 70 50 100C46 70 30 54 0 50C30 46 46 30 50 0Z" fill="currentColor" />

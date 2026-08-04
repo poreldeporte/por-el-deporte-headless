@@ -27,17 +27,17 @@ const VALUES = [
   {
     n: '01',
     t: 'Community',
-    b: 'Building a vibrant Miami soccer community where fans connect through shared events, matches, and passion for the game since 2014.',
+    b: 'A place to play, watch, and hang out. We have been putting on games and events in Miami since 2014.',
   },
   {
     n: '02',
     t: 'Respect',
-    b: 'Honoring the spirit of fair play — valuing opponents, teammates, and soccer traditions in every part of our club.',
+    b: 'Play hard, shake hands after. We look after our teammates and the people we play against.',
   },
   {
     n: '03',
     t: 'Lifestyle',
-    b: 'Embracing an active, healthy lifestyle inspired by tropical Miami vibes, blending soccer passion with everyday comfort.',
+    b: 'Football, the beach, and gear you can wear all week. That is pretty much the whole idea.',
   },
 ];
 
@@ -79,7 +79,7 @@ export function ShopPage({
           <h1 className="pel-shop__title">Gear Up.</h1>
           <p className="pel-shop__sub">
             Every tee, hat, and tote supports our Key Biscayne community. Rep the
-            club — score your favorites.
+            club and grab your favorites.
           </p>
         </div>
       </section>
@@ -118,7 +118,7 @@ export function ShopPage({
             <p className="pel-shop__empty-title">Nothing here yet.</p>
             <p className="pel-shop__empty-sub">
               {filter === 'All'
-                ? 'This collection has no products right now — check back soon.'
+                ? 'Nothing here right now. Check back soon.'
                 : `No ${filter.toLowerCase()} in this collection yet.`}
             </p>
             {filter === 'All' ? (

@@ -62,9 +62,9 @@ const CLOUDS: {pos: CSSProperties; text: string}[] = [
   {pos: {left: '5%', top: '10%', width: '200px', height: '158px'}, text: 'The hoodie you asked for'},
   {pos: {right: '5%', top: '12%', width: '210px', height: '165px'}, text: 'Three new tees to match'},
   {pos: {left: '1%', top: '52%', width: '195px', height: '152px'}, text: '100% ring-spun cotton'},
-  {pos: {right: '2%', top: '54%', width: '195px', height: '152px'}, text: 'Designed & worn in Miami'},
-  {pos: {left: '4%', bottom: '2%', width: '205px', height: '160px'}, text: 'Free shipping — on your doorstep in 1 week'},
-  {pos: {right: '4%', bottom: '1%', width: '205px', height: '160px'}, text: 'Every purchase powers our Miami community'},
+  {pos: {right: '2%', top: '54%', width: '195px', height: '152px'}, text: 'Made and worn in Miami'},
+  {pos: {left: '4%', bottom: '2%', width: '205px', height: '160px'}, text: 'Free shipping, about a week'},
+  {pos: {right: '4%', bottom: '1%', width: '205px', height: '160px'}, text: 'Every order helps fund our games'},
 ];
 
 const SHOP_URL = '/collections/all-products';
@@ -79,8 +79,8 @@ export function FunctionSection() {
           We Delivered
         </h2>
         <p className="pel-function__sub" data-reveal>
-          The Artisan PED Hoodie and three new tees — an homage to our Key
-          Biscayne roots, made for Miami weather.
+          The hoodie you kept asking for, plus three new tees. Made for
+          Miami weather.
         </p>
         <div className="pel-function__cta" data-reveal>
           <Link to={SHOP_URL} className="pel-btn-outline">

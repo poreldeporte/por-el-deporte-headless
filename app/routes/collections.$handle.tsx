@@ -12,7 +12,7 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
     title: `Por El Deporte | ${collection?.title ?? 'Shop'}`,
     description:
       collection?.description ||
-      'Shop Por El Deporte apparel — original club designs, 100% cotton, free shipping.',
+      'Shop Por El Deporte apparel. Original club designs, 100% cotton, free shipping.',
     url: `${siteOrigin(matches)}${location.pathname}`,
     image: collection?.image?.url,
   });

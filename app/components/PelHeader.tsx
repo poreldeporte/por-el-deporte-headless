@@ -27,7 +27,7 @@ export function PelHeader() {
             Shop
           </NavLink>
         </nav>
-        <Link to="/" className="pel-siteheader__logo" aria-label="Por El Deporte — home">
+        <Link to="/" className="pel-siteheader__logo" aria-label="Por El Deporte home">
           <PelLogoMark height={46} />
         </Link>
         <div className="pel-siteheader__actions">

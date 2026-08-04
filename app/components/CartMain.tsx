@@ -152,7 +152,7 @@ function CartEmpty({
       </div>
       <p className="pel-cart-empty__title">Your cart is empty</p>
       <p className="pel-cart-empty__sub">
-        Looks like you haven&rsquo;t added anything yet — let&rsquo;s get you
+        Nothing in here yet. Let&rsquo;s get you
         kitted out.
       </p>
       <Link

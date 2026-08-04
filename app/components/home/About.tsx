@@ -81,8 +81,8 @@ export function About() {
 
         <div className="pel-about__body">
           <p className="pel-about__lead" data-reveal>
-            More than just a team, Por El Deporte is a community — built on lasting
-            friendships, mutual support, and memories we&rsquo;ll cherish forever.
+            We started as a few friends who wanted a good game. Now it&rsquo;s a
+            whole community, and we&rsquo;re glad you found us.
           </p>
           <div className="pel-about__meta">
             <div className="pel-about__cta">

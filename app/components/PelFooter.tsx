@@ -97,7 +97,7 @@ export function PelFooter() {
       <div className="pel-footer__scallop" aria-hidden="true" />
       <div className="pel-footer__body">
         <div className="pel-footer__lead">
-          <Link to="/" className="pel-footer__logo" aria-label="Por El Deporte — home">
+          <Link to="/" className="pel-footer__logo" aria-label="Por El Deporte home">
             <PelLogoMark height={70} />
           </Link>
           <div className="pel-footer__hero">
@@ -148,7 +148,7 @@ export function PelFooter() {
         </div>
         <div className="pel-footer__rule" />
         <p className="pel-footer__legal">
-          Founded in 2014 in Key Biscayne, FL. Free shipping on all orders — every
+          Founded in 2014 in Key Biscayne, FL. Free shipping on all orders. Every
           tee or hat you snag supports our community: building events, uniting fans,
           and spreading sunny soccer passion. Eco-friendly 100% cotton.
         </p>

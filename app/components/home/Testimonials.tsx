@@ -17,7 +17,7 @@ const TESTIMONIALS = [
   },
   {
     t: 'Softest hoodie I own',
-    b: 'The Artisan PED Hoodie is unreal. It has barely left my shoulders since it arrived — and it was on my doorstep within the week.',
+    b: 'The Artisan PED Hoodie is unreal. It has barely left my shoulders since it arrived, and it turned up in under a week.',
     n: 'Nico B',
   },
   {

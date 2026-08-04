@@ -18,7 +18,7 @@ export const meta: Route.MetaFunction = ({matches}) => {
     ...seoMeta({
       title: 'Por El Deporte | Miami Soccer Apparel & Community',
       description:
-        'Beyond the game — building community and creating memories in Key Biscayne since 2014. Shop Por El Deporte apparel.',
+        'Football, friends, and Key Biscayne since 2014. Shop Por El Deporte apparel.',
       url: origin || undefined,
       image:
         'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-26.jpg?v=1755707174&width=1200',
@@ -182,7 +182,7 @@ function TopMarquee() {
 function OrangeMarquee() {
   const phrases = [
     {id: 'ship', text: 'Free Shipping on All Orders'},
-    {id: 'est', text: 'Est. 2014 — Key Biscayne'},
+    {id: 'est', text: 'Est. 2014 Key Biscayne'},
     {id: 'week', text: 'On Your Doorstep in 1 Week'},
     {id: 'community', text: 'Powered by Community'},
   ];
@@ -212,7 +212,7 @@ function Hero() {
           <Link to="/collections/all-products">Shop</Link>
         </div>
         <div className="pel-nav__logo">
-          <Link to="/" aria-label="Por El Deporte — home">
+          <Link to="/" aria-label="Por El Deporte home">
             <PelLogoMark height={46} />
           </Link>
         </div>
@@ -236,8 +236,8 @@ function Hero() {
         </h1>
         <div className="pel-hero__lede">
           <p className="pel-hero__sub">
-            Beyond the game — building community and creating memories in Key
-            Biscayne since 2014.
+            Football, friends, and good days on the island. Key Biscayne
+            since 2014.
           </p>
           <div className="pel-cta-row">
             <Link to="/collections/all-products" className="pel-btn">

@@ -224,7 +224,7 @@ export function ErrorBoundary() {
 
   return (
     <div className="pel-error">
-      <a href="/" className="pel-error__logo" aria-label="Por El Deporte — home">
+      <a href="/" className="pel-error__logo" aria-label="Por El Deporte home">
         Por El Deporte
       </a>
       <div className="pel-error__code">{errorStatus}</div>
@@ -233,7 +233,7 @@ export function ErrorBoundary() {
       </h1>
       <p className="pel-error__msg">
         {is404
-          ? "We couldn't find that page — but there's plenty of gear waiting for you."
+          ? "We could not find that page, but there is plenty of gear waiting for you."
           : 'An unexpected error occurred. Try again in a moment, or head back home.'}
       </p>
       <div className="pel-error__cta">
