@@ -1203,59 +1203,11 @@ a.pel-footer__link:hover {
   overflow: hidden;
   background: var(--pel-sand);
 }
-.pel-ig__inner:has(.pel-ig__img--product) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .pel-ig__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-}
-.pel-ig__img--product {
-  width: 82%;
-  height: 82%;
-  object-fit: contain;
-}
-.pel-ig__inner--say {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 26px;
-}
-.pel-ig__inner--green {
-  background: var(--pel-green);
-  color: var(--pel-cream);
-}
-.pel-ig__inner--light {
-  background: #fffdf6;
-  border: var(--border-width) solid var(--pel-ink);
-  color: var(--pel-ink);
-}
-.pel-ig__say-title {
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: clamp(22px, 1.8vw, 30px);
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-.pel-ig__say-name {
-  display: block;
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.05em;
-  margin-bottom: 10px;
-}
-.pel-ig__say-body {
-  display: block;
-  font: 600 13px/1.6 var(--font-body);
-}
-.pel-ig__inner--green .pel-ig__say-body {
-  opacity: 0.9;
-}
-.pel-ig__inner--light .pel-ig__say-body {
-  opacity: 0.75;
 }
 .pel-ig__foot {
   display: flex;

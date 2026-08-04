@@ -1,25 +1,23 @@
 const IG = 'https://www.instagram.com/poreldeporte/';
 const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/';
 
-type Post =
-  | {kind: 'photo'; id: string; rot: number; src: string; alt: string; product?: boolean}
-  | {kind: 'say'; id: string; rot: number; tone: 'green' | 'light'; title: string; name: string; body: string};
+type Post = {id: string; rot: number; src: string; alt: string};
 
 const POSTS: Post[] = [
-  {kind: 'photo', id: 'i1', rot: -2.4, src: `${CDN}ped-2025-dad-sitting-cross-legged-in.jpg?v=1785799791&width=700`, alt: 'A dad in the kit laughing as his toddler walks past'},
-  {kind: 'photo', id: 'i2', rot: 1.6, src: `${CDN}ped-2025-three-players-walking-away-together.jpg?v=1785799791&width=700`, alt: 'Three teammates walking away together'},
-  {kind: 'photo', id: 'i3', rot: -1.2, src: `${CDN}palmas-kit-462846.png?v=1736430527&width=533`, alt: '“Palmas” Jersey', product: true},
-  {kind: 'say', id: 'i4', rot: 2.2, tone: 'green', title: 'Feels like family', name: 'Tomás R.', body: 'Wore the crest to a match and got stopped twice asking where it was from.'},
-  {kind: 'photo', id: 'i5', rot: -1.8, src: `${CDN}ped-2025-two-players-embracing-back-of.jpg?v=1785799791&width=700`, alt: 'Teammates embracing after a goal'},
-  {kind: 'photo', id: 'i6', rot: 1.4, src: `${CDN}artisan-ped-hoodie-9133088.png?v=1757600942&width=533`, alt: 'Artisan PED Hoodie', product: true},
-  {kind: 'photo', id: 'i7', rot: -2.2, src: `${CDN}ped-2025-player-with-water-bottle-hair.jpg?v=1785799791&width=700`, alt: 'A water break in the shade'},
-  {kind: 'photo', id: 'i8', rot: 1.8, src: `${CDN}ped-2025-keeper-sliding-out-as-a.jpg?v=1785799791&width=700`, alt: 'A shot on goal with the Miami skyline behind'},
-  {kind: 'photo', id: 'i9', rot: 2.4, src: `${CDN}la-isla-tee-511237.png?v=1713839421&width=533`, alt: 'La Isla Tee', product: true},
-  {kind: 'say', id: 'i10', rot: -1.6, tone: 'light', title: 'We give back', name: 'Por el deporte', body: 'Every purchase funds local matches, events, and youth soccer.'},
-  {kind: 'photo', id: 'i11', rot: 1.2, src: `${CDN}ped-2025-back-of-kit-ale-23.jpg?v=1785799791&width=700`, alt: 'Back of the club kit on match day'},
-  {kind: 'photo', id: 'i12', rot: -2, src: `${CDN}the-island-bucket-9731644.png?v=1755720072&width=533`, alt: 'The Island Bucket hat', product: true},
-  {kind: 'photo', id: 'i13', rot: 1.6, src: `${CDN}ped-2025-goalkeeper-fully-extended-in-a.jpg?v=1785799791&width=700`, alt: 'The keeper full stretch for a diving save'},
-  {kind: 'photo', id: 'i14', rot: -2.4, src: `${CDN}ocean-sunset-tee-382023.png?v=1736430528&width=533`, alt: 'The Ocean Tee', product: true},
+  {id: 'i1', rot: -2.4, src: `${CDN}ped-2025-dad-sitting-cross-legged-in.jpg?v=1785799791&width=700`, alt: 'A dad in the kit laughing as his toddler walks past'},
+  {id: 'i2', rot: 1.6, src: `${CDN}ped-2025-three-players-walking-away-together.jpg?v=1785799791&width=700`, alt: 'Three teammates walking away together'},
+  {id: 'i3', rot: -1.2, src: `${CDN}ped-2025-young-girl-in-pink-kit.jpg?v=1785801925&width=700`, alt: 'A young supporter up in the banyan tree'},
+  {id: 'i4', rot: 2.2, src: `${CDN}ped-2025-two-players-embracing-back-of.jpg?v=1785799791&width=700`, alt: 'Teammates embracing after a goal'},
+  {id: 'i5', rot: -1.8, src: `${CDN}ped-2025-player-with-water-bottle-hair.jpg?v=1785799791&width=700`, alt: 'A water break in the shade'},
+  {id: 'i6', rot: 1.4, src: `${CDN}ped-2025-bearded-player-walking-past-sunlit.jpg?v=1785801925&width=700`, alt: 'Walking past the sunlit fence line'},
+  {id: 'i7', rot: -2.2, src: `${CDN}ped-2025-keeper-sliding-out-as-a.jpg?v=1785799791&width=700`, alt: 'A shot on goal with the Miami skyline behind'},
+  {id: 'i8', rot: 1.8, src: `${CDN}ped-2025-teammates-clasping-hands-and-slapping.jpg?v=1785801925&width=700`, alt: 'Hands clasped after the final whistle'},
+  {id: 'i9', rot: 2.4, src: `${CDN}ped-2025-player-running-toward-camera-laughing.jpg?v=1785801925&width=700`, alt: 'All smiles mid-stride'},
+  {id: 'i10', rot: -1.6, src: `${CDN}ped-2025-player-laughing-in-cream-crest.jpg?v=1785801925&width=700`, alt: 'Laughing on the sideline in the crest tee'},
+  {id: 'i11', rot: 1.2, src: `${CDN}ped-2025-back-of-kit-ale-23.jpg?v=1785799791&width=700`, alt: 'Back of the club kit on match day'},
+  {id: 'i12', rot: -2, src: `${CDN}ped-2025-bearded-player-standing-relaxed-in.jpg?v=1785801925&width=700`, alt: 'The kit, out in the afternoon light'},
+  {id: 'i13', rot: 1.6, src: `${CDN}ped-2025-goalkeeper-fully-extended-in-a.jpg?v=1785799791&width=700`, alt: 'The keeper full stretch for a diving save'},
+  {id: 'i14', rot: -2.4, src: `${CDN}ped-2025-goalkeeper-stretched-low-inside-the.jpg?v=1785801925&width=700`, alt: 'Gloves wrapped around it on the line'},
 ];
 
 export function InstagramFeed() {
@@ -48,24 +46,14 @@ export function InstagramFeed() {
             style={{transform: `rotate(${p.rot}deg)`}}
             aria-label="View this post on Instagram"
           >
-            {p.kind === 'photo' ? (
-              <div className="pel-ig__inner">
-                <img
-                  className={p.product ? 'pel-ig__img pel-ig__img--product' : 'pel-ig__img'}
-                  src={p.src}
-                  alt={p.alt}
-                  loading="lazy"
-                />
-              </div>
-            ) : (
-              <div className={`pel-ig__inner pel-ig__inner--say pel-ig__inner--${p.tone}`}>
-                <span className="pel-ig__say-title">{p.title}</span>
-                <span>
-                  <span className="pel-ig__say-name">{p.name}</span>
-                  <span className="pel-ig__say-body">{p.body}</span>
-                </span>
-              </div>
-            )}
+            <div className="pel-ig__inner">
+              <img
+                className="pel-ig__img"
+                src={p.src}
+                alt={p.alt}
+                loading="lazy"
+              />
+            </div>
           </a>
         ))}
       </div>
