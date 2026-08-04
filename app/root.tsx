@@ -11,7 +11,6 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -76,8 +75,15 @@ export function links() {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Montserrat:wght@500;600;700;800&display=swap',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
-    {rel: 'apple-touch-icon', href: favicon},
+    // Icons are real files in public/ (served from the storefront origin), not
+    // bundled assets, so /favicon.ico resolves for the crawlers and older
+    // browsers that request that exact path and never read <link>.
+    {rel: 'icon', href: '/favicon.ico', sizes: '48x48'},
+    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/icon-32.png'},
+    {rel: 'icon', type: 'image/png', sizes: '16x16', href: '/icon-16.png'},
+    // iOS ignores SVG and multi-size .ico — it wants one opaque 180x180 PNG.
+    {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
+    {rel: 'manifest', href: '/manifest.json'},
   ];
 }
 

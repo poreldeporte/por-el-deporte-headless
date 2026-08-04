@@ -13,14 +13,59 @@ import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({matches}) => {
-  return seoMeta({
-    title: 'Por El Deporte | Miami Soccer Apparel & Community',
-    description:
-      'Beyond the game — building community and creating memories in Key Biscayne since 2014. Shop Por El Deporte apparel.',
-    url: siteOrigin(matches) || undefined,
-    image:
-      'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-26.jpg?v=1755707174&width=1200',
-  });
+  const origin = siteOrigin(matches);
+  return [
+    ...seoMeta({
+      title: 'Por El Deporte | Miami Soccer Apparel & Community',
+      description:
+        'Beyond the game — building community and creating memories in Key Biscayne since 2014. Shop Por El Deporte apparel.',
+      url: origin || undefined,
+      image:
+        'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-26.jpg?v=1755707174&width=1200',
+    }),
+    // Site-level structured data. The PDP already emits schema.org/Product; the
+    // homepage is where Google looks for who the brand IS — Organization drives
+    // the knowledge panel and the logo shown beside the site in results, and
+    // WebSite + SearchAction is what makes a sitelinks search box possible.
+    // The logo must be a square >=112px on a URL Google can crawl, which is why
+    // it points at the icon we ship rather than the 100x122 shop logo.
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Por El Deporte',
+        alternateName: 'Por El Deporte FC',
+        url: origin || undefined,
+        logo: origin ? `${origin}/icon-512.png` : undefined,
+        description:
+          'Miami soccer apparel and community, founded in Key Biscayne in 2014.',
+        foundingDate: '2014',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Key Biscayne',
+          addressRegion: 'FL',
+          addressCountry: 'US',
+        },
+        sameAs: ['https://www.instagram.com/poreldeporte/'],
+      },
+    },
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Por El Deporte',
+        url: origin || undefined,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: `${origin}/search?q={search_term_string}`,
+          },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+    },
+  ];
 };
 
 // The rail is merchant-controlled: point this at any collection you curate in
