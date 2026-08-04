@@ -18,6 +18,7 @@ const POSTS: Post[] = [
   {id: 'i12', rot: -2, src: `${CDN}ped-2025-bearded-player-standing-relaxed-in.jpg?v=1785801925&width=700`, alt: 'The kit, out in the afternoon light'},
   {id: 'i13', rot: 1.6, src: `${CDN}ped-2025-goalkeeper-fully-extended-in-a.jpg?v=1785799791&width=700`, alt: 'The keeper full stretch for a diving save'},
   {id: 'i14', rot: -2.4, src: `${CDN}ped-2025-goalkeeper-stretched-low-inside-the.jpg?v=1785801925&width=700`, alt: 'Gloves wrapped around it on the line'},
+  {id: 'i15', rot: 1.8, src: `${CDN}ped-2025-slide-tackle-one-player-down.jpg?v=1785878274&width=700`, alt: 'A slide tackle at full stretch'},
 ];
 
 export function InstagramFeed() {

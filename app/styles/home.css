@@ -1244,6 +1244,13 @@ a.pel-footer__link:hover {
     gap: 14px;
     padding: 0 20px;
   }
+  /* 15 cards over 2 columns leaves one on its own. Centre it at column width so
+     it reads as the end of the feed rather than a missing tile. */
+  .pel-ig__card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 7px);
+  }
   .pel-ig__foot {
     margin-top: 40px;
   }
