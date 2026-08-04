@@ -2,74 +2,76 @@ import type {CSSProperties} from 'react';
 import {Link} from 'react-router';
 
 /**
- * "You Asked, We Delivered" — the Artisan PED Hoodie feature: an overlapping
- * product cluster flanked by floating cloud "sticker" callouts.
- * Product images are brand PNGs (Shopify-hosted); the cluster reveals with a
- * stagger and the clouds gently float (CSS) + fade in (anime.js via useHomeReveal).
+ * "You Asked, We Delivered" — the current drop: the hoodie plus three tees,
+ * laid out as a lightly overlapping row of product shots flanked by floating
+ * cloud "sticker" callouts. Each garment links to its own product page.
+ * The row reveals with a stagger and the clouds gently float (CSS) + fade in
+ * (anime.js via useHomeReveal).
  */
 const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files';
 
 const CLUSTER: {
   img: string;
   alt: string;
+  href: string;
   wrap: CSSProperties;
   inner: CSSProperties;
-  imgTransform: string;
   dx: number;
   dy: number;
 }[] = [
   {
-    img: `${CDN}/artisan-ped-hoodie-4463316.png?v=1757600942&width=700`,
-    alt: 'Artisan PED Hoodie — back',
-    wrap: {width: '300px', height: '400px', marginRight: '-110px'},
-    inner: {transform: 'rotate(-9deg) translateY(26px)'},
-    imgTransform: 'scale(1.12)',
+    img: `${CDN}/island-sketch-tee-1636967.png?v=1765300448&width=700`,
+    alt: 'Island Sketch Tee',
+    href: '/products/island-sketch-tee',
+    wrap: {width: '290px', height: '360px', marginRight: '-38px'},
+    inner: {transform: 'rotate(-7deg) translateY(22px)'},
     dx: -90,
     dy: 0,
   },
   {
+    // The hoodie is the anchor: biggest, centred, sitting in front.
     img: `${CDN}/artisan-ped-hoodie-9133088.png?v=1757600942&width=900`,
     alt: 'Artisan PED Hoodie',
-    wrap: {width: '370px', height: '480px', zIndex: 2},
+    href: '/products/artisan-ped-hoodie',
+    wrap: {width: '360px', height: '460px', zIndex: 3},
     inner: {},
-    imgTransform: 'none',
     dx: 0,
     dy: 72,
   },
   {
-    img: `${CDN}/the-island-bucket-9731644.png?v=1755720072&width=700`,
-    alt: 'The Island Bucket',
-    wrap: {width: '300px', height: '380px', zIndex: 1, marginLeft: '-115px'},
-    inner: {transform: 'translateY(14px)'},
-    imgTransform: 'scale(1.32) translateY(4%)',
-    dx: 0,
-    dy: 60,
+    img: `${CDN}/futbol-mate-asado-tee-9742396.png?v=1756312839&width=700`,
+    alt: 'Futbol, Mate, Asado Tee',
+    href: '/products/futbol-mate-asado-tee',
+    wrap: {width: '290px', height: '360px', zIndex: 2, marginLeft: '-38px'},
+    inner: {transform: 'rotate(5deg) translateY(26px)'},
+    dx: 60,
+    dy: 40,
   },
   {
-    img: `${CDN}/por-el-deporte-cap-1609335.png?v=1755720071&width=700`,
-    alt: 'Por El Deporte Cap',
-    wrap: {width: '280px', height: '340px', marginLeft: '-125px'},
-    inner: {transform: 'rotate(9deg) translateY(30px)'},
-    imgTransform: 'scale(1.28) translateY(7%)',
+    img: `${CDN}/athletic-club-shield-tee-2037918.png?v=1757529282&width=700`,
+    alt: 'Athletic Club Shield Tee',
+    href: '/products/athletic-club-shield-tee',
+    wrap: {width: '280px', height: '345px', marginLeft: '-34px'},
+    inner: {transform: 'rotate(9deg) translateY(34px)'},
     dx: 120,
     dy: 0,
   },
 ];
 
 const CLOUDS: {pos: CSSProperties; text: string}[] = [
-  {pos: {left: '5%', top: '10%', width: '200px', height: '158px'}, text: 'Our first-ever official hoodie'},
-  {pos: {right: '5%', top: '12%', width: '210px', height: '165px'}, text: 'Crafted for unbeatable softness'},
-  {pos: {left: '1%', top: '52%', width: '195px', height: '152px'}, text: 'An original for the PED community'},
+  {pos: {left: '5%', top: '10%', width: '200px', height: '158px'}, text: 'The hoodie you asked for'},
+  {pos: {right: '5%', top: '12%', width: '210px', height: '165px'}, text: 'Three new tees to match'},
+  {pos: {left: '1%', top: '52%', width: '195px', height: '152px'}, text: '100% ring-spun cotton'},
   {pos: {right: '2%', top: '54%', width: '195px', height: '152px'}, text: 'Designed & worn in Miami'},
   {pos: {left: '4%', bottom: '2%', width: '205px', height: '160px'}, text: 'Free shipping — on your doorstep in 1 week'},
   {pos: {right: '4%', bottom: '1%', width: '205px', height: '160px'}, text: 'Every purchase powers our Miami community'},
 ];
 
-const HOODIE_URL = '/products/artisan-ped-hoodie';
+const SHOP_URL = '/collections/all-products';
 
 export function FunctionSection() {
   return (
-    <section className="pel-function" aria-label="The Artisan PED Hoodie">
+    <section className="pel-function" aria-label="The latest drop">
       <div className="pel-function__head">
         <h2 className="pel-function__title" data-reveal>
           You Asked,
@@ -77,14 +79,14 @@ export function FunctionSection() {
           We Delivered
         </h2>
         <p className="pel-function__sub" data-reveal>
-          The Artisan PED Hoodie — our first-ever official hoodie, an homage to our
-          Key Biscayne roots.
+          The Artisan PED Hoodie and three new tees — an homage to our Key
+          Biscayne roots, made for Miami weather.
         </p>
         <div className="pel-function__cta" data-reveal>
-          <Link to={HOODIE_URL} className="pel-btn-outline">
-            Shop Hoodie
+          <Link to={SHOP_URL} className="pel-btn-outline">
+            Shop the Drop
           </Link>
-          <Link to={HOODIE_URL} className="pel-icon-btn" aria-label="Shop the hoodie">
+          <Link to={SHOP_URL} className="pel-icon-btn" aria-label="Shop the drop">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
               <path d="M7 17L17 7M8.5 7H17v8.5" />
             </svg>
@@ -94,24 +96,21 @@ export function FunctionSection() {
 
       <div className="pel-cluster" data-reveal-stagger>
         {CLUSTER.map((c) => (
-          <div
+          <Link
             key={c.alt}
+            to={c.href}
             className="pel-cluster__item"
             style={c.wrap}
+            aria-label={`Shop the ${c.alt}`}
             data-reveal-item
             data-dx={c.dx}
             data-dy={c.dy}
             data-scale="0.82"
           >
             <div className="pel-cluster__inner" style={c.inner}>
-              <img
-                src={c.img}
-                alt={c.alt}
-                loading="lazy"
-                style={{transform: c.imgTransform}}
-              />
+              <img src={c.img} alt={c.alt} loading="lazy" />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
