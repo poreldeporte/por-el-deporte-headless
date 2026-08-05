@@ -6,7 +6,7 @@ import {Link} from 'react-router';
  * laid out as a lightly overlapping row of product shots flanked by floating
  * cloud "sticker" callouts. Each garment links to its own product page.
  * The row reveals with a stagger and the clouds gently float (CSS) + fade in
- * (anime.js via useHomeReveal).
+ * (anime.js via useScrollMotion).
  */
 const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files';
 

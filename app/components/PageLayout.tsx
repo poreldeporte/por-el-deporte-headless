@@ -11,6 +11,7 @@ import {PelFooter} from '~/components/PelFooter';
 import {CartButton} from '~/components/home/CartButton';
 import {CommunityPanel} from '~/components/home/CommunityPanel';
 import {CartMain} from '~/components/CartMain';
+import {useScrollMotion} from '~/components/motion/useScrollMotion';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -29,6 +30,10 @@ export function PageLayout({cart, children = null}: PageLayoutProps) {
   // footer, cart FAB, and cloud clip-path defs are global.
   const {pathname} = useLocation();
   const ownsHero = pathname === '/';
+
+  // Scroll motion for the whole site. It used to be called from _index and
+  // ShopPage only, which is why everything else sat still.
+  useScrollMotion();
 
   return (
     <Aside.Provider>

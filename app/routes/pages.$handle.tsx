@@ -84,6 +84,7 @@ export default function Page() {
         <h1 className="pel-legal__title">{page.title}</h1>
         <div
           className="pel-prose"
+          data-reveal
           dangerouslySetInnerHTML={{__html: page.body}}
         />
       </div>

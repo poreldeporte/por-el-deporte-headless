@@ -8,7 +8,6 @@ import {Moods} from '~/components/home/Moods';
 import {FunctionSection} from '~/components/home/FunctionSection';
 import {InstagramFeed} from '~/components/home/InstagramFeed';
 import {Testimonials} from '~/components/home/Testimonials';
-import {useHomeReveal} from '~/components/home/useHomeReveal';
 import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
@@ -105,7 +104,6 @@ export async function loader({context}: Route.LoaderArgs) {
 
 export default function Homepage() {
   const {railProducts} = useLoaderData<typeof loader>();
-  useHomeReveal();
   return (
     <div className="pel-home">
       <TopMarquee />

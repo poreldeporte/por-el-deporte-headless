@@ -151,13 +151,14 @@ export default function Article() {
         </header>
 
         {image ? (
-          <div className="pel-article__media">
+          <div className="pel-article__media" data-reveal>
             <Image data={image} sizes="(min-width: 900px) 860px, 92vw" loading="eager" />
           </div>
         ) : null}
 
         <div
           className="pel-prose pel-article__body"
+          data-reveal
           dangerouslySetInnerHTML={{__html: contentHtml}}
         />
       </article>

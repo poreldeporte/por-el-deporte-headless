@@ -93,7 +93,7 @@ export default function Blog() {
         ]}
       />
       <div className="pel-journal__inner">
-        <div className="pel-journal__grid">
+        <div className="pel-journal__grid" data-reveal-stagger>
           <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
             {({node: article, index}) => (
               <ArticleItem
@@ -122,7 +122,7 @@ function ArticleItem({
     day: 'numeric',
   }).format(new Date(article.publishedAt!));
   return (
-    <article className="pel-post" key={article.id}>
+    <article className="pel-post" key={article.id} data-reveal-item data-dy="30">
       <Link
         className="pel-post__link"
         prefetch="intent"

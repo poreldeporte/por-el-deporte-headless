@@ -74,7 +74,7 @@ export default function Blogs() {
       />
       <Breadcrumbs items={[{name: 'Home', href: '/'}, {name: 'Journal'}]} />
       <div className="pel-journal__inner">
-        <div className="pel-journal__blogs">
+        <div className="pel-journal__blogs" data-reveal>
           <PaginatedResourceSection<BlogNode> connection={blogs}>
             {({node: blog}) => (
               <Link

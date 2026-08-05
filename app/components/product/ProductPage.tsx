@@ -170,7 +170,7 @@ export function ProductPage({
         </div>
 
         {/* Stat cards */}
-        <div className="pel-pdp__stats">
+        <div className="pel-pdp__stats" data-reveal>
           {STATS.map((s) => (
             <div key={s.label} className="pel-pdp__stat">
               <div className="pel-pdp__stat-value">{s.value}</div>
@@ -262,7 +262,7 @@ export function ProductPage({
             );
           })}
 
-          <div className="pel-pdp__fabric">
+          <div className="pel-pdp__fabric" data-reveal>
             <span>Plastic-Free</span>
             <span className="pel-pdp__fabric-div" />
             <span>100% ring-spun cotton</span>
@@ -305,8 +305,8 @@ export function ProductPage({
       </section>
 
       {/* Info cards */}
-      <section className="pel-pdp__info" id="pdp-details">
-        <div className="pel-pdp__card">
+      <section className="pel-pdp__info" id="pdp-details" data-reveal-stagger>
+        <div className="pel-pdp__card" data-reveal-item data-dy="26">
           <h2 className="pel-pdp__card-title">The Story</h2>
           {rest ? (
             <div
@@ -325,7 +325,7 @@ export function ProductPage({
           </div>
         </div>
 
-        <div className="pel-pdp__card">
+        <div className="pel-pdp__card" data-reveal-item data-dy="26">
           <h2 className="pel-pdp__card-title">Why You&rsquo;ll Live In It</h2>
           <ul className="pel-pdp__wear">
             {WEAR[kind].map((line) => (
@@ -339,7 +339,7 @@ export function ProductPage({
           </ul>
         </div>
 
-        <div className="pel-pdp__card">
+        <div className="pel-pdp__card" data-reveal-item data-dy="26">
           <h2 className="pel-pdp__card-title">The Specs</h2>
           <div className="pel-pdp__specs">
             {SPECS[kind].map(([k, v]) => (
@@ -360,7 +360,7 @@ export function ProductPage({
               ...MOMENTS.map((m) => ({...m, key: `a-${m.id}`, dup: false})),
               ...MOMENTS.map((m) => ({...m, key: `b-${m.id}`, dup: true})),
             ].map((m) => (
-              <div key={m.key} className="pel-pdp__moment">
+              <div key={m.key} className="pel-pdp__moment" data-scroll-parallax data-speed="18">
                 <img src={m.src} alt={m.dup ? '' : m.alt} loading="lazy" />
               </div>
             ))}

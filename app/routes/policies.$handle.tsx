@@ -61,6 +61,7 @@ export default function Policy() {
         <h1 className="pel-legal__title">{policy.title}</h1>
         <div
           className="pel-prose"
+          data-reveal
           dangerouslySetInnerHTML={{__html: policy.body}}
         />
       </div>

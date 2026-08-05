@@ -5,7 +5,6 @@ import type {ShopProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
-import {useHomeReveal} from '~/components/home/useHomeReveal';
 
 const BANNER_IMG =
   'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1216.jpg?v=1755705211&width=2000';
@@ -51,7 +50,6 @@ export function ShopPage({
   image?: string | null;
   products: ShopProductFragment[];
 }) {
-  useHomeReveal();
   const [filter, setFilter] = useState('All');
 
   const categories = useMemo(() => {

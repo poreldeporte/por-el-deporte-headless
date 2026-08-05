@@ -51,7 +51,12 @@ while (queue.length && visited.length < MAX_PAGES) {
   const url = BASE + path;
   let response;
   try {
-    response = await page.goto(url, {waitUntil: 'networkidle', timeout: 30000});
+    // 'load' + a short settle, NOT 'networkidle'. Pages carrying 20-30 lazy
+    // images never reach a 500ms network-quiet window inside the timeout, so
+    // networkidle reported /about and three PDPs as "failed to load" when they
+    // render perfectly. Playwright discourages networkidle for exactly this.
+    response = await page.goto(url, {waitUntil: 'load', timeout: 30000});
+    await page.waitForTimeout(600);
   } catch {
     record('PAGE FAILED TO LOAD', path, url);
     continue;
