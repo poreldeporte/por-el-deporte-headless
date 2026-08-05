@@ -25,6 +25,57 @@ const MOMENTS = [
   {id: 'm8', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-808.jpg?v=1755707867&width=800', alt: 'Building community'},
 ];
 
+
+/**
+ * Shopify has no productType or tags set on any product, so the garment kind is
+ * inferred from the title. Set real product types in admin and this can read
+ * them instead (it would also fix the Shop page's title-derived category chips).
+ */
+type Kind = 'hoodie' | 'tee' | 'hat' | 'tote' | 'jersey' | 'shorts';
+function kindOf(title: string): Kind {
+  const t = title.toLowerCase();
+  if (t.includes('hoodie')) return 'hoodie';
+  if (t.includes('cap') || t.includes('bucket') || t.includes('hat')) return 'hat';
+  if (t.includes('tote')) return 'tote';
+  if (t.includes('jersey') || t.includes('kit')) return 'jersey';
+  if (t.includes('short')) return 'shorts';
+  return 'tee';
+}
+
+/** Card 2: why you'll actually wear it. Short lines, not a wall of grey text. */
+const WEAR: Record<Kind, string[]> = {
+  tee: ['Heavyweight cotton that keeps its shape', 'Relaxed cut, true to size', 'Pre-shrunk, so it fits the same in a year', 'Soft enough for the flight home'],
+  hoodie: ['Brushed fleece inside, heavy outside', 'Roomy without swimming in it', 'Ribbed cuffs that stay put', 'The one you will reach for all winter'],
+  hat: ['Organic cotton twill, no plastic', 'Broken in from the first wear', 'Holds its shape in the sun', 'Adjustable, fits most heads'],
+  tote: ['Thick canvas with a flat bottom', 'Handles long enough for a shoulder', 'Takes a full shop or a full kit', 'Washes and keeps going'],
+  jersey: ['Match-day fabric that breathes', 'Cut to move, not to cling', 'Colours that hold after the wash', 'The same one the team wears'],
+  shorts: ['Light enough to forget you have them on', 'Deep pockets that hold a phone', 'Elastic waist, drawcord if you want it', 'Dries fast after a game'],
+};
+
+/** Card 3: the specs, tailored per garment. */
+const SPECS: Record<Kind, [string, string][]> = {
+  tee: [['Fabric', '100% ring-spun cotton'], ['Weight', 'Heavyweight'], ['Fit', 'Relaxed, pre-shrunk'], ['Collar', 'Double-needle'], ['Neck', 'Twill-taped'], ['Sizes', 'S to 2XL']],
+  hoodie: [['Fabric', 'Cotton-rich fleece'], ['Weight', 'Heavyweight'], ['Fit', 'Relaxed'], ['Hood', 'Double-lined'], ['Pocket', 'Front kangaroo'], ['Sizes', 'S to 2XL']],
+  hat: [['Fabric', '100% organic cotton twill'], ['Weight', '8 oz'], ['Panels', 'Six, unstructured'], ['Closure', 'Adjustable'], ['Certified', 'GOTS and OEKO-TEX'], ['Fit', 'One size']],
+  tote: [['Fabric', '100% cotton canvas'], ['Weight', 'Heavyweight'], ['Base', 'Flat bottom'], ['Handles', 'Shoulder length'], ['Care', 'Machine wash cold'], ['Size', 'One size']],
+  jersey: [['Fabric', 'Performance knit'], ['Fit', 'Athletic'], ['Crest', 'Embroidered'], ['Worn by', 'The club, every match day'], ['Care', 'Cold wash, hang dry'], ['Sizes', 'S to 2XL']],
+  shorts: [['Fabric', 'Lightweight woven'], ['Fit', 'Athletic'], ['Waist', 'Elastic with drawcord'], ['Pockets', 'Side, deep'], ['Care', 'Machine wash cold'], ['Sizes', 'S to 2XL']],
+};
+
+/**
+ * The description is authored as a punchy opening line followed by the story.
+ * The opener becomes the subtitle under the product name; the rest fills the
+ * first info card, which stops that column running twice as long as the others.
+ */
+function splitDescription(html: string): {lead: string; rest: string} {
+  const paras = html.match(/<p[\s\S]*?<\/p>/gi);
+  if (!paras || paras.length === 0) return {lead: '', rest: html};
+  const strip = (x: string) => x.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  const lead = strip(paras[0]);
+  if (paras.length === 1) return {lead, rest: ''};
+  return {lead, rest: paras.slice(1).join('')};
+}
+
 export function ProductPage({
   product,
   selectedVariant,
@@ -65,6 +116,8 @@ export function ProductPage({
   }, [variantImageId, variantIndex]);
 
   const main = images[activeImg] ?? variantImage ?? images[0];
+  const kind = kindOf(product.title);
+  const {lead, rest} = splitDescription(product.descriptionHtml ?? '');
 
   const available = Boolean(selectedVariant?.availableForSale);
   const unitAmount = Number(selectedVariant?.price?.amount ?? 0);
@@ -114,6 +167,7 @@ export function ProductPage({
         {/* Buy panel */}
         <div className="pel-pdp__buy">
           <h1 className="pel-pdp__title">{product.title}</h1>
+          {lead ? <p className="pel-pdp__lead">{lead}</p> : null}
           <div className="pel-pdp__price">
             {selectedVariant?.price ? <Money data={selectedVariant.price} /> : null}
             {selectedVariant?.compareAtPrice ? (
@@ -231,16 +285,16 @@ export function ProductPage({
       {/* Info cards */}
       <section className="pel-pdp__info" id="pdp-details">
         <div className="pel-pdp__card">
-          <h2 className="pel-pdp__card-title">Club Pride</h2>
-          {product.descriptionHtml ? (
+          <h2 className="pel-pdp__card-title">The Story</h2>
+          {rest ? (
             <div
               className="pel-pdp__card-body"
-              dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
+              dangerouslySetInnerHTML={{__html: rest}}
             />
           ) : (
             <p className="pel-pdp__card-body">
-              Club gear made by people who actually play. Wear it to the game
-              or anywhere else.
+              Club gear made by people who actually play. Wear it to the game or
+              anywhere else.
             </p>
           )}
           <div className="pel-pdp__card-foot">
@@ -250,24 +304,23 @@ export function ProductPage({
         </div>
 
         <div className="pel-pdp__card">
-          <h2 className="pel-pdp__card-title">Fabric &amp; Fit</h2>
-          <p className="pel-pdp__card-body">
-            100% ring-spun cotton, no plastic. Soft, breathable and heavy enough
-            to feel good. Pre-shrunk relaxed fit with a double-needle collar and
-            twill-taped neck so it holds up.
-          </p>
+          <h2 className="pel-pdp__card-title">Why You&rsquo;ll Live In It</h2>
+          <ul className="pel-pdp__wear">
+            {WEAR[kind].map((line) => (
+              <li key={line}>
+                <svg width="15" height="15" viewBox="0 0 100 100" aria-hidden="true">
+                  <path d="M50 0C54 30 70 46 100 50C70 54 54 70 50 100C46 70 30 54 0 50C30 46 46 30 50 0Z" fill="currentColor" />
+                </svg>
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="pel-pdp__card">
-          <h2 className="pel-pdp__card-title">Details</h2>
+          <h2 className="pel-pdp__card-title">The Specs</h2>
           <div className="pel-pdp__specs">
-            {[
-              ['Fit', 'Relaxed, pre-shrunk'],
-              ['Weight', 'Heavyweight'],
-              ['Collar', 'Double-needle'],
-              ['Neck', 'Twill-taped'],
-              ['Sizes', 'S – 2XL'],
-            ].map(([k, v]) => (
+            {SPECS[kind].map(([k, v]) => (
               <div key={k} className="pel-pdp__spec">
                 <span className="pel-pdp__spec-k">{k}</span>
                 <span className="pel-pdp__spec-v">{v}</span>

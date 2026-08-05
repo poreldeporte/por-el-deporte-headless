@@ -115,16 +115,31 @@
   text-transform: uppercase;
   color: var(--pel-ink);
 }
+/* Short hook under the product name, taken from the first line of the
+   description so the story card does not carry it twice. */
+.pel-pdp__lead {
+  margin: 14px 0 0;
+  max-width: 46ch;
+  font: 600 16px/1.55 var(--font-body);
+  color: var(--text-muted);
+}
+/* The price is the thing people look for. It was 24px, smaller than the size
+   pills next to it; now it anchors the panel. */
 .pel-pdp__price {
   display: flex;
   align-items: baseline;
-  gap: 4px;
-  margin: 16px 0 0;
+  gap: 12px;
+  margin: 18px 0 0;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 1.2;
+  font-weight: 650;
+  font-size: clamp(40px, 4.4vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.01em;
   color: var(--pel-ink);
+}
+.pel-pdp__price s {
+  font-size: 0.42em;
+  font-weight: 600;
 }
 .pel-pdp__compare {
   color: var(--text-muted);
@@ -333,6 +348,28 @@
   text-transform: uppercase;
   color: var(--pel-ink);
 }
+/* Card 2 reads as a short list of reasons, not a paragraph of grey text. */
+.pel-pdp__wear {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pel-pdp__wear li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font: 600 14px/1.5 var(--font-body);
+  color: var(--pel-ink);
+}
+.pel-pdp__wear svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--pel-orange);
+}
+
 .pel-pdp__specs {
   display: flex;
   flex-direction: column;
