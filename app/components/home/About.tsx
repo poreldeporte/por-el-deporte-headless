@@ -1,6 +1,5 @@
 import type {CSSProperties} from 'react';
 import {Link} from 'react-router';
-import {Stars} from './Stars';
 
 /**
  * "Founded in 2014…" — a cloud-clipped photo collage + brand statement.
@@ -103,8 +102,10 @@ export function About() {
                 </svg>
               </Link>
             </div>
+            {/* This row used to lead with a 4-of-5 star rating. There is no
+                review system behind the site, so the rating was invented — it
+                came out rather than being restated as a claim we can't back. */}
             <div className="pel-about__rating">
-              <Stars total={5} filled={4} size={24} />
               <a
                 href="https://www.instagram.com/poreldeporte"
                 target="_blank"

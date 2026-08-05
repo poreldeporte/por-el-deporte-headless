@@ -1,5 +1,4 @@
-import {useState} from 'react';
-import {Link} from 'react-router';
+import {Link, useFetcher} from 'react-router';
 import {PelLogoMark} from '~/components/PelLogo';
 
 /**
@@ -70,27 +69,53 @@ function FooterLinkEl({item}: {item: FooterLink}) {
   );
 }
 
+/**
+ * Real signup, posting to the api.newsletter resource route, which subscribes
+ * the address in Shopify. It used to be a form that swallowed the email and
+ * claimed success regardless — so the result here is whatever actually happened,
+ * including the failures.
+ */
 function NewsletterCard() {
-  const [notified, setNotified] = useState(false);
+  const fetcher = useFetcher<{ok: boolean; message: string}>();
+  const sending = fetcher.state !== 'idle';
+  const result = fetcher.data;
+
   return (
-    <form
+    <fetcher.Form
+      method="post"
+      action="/api/newsletter"
       className="pel-newsletter"
-      onSubmit={(e) => {
-        e.preventDefault();
-        setNotified(true);
-      }}
     >
-      <input
-        className="pel-newsletter__input"
-        type="email"
-        required
-        placeholder="ENTER YOUR EMAIL..."
-        aria-label="Email address"
-      />
-      <button type="submit" className="pel-newsletter__btn">
-        {notified ? 'You’re In!' : 'Notify Me'}
-      </button>
-    </form>
+      {result?.ok ? (
+        <p className="pel-newsletter__done" role="status">
+          {result.message} Keep an eye on your inbox.
+        </p>
+      ) : (
+        <>
+          <input
+            className="pel-newsletter__input"
+            type="email"
+            name="email"
+            required
+            placeholder="ENTER YOUR EMAIL..."
+            aria-label="Email address"
+            disabled={sending}
+          />
+          <button
+            type="submit"
+            className="pel-newsletter__btn"
+            disabled={sending}
+          >
+            {sending ? 'Adding…' : 'Notify Me'}
+          </button>
+        </>
+      )}
+      {result && !result.ok ? (
+        <p className="pel-newsletter__error" role="alert">
+          {result.message}
+        </p>
+      ) : null}
+    </fetcher.Form>
   );
 }
 

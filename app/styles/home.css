@@ -848,6 +848,9 @@ body:has(.pel-home) {
   padding: 0 14px;
   flex: none;
 }
+/* No min-height: the flex row stretches every card to the tallest one, so the
+   cards stay a uniform height on their own. The old 380px floor was sized around
+   a star rating that no longer exists and left a dead gap above the name. */
 .pel-testi__card {
   flex: none;
   width: 440px;
@@ -857,13 +860,6 @@ body:has(.pel-home) {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  min-height: 380px;
-}
-.pel-testi__stars {
-  display: flex;
-  gap: 6px;
-  color: var(--pel-orange);
-  margin-bottom: 26px;
 }
 .pel-testi__cardtitle {
   margin: 0 0 18px;
@@ -959,6 +955,7 @@ a.pel-footer__logo {
   top: 50%;
   transform: translate(-50%, -50%) rotate(-2deg);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   background: var(--pel-cream);
   border-radius: var(--radius-md);
@@ -995,6 +992,32 @@ a.pel-footer__logo {
 }
 .pel-newsletter__btn:hover {
   background: var(--pel-ink);
+}
+.pel-newsletter__btn:disabled,
+.pel-newsletter__input:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+/* The confirmation replaces the input and the button, so it is the pill's only
+   child — it takes the full width and centres itself. */
+.pel-newsletter__done {
+  flex: 1;
+  margin: 0;
+  padding: 14px 18px 14px 0;
+  text-align: center;
+  font: 600 13px/1.4 var(--font-body);
+  letter-spacing: 0.04em;
+  color: var(--pel-ink);
+}
+/* An error sits on its own row under the field rather than squeezing in beside
+   the button, which is why the pill is allowed to wrap. */
+.pel-newsletter__error {
+  flex: 0 0 100%;
+  margin: 6px 0 2px;
+  padding-right: 18px;
+  font: 600 12px/1.4 var(--font-body);
+  letter-spacing: 0.03em;
+  color: #a4331f;
 }
 .pel-footer__cloud {
   position: absolute;
@@ -1340,7 +1363,6 @@ a.pel-footer__link:hover {
   }
   .pel-testi__card {
     width: 300px;
-    min-height: 320px;
     padding: 24px;
   }
   .pel-footer {
