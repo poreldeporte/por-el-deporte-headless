@@ -60,10 +60,12 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
                 : 'https://schema.org/OutOfStock',
               itemCondition: 'https://schema.org/NewCondition',
               url: `${origin}${location.pathname}`,
-              // Free shipping on all orders is stated site-wide (marquee and
-              // footer), so it is safe to declare. Delivery times, and the
-              // return policy, are deliberately NOT declared here: Google
-              // surfaces both as commitments and we do not have the real terms.
+              // Verified against the store's delivery profiles: the domestic
+              // zone's only rate is $0.00, so free US shipping is real and safe
+              // to declare. Scoped to US on purpose — Rest of World is billed at
+              // live USPS/DHL rates. Delivery times, and the return policy, are
+              // deliberately NOT declared: Google surfaces both as commitments
+              // and we do not have the real terms.
               shippingDetails: {
                 '@type': 'OfferShippingDetails',
                 shippingRate: {

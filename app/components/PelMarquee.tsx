@@ -30,10 +30,10 @@ export function PelMarquee({
 }
 
 export const MARQUEE_ITEMS = [
-  {id: 'ship', text: 'Free Shipping on All Orders'},
+  {id: 'ship', text: 'Free Shipping on U.S. Orders'},
   {id: 'btg', text: 'Beyond the Game'},
   {id: 'week', text: 'On Your Doorstep in 1 Week'},
-  {id: 'ship2', text: 'Free Shipping on All Orders'},
+  {id: 'ship2', text: 'Free Shipping on U.S. Orders'},
   {id: 'btg2', text: 'Beyond the Game'},
   {id: 'week2', text: 'On Your Doorstep in 1 Week'},
 ];

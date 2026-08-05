@@ -46,6 +46,16 @@ export const meta: Route.MetaFunction = ({matches}) => {
           addressRegion: 'FL',
           addressCountry: 'US',
         },
+        // A reachable support address is a basic trust signal for a store, and
+        // Google uses it for the knowledge panel. This is the shop's own
+        // contactEmail from Shopify settings, not a personal one.
+        email: 'contact@poreldeporte.com',
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer support',
+          email: 'contact@poreldeporte.com',
+          availableLanguage: ['English', 'Spanish'],
+        },
         sameAs: ['https://www.instagram.com/poreldeporte/'],
       },
     },
@@ -181,7 +191,7 @@ function TopMarquee() {
 
 function OrangeMarquee() {
   const phrases = [
-    {id: 'ship', text: 'Free Shipping on All Orders'},
+    {id: 'ship', text: 'Free Shipping on U.S. Orders'},
     {id: 'est', text: 'Est. 2014 Key Biscayne'},
     {id: 'week', text: 'On Your Doorstep in 1 Week'},
     {id: 'community', text: 'Powered by Community'},

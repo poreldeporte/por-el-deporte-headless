@@ -1,4 +1,5 @@
 import type {CSSProperties} from 'react';
+import {Link} from 'react-router';
 import {Stars} from './Stars';
 
 /**
@@ -86,18 +87,21 @@ export function About() {
           </p>
           <div className="pel-about__meta">
             <div className="pel-about__cta">
-              <button type="button" className="pel-btn-outline">
+              <Link to="/about" className="pel-btn-outline" prefetch="intent">
                 Our Mission
-              </button>
-              <button
-                type="button"
+              </Link>
+              <Link
+                to="/about"
                 className="pel-icon-btn"
                 aria-label="Our mission"
+                prefetch="intent"
+                tabIndex={-1}
+                aria-hidden="true"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                   <path d="M7 17L17 7M8.5 7H17v8.5" />
                 </svg>
-              </button>
+              </Link>
             </div>
             <div className="pel-about__rating">
               <Stars total={5} filled={4} size={24} />

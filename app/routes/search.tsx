@@ -169,6 +169,11 @@ const SEARCH_ARTICLE_FRAGMENT = `#graphql
     id
     title
     trackingParameters
+    # Articles live at /blogs/:blogHandle/:articleHandle, so the result link
+    # needs the blog it belongs to — without it the link 404s.
+    blog {
+      handle
+    }
   }
 ` as const;
 

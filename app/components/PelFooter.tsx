@@ -48,6 +48,9 @@ const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
     items: [
       {t: 'Refund Policy', to: '/policies/refund-policy'},
       {t: 'Privacy Policy', to: '/policies/privacy-policy'},
+      // The store's real support address, from Shopify's shop settings. Nothing
+      // on the storefront offered a way to reach anyone before this.
+      {t: 'Contact Us', href: 'mailto:contact@poreldeporte.com'},
     ],
   },
 ];
@@ -148,7 +151,7 @@ export function PelFooter() {
         </div>
         <div className="pel-footer__rule" />
         <p className="pel-footer__legal">
-          Founded in 2014 in Key Biscayne, FL. Free shipping on all orders. Every
+          Founded in 2014 in Key Biscayne, FL. Free shipping on U.S. orders. Every
           tee or hat you snag supports our community: building events, uniting fans,
           and spreading sunny soccer passion. Eco-friendly 100% cotton.
         </p>

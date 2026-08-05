@@ -36,7 +36,7 @@ const ING_CLUB: [string, string][] = [
   ['Respect & Fair Play', 'salt'],
   ['Original Club Designs', 'pill'],
   ['100% Cotton', 'droplet'],
-  ['Free Shipping on All Orders', 'flask'],
+  ['Free Shipping on U.S. Orders', 'flask'],
   ['Sizes S to 2XL', 'sparkle'],
 ];
 
