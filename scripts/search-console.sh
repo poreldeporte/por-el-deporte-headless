@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Google Search Console setup, driven by the API instead of the web UI.
 #
-#   ./scripts/search-console.sh token     # phase 1: get the verification string
-#   ./scripts/search-console.sh verify    # phase 2: verify + add + submit sitemaps
+#   ./scripts/search-console.sh dns-token   # RECOMMENDED: TXT record, no deploy needed
+#   ./scripts/search-console.sh dns-verify  # verify + add property + submit sitemap
+#   ./scripts/search-console.sh token       # alt: meta tag (needs an Oxygen deploy)
+
 #   ./scripts/search-console.sh report    # anytime: coverage + top queries
 #
 # Prerequisite (only a human can do this — it needs the Google password/2FA):
@@ -52,6 +54,53 @@ ensure_apis() {
 }
 
 case "${1:-}" in
+  dns-token)
+    # Preferred over `token`. poreldeporte.com's nameservers are Cloudflare, so a
+    # TXT record is a 30-second change in a dashboard — and unlike the meta tag it
+    # needs no deploy, covers every subdomain, and survives a storefront rebuild.
+    ensure_apis
+    echo "==> requesting a DNS_TXT verification token for $DOMAIN"
+    api POST 'https://www.googleapis.com/siteVerification/v1/token' \
+      "{\"verificationMethod\":\"DNS_TXT\",\"site\":{\"type\":\"INET_DOMAIN\",\"identifier\":\"$DOMAIN\"}}" \
+      | python3 -c '
+import sys, json
+d = json.load(sys.stdin)
+if "error" in d:
+    print("    ERROR:", json.dumps(d["error"])[:400]); sys.exit(1)
+print("    Add this TXT record in Cloudflare DNS for poreldeporte.com:")
+print()
+print("      Type:  TXT")
+print("      Name:  @        (the root, poreldeporte.com)")
+print("      Value:", d["token"])
+print()
+print("    NOTE: the domain already has one google-site-verification TXT record.")
+print("    ADD this one alongside it — do not replace it, something else is using it.")
+print()
+print("    Then run:  ./scripts/search-console.sh dns-verify")
+'
+    ;;
+
+  dns-verify)
+    echo "==> checking the TXT record has propagated"
+    if ! dig +short TXT "$DOMAIN" | grep -q 'google-site-verification'; then
+      echo "    no google-site-verification TXT found on $DOMAIN" >&2
+      exit 1
+    fi
+    dig +short TXT "$DOMAIN" | grep 'google-site-verification' | sed 's/^/    found: /'
+    echo "==> verifying domain ownership"
+    api POST 'https://www.googleapis.com/siteVerification/v1/webResource?verificationMethod=DNS_TXT' \
+      "{\"site\":{\"type\":\"INET_DOMAIN\",\"identifier\":\"$DOMAIN\"}}" | sed 's/^/    /'
+    echo "==> adding the sc-domain property"
+    api PUT "https://www.googleapis.com/webmasters/v3/sites/sc-domain%3A$DOMAIN" | sed 's/^/    /'
+    echo "==> submitting the sitemap index"
+    code=$(curl -sS -o /dev/null -w '%{http_code}' -X PUT \
+      "https://www.googleapis.com/webmasters/v3/sites/sc-domain%3A$DOMAIN/sitemaps/$(python3 -c "
+import urllib.parse; print(urllib.parse.quote('${SITE}sitemap.xml', safe=''))")" \
+      -H "Authorization: Bearer $(tok)" -H "x-goog-user-project: $PROJECT")
+    echo "    sitemap.xml -> HTTP $code"
+    echo "==> done, no deploy required."
+    ;;
+
   token)
     ensure_apis
     echo "==> requesting a META verification token for $SITE"
