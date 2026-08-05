@@ -5,6 +5,7 @@ import type {ProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {swatchColor} from '~/lib/swatches';
 
 type Variant = ProductFragment['selectedOrFirstAvailableVariant'];
 
@@ -197,12 +198,18 @@ export function ProductPage({
                     const cls = isColor
                       ? `pel-pdp__swatch${selected ? ' is-active' : ''}`
                       : `pel-pdp__size${selected ? ' is-active' : ''}`;
+                    // Only draw a dot when we actually know the colour. Painting
+                    // an unknown one with a neutral fallback is worse than no
+                    // dot: it tells the customer the garment is that colour.
+                    const dot = isColor ? swatchColor(name, swatch) : null;
                     const inner = isColor ? (
                       <>
-                        <span
-                          className="pel-pdp__swatch-dot"
-                          style={{background: swatch?.color || 'var(--pel-sand)'}}
-                        />
+                        {dot ? (
+                          <span
+                            className="pel-pdp__swatch-dot"
+                            style={{background: dot}}
+                          />
+                        ) : null}
                         <span className="pel-pdp__swatch-name">{name}</span>
                       </>
                     ) : (

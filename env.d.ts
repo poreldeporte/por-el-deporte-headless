@@ -19,5 +19,13 @@ declare global {
      * failure when it's missing instead of pretending the signup worked.
      */
     PRIVATE_ADMIN_API_TOKEN?: string;
+
+    /**
+     * Google Search Console HTML-tag verification token — the `content` value
+     * from the <meta name="google-site-verification"> snippet it hands you.
+     * Rendered into every page's <head> by root.tsx when set. PUBLIC_ because
+     * it is meant to be visible in the markup; it grants nothing on its own.
+     */
+    PUBLIC_GOOGLE_SITE_VERIFICATION?: string;
   }
 }

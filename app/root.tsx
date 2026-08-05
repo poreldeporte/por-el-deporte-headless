@@ -101,6 +101,10 @@ export async function loader(args: Route.LoaderArgs) {
     ...criticalData,
     origin: new URL(args.request.url).origin,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    // Google Search Console's HTML-tag verification. Kept in an env var so
+    // claiming the property is a config change in Oxygen, not a code change —
+    // and so the token isn't committed to a public repo. See docs/GOOGLE_SETUP.md.
+    googleSiteVerification: env.PUBLIC_GOOGLE_SITE_VERIFICATION,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -166,6 +170,12 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  // Read from root loader data rather than a meta() export: in React Router v7
+  // the deepest matched route's meta() replaces its parents', so a root-level
+  // meta tag would vanish on every page that defines its own. Optional-chained
+  // because Layout also renders the error boundary, where there is no data.
+  const googleSiteVerification = useRouteLoaderData<RootLoader>('root')
+    ?.googleSiteVerification;
 
   return (
     <html lang="en">
@@ -173,6 +183,12 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="theme-color" content="#F7F0DE" />
+        {googleSiteVerification ? (
+          <meta
+            name="google-site-verification"
+            content={googleSiteVerification}
+          />
+        ) : null}
         <link rel="stylesheet" href={tailwindCss}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
