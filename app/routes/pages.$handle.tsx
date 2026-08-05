@@ -2,13 +2,29 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {seoMeta, siteOrigin} from '~/lib/seo';
+import {isPageBodyEmpty, pageCanonicalPath} from '~/lib/pages-seo';
 
 export const meta: Route.MetaFunction = ({data, location, matches}) => {
-  return seoMeta({
-    title: `Por El Deporte | ${data?.page.title ?? ''}`,
-    description: data?.page.seo?.description,
-    url: `${siteOrigin(matches)}${location.pathname}`,
-  });
+  const page = data?.page;
+  const handle = page?.handle ?? '';
+  const origin = siteOrigin(matches);
+  // A duplicate points its canonical at the page that owns the content; an
+  // empty page is told not to index at all. Deliberately never both — noindex
+  // on a page that canonicalises elsewhere can carry the noindex across to the
+  // target, which would drop the real page out of the index too.
+  const canonical = pageCanonicalPath(handle, location.pathname);
+  const empty = canonical === location.pathname && isPageBodyEmpty(page?.body);
+
+  return [
+    ...seoMeta({
+      title: `Por El Deporte | ${page?.title ?? ''}`,
+      description: page?.seo?.description,
+      url: `${origin}${canonical}`,
+    }),
+    ...(empty
+      ? [{name: 'robots', content: 'noindex, follow'} as const]
+      : []),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

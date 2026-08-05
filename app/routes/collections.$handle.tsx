@@ -3,19 +3,26 @@ import type {Route} from './+types/collections.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ShopPage} from '~/components/shop/ShopPage';
-import {seoMeta, siteOrigin} from '~/lib/seo';
+import {seoMeta, siteOrigin, breadcrumbLd} from '~/lib/seo';
 import shopStyles from '~/styles/shop.css?url';
 
 export const meta: Route.MetaFunction = ({data, location, matches}) => {
   const collection = data?.collection;
-  return seoMeta({
-    title: `Por El Deporte | ${collection?.title ?? 'Shop'}`,
-    description:
-      collection?.description ||
-      'Shop Por El Deporte apparel. Original club designs, 100% cotton, free shipping.',
-    url: `${siteOrigin(matches)}${location.pathname}`,
-    image: collection?.image?.url,
-  });
+  const origin = siteOrigin(matches);
+  return [
+    ...seoMeta({
+      title: `Por El Deporte | ${collection?.title ?? 'Shop'}`,
+      description:
+        collection?.description ||
+        'Shop Por El Deporte apparel. Original club designs, 100% cotton, free shipping.',
+      url: `${origin}${location.pathname}`,
+      image: collection?.image?.url,
+    }),
+    breadcrumbLd(origin, [
+      {name: 'Home', href: '/'},
+      {name: collection?.title ?? 'Shop'},
+    ]),
+  ];
 };
 
 export const links: Route.LinksFunction = () => [

@@ -133,8 +133,8 @@ function SearchResultsProducts({
 
           return (
             <div>
-              <div>
-                <PreviousLink>
+              <div className="pel-loadmore">
+                <PreviousLink className="pel-btn-outline">
                   {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
                 </PreviousLink>
               </div>
@@ -142,8 +142,8 @@ function SearchResultsProducts({
                 {ItemsMarkup}
                 <br />
               </div>
-              <div>
-                <NextLink>
+              <div className="pel-loadmore">
+                <NextLink className="pel-btn-outline">
                   {isLoading ? 'Loading...' : <span>Load more ↓</span>}
                 </NextLink>
               </div>

@@ -230,6 +230,70 @@ main h1 {
   cursor: default;
 }
 
+/* Pagination links ("Load more" / "Load previous"). Hydrogen's <Pagination>
+   renders real <a href> pages rather than an infinite scroll, which is what
+   Google asks for — a crawler can follow them and reach every result. They just
+   needed the brand's button treatment (and a real tap target) instead of the
+   skeleton's bare 19px-tall link. Empty when there is no further page, so the
+   wrapper collapses rather than leaving a gap. */
+.pel-loadmore {
+  display: flex;
+  justify-content: center;
+}
+.pel-loadmore:empty {
+  display: none;
+}
+
+/* ===== Breadcrumbs ===== */
+.pel-crumbs {
+  max-width: var(--container);
+  margin: 0 auto -10px;
+  padding: 8px 48px 0;
+}
+.pel-crumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font: 700 12px/1.4 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.pel-crumbs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+/* The links are 12px text, so their natural box is ~24px tall — half the 44px
+   minimum touch target. Padding them out to 44px and pulling the same amount
+   back off the nav's own vertical padding grows the hit area without moving a
+   single pixel of the trail on screen. */
+.pel-crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.pel-crumbs a:hover {
+  color: var(--pel-orange);
+}
+.pel-crumbs__item [aria-current='page'] {
+  color: var(--pel-ink);
+}
+.pel-crumbs__sep {
+  color: var(--border-soft);
+}
+@media (max-width: 48em) {
+  .pel-crumbs {
+    padding: 4px 20px 0;
+  }
+}
+
 /* ===== Subpage banner =====
    The design uses one "SUBPAGE BANNER" pattern for the interior pages — same
    geometry, gradient and type on About as on the Shop banner. It lives in this

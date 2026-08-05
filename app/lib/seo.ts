@@ -78,3 +78,29 @@ export function seoMeta({
 
   return tags;
 }
+
+/**
+ * BreadcrumbList JSON-LD. Google requires at least two ListItems, each with
+ * `position` and `name`; `item` is required except on the last crumb, where
+ * omitting it lets Google use the current page URL.
+ */
+export function breadcrumbLd(
+  origin: string,
+  items: {name: string; href?: string}[],
+) {
+  return {
+    'script:ld+json': {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: items.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.name,
+        // Last crumb intentionally has no `item`.
+        ...(c.href && i < items.length - 1
+          ? {item: `${origin}${c.href}`}
+          : {}),
+      })),
+    },
+  };
+}

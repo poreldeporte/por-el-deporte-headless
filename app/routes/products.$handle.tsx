@@ -10,7 +10,7 @@ import {
 } from '@shopify/hydrogen';
 import {ProductPage} from '~/components/product/ProductPage';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {seoMeta, siteOrigin} from '~/lib/seo';
+import {seoMeta, siteOrigin, breadcrumbLd} from '~/lib/seo';
 import productStyles from '~/styles/product.css?url';
 
 export const meta: Route.MetaFunction = ({data, location, matches}) => {
@@ -42,6 +42,14 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
         image: product.images.nodes.map((n) => n.url),
         brand: {'@type': 'Brand', name: product.vendor || 'Por El Deporte'},
         sku: variant?.sku || undefined,
+        productID: product.id,
+        category: product.productType || undefined,
+        // Variant attributes Google lists as recommended for merchant listings.
+        ...Object.fromEntries(
+          (variant?.selectedOptions ?? [])
+            .filter((o) => ['color', 'size'].includes(o.name.toLowerCase()))
+            .map((o) => [o.name.toLowerCase(), o.value]),
+        ),
         offers: variant
           ? {
               '@type': 'Offer',
@@ -50,11 +58,35 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
               availability: variant.availableForSale
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
+              itemCondition: 'https://schema.org/NewCondition',
               url: `${origin}${location.pathname}`,
+              // Free shipping on all orders is stated site-wide (marquee and
+              // footer), so it is safe to declare. Delivery times, and the
+              // return policy, are deliberately NOT declared here: Google
+              // surfaces both as commitments and we do not have the real terms.
+              shippingDetails: {
+                '@type': 'OfferShippingDetails',
+                shippingRate: {
+                  '@type': 'MonetaryAmount',
+                  value: '0',
+                  currency: variant.price.currencyCode,
+                },
+                shippingDestination: {
+                  '@type': 'DefinedRegion',
+                  addressCountry: 'US',
+                },
+              },
             }
           : undefined,
       },
     },
+    // Google reads the links between pages to infer site structure; the trail
+    // is Home > Shop > this product.
+    breadcrumbLd(origin, [
+      {name: 'Home', href: '/'},
+      {name: 'Shop', href: '/collections/all-products'},
+      {name: product.title},
+    ]),
   ];
 };
 
@@ -205,6 +237,7 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    productType
     images(first: 10) {
       nodes {
         id

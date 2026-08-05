@@ -4,6 +4,7 @@ import {Image, Money, type MappedProductOptions} from '@shopify/hydrogen';
 import type {ProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 
 type Variant = ProductFragment['selectedOrFirstAvailableVariant'];
 
@@ -128,6 +129,13 @@ export function ProductPage({
 
   return (
     <div className="pel-pdp">
+      <Breadcrumbs
+        items={[
+          {name: 'Home', href: '/'},
+          {name: 'Shop', href: '/collections/all-products'},
+          {name: product.title},
+        ]}
+      />
       <section className="pel-pdp__main">
         {/* Gallery */}
         <div className="pel-pdp__gallery">

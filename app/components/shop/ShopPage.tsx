@@ -4,6 +4,7 @@ import {Image, Money} from '@shopify/hydrogen';
 import type {ShopProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {useHomeReveal} from '~/components/home/useHomeReveal';
 
 const BANNER_IMG =
@@ -66,6 +67,7 @@ export function ShopPage({
 
   return (
     <div className="pel-shop">
+      <Breadcrumbs items={[{name: 'Home', href: '/'}, {name: title}]} />
       <section
         className="pel-shop__banner"
         style={{backgroundImage: `url(${image || BANNER_IMG})`}}
