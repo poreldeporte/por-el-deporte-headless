@@ -406,7 +406,12 @@ main h1 {
 }
 
 /* ===== Community panel (What Makes Us Special) ===== */
-.pel-fab--community {
+/* `.pel-fabs` prefix is load-order insurance, not decoration: home.css is
+   imported after this sheet (root.tsx), so its equal-specificity
+   `.pel-fab { right: 26px }` used to win here and stack this button exactly on
+   top of the cart FAB — identical rects, and every click on "What makes us
+   special" hit the cart button and opened the drawer instead. */
+.pel-fabs .pel-fab--community {
   right: 98px; /* sits just left of the cart FAB */
 }
 .pel-community__scrim {
