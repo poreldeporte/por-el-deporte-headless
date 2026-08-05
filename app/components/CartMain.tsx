@@ -57,11 +57,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
     >
       <CartEmpty hidden={linesCount} layout={layout} />
       <CartMessages />
-      {layout === 'aside' && cartHasItems ? (
-        <CartProgress
-          subtotal={Number(cart?.cost?.subtotalAmount?.amount ?? 0)}
-        />
-      ) : null}
+      {layout === 'aside' && cartHasItems ? <CartShippingNote /> : null}
       <div className="cart-details">
         <p id="cart-lines" className="sr-only">
           Line items
@@ -93,44 +89,29 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   );
 }
 
-const CART_MILESTONES = [
-  {at: 75, off: '5%'},
-  {at: 150, off: '10%'},
-  {at: 225, off: '15%'},
-  {at: 300, off: '20%'},
-  {at: 400, off: '25%'},
-];
-
-/** Free-shipping / spend-more discount progress bar shown atop the cart drawer. */
-function CartProgress({subtotal}: {subtotal: number}) {
-  const last = CART_MILESTONES[CART_MILESTONES.length - 1].at;
-  const pct = Math.min(100, (subtotal / last) * 100);
-  const next = CART_MILESTONES.find((m) => m.at > subtotal);
-  const away = next ? Math.ceil(next.at - subtotal) : 0;
+/**
+ * The drawer used to show a spend ladder here — "You are $27 away from getting
+ * 5% off!" over 5/10/15/20/25% tiers at $75/$150/$225/$300/$400.
+ *
+ * None of those discounts exist. The store has exactly one automatic discount
+ * and it is free shipping; every percentage discount in the account is a
+ * one-off code, almost all expired. So the bar was telling customers that
+ * spending another $27 would earn them 5% off, in the checkout path, and it
+ * never would. That's a worse promise than a fake review — money moves on it.
+ *
+ * Replaced with the thing that is actually true and automatic. If real spend
+ * tiers get set up in Shopify later, this is where the bar goes back, driven by
+ * the discount data rather than a hardcoded list.
+ */
+function CartShippingNote() {
   return (
-    <div className="pel-cartprog">
-      <div className="pel-cartprog__line">
-        {next
-          ? `You are $${away} away from getting ${next.off} off!`
-          : 'You unlocked 25% off your order!'}
-      </div>
-      <div className="pel-cartprog__bar">
-        <div className="pel-cartprog__fill" style={{width: `${pct}%`}} />
-        <div className="pel-cartprog__dots">
-          {CART_MILESTONES.map((m) => (
-            <div
-              key={m.at}
-              className={`pel-cartprog__dot${subtotal >= m.at ? ' is-hit' : ''}`}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
-                <path d="M11 4H5a1 1 0 0 0-1 1v6l9 9 7-7-9-9z" />
-                <path d="M7.5 8.5h.01" />
-              </svg>
-              <span>{m.off} off</span>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="pel-cartnote">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <path d="M3 7h11v8H3zM14 10h4l3 3v2h-7z" />
+        <circle cx="7" cy="17.5" r="1.6" />
+        <circle cx="17" cy="17.5" r="1.6" />
+      </svg>
+      <span>Free shipping on U.S. orders, no minimum.</span>
     </div>
   );
 }

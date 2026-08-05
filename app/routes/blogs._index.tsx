@@ -3,11 +3,23 @@ import type {Route} from './+types/blogs._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import type {BlogsQuery} from 'storefrontapi.generated';
+import {BlogBanner} from '~/components/blog/BlogBanner';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {breadcrumbLd, seoMeta, siteOrigin} from '~/lib/seo';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: `Por El Deporte | Blogs`}];
+export const meta: Route.MetaFunction = ({location, matches}) => {
+  const origin = siteOrigin(matches);
+  return [
+    ...seoMeta({
+      title: 'Por El Deporte | Journal',
+      description:
+        'Match reports, tournaments, and days on the island from the Por El Deporte community.',
+      url: `${origin}${location.pathname}`,
+    }),
+    breadcrumbLd(origin, [{name: 'Home', href: '/'}, {name: 'Journal'}]),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -54,21 +66,31 @@ export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
   return (
-    <div className="blogs">
-      <h1>Blogs</h1>
-      <div className="blogs-grid">
-        <PaginatedResourceSection<BlogNode> connection={blogs}>
-          {({node: blog}) => (
-            <Link
-              className="blog"
-              key={blog.handle}
-              prefetch="intent"
-              to={`/blogs/${blog.handle}`}
-            >
-              <h2>{blog.title}</h2>
-            </Link>
-          )}
-        </PaginatedResourceSection>
+    <div className="pel-journal">
+      <BlogBanner
+        eyebrow="From the Club"
+        title="Journal"
+        sub="Match reports, tournaments, and days on the island."
+      />
+      <Breadcrumbs items={[{name: 'Home', href: '/'}, {name: 'Journal'}]} />
+      <div className="pel-journal__inner">
+        <div className="pel-journal__blogs">
+          <PaginatedResourceSection<BlogNode> connection={blogs}>
+            {({node: blog}) => (
+              <Link
+                className="pel-journal__blog"
+                key={blog.handle}
+                prefetch="intent"
+                to={`/blogs/${blog.handle}`}
+              >
+                <span>{blog.title}</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M7 17L17 7M8.5 7H17v8.5" />
+                </svg>
+              </Link>
+            )}
+          </PaginatedResourceSection>
+        </div>
       </div>
     </div>
   );

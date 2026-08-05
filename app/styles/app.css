@@ -125,7 +125,9 @@ aside header h2 {
   margin-top: 0;
 }
 
-aside main {
+/* Was `aside main` — the drawer body is a div now, so that there is only one
+   `main` landmark per page. See app/components/Aside.tsx. */
+aside .aside__body {
   margin: 1rem;
 }
 
@@ -165,7 +167,12 @@ aside li {
   transition: opacity 400ms ease-in-out;
   transition: opacity 400ms;
   visibility: hidden;
-  z-index: 10;
+  /* Must sit above the sticky site header (.pel-siteheader, z-index 40). At 10
+     the header painted over the drawer's own header on every page except the
+     homepage, which hid the "CART" title and made the close button genuinely
+     unclickable — elementFromPoint at its centre returned the site header.
+     There was no way to dismiss the cart with the X. */
+  z-index: 60;
 }
 
 .overlay .close-outside {
@@ -301,15 +308,18 @@ button.reset:hover:not(:has(> *)) {
 * components/Cart
 * --------------------------------------------------
 */
+/* The drawer is a flex column (see `aside`), so the line-item region takes the
+   leftover space and scrolls inside it, with the totals block as a sibling
+   below. The old fixed `max-height: calc(100vh - 250px)` was guesswork that
+   didn't account for the drawer header or the shipping note, so the absolutely
+   positioned totals panel sat on top of the items — on a laptop with two things
+   in the cart you saw no products at all. min-height:0 is what actually lets a
+   flex child shrink enough to scroll. */
 .cart-main {
-  height: 100%;
-  max-height: calc(100vh - var(--cart-aside-summary-height));
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   width: auto;
-}
-
-.cart-main.with-discount {
-  max-height: calc(100vh - var(--cart-aside-summary-height-with-discount));
 }
 
 .cart-line {
@@ -330,13 +340,12 @@ button.reset:hover:not(:has(> *)) {
   position: relative;
 }
 
+/* Layout lives in pel-cart.css, which owns the drawer's flex column. This used
+   to be `position: absolute; width: calc(var(--aside-width) - 40px)`, which both
+   painted over the line items and clipped the subtotal off the right edge on
+   phones, where the drawer is narrower than --aside-width. */
 .cart-summary-aside {
-  background: white;
-  border-top: 1px solid var(--color-dark);
-  bottom: 0;
   padding-top: 0.75rem;
-  position: absolute;
-  width: calc(var(--aside-width) - 40px);
 }
 
 .cart-line-quantity {

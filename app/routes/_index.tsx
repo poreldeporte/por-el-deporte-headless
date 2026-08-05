@@ -11,6 +11,7 @@ import {Testimonials} from '~/components/home/Testimonials';
 import {useHomeReveal} from '~/components/home/useHomeReveal';
 import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
+import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
 
 export const meta: Route.MetaFunction = ({matches}) => {
   const origin = siteOrigin(matches);
@@ -206,10 +207,23 @@ function OrangeMarquee() {
 function Hero() {
   return (
     <section className="pel-hero" aria-label="Hero">
+      {/* The LCP element. It was a single fixed width=2400 JPEG with no srcset
+          and default priority, so a phone downloaded a 2400px file and the
+          browser discovered it only after parsing — 8.3s LCP on emulated 4G.
+          srcset lets Shopify's CDN serve a size that matches the viewport, and
+          fetchPriority="high" moves it to the front of the queue. Paired with
+          the preload in root.tsx links(). */}
       <img
         className="pel-hero__img"
-        src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-221.jpg?v=1755706115&width=2400"
+        src={`${HERO_SRC}&width=1600`}
+        srcSet={HERO_SRCSET}
+        sizes="100vw"
+        width={2400}
+        height={1600}
         alt="Por El Deporte match day"
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
       />
       <div className="pel-hero__overlay" />
 

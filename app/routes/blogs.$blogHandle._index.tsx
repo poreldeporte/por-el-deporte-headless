@@ -4,9 +4,27 @@ import {Image, getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {BlogBanner} from '~/components/blog/BlogBanner';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {breadcrumbLd, seoMeta, siteOrigin} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Por El Deporte | ${data?.blog.title ?? ''} blog`}];
+export const meta: Route.MetaFunction = ({data, location, matches}) => {
+  const origin = siteOrigin(matches);
+  const title = data?.blog.title ?? 'Journal';
+  return [
+    ...seoMeta({
+      title: `Por El Deporte | ${title}`,
+      description:
+        data?.blog.seo?.description ??
+        `${title} from the Por El Deporte community — match reports, tournaments, and days on the island.`,
+      url: `${origin}${location.pathname}`,
+    }),
+    breadcrumbLd(origin, [
+      {name: 'Home', href: '/'},
+      {name: 'Journal', href: '/blogs'},
+      {name: title},
+    ]),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -65,18 +83,27 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
-      <div className="blog-grid">
-        <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
-          {({node: article, index}) => (
-            <ArticleItem
-              article={article}
-              key={article.id}
-              loading={index < 2 ? 'eager' : 'lazy'}
-            />
-          )}
-        </PaginatedResourceSection>
+    <div className="pel-journal">
+      <BlogBanner eyebrow="From the Club" title={blog.title} />
+      <Breadcrumbs
+        items={[
+          {name: 'Home', href: '/'},
+          {name: 'Journal', href: '/blogs'},
+          {name: blog.title},
+        ]}
+      />
+      <div className="pel-journal__inner">
+        <div className="pel-journal__grid">
+          <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
+            {({node: article, index}) => (
+              <ArticleItem
+                article={article}
+                key={article.id}
+                loading={index < 2 ? 'eager' : 'lazy'}
+              />
+            )}
+          </PaginatedResourceSection>
+        </div>
       </div>
     </div>
   );
@@ -95,23 +122,34 @@ function ArticleItem({
     day: 'numeric',
   }).format(new Date(article.publishedAt!));
   return (
-    <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
-        {article.image && (
-          <div className="blog-article-image">
+    <article className="pel-post" key={article.id}>
+      <Link
+        className="pel-post__link"
+        prefetch="intent"
+        to={`/blogs/${article.blog.handle}/${article.handle}`}
+      >
+        {article.image ? (
+          <div className="pel-post__media">
             <Image
               alt={article.image.altText || article.title}
               aspectRatio="3/2"
               data={article.image}
               loading={loading}
-              sizes="(min-width: 768px) 50vw, 100vw"
+              sizes="(min-width: 900px) 33vw, (min-width: 600px) 50vw, 100vw"
             />
           </div>
-        )}
-        <h3>{article.title}</h3>
-        <small>{publishedAt}</small>
+        ) : null}
+        <div className="pel-post__body">
+          <time className="pel-post__date" dateTime={article.publishedAt}>
+            {publishedAt}
+          </time>
+          <h2 className="pel-post__title">{article.title}</h2>
+          {article.author?.name ? (
+            <div className="pel-post__author">{article.author.name}</div>
+          ) : null}
+        </div>
       </Link>
-    </div>
+    </article>
   );
 }
 

@@ -68,7 +68,11 @@ export function Aside({
             &times;
           </button>
         </header>
-        <main>{children}</main>
+        {/* A div, not <main>. The skeleton used <main> here, which gave every
+            page on the site two `main` landmarks — and this one comes first in
+            the DOM, so a screen reader jumping to "main content" landed inside
+            the cart drawer instead of the page. */}
+        <div className="aside__body">{children}</div>
       </aside>
     </div>
   );

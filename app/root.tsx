@@ -20,6 +20,7 @@ import pelChrome from '~/styles/pel-chrome.css?url';
 import homeStyles from '~/styles/home.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
+import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
 
 export type RootLoader = typeof loader;
 
@@ -84,6 +85,18 @@ export function links() {
     // iOS ignores SVG and multi-size .ico — it wants one opaque 180x180 PNG.
     {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
     {rel: 'manifest', href: '/manifest.json'},
+    // Preload the homepage hero. It's the LCP element and the browser otherwise
+    // only discovers it after parsing the document; `imageSrcSet`/`imageSizes`
+    // must mirror the <img> exactly or the preload fetches a second file.
+    // `fetchPriority` is on the tag too — this just moves the discovery earlier.
+    {
+      rel: 'preload',
+      as: 'image',
+      href: `${HERO_SRC}&width=1600`,
+      imageSrcSet: HERO_SRCSET,
+      imageSizes: '100vw',
+      fetchPriority: 'high',
+    },
   ];
 }
 
@@ -240,6 +253,18 @@ export function ErrorBoundary() {
 
   return (
     <div className="pel-error">
+      {/* Error routes have no meta() of their own, and root deliberately doesn't
+          export one (in React Router v7 a parent's meta() is replaced by the
+          deepest match, so a root-level title would vanish everywhere). Without
+          these the browser tab showed the raw URL and the page had no title or
+          robots directive at all. Rendered here rather than via <Meta /> because
+          the boundary replaces the route tree. */}
+      <title>
+        {is404
+          ? 'Page not found | Por El Deporte'
+          : 'Something went wrong | Por El Deporte'}
+      </title>
+      <meta name="robots" content="noindex, follow" />
       <a href="/" className="pel-error__logo" aria-label="Por El Deporte home">
         Por El Deporte
       </a>

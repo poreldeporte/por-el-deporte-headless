@@ -141,8 +141,15 @@ export function ProductPage({
         {/* Gallery */}
         <div className="pel-pdp__gallery">
           <div className="pel-pdp__stage">
+            {/* The PDP's LCP element — must not be lazy. Hydrogen's <Image>
+                defaults to loading="lazy", which delays the largest paint until
+                after the browser has laid the page out. */}
             {main ? (
-              <Image data={main} sizes="(min-width: 60em) 640px, 100vw" />
+              <Image
+                data={main}
+                sizes="(min-width: 60em) 640px, 100vw"
+                loading="eager"
+              />
             ) : null}
           </div>
           {images.length > 1 ? (

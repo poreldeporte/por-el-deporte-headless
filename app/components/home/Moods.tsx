@@ -22,15 +22,26 @@ const MOODS = [
   },
 ];
 
+const MOODS_BG =
+  'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740';
+
 export function Moods() {
   return (
     <section className="pel-moods" aria-label="Our community values">
+      {/* Decorative, and three viewports below the fold — it was competing with
+          the hero for bandwidth at 474 KB. lazy + a viewport-matched srcset. */}
       <img
         className="pel-moods__bg"
         data-bg-parallax
-        src="https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740&width=2400"
+        src={`${MOODS_BG}&width=1600`}
+        srcSet={[960, 1280, 1600, 2000]
+          .map((w) => `${MOODS_BG}&width=${w} ${w}w`)
+          .join(', ')}
+        sizes="100vw"
         alt=""
         aria-hidden="true"
+        loading="lazy"
+        decoding="async"
       />
       <div className="pel-moods__overlay" />
 

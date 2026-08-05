@@ -2,9 +2,61 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {breadcrumbLd, seoMeta, siteOrigin} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Por El Deporte | ${data?.article.title ?? ''} article`}];
+export const meta: Route.MetaFunction = ({data, location, matches}) => {
+  const origin = siteOrigin(matches);
+  const article = data?.article;
+  const title = article?.title ?? 'Journal';
+  const url = `${origin}${location.pathname}`;
+  // Strip the body down to a description when the article has no SEO one set.
+  const excerpt = article?.contentHtml
+    ? article.contentHtml
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 155)
+    : undefined;
+
+  return [
+    ...seoMeta({
+      title: `Por El Deporte | ${title}`,
+      description: article?.seo?.description || excerpt,
+      url,
+      image: article?.image?.url,
+      type: 'article',
+    }),
+    // BlogPosting rather than Article: it's the specific type, and Google reads
+    // headline/datePublished/author/image from it for the Article rich result.
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: title,
+        url,
+        mainEntityOfPage: {'@type': 'WebPage', '@id': url},
+        datePublished: article?.publishedAt,
+        image: article?.image?.url ? [article.image.url] : undefined,
+        author: article?.author?.name
+          ? {'@type': 'Person', name: article.author.name}
+          : undefined,
+        publisher: {
+          '@type': 'Organization',
+          name: 'Por El Deporte',
+          logo: origin
+            ? {'@type': 'ImageObject', url: `${origin}/icon-512.png`}
+            : undefined,
+        },
+        description: article?.seo?.description || excerpt,
+      },
+    },
+    breadcrumbLd(origin, [
+      {name: 'Home', href: '/'},
+      {name: 'Journal', href: '/blogs'},
+      {name: title},
+    ]),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -76,20 +128,39 @@ export default function Article() {
   }).format(new Date(article.publishedAt));
 
   return (
-    <div className="article">
-      <h1>
-        {title}
-        <div>
-          <time dateTime={article.publishedAt}>{publishedDate}</time> &middot;{' '}
-          <address>{author?.name}</address>
-        </div>
-      </h1>
-
-      {image && <Image data={image} sizes="90vw" loading="eager" />}
-      <div
-        dangerouslySetInnerHTML={{__html: contentHtml}}
-        className="article"
+    <div className="pel-article">
+      <Breadcrumbs
+        items={[
+          {name: 'Home', href: '/'},
+          {name: 'Journal', href: '/blogs'},
+          {name: title},
+        ]}
       />
+      <article className="pel-article__inner">
+        <header className="pel-article__head">
+          <div className="pel-article__meta">
+            <time dateTime={article.publishedAt}>{publishedDate}</time>
+            {author?.name ? (
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <address>{author.name}</address>
+              </>
+            ) : null}
+          </div>
+          <h1 className="pel-article__title">{title}</h1>
+        </header>
+
+        {image ? (
+          <div className="pel-article__media">
+            <Image data={image} sizes="(min-width: 900px) 860px, 92vw" loading="eager" />
+          </div>
+        ) : null}
+
+        <div
+          className="pel-prose pel-article__body"
+          dangerouslySetInnerHTML={{__html: contentHtml}}
+        />
+      </article>
     </div>
   );
 }
