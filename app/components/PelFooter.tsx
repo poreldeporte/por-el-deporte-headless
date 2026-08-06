@@ -180,6 +180,16 @@ export function PelFooter() {
           tee or hat you snag supports our community: building events, uniting fans,
           and spreading sunny soccer passion. Eco-friendly 100% cotton.
         </p>
+        <p className="pel-footer__credit">
+          Design by{' '}
+          <a
+            href="https://violacreative.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span>Viola Creative</span>
+          </a>
+        </p>
       </div>
     </footer>
   );
