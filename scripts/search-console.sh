@@ -21,7 +21,14 @@ set -euo pipefail
 
 SITE="https://poreldeporte.com/"
 DOMAIN="poreldeporte.com"
-PROJECT="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
+
+# NOT `gcloud config get-value project`. That returns por-el-deporte-investments,
+# which the signed-in account (franco.viola@live.com) is not a member of — every
+# call died with "Caller does not have required permission to use project".
+# por-el-deporte-app is owned by that account and has siteverification and
+# searchconsole enabled on it. These APIs refuse to run on ADC user credentials
+# without a quota project at all, so one has to be named and it has to be usable.
+PROJECT="${GOOGLE_CLOUD_PROJECT:-por-el-deporte-app}"
 
 tok() {
   gcloud auth application-default print-access-token 2>/dev/null || {
@@ -31,25 +38,15 @@ tok() {
   }
 }
 
-# x-goog-user-project bills the call to a Cloud project, and sending one the
-# signed-in account has no serviceusage permission on is worse than sending none
-# at all — the API rejects the header before it ever looks at the request. Only
-# attach it if ADC actually accepted the project as its quota project.
 ADC_FILE="${HOME}/.config/gcloud/application_default_credentials.json"
-quota_project() {
-  [ -f "$ADC_FILE" ] || return 0
-  python3 -c "
-import json,sys
-try: print(json.load(open('$ADC_FILE')).get('quota_project_id') or '')
-except Exception: print('')
-" 2>/dev/null
-}
 
+# x-goog-user-project names the project that carries the quota for the call. It
+# is mandatory here — with ADC user credentials and no header, the API answers
+# "requires a quota project, which is not set by default" — and it must name a
+# project the caller can actually use, or it fails before the request is read.
 api() { # method url [body]
   local m=$1 u=$2 body=${3:-}
-  local qp; qp=$(quota_project)
-  local hdrs=(-H "Authorization: Bearer $(tok)")
-  [ -n "$qp" ] && hdrs+=(-H "x-goog-user-project: $qp")
+  local hdrs=(-H "Authorization: Bearer $(tok)" -H "x-goog-user-project: $PROJECT")
   if [ -n "$body" ]; then
     curl -sS -X "$m" "$u" "${hdrs[@]}" -H 'Content-Type: application/json' -d "$body"
   else
@@ -58,17 +55,24 @@ api() { # method url [body]
 }
 
 # Fails loudly and early rather than letting the API return a confusing 403.
+#
+# The granted scopes are NOT in the ADC file — gcloud persists only the refresh
+# token there, so reading `scopes` from it always came back empty and this guard
+# rejected a perfectly good login. The access token itself is the only honest
+# source, so ask Google what it is actually good for.
 require_scopes() {
   local have
-  have=$(python3 -c "
-import json
-try:
-    d=json.load(open('$ADC_FILE'))
-    print(' '.join(d.get('scopes') or []))
-except Exception:
-    print('')
+  have=$(curl -sS --max-time 15 \
+    "https://oauth2.googleapis.com/tokeninfo?access_token=$(tok)" 2>/dev/null \
+    | python3 -c "
+import json,sys
+try: print(json.load(sys.stdin).get('scope',''))
+except Exception: print('')
 " 2>/dev/null)
   case "$have" in
+    # Network trouble shouldn't masquerade as a scope problem; let the real API
+    # call report it instead of blocking on an unanswered introspection.
+    '') echo "    (could not introspect token — continuing)" >&2; return 0 ;;
     *siteverification*) return 0 ;;
   esac
   cat >&2 <<'EOF'
@@ -90,19 +94,36 @@ EOF
   exit 1
 }
 
+# Enable via the Service Usage REST API rather than `gcloud services enable`.
+# The gcloud CLI authenticates separately from ADC, and its own credentials had
+# expired — it failed with "Reauthentication failed. cannot prompt during
+# non-interactive execution", which reads like a permissions problem and isn't.
+# The ADC token already carries cloud-platform, so use it directly and the CLI's
+# login state stops mattering.
 ensure_apis() {
   require_scopes
-  # Both of these need permissions on the Cloud project that the signing-in
-  # account may not have, and neither is required for the verification and
-  # Search Console calls to work. Advisory only.
-  echo "==> enabling APIs on $PROJECT (optional, ignore failures)"
-  gcloud services enable siteverification.googleapis.com searchconsole.googleapis.com \
-    --project "$PROJECT" >/dev/null 2>&1 \
-    && echo "    enabled" \
-    || echo "    skipped (no permission on $PROJECT) — not required"
-  gcloud auth application-default set-quota-project "$PROJECT" >/dev/null 2>&1 \
-    && echo "    quota project set" \
-    || echo "    quota project not set — calls will run without one"
+  echo "==> checking APIs on $PROJECT"
+  local t; t=$(tok)
+  for svc in siteverification.googleapis.com searchconsole.googleapis.com; do
+    local state
+    state=$(curl -sS --max-time 20 \
+      "https://serviceusage.googleapis.com/v1/projects/$PROJECT/services/$svc" \
+      -H "Authorization: Bearer $t" \
+      | python3 -c "
+import json,sys
+try: print(json.load(sys.stdin).get('state',''))
+except Exception: print('')
+" 2>/dev/null)
+    if [ "$state" = "ENABLED" ]; then
+      echo "    $svc already enabled"
+      continue
+    fi
+    curl -sS --max-time 30 -o /dev/null -X POST \
+      "https://serviceusage.googleapis.com/v1/projects/$PROJECT/services/$svc:enable" \
+      -H "Authorization: Bearer $t" -H 'Content-Type: application/json' -d '{}' \
+      && echo "    $svc enable requested" \
+      || echo "    $svc could not be enabled — check access to $PROJECT"
+  done
 }
 
 case "${1:-}" in
