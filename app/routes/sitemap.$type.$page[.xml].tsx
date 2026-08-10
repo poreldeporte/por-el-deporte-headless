@@ -31,6 +31,8 @@ export async function loader({
     body = await withoutExcludedPages(response, storefront);
   } else if (params.type === 'articles') {
     body = await withArticleBlogPaths(response, storefront);
+  } else if (params.type === 'collections') {
+    body = await withoutEmptyCollections(response, storefront);
   }
 
   const headers = new Headers(response.headers);
@@ -72,6 +74,33 @@ async function withoutExcludedPages(
     const loc = /<loc>([^<]+)<\/loc>/.exec(block)?.[1] ?? '';
     const handle = loc.split('/pages/')[1];
     return handle && excluded.has(handle) ? '' : block;
+  });
+}
+
+/**
+ * A collection with no products renders a page with nothing to buy. Submitting
+ * those to Google spends crawl budget on an empty shelf, so they come out of the
+ * sitemap until someone puts something in them. Two of the four are empty today.
+ */
+async function withoutEmptyCollections(
+  response: Response,
+  storefront: Route.LoaderArgs['context']['storefront'],
+): Promise<string> {
+  const xml = await response.text();
+  const {collections} = await storefront.query(SITEMAP_COLLECTIONS_QUERY, {
+    variables: {first: 250},
+    cache: storefront.CacheLong(),
+  });
+  const empty = new Set(
+    (collections?.nodes ?? [])
+      .filter((c) => (c.products?.nodes?.length ?? 0) === 0)
+      .map((c) => c.handle),
+  );
+  if (!empty.size) return xml;
+  return xml.replace(/[ \t]*<url>[\s\S]*?<\/url>\n?/g, (block) => {
+    const loc = /<loc>([^<]+)<\/loc>/.exec(block)?.[1] ?? '';
+    const handle = loc.split('/collections/')[1];
+    return handle && empty.has(handle) ? '' : block;
   });
 }
 
@@ -153,6 +182,21 @@ async function siteRoutesSitemap(
     },
   });
 }
+
+const SITEMAP_COLLECTIONS_QUERY = `#graphql
+  query SitemapCollections($first: Int!) {
+    collections(first: $first) {
+      nodes {
+        handle
+        products(first: 1) {
+          nodes {
+            id
+          }
+        }
+      }
+    }
+  }
+` as const;
 
 const SITEMAP_ARTICLE_BLOGS_QUERY = `#graphql
   query SitemapArticleBlogs($blogs: Int!, $articles: Int!) {

@@ -75,7 +75,10 @@ export function ShopPage({
           <div className="pel-shop__eyebrow">
             Shop All &bull; {products.length} Styles
           </div>
-          <h1 className="pel-shop__title">Gear Up.</h1>
+          {/* The collection's own name, not "Gear Up." on all four — that left
+              every collection page with an identical heading and no indication
+              of which one you were looking at. */}
+          <h1 className="pel-shop__title">{title}</h1>
           <p className="pel-shop__sub">
             Every tee, hat, and tote supports our Key Biscayne community. Rep the
             club and grab your favorites.

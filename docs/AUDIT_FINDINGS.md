@@ -23,9 +23,9 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 9 | high | FIXED | "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text |
 | 10 | high | FIXED | Homepage cart FAB sits exactly on top of the community FAB, making the community button unclickable |
 | 11 | high | FIXED | --text-muted token is 3.82:1 on cream, failing body copy, breadcrumb links and variant labels |
-| 12 | high | OPEN | Product pages hardcode "100% ring-spun cotton / Plastic-Free" on every product, contradicting the Specs card on the same page |
-| 13 | high | OPEN | Two of the store's four collections are completely empty, and one is a footer link on every page |
-| 14 | high | OPEN | Homepage "Shop Our Signature Gear" rail shows 12 products with no prices, and Quick Add blind-picks a size |
+| 12 | high | FIXED | Product pages hardcode "100% ring-spun cotton / Plastic-Free" on every product, contradicting the Specs card on the same page |
+| 13 | high | FIXED | Two of the store's four collections are completely empty, and one is a footer link on every page |
+| 14 | high | FIXED | Homepage "Shop Our Signature Gear" rail shows 12 products with no prices, and Quick Add blind-picks a size |
 | 15 | high | FIXED | All three blog templates are unbranded stock Hydrogen skeleton — content renders flush against the viewport edge with no container |
 | 16 | high | DRAFTED | /policies/refund-policy serves the Privacy Policy verbatim — the store has no visible returns policy |
 | 17 | high | FIXED | Homepage hero (the LCP element) is a fixed width=2400 image with no srcset, no preload and no fetchpriority — 8.3s LCP on emulated 4G |
@@ -47,14 +47,14 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 33 | medium | FIXED | Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch |
 | 34 | medium | FIXED | Announcement marquee text is 3.9:1 on blue on every page |
 | 35 | medium | OPEN | /collections renders four blank beige squares — no collection has an image |
-| 36 | medium | OPEN | Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading |
+| 36 | medium | FIXED | Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading |
 | 37 | medium | OPEN | Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints |
 | 38 | medium | OPEN | Product page editorial strip: 707 KB of hand-written imgs at fixed width=800 into 352x440 / 240x300 boxes |
 | 39 | medium | OPEN | /collections renders as four completely blank boxes — and it is the destination of the account area's only 'Start Shopping' CTA |
-| 40 | medium | OPEN | Two empty collections are live, promoted in the site footer, and listed in the sitemap; the empty collection page still runs the 'Gear Up.' sell hero over zero products |
+| 40 | medium | FIXED | Two empty collections are live, promoted in the site footer, and listed in the sitemap; the empty collection page still runs the 'Gear Up.' sell hero over zero products |
 | 41 | medium | OPEN | Sold-out variants are signalled by 35% opacity alone — still clickable, no accessible state, and no explanation once the shopper is in a dead end |
 | 42 | medium | OPEN | Product meta/og descriptions are missing spaces between sentences and run 60-150% over the SERP snippet limit |
-| 43 | medium | OPEN | All four collection pages share one identical meta description, and no collection page has an og:image |
+| 43 | medium | FIXED | All four collection pages share one identical meta description, and no collection page has an og:image |
 | 44 | medium | DRAFTED | /policies/refund-policy serves the Privacy Policy text verbatim — there are no refund terms anywhere on the site |
 | 45 | medium | FIXED | Product page's main gallery image — the LCP element — is marked loading="lazy" |
 | 46 | medium | FIXED | Homepage ships 4.5 MB of images; the 15-tile Instagram grid alone is 2.5 MB, every tile hardcoded to width=700 for a ~170px box |
@@ -190,7 +190,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Raise the token alpha from 0.55 to at least ~0.66 (`rgba(23,23,23,0.66)` ≈ 4.6:1 on #F7F0DE), or set `--text-muted: #5F5C56`. One token change fixes all listed call sites.
 
-### 12. HIGH — OPEN — Product pages hardcode "100% ring-spun cotton / Plastic-Free" on every product, contradicting the Specs card on the same page
+### 12. HIGH — FIXED — Product pages hardcode "100% ring-spun cotton / Plastic-Free" on every product, contradicting the Specs card on the same page
 
 **Where:** `app/components/product/ProductPage.tsx:11-16 (STATS) and :251-257 (`.pel-pdp__fabric` band); visible on /products/kit-launch, /products/artisan-ped-hoodie, /products/organic-bucket-hat, /products/por-el-deporte-cap, /products/the-tote, /products/el-clasico-tote`
 
@@ -200,7 +200,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Make the fabric band and the two material stat cards derive from `kind` the same way WEAR and SPECS already do (e.g. reuse `SPECS[kind]`'s Fabric row for the band's middle chip, and drop the "0 Plastic" / "100% Ring-Spun Cotton" stats for jersey/hoodie, keeping them only where the spec table agrees).
 
-### 13. HIGH — OPEN — Two of the store's four collections are completely empty, and one is a footer link on every page
+### 13. HIGH — FIXED — Two of the store's four collections are completely empty, and one is a footer link on every page
 
 **Where:** `/collections/2022-kits ("Official Kits") and /collections/2023-por-el-deporte-kits; linked from app/components/PelFooter.tsx:18 and from the /collections index`
 
@@ -210,7 +210,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Either add the Palmas Jersey (and any other kits) to "Official Kits" in Shopify admin and unpublish/delete "2023 Por El Deporte Kits", or repoint the footer's "Official Kits" link at /products/kit-launch. Also collapse the two duplicate sentences in the empty state into one.
 
-### 14. HIGH — OPEN — Homepage "Shop Our Signature Gear" rail shows 12 products with no prices, and Quick Add blind-picks a size
+### 14. HIGH — FIXED — Homepage "Shop Our Signature Gear" rail shows 12 products with no prices, and Quick Add blind-picks a size
 
 **Where:** `app/components/home/ProductRail.tsx:93-126; query at app/routes/_index.tsx:284-300`
 
@@ -433,7 +433,7 @@ Key Biscayne FL, United States
 
 **Fix:** Upload a collection image for each collection in Shopify admin (Collections → Featured image). Optionally fall back to the collection's first product image in CollectionItem so the page can never render empty wells again.
 
-### 36. MEDIUM — OPEN — Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading
+### 36. MEDIUM — FIXED — Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading
 
 **Where:** `app/components/shop/ShopPage.tsx:78-86 — `title` is passed in but used only for the breadcrumb and aria-label; the H1 and eyebrow are hardcoded`
 
@@ -473,7 +473,7 @@ Key Biscayne FL, United States
 
 **Fix:** Point account.orders._index.tsx:111 at /collections/all-products like every other shop CTA. For the /collections page itself, render a fallback inside .pel-collections__well when collection.image is null (the collection's first product image, or the brand mark on sand) so the card is never an empty box — or upload collection images in Shopify admin.
 
-### 40. MEDIUM — OPEN — Two empty collections are live, promoted in the site footer, and listed in the sitemap; the empty collection page still runs the 'Gear Up.' sell hero over zero products
+### 40. MEDIUM — FIXED — Two empty collections are live, promoted in the site footer, and listed in the sitemap; the empty collection page still runs the 'Gear Up.' sell hero over zero products
 
 **Where:** `/Users/francoviola/Desktop/ViolaCreative/por-el-deporte-ecommerce/app/components/PelFooter.tsx:18; hero copy at app/components/shop/ShopPage.tsx:79-85`
 
@@ -503,7 +503,7 @@ Key Biscayne FL, United States
 
 **Fix:** In products.$handle.tsx:22-25, build the description from `product.descriptionHtml`: replace block-closing tags (`</p>`, `<br>`, `</li>`, `</div>`, `</h[1-6]>`) with a space before stripping remaining tags, decode entities, collapse runs of whitespace, then truncate at the last word boundary before ~155 chars. Keep `product.seo?.description` as the first-choice override. Put the helper in app/lib/seo.ts so the JSON-LD `description` gets the cleaned value too.
 
-### 43. MEDIUM — OPEN — All four collection pages share one identical meta description, and no collection page has an og:image
+### 43. MEDIUM — FIXED — All four collection pages share one identical meta description, and no collection page has an og:image
 
 **Where:** `app/routes/collections.$handle.tsx:15-19; app/lib/seo.ts:38-80 (no default image) — URL paths: /collections/all-products, /collections/all-tees, /collections/2022-kits, /collections/2023-por-el-deporte-kits, plus /collections and /policies*`
 

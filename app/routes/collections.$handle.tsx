@@ -12,9 +12,12 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
   return [
     ...seoMeta({
       title: `Por El Deporte | ${collection?.title ?? 'Shop'}`,
+      // Every collection shared one identical meta description. Falls back to a
+      // line naming the collection so the four are at least distinguishable in
+      // search results, rather than four rows of the same sentence.
       description:
         collection?.description ||
-        'Shop Por El Deporte apparel. Original club designs, 100% cotton, free shipping.',
+        `${collection?.title ?? 'Shop'} from Por El Deporte. Original club designs made in Miami, with free shipping on U.S. orders.`,
       url: `${origin}${location.pathname}`,
       image: collection?.image?.url,
     }),
