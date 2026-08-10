@@ -22,8 +22,14 @@ const MOODS = [
   },
 ];
 
+/* The previous frame was a close crop of feet around a ball, which put adidas
+   stripes, a Nike swoosh, a FILA shoe and a branded ball in the section — none
+   of it ours, the same problem the hero had. This one is supporters lined up on
+   the fence watching: everyone in the club's own kit, plain shorts, and it
+   actually reads as "this is a community". The dark fence behind the headline
+   also gives the cream type far better contrast than the open grass did. */
 const MOODS_BG =
-  'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-335.jpg?v=1750173740';
+  'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-763.jpg?v=1755707862';
 
 export function Moods() {
   return (

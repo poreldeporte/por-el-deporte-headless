@@ -103,7 +103,11 @@ aside header .close:hover {
   margin-top: 10px;
   flex-wrap: wrap;
 }
-.cart-line-quantity button {
+/* Only the steppers are circles. This used to select every button in the row,
+   which caught "Remove" too — a 32px circle drawn around a six-letter word, so
+   the border struck straight through the text. Keyed on the steppers' own name
+   attribute rather than position, since Remove is the last child. */
+.cart-line-quantity button[name$='-quantity'] {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -117,7 +121,7 @@ aside header .close:hover {
   align-items: center;
   justify-content: center;
 }
-.cart-line-quantity button:hover:not(:disabled) {
+.cart-line-quantity button[name$='-quantity']:hover:not(:disabled) {
   background: var(--pel-ink);
   color: var(--pel-cream);
 }
@@ -125,10 +129,23 @@ aside header .close:hover {
   opacity: 0.35;
   cursor: default;
 }
+/* Remove reads as a quiet text action, and gets a real tap target. */
 .cart-line-quantity a[href],
-.cart-line-quantity button[type='submit']:last-child {
+.cart-line-quantity button[type='submit']:not([name$='-quantity']) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font: 600 13px/1 var(--font-body);
+  cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+.cart-line-quantity button[type='submit']:not([name$='-quantity']):hover:not(:disabled) {
+  color: var(--pel-orange);
 }
 
 /* ── Drawer layout ──
@@ -213,6 +230,67 @@ aside .aside__body {
   font: 700 13px/1 var(--font-body);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/* ── /cart page summary ──
+   The drawer's summary was branded; this one was never touched, so the dedicated
+   cart page — where the footer's "View Cart" link lands — presented its primary
+   checkout CTA as plain black 16px text stretched 1224px wide and 22px tall.
+   Same treatment as the drawer, laid out as a card beside the line items rather
+   than a full-bleed strip. */
+.cart-summary-page {
+  position: relative;
+  background: var(--pel-cream);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  padding: 26px 24px 22px;
+}
+.cart-summary-page h4 {
+  margin: 0 0 14px;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cart-summary-page a[href] {
+  display: block;
+  margin-top: 18px;
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  border-radius: var(--radius-pill);
+  text-align: center;
+  text-decoration: none;
+  transition: background var(--dur-fast);
+}
+.cart-summary-page a[href]:hover {
+  background: var(--pel-orange);
+}
+.cart-summary-page a[href] p {
+  margin: 0;
+  padding: 18px;
+  font: 700 13px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cart-summary-page input[type='text'] {
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  padding: 10px 16px;
+  font: 600 12px/1 var(--font-body);
+  background: var(--pel-white);
+}
+.cart-summary-page button {
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 10px 4px;
+}
+.cart-summary-page button:hover {
+  color: var(--pel-orange);
 }
 
 /* Discount / gift-card inputs */

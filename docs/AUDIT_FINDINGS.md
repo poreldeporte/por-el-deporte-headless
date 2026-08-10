@@ -17,10 +17,10 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 3 | blocker | FIXED | Cart drawer cannot be closed on any page except the homepage — close button is buried under the sticky site header |
 | 4 | blocker | FIXED | On phones the cart drawer shows no product at all and the subtotal amount is clipped off-screen |
 | 5 | blocker | FIXED | Cart drawer promises 5-25% off spend tiers that are never applied to the cart or the checkout |
-| 6 | high | OPEN | The /cart page's checkout CTA and totals block render as unstyled stock Hydrogen skeleton — the same component is fully branded in the cart drawer |
+| 6 | high | FIXED | The /cart page's checkout CTA and totals block render as unstyled stock Hydrogen skeleton — the same component is fully branded in the cart drawer |
 | 7 | high | OPEN | Order detail shows $0.00 in the per-item "Total" column (renders the discount, not the line total) |
-| 8 | high | OPEN | /cart page's Totals block is raw Hydrogen skeleton — the primary checkout CTA is unstyled plain text |
-| 9 | high | OPEN | "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text |
+| 8 | high | FIXED | /cart page's Totals block is raw Hydrogen skeleton — the primary checkout CTA is unstyled plain text |
+| 9 | high | FIXED | "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text |
 | 10 | high | FIXED | Homepage cart FAB sits exactly on top of the community FAB, making the community button unclickable |
 | 11 | high | OPEN | --text-muted token is 3.82:1 on cream, failing body copy, breadcrumb links and variant labels |
 | 12 | high | OPEN | Product pages hardcode "100% ring-spun cotton / Plastic-Free" on every product, contradicting the Specs card on the same page |
@@ -29,7 +29,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 15 | high | FIXED | All three blog templates are unbranded stock Hydrogen skeleton — content renders flush against the viewport edge with no container |
 | 16 | high | DRAFTED | /policies/refund-policy serves the Privacy Policy verbatim — the store has no visible returns policy |
 | 17 | high | FIXED | Homepage hero (the LCP element) is a fixed width=2400 image with no srcset, no preload and no fetchpriority — 8.3s LCP on emulated 4G |
-| 18 | medium | OPEN | Cart line "Remove" button is styled as a 32px circle, drawing a stray circular border across its own text |
+| 18 | medium | FIXED | Cart line "Remove" button is styled as a 32px circle, drawing a stray circular border across its own text |
 | 19 | medium | OPEN | Order detail shipping address renders as one run-together string with the customer's name printed twice |
 | 20 | medium | OPEN | Order totals table prints every label twice — "Subtotal Subtotal", "Tax Tax", "Total Total" |
 | 21 | medium | OPEN | Address forms reuse the same DOM ids, so every label on a saved address wires to the empty "Create address" form |
@@ -130,7 +130,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Either delete CartProgress, or make it real: create the matching automatic discounts in Shopify, add `discountAllocations` and `cost.totalAmount` to the cart fragment, render a Discount row and an Order total row in CartSummary, and compute the bar fill from the milestone index rather than subtotal/400 so the fill and the dots agree.
 
-### 6. HIGH — OPEN — The /cart page's checkout CTA and totals block render as unstyled stock Hydrogen skeleton — the same component is fully branded in the cart drawer
+### 6. HIGH — FIXED — The /cart page's checkout CTA and totals block render as unstyled stock Hydrogen skeleton — the same component is fully branded in the cart drawer
 
 **Where:** `app/components/CartSummary.tsx:13 (layout==='page' → 'cart-summary-page'); app/styles/pel-cart.css:135 styles only .cart-summary-aside; app/styles/app.css:329 gives .cart-summary-page just `position: relative`. URL: /cart`
 
@@ -150,7 +150,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Render the real line total instead of the discount: either compute `price.amount * quantity` (minus `totalDiscount`) into a MoneyV2 and pass that to `<Money>`, or add a total-price field to the `OrderLineItemFull` fragment and use it. Keep `totalDiscount` only if you add a separate "Discount" column.
 
-### 8. HIGH — OPEN — /cart page's Totals block is raw Hydrogen skeleton — the primary checkout CTA is unstyled plain text
+### 8. HIGH — FIXED — /cart page's Totals block is raw Hydrogen skeleton — the primary checkout CTA is unstyled plain text
 
 **Where:** `app/components/CartSummary.tsx:49-60, 99-115, 223-244; only .cart-summary-aside is branded in app/styles/pel-cart.css:135-188, while .cart-summary-page is just `position:relative` in app/styles/app.css:329-331. URL: /cart`
 
@@ -160,7 +160,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Extend the pel-cart.css rules that already style `.cart-summary-aside` (button pill, input pill, uppercase micro-label) to `.cart-summary-page`, or refactor them onto a shared class applied in both layouts.
 
-### 9. HIGH — OPEN — "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text
+### 9. HIGH — FIXED — "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text
 
 **Where:** `app/styles/pel-cart.css:106-119 (.cart-line-quantity button) applied to the LinesRemove submit in app/components/CartLineItem.tsx:146-165`
 
@@ -250,7 +250,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Give the hero a real responsive source and prioritise it: add `srcset` at 800/1200/1600/2400 with `sizes="100vw"`, plus `fetchpriority="high"` and `decoding="sync"` on the img, and emit a matching `<link rel="preload" as="image" imagesrcset=... imagesizes="100vw">` from the _index route's links export so the preload scanner starts it in the first RTT.
 
-### 18. MEDIUM — OPEN — Cart line "Remove" button is styled as a 32px circle, drawing a stray circular border across its own text
+### 18. MEDIUM — FIXED — Cart line "Remove" button is styled as a 32px circle, drawing a stray circular border across its own text
 
 **Where:** `app/styles/pel-cart.css:106-132 (`.cart-line-quantity button` sets width/height/border-radius; the `button[type='submit']:last-child` rule at :129 only adds underline). Affects /cart and the cart drawer`
 
