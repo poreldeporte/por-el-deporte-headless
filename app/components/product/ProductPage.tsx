@@ -13,16 +13,12 @@ type Variant = ProductFragment['selectedOrFirstAvailableVariant'];
  * The stat band, derived per garment rather than hardcoded.
  *
  * It used to read "100% Ring-Spun Cotton / 0 Plastic / 1 WK To Your Door /
- * 2014" on every product, which contradicted the Specs card directly beneath it
- * on anything that isn't a cotton tee — the hoodie's specs say cotton-rich
- * fleece, the bucket hat's say organic cotton twill, the jersey's say
- * performance knit. Two different fabrics for one garment, a screen apart.
+ * 2014" on every product, contradicting the Specs card directly beneath it on
+ * anything that isn't a cotton tee. "1 WK To Your Door" went too: a delivery
+ * promise nobody had checked against real orders, replaced by free U.S.
+ * shipping, which was verified against the store's delivery profiles (the
+ * domestic zone's only rate is $0).
  *
- * "1 WK To Your Door" also went: it is a delivery promise nobody has checked
- * against real orders. Free U.S. shipping replaces it, which was verified
- * against the store's delivery profiles (the domestic zone's only rate is $0).
- */
-/**
  * Every card is a big value over a small label, so a card with no value renders
  * as a rule and a caption floating in a box 40px shorter than its neighbours —
  * which is exactly what "Heavyweight" did on every tee, and what the fabric line
@@ -599,7 +595,7 @@ export function ProductPage({
           )}
           <div className="pel-pdp__card-foot">
             <div>Est. 2014 Key Biscayne</div>
-            <div>Every order supports local soccer</div>
+            <div>Every order pays for the next match</div>
           </div>
         </div>
 

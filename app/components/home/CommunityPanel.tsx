@@ -31,7 +31,7 @@ const ING_APP: [string, string][] = [
 const ING_CLUB: [string, string][] = [
   ['Founded in 2014', 'sparkle'],
   ['Key Biscayne, FL Roots', 'leaf'],
-  ['A Miami Soccer Community', 'citrus'],
+  ['A Miami Football Community', 'citrus'],
   ['Featured on CBS Golazo', 'molecule'],
   ['Shared Events & Matches', 'grapes'],
   ['Respect & Fair Play', 'salt'],

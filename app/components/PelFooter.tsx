@@ -187,9 +187,14 @@ export function PelFooter() {
         </div>
         <div className="pel-footer__rule" />
         <p className="pel-footer__legal">
-          Founded in 2014 in Key Biscayne, FL. Free shipping on U.S. orders. Every
-          tee or hat you snag supports our community: building events, uniting fans,
-          and spreading sunny soccer passion. Eco-friendly 100% cotton.
+          {/* Was "every tee or hat you snag supports our community: building
+              events, uniting fans, and spreading sunny soccer passion" — three
+              abstractions and a phrase no one has ever said aloud. What the
+              money actually does is concrete, so it says that instead. */}
+          Founded in 2014 in Key Biscayne, FL. Free shipping on U.S. orders. What
+          you buy pays for pitch time, balls and the next match &mdash; the games
+          have always been free to turn up to, and we would like to keep it that
+          way.
         </p>
         <p className="pel-footer__credit">
           Design by{' '}

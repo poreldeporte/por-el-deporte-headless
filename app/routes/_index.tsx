@@ -16,9 +16,15 @@ export const meta: Route.MetaFunction = ({matches}) => {
   const origin = siteOrigin(matches);
   return [
     ...seoMeta({
-      title: 'Por El Deporte | Miami Soccer Apparel & Community',
+      // The title is the club's own line rather than a category phrase. That
+      // deliberately gives up the "miami soccer apparel" keyword — a term this
+      // brand was never going to outrank the sportswear giants for, and one that
+      // sounded like a supplier rather than a club. It does mean the title no
+      // longer says we sell anything, so the description has to: it now carries
+      // the products, the place and the year.
+      title: 'Por El Deporte | Football, Friends, Key Biscayne',
       description:
-        'Football, friends, and Key Biscayne since 2014. Shop Por El Deporte apparel.',
+        'Original kit, tees, caps and totes from a club that has been playing on Key Biscayne since 2014. Free shipping in the U.S.',
       url: origin || undefined,
       image:
         'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-26.jpg?v=1755707174&width=1200',
@@ -38,7 +44,7 @@ export const meta: Route.MetaFunction = ({matches}) => {
         url: origin || undefined,
         logo: origin ? `${origin}/icon-512.png` : undefined,
         description:
-          'Miami soccer apparel and community, founded in Key Biscayne in 2014.',
+          'A football club and clothing label from Key Biscayne, Florida, putting on games and making original kit since 2014.',
         foundingDate: '2014',
         address: {
           '@type': 'PostalAddress',
@@ -252,14 +258,16 @@ function Hero() {
 
       <div className="pel-hero__content">
         <h1 className="pel-hero__title">
-          Miami Soccer
+          Football, Friends,
           <br />
-          Apparel &amp; Community
+          Key Biscayne
         </h1>
         <div className="pel-hero__lede">
+          {/* The headline is the club's line; this one has to say what we
+              actually sell, since the headline no longer does. */}
           <p className="pel-hero__sub">
-            Football, friends, and good days on the island. Key Biscayne
-            since 2014.
+            Original kit, tees and caps from the club that plays on the island.
+            Since 2014.
           </p>
           <div className="pel-cta-row">
             <Link to="/collections/all-products" className="pel-btn">

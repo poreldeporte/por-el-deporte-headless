@@ -78,7 +78,12 @@ export function metaDescription(raw?: string | null): string | undefined {
   if (!raw) return undefined;
   const text = raw
     .replace(/<[^>]+>/g, ' ')
-    .replace(/([.!?])(?=[A-Z])/g, '$1 ')
+    // Restores the space lost at a paragraph break ("…sort it out.The window").
+    // The lookbehind keeps it away from initialisms: the dot in "U.S." follows a
+    // lone capital, so it is left alone — without it this rendered "the U. S.".
+    // A sentence ending in an all-caps word is still handled, because the "A" in
+    // "USA." has no word boundary before it.
+    .replace(/(?<!\b[A-Z])([.!?])(?=[A-Z])/g, '$1 ')
     .replace(/\s+/g, ' ')
     .trim();
   if (!text) return undefined;
