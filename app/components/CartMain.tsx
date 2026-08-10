@@ -83,8 +83,12 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             })}
           </ul>
         </div>
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
+      {/* Outside .cart-details on purpose. That element is the scroll container,
+          so a summary inside it scrolled away with the line items — the total
+          and the checkout button were below the fold as soon as the cart held a
+          few things. As a sibling it stays pinned to the bottom of the drawer. */}
+      {cartHasItems && <CartSummary cart={cart} layout={layout} />}
     </section>
   );
 }

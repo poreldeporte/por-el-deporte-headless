@@ -340,13 +340,8 @@ button.reset:hover:not(:has(> *)) {
   position: relative;
 }
 
-/* Layout lives in pel-cart.css, which owns the drawer's flex column. This used
-   to be `position: absolute; width: calc(var(--aside-width) - 40px)`, which both
-   painted over the line items and clipped the subtotal off the right edge on
-   phones, where the drawer is narrower than --aside-width. */
-.cart-summary-aside {
-  padding-top: 0.75rem;
-}
+/* .cart-summary-aside layout lives entirely in pel-cart.css, which owns the
+   drawer's flex column. A stray `padding-top` here fought its shorthand. */
 
 .cart-line-quantity {
   display: flex;
@@ -357,16 +352,8 @@ button.reset:hover:not(:has(> *)) {
   padding-left: 2rem;
 }
 
-.cart-discount {
-  align-items: center;
-  display: flex;
-  margin-top: 0.25rem;
-}
-
-.cart-subtotal {
-  align-items: center;
-  display: flex;
-}
+/* .cart-discount and .cart-subtotal removed with the discount and gift-card
+   forms; the totals rows are .cart-row in pel-cart.css. */
 /*
 * --------------------------------------------------
 * components/Search

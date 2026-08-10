@@ -1207,6 +1207,15 @@ a.pel-footer__link:hover {
   background: var(--pel-orange);
   color: #fff;
 }
+/* The FAB shares z-index 60 with the drawer overlay and comes later in the DOM,
+   so it painted on top of the cart — sitting over the fineprint under the
+   checkout button and, at some heights, over the button itself. Nothing behind
+   an open drawer should be clickable anyway. */
+body:has(.overlay.expanded) .pel-fab {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast);
+}
 .pel-fab__badge {
   position: absolute;
   top: -4px;

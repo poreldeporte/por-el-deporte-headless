@@ -85,13 +85,16 @@ function CollectionItem({
 }) {
   const art =
     collection?.image ?? collection?.products?.nodes?.[0]?.featuredImage ?? null;
-  return (
-    <Link
-      className="pel-collections__card"
-      key={collection.id}
-      to={`/collections/${collection.handle}`}
-      prefetch="intent"
-    >
+
+  // Two of the four collections (Official Kits, 2023 PED Kits) hold no products.
+  // Their tiles said "Coming soon" but still linked through to a shelf reading
+  // "0 Styles" under a subhead inviting you to grab your favourites — a dead end
+  // dressed up as a destination. A teaser that doesn't pretend to be a link is
+  // honest; the moment someone puts a product in, it becomes a link again.
+  const isEmpty = (collection?.products?.nodes?.length ?? 0) === 0;
+
+  const well = (
+    <>
       <div className="pel-collections__well">
         {art ? (
           <Image
@@ -108,6 +111,25 @@ function CollectionItem({
         )}
       </div>
       <h3 className="pel-collections__name">{collection.title}</h3>
+    </>
+  );
+
+  if (isEmpty) {
+    return (
+      <div className="pel-collections__card pel-collections__card--soon">
+        {well}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      className="pel-collections__card"
+      key={collection.id}
+      to={`/collections/${collection.handle}`}
+      prefetch="intent"
+    >
+      {well}
     </Link>
   );
 }

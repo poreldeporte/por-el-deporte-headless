@@ -170,6 +170,14 @@ aside .aside__body {
   display: flex;
   flex-direction: column;
 }
+/* The cart drawer runs to the edges. Its own body margin and .cart-main's
+   symmetric vertical padding left the summary floating 48px above the bottom of
+   the drawer — a band of cream under the checkout button that made the pinned
+   footer look like it had simply stopped early. The scroll area keeps its
+   breathing room; the footer sits flush. */
+aside .aside__body:has(.cart-main) {
+  margin-bottom: 0;
+}
 .cart-main {
   flex: 1;
   min-height: 0;
@@ -177,6 +185,8 @@ aside .aside__body {
   flex-direction: column;
   max-height: none;
   overflow: visible;
+  padding-top: 4px;
+  padding-bottom: 0;
 }
 .cart-main .cart-details {
   flex: 1;
@@ -184,156 +194,86 @@ aside .aside__body {
   overflow-y: auto;
 }
 
-/* ── Summary + checkout ── */
+/* ── Summary + checkout ──
+   Pinned footer, not the tail of the scroll area. .cart-main is the flex column
+   and .cart-details is the only thing that scrolls, so this sits below it and
+   stays put however many items are in the cart. */
 .cart-summary-aside {
   flex: none;
-  position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: auto;
   background: var(--pel-cream);
   border-top: var(--border-width) solid var(--pel-ink);
-  padding: 20px 4px 10px;
-  margin-top: 8px;
+  padding: 18px 24px calc(18px + env(safe-area-inset-bottom));
+  margin: 0;
 }
-.cart-summary-aside h4 {
-  margin: 0 0 12px;
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.cart-subtotal {
+
+/* Label left, value right — the pattern the whole drawer uses. */
+.cart-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 16px;
   margin: 0;
+}
+.cart-row dt,
+.cart-row dd {
+  margin: 0;
+}
+.cart-row--muted {
+  font: 600 13px/1.3 var(--font-body);
+  color: var(--text-muted);
+}
+.cart-row--total {
   font-family: var(--font-display);
   font-weight: 650;
-  font-size: 22px;
+  font-size: 24px;
+  line-height: 1.1;
   color: var(--pel-ink);
 }
-.cart-summary-aside a[href] {
+.cart-row--total dt {
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.cart-checkout {
   display: block;
-  margin-top: 14px;
+  margin-top: 4px;
+  padding: 18px;
   background: var(--pel-ink);
   color: var(--pel-cream);
   border-radius: var(--radius-pill);
   text-align: center;
   text-decoration: none;
-  transition: background var(--dur-fast);
-}
-.cart-summary-aside a[href]:hover {
-  background: var(--pel-orange);
-}
-.cart-summary-aside a[href] p {
-  margin: 0;
-  padding: 18px;
   font: 700 13px/1 var(--font-body);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  transition: background var(--dur-fast);
+}
+.cart-checkout:hover {
+  background: var(--pel-orange);
+}
+
+.cart-fineprint {
+  margin: 0;
+  text-align: center;
+  font: 500 11px/1.4 var(--font-body);
+  color: var(--text-muted);
 }
 
 /* ── /cart page summary ──
-   The drawer's summary was branded; this one was never touched, so the dedicated
-   cart page — where the footer's "View Cart" link lands — presented its primary
-   checkout CTA as plain black 16px text stretched 1224px wide and 22px tall.
-   Same treatment as the drawer, laid out as a card beside the line items rather
-   than a full-bleed strip. */
-.cart-summary-page {
-  position: relative;
-  background: var(--pel-cream);
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: var(--radius-lg);
-  padding: 26px 24px 22px;
-}
-.cart-summary-page h4 {
-  margin: 0 0 14px;
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.cart-summary-page a[href] {
-  display: block;
-  margin-top: 18px;
-  background: var(--pel-ink);
-  color: var(--pel-cream);
-  border-radius: var(--radius-pill);
-  text-align: center;
-  text-decoration: none;
-  transition: background var(--dur-fast);
-}
-.cart-summary-page a[href]:hover {
-  background: var(--pel-orange);
-}
-.cart-summary-page a[href] p {
-  margin: 0;
-  padding: 18px;
-  font: 700 13px/1 var(--font-body);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.cart-summary-page input[type='text'] {
-  border: var(--border-width) solid var(--border-soft);
-  border-radius: var(--radius-pill);
-  padding: 10px 16px;
-  font: 600 12px/1 var(--font-body);
-  background: var(--pel-white);
-}
-.cart-summary-page button {
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--pel-ink);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 10px 4px;
-}
-.cart-summary-page button:hover {
-  color: var(--pel-orange);
-}
-
-/* ── Summary rhythm ──
-   The discount and gift-card sections were each 113px tall around a 49px form —
-   32px of inherited margin above and below, plus a stray <br> after the checkout
-   link. That is where the "large unexplained gaps" came from. Spacing is set
-   here explicitly instead of inherited from the skeleton's generic element
-   rules, so both cart layouts stack predictably. */
-.cart-summary-aside,
+   Same content, presented as a card beside the line items rather than a strip
+   welded to the bottom of a drawer. */
 .cart-summary-page {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-/* reset.css applies `section { padding: 1rem 0 }` globally, which is what
-   actually inflated each discount/gift-card block to 113px around a 49px form.
-   Margin was never the problem. */
-.cart-summary-aside section,
-.cart-summary-page section,
-.cart-summary-aside form,
-.cart-summary-page form,
-.cart-summary-aside > div,
-.cart-summary-page > div {
-  margin: 0;
-  padding: 0;
-}
-.cart-summary-aside section > *,
-.cart-summary-page section > * {
-  margin: 0;
-}
-/* A <br> used as a spacer under the checkout link. */
-.cart-summary-aside br,
-.cart-summary-page br {
-  display: none;
-}
-
-/* Discount / gift-card inputs */
-.cart-summary-aside input[type='text'] {
-  border: var(--border-width) solid var(--border-soft);
-  border-radius: var(--radius-pill);
-  padding: 10px 16px;
-  font: 600 12px/1 var(--font-body);
-  background: var(--pel-white);
+  gap: 10px;
+  background: var(--pel-cream);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  padding: 24px;
 }
 
 /* ── Free-shipping note (drawer top) ──
@@ -438,79 +378,6 @@ aside .aside__body {
 }
 .pel-cart-msg__close:hover {
   opacity: 1;
-}
-
-/* A discount code Shopify rejected. Previously silent: the field cleared and
-   nothing said whether it had worked. */
-.cart-code-error {
-  margin: 6px 0 0;
-  font: 600 12px/1.4 var(--font-body);
-  color: #a4331f;
-}
-
-/* ── Discount / gift-card rows ──
-   These were a styled pill input sitting beside a browser-default 16px "Apply"
-   in Times-ish body text, which is what made them look unfinished. Treated as
-   one control: the input flexes, the button is a solid pill matched to its
-   height, and both rows share the same rhythm. */
-.cart-summary-aside section > div,
-.cart-summary-page section > div {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.cart-summary-aside section input[type='text'],
-.cart-summary-page section input[type='text'] {
-  flex: 1;
-  min-width: 0;
-  height: 42px;
-  padding: 0 18px;
-  border: var(--border-width) solid var(--border-soft);
-  border-radius: var(--radius-pill);
-  background: var(--pel-white);
-  font: 600 12px/1 var(--font-body);
-  letter-spacing: 0.04em;
-  color: var(--pel-ink);
-}
-.cart-summary-aside section input[type='text']::placeholder,
-.cart-summary-page section input[type='text']::placeholder {
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 11px;
-}
-.cart-summary-aside section input[type='text']:focus,
-.cart-summary-page section input[type='text']:focus {
-  outline: none;
-  border-color: var(--pel-ink);
-}
-.cart-summary-aside section button[type='submit'],
-.cart-summary-page section button[type='submit'] {
-  flex: none;
-  height: 42px;
-  padding: 0 20px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: var(--pel-ink);
-  color: var(--pel-cream);
-  font: 700 11px/1 var(--font-body);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background var(--dur-fast);
-}
-.cart-summary-aside section button[type='submit']:hover,
-.cart-summary-page section button[type='submit']:hover {
-  background: var(--pel-orange-ink);
-}
-/* The "remove applied code" button is a small text action, not a pill. */
-.cart-summary-aside dl button,
-.cart-summary-page dl button {
-  background: transparent;
-  color: var(--text-muted);
-  border: none;
-  padding: 4px;
-  cursor: pointer;
 }
 
 /* ── Cart line, laid out like the reference ──
@@ -619,40 +486,3 @@ aside .aside__body {
   color: var(--pel-cream);
 }
 
-/* Totals block: label left, value right, on both rows. */
-.cart-shipping,
-.cart-subtotal {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: 0;
-  gap: 16px;
-}
-.cart-shipping dt,
-.cart-subtotal dt {
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.cart-shipping dd {
-  margin: 0;
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--pel-ink);
-}
-.cart-subtotal dt {
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: 18px;
-  letter-spacing: 0.02em;
-  color: var(--pel-ink);
-}
-.cart-subtotal dd {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: 22px;
-  color: var(--pel-ink);
-}

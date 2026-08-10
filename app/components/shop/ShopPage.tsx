@@ -73,15 +73,21 @@ export function ShopPage({
         <div className="pel-shop__banner-overlay" />
         <div className="pel-shop__banner-inner">
           <div className="pel-shop__eyebrow">
-            Shop All &bull; {products.length} Styles
+            {products.length
+              ? `Shop All • ${products.length} Styles`
+              : 'Coming Soon'}
           </div>
           {/* The collection's own name, not "Gear Up." on all four — that left
               every collection page with an identical heading and no indication
               of which one you were looking at. */}
           <h1 className="pel-shop__title">{title}</h1>
           <p className="pel-shop__sub">
-            Every tee, hat, and tote supports our Key Biscayne community. Rep the
-            club and grab your favorites.
+            {/* Two collections hold no products. Telling someone to "grab your
+                favorites" above an empty shelf reads as a broken page rather
+                than one that hasn't been filled yet. */}
+            {products.length
+              ? 'Every tee, hat, and tote supports our Key Biscayne community. Rep the club and grab your favorites.'
+              : "This one isn't stocked yet. Everything we do make is in the shop."}
           </p>
         </div>
       </section>

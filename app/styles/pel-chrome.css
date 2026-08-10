@@ -972,6 +972,17 @@ summary:focus-visible,
 .pel-collections__card:hover {
   transform: translateY(-6px);
 }
+/* An unstocked collection is a teaser, not a link — no lift, no pointer, so it
+   doesn't invite a click that leads to an empty shelf. */
+.pel-collections__card--soon {
+  cursor: default;
+}
+.pel-collections__card--soon:hover {
+  transform: none;
+}
+.pel-collections__card--soon .pel-collections__name {
+  opacity: 0.6;
+}
 .pel-collections__well {
   border: 2px solid var(--pel-ink);
   border-radius: 20px;
