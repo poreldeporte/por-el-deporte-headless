@@ -20,8 +20,15 @@
 
 :root {
   /* ── Color · brand ─────────────────────────── */
-  --pel-orange: #ce643e; /* primary · brand · accent */
-  --pel-blue: #4576ce; /* secondary accent */
+  --pel-orange: #ce643e; /* primary · brand · accent. Fills and decoration only. */
+  /* Orange is 3.35:1 against cream in both directions, so it fails AA for text
+     at any size under 24px. This darker cut is 4.88:1 either way and is what
+     small type uses — orange words on cream, and cream words on an orange fill.
+     Keeping them as separate tokens means the brand colour itself is untouched
+     wherever it is just a shape. */
+  --pel-orange-ink: #a55032;
+  --pel-blue: #3e6ab9; /* secondary accent. Was #4576ce, which put cream marquee
+                          text at 3.90:1 on every page; this is 4.64:1. */
   --pel-green: #2f6a44; /* secondary accent (footer) */
 
   /* ── Color · neutrals ──────────────────────── */
@@ -36,7 +43,9 @@
   --surface: var(--pel-cream);
   --surface-sunken: var(--pel-sand);
   --text: var(--pel-ink);
-  --text-muted: rgba(23, 23, 23, 0.55);
+  /* 0.55 composited to 3.84:1 on cream, failing body copy, breadcrumb links,
+     variant labels and the PDP lead. 0.65 is 5.28:1 and still reads as muted. */
+  --text-muted: rgba(23, 23, 23, 0.65);
   --text-on-dark: var(--pel-cream);
   --brand: var(--pel-orange);
   --border: var(--pel-ink);

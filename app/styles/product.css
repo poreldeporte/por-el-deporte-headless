@@ -227,7 +227,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: var(--pel-orange);
+  background: var(--pel-orange-ink); /* cream text sits on this: 4.88:1 */
   border-radius: var(--radius-md);
   padding: 16px 24px;
   margin: 32px 0 0;

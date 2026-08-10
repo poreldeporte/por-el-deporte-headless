@@ -151,6 +151,10 @@ body:has(.pel-home) {
 .pel-home .pel-nav__links a:hover {
   color: var(--pel-orange);
 }
+/* The hero nav sits over the dark hero overlay, not on cream, so it keeps the
+   brighter orange: #ce643e is 4.88:1 on #131313, while the darker text cut
+   drops to 3.36:1 there. The cream site header uses --pel-orange-ink instead;
+   the two are on opposite backdrops and need opposite directions. */
 .pel-home .pel-nav__links a.is-active {
   color: var(--pel-orange);
   text-decoration: underline;
@@ -361,7 +365,9 @@ body:has(.pel-home) {
   letter-spacing: 0;
 }
 .pel-rail__count span {
-  opacity: 0.5;
+  /* 0.5 composited to 3.31:1 on cream. 0.7 is 6.24:1 and still reads as the
+     quieter half of "01 / 12". */
+  opacity: 0.7;
 }
 .pel-rail__btns {
   display: flex;
@@ -979,7 +985,7 @@ a.pel-footer__logo {
 }
 .pel-newsletter__btn {
   flex: none;
-  background: var(--pel-orange);
+  background: var(--pel-orange-ink);
   color: var(--pel-cream);
   border: none;
   border-radius: var(--radius-pill);
@@ -1070,7 +1076,10 @@ a.pel-footer__logo {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--pel-cream);
-  opacity: 0.7;
+  /* Was 0.7, which composited to 3.67:1 on the footer green — 18px/600 is not
+     large text, so it needs 4.5. 0.85 is 4.60:1 and still reads as a quieter
+     heading than the links beneath it. */
+  opacity: 0.85;
 }
 .pel-footer__links {
   display: flex;
@@ -1244,7 +1253,8 @@ a.pel-footer__link:hover {
   text-transform: uppercase;
   color: var(--pel-ink);
   text-decoration: none;
-  opacity: 0.6;
+  /* 0.6 landed at 4.49:1, a hair under AA for 13px. */
+  opacity: 0.7;
   transition:
     opacity var(--dur-fast),
     color var(--dur-fast);

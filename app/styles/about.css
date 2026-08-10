@@ -126,7 +126,7 @@
   line-height: 1.06;
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: #7a2e17;
+  color: var(--pel-ink); /* was #7a2e17: 2.47:1 on the orange panel */
   background: rgba(247, 240, 222, 0.34);
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -138,7 +138,7 @@
   font: 700 12.5px/1.65 var(--font-body);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: #7a2e17;
+  color: var(--pel-ink); /* was #7a2e17: 2.47:1 on the orange panel */
 }
 
 @media (max-width: 60em) {

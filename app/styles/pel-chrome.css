@@ -72,10 +72,10 @@ main h1 {
   text-decoration: none;
 }
 .pel-siteheader__links a:hover {
-  color: var(--pel-orange);
+  color: var(--pel-orange-ink);
 }
 .pel-siteheader__links a.is-active {
-  color: var(--pel-orange);
+  color: var(--pel-orange-ink);
   text-decoration: underline;
   text-underline-offset: 5px;
   text-decoration-thickness: 2px;
@@ -304,7 +304,7 @@ main h1 {
   text-decoration: none;
 }
 .pel-crumbs a:hover {
-  color: var(--pel-orange);
+  color: var(--pel-orange-ink);
 }
 .pel-crumbs__item [aria-current='page'] {
   color: var(--pel-ink);
@@ -418,7 +418,7 @@ main h1 {
   font: 700 12px/1 var(--font-body);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--pel-orange);
+  color: var(--pel-orange-ink);
   margin-bottom: 10px;
 }
 .cart__title {
@@ -855,7 +855,7 @@ summary:focus-visible,
   font: 700 12px/1 var(--font-body);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--pel-orange);
+  color: var(--pel-orange-ink);
   margin-bottom: 10px;
 }
 .pel-legal__title {

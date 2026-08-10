@@ -22,7 +22,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 8 | high | FIXED | /cart page's Totals block is raw Hydrogen skeleton — the primary checkout CTA is unstyled plain text |
 | 9 | high | FIXED | "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text |
 | 10 | high | FIXED | Homepage cart FAB sits exactly on top of the community FAB, making the community button unclickable |
-| 11 | high | OPEN | --text-muted token is 3.82:1 on cream, failing body copy, breadcrumb links and variant labels |
+| 11 | high | FIXED | --text-muted token is 3.82:1 on cream, failing body copy, breadcrumb links and variant labels |
 | 12 | high | OPEN | Product pages hardcode "100% ring-spun cotton / Plastic-Free" on every product, contradicting the Specs card on the same page |
 | 13 | high | OPEN | Two of the store's four collections are completely empty, and one is a footer link on every page |
 | 14 | high | OPEN | Homepage "Shop Our Signature Gear" rail shows 12 products with no prices, and Quick Add blind-picks a size |
@@ -43,9 +43,9 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 29 | medium | OPEN | Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts |
 | 30 | medium | OPEN | Quick-add-to-cart buttons on the shop grid have no accessible name |
 | 31 | medium | OPEN | Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close |
-| 32 | medium | OPEN | About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site |
-| 33 | medium | OPEN | Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch |
-| 34 | medium | OPEN | Announcement marquee text is 3.9:1 on blue on every page |
+| 32 | medium | FIXED | About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site |
+| 33 | medium | FIXED | Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch |
+| 34 | medium | FIXED | Announcement marquee text is 3.9:1 on blue on every page |
 | 35 | medium | OPEN | /collections renders four blank beige squares — no collection has an image |
 | 36 | medium | OPEN | Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading |
 | 37 | medium | OPEN | Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints |
@@ -63,7 +63,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 49 | medium | FIXED | All four blog routes still carry stock Hydrogen-skeleton meta: no canonical, no description, no Open Graph, and "… blog" / "… article" titles |
 | 50 | low | OPEN | Invalid <legend> placement and unstyled <h3>s in the account body |
 | 51 | low | OPEN | Empty close-overlay button inside the cart dialog has no accessible name |
-| 52 | low | OPEN | Footer column headings are cream at 70% opacity over green — 3.67:1 |
+| 52 | low | FIXED | Footer column headings are cream at 70% opacity over green — 3.67:1 |
 | 53 | low | OPEN | Keyboard focus ring is nearly invisible on the green footer and over the hero photo |
 | 54 | low | OPEN | Footer "Club" column is leftover old-theme navigation: Our Mission / Gallery / Join the Revolution all point at /about |
 | 55 | low | OPEN | The "What Makes Us Special" drawer sends customers to poreldeporte.com/pages/app, which renders an empty page titled "app" |
@@ -180,7 +180,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Increase specificity of the offset (e.g. `.pel-fabs .pel-fab--community { right: 98px }`) or move the `--community` rule into home.css after the base `.pel-fab` rule.
 
-### 11. HIGH — OPEN — --text-muted token is 3.82:1 on cream, failing body copy, breadcrumb links and variant labels
+### 11. HIGH — FIXED — --text-muted token is 3.82:1 on cream, failing body copy, breadcrumb links and variant labels
 
 **Where:** `app/styles/pel-tokens.css:39 (`--text-muted: rgba(23, 23, 23, 0.55)`); consumers include app/styles/product.css:120-124 (`.pel-pdp__lead`) and app/styles/shop.css:184-189 (`.pel-shopcard__cat`)`
 
@@ -393,7 +393,7 @@ Key Biscayne FL, United States
 
 **Fix:** In Aside.tsx, set `aria-modal={expanded || undefined}` (and ideally `role="dialog"` only when expanded, or `inert`/`hidden` when not), move focus to the dialog (the Close button or the aside container) in the existing `expanded` useEffect, cycle Tab/Shift+Tab within the overlay while open, and restore focus to the previously focused element on close.
 
-### 32. MEDIUM — OPEN — About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site
+### 32. MEDIUM — FIXED — About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site
 
 **Where:** `app/components/about/AboutPage.tsx → `.pel-mission__body` inside `.pel-mission__panel` — /about`
 
@@ -403,7 +403,7 @@ Key Biscayne FL, United States
 
 **Fix:** Darken the copy colour substantially on the orange panel (e.g. to `var(--pel-ink)` #171717, which gives ~6.0:1 on #CE643E) or switch to `var(--pel-cream)` on a darker panel. #7A2E17 cannot reach 4.5:1 against #CE643E.
 
-### 33. MEDIUM — OPEN — Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch
+### 33. MEDIUM — FIXED — Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch
 
 **Where:** `app/styles/pel-tokens.css:23 (`--pel-orange: #ce643e`); app/styles/home.css:980-988 (`.pel-newsletter__btn`); app/styles/product.css:193-198 (`.pel-pdp__swatch-name`) — /, /about, /collections/all-products, /products/*`
 
@@ -413,7 +413,7 @@ Key Biscayne FL, United States
 
 **Fix:** Darken the orange used behind or as text (e.g. #B44E2A gives ~4.6:1 against #F7F0DE and ~4.7:1 under cream), or keep #CE643E purely for large display type and fills while using `var(--pel-ink)` for text on orange and a darker orange for orange-on-cream text.
 
-### 34. MEDIUM — OPEN — Announcement marquee text is 3.9:1 on blue on every page
+### 34. MEDIUM — FIXED — Announcement marquee text is 3.9:1 on blue on every page
 
 **Where:** `app/components/PelMarquee.tsx via app/components/PelHeader.tsx:17 — all four audited pages`
 
@@ -593,7 +593,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add `aria-label="Close cart"` to the `.close-outside` button, or make it a non-focusable presentational click-catcher (`<div>` with an onClick plus `aria-hidden="true"`, given the labelled Close button already exists at Aside.tsx:67).
 
-### 52. LOW — OPEN — Footer column headings are cream at 70% opacity over green — 3.67:1
+### 52. LOW — FIXED — Footer column headings are cream at 70% opacity over green — 3.67:1
 
 **Where:** `app/styles/home.css:1064-1074 (`.pel-footer__colh`, `opacity: 0.7`); rendered by app/components/PelFooter.tsx:164 — all pages`
 
