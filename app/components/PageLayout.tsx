@@ -61,14 +61,29 @@ export function PageLayout({cart, children = null}: PageLayoutProps) {
 
 function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   return (
-    <Aside type="cart" heading="CART">
-      <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={cart}>
-          {(cart) => {
-            return <CartMain cart={cart} layout="aside" />;
-          }}
-        </Await>
-      </Suspense>
-    </Aside>
+    <Suspense
+      fallback={
+        <Aside type="cart" heading="YOUR BAG">
+          <p>Loading cart ...</p>
+        </Aside>
+      }
+    >
+      <Await resolve={cart}>
+        {(resolved) => {
+          const count = resolved?.totalQuantity ?? 0;
+          // The reference names the contents rather than the container: "3 items
+          // in your bag" tells you something, "CART" repeats the icon you clicked.
+          const heading =
+            count > 0
+              ? `${count} ITEM${count === 1 ? '' : 'S'} IN YOUR BAG`
+              : 'YOUR BAG';
+          return (
+            <Aside type="cart" heading={heading}>
+              <CartMain cart={resolved} layout="aside" />
+            </Aside>
+          );
+        }}
+      </Await>
+    </Suspense>
   );
 }

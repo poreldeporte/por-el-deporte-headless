@@ -38,35 +38,43 @@ export function CartLineItem({
     <li key={id} className="cart-line">
       <div className="cart-line-inner">
         {image && (
-          <Image
-            alt={title}
-            aspectRatio="1/1"
-            data={image}
-            height={100}
-            loading="lazy"
-            width={100}
-          />
+          <div className="cart-line__media">
+            <Image
+              alt={title}
+              aspectRatio="1/1"
+              data={image}
+              height={110}
+              loading="lazy"
+              width={110}
+            />
+          </div>
         )}
 
-        <div>
-          <Link
-            prefetch="intent"
-            to={lineItemUrl}
-            onClick={() => {
-              if (layout === 'aside') {
-                close();
-              }
-            }}
-          >
-            <p>
-              <strong>{product.title}</strong>
-            </p>
-          </Link>
-          <ProductPrice price={line?.cost?.totalAmount} />
+        <div className="cart-line__body">
+          {/* Title and price share a row, price hard right — a shopper scanning
+              a cart reads down the right edge for the numbers. */}
+          <div className="cart-line__head">
+            <Link
+              className="cart-line__title"
+              prefetch="intent"
+              to={lineItemUrl}
+              onClick={() => {
+                if (layout === 'aside') {
+                  close();
+                }
+              }}
+            >
+              {product.title}
+            </Link>
+            <div className="cart-line__price">
+              <ProductPrice price={line?.cost?.totalAmount} />
+            </div>
+          </div>
+
           {/* Shopify gives a single-variant product one option called "Title"
               with the value "Default Title". Printing it verbatim put
               "Title: Default Title" under every tote and cap in the cart. */}
-          <ul>
+          <ul className="cart-line__opts">
             {selectedOptions
               .filter(
                 (option) =>
@@ -74,9 +82,7 @@ export function CartLineItem({
               )
               .map((option) => (
                 <li key={option.name}>
-                  <small>
-                    {option.name}: {option.value}
-                  </small>
+                  {option.name}: {option.value}
                 </li>
               ))}
           </ul>
@@ -118,7 +124,9 @@ function CartLineQuantity({line}: {line: CartLine}) {
 
   return (
     <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
+      {/* One pill holding minus / count / plus, with Remove pushed to the far
+          right of the row. */}
+      <div className="cart-line-quantity__stepper">
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
         <button
           aria-label="Decrease quantity"
@@ -129,7 +137,9 @@ function CartLineQuantity({line}: {line: CartLine}) {
           <span>&#8722; </span>
         </button>
       </CartLineUpdateButton>
-      &nbsp;
+      <span className="cart-line-quantity__count" aria-live="polite">
+        {quantity}
+      </span>
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
         <button
           aria-label="Increase quantity"
@@ -140,7 +150,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
           <span>&#43;</span>
         </button>
       </CartLineUpdateButton>
-      &nbsp;
+      </div>
       <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
     </div>
   );

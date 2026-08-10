@@ -512,3 +512,147 @@ aside .aside__body {
   padding: 4px;
   cursor: pointer;
 }
+
+/* ── Cart line, laid out like the reference ──
+   Media tile left, then a two-column head with the title on the left and the
+   price hard right, the variant as a quiet subtitle, and a control row with the
+   stepper as one pill and Remove pushed to the far edge. Rows are separated by a
+   rule so three items read as three things rather than one column of text. */
+.cart-line {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-soft);
+  list-style: none;
+}
+.cart-line:last-child {
+  border-bottom: none;
+}
+.cart-line-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.cart-line__media {
+  flex: none;
+  width: 96px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--pel-sand);
+}
+.cart-line__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.cart-line__body {
+  flex: 1;
+  min-width: 0;
+}
+.cart-line__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cart-line__title {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 19px;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+  text-decoration: none;
+}
+.cart-line__title:hover {
+  color: var(--pel-orange-ink);
+}
+.cart-line__price {
+  flex: none;
+  font: 700 15px/1.2 var(--font-body);
+  color: var(--pel-ink);
+}
+.cart-line__price * {
+  margin: 0;
+  font: inherit;
+}
+.cart-line__opts {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  font: 600 12px/1.5 var(--font-body);
+  color: var(--text-muted);
+}
+
+/* Control row: one stepper pill, Remove at the far right. */
+.cart-line-quantity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: nowrap;
+}
+.cart-line-quantity__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-pill);
+}
+.cart-line-quantity__count {
+  min-width: 26px;
+  text-align: center;
+  font: 700 13px/1 var(--font-body);
+  color: var(--pel-ink);
+}
+.cart-line-quantity__stepper button[name$='-quantity'] {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+}
+.cart-line-quantity__stepper button[name$='-quantity']:hover:not(:disabled) {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+
+/* Totals block: label left, value right, on both rows. */
+.cart-shipping,
+.cart-subtotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0;
+  gap: 16px;
+}
+.cart-shipping dt,
+.cart-subtotal dt {
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.cart-shipping dd {
+  margin: 0;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+.cart-subtotal dt {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: var(--pel-ink);
+}
+.cart-subtotal dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 22px;
+  color: var(--pel-ink);
+}

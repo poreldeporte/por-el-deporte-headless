@@ -21,6 +21,13 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
   return (
     <div aria-labelledby={summaryId} className={className}>
       <h4 id={summaryId}>Totals</h4>
+      {/* Shipping stated here rather than left as a surprise at checkout. It is
+          genuinely free for U.S. orders (the domestic zone's only rate is
+          $0.00); international is quoted live by the carrier. */}
+      <dl role="group" className="cart-shipping">
+        <dt>Shipping</dt>
+        <dd>Free in the U.S.</dd>
+      </dl>
       <dl role="group" className="cart-subtotal">
         <dt>Subtotal</dt>
         <dd>
