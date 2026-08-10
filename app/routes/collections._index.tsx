@@ -83,6 +83,8 @@ function CollectionItem({
   collection: CollectionFragment;
   index: number;
 }) {
+  const art =
+    collection?.image ?? collection?.products?.nodes?.[0]?.featuredImage ?? null;
   return (
     <Link
       className="pel-collections__card"
@@ -91,14 +93,18 @@ function CollectionItem({
       prefetch="intent"
     >
       <div className="pel-collections__well">
-        {collection?.image && (
+        {art ? (
           <Image
-            alt={collection.image.altText || collection.title}
+            alt={art.altText || collection.title}
             aspectRatio="1/1"
-            data={collection.image}
+            data={art}
             loading={index < 3 ? 'eager' : undefined}
             sizes="(min-width: 45em) 400px, 100vw"
           />
+        ) : (
+          // An empty collection has no product to borrow from either. Say so
+          // rather than showing a blank tile with a name under it.
+          <span className="pel-collections__empty">Coming soon</span>
         )}
       </div>
       <h3 className="pel-collections__name">{collection.title}</h3>
@@ -117,6 +123,21 @@ const COLLECTIONS_QUERY = `#graphql
       altText
       width
       height
+    }
+    # Not one collection in this store has an image set, so every card on this
+    # page rendered as an empty box. Borrowing the first product's photo means
+    # the page works on real data instead of waiting for someone to upload four
+    # images, and a real collection image still wins when one exists.
+    products(first: 1) {
+      nodes {
+        featuredImage {
+          id
+          url
+          altText
+          width
+          height
+        }
+      }
     }
   }
   query StoreCollections(

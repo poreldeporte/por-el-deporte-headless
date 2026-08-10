@@ -38,22 +38,22 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 24 | medium | OPEN | Account forms are capped at 400px by a leftover skeleton reset, leaving two-thirds of the branded card empty |
 | 25 | medium | OPEN | Address form demands raw ISO codes for country and state with no hint that codes are required |
 | 26 | medium | OPEN | Destructive address delete has no confirmation, profile save has no success feedback, and all address Save buttons disable together |
-| 27 | medium | OPEN | Cart line items display "Title: Default Title" for single-variant products |
+| 27 | medium | FIXED | Cart line items display "Title: Default Title" for single-variant products |
 | 28 | medium | OPEN | Invalid discount code fails completely silently — no error, no clearing, no feedback |
 | 29 | medium | FIXED | Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts |
-| 30 | medium | OPEN | Quick-add-to-cart buttons on the shop grid have no accessible name |
+| 30 | medium | FIXED | Quick-add-to-cart buttons on the shop grid have no accessible name |
 | 31 | medium | OPEN | Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close |
 | 32 | medium | FIXED | About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site |
 | 33 | medium | FIXED | Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch |
 | 34 | medium | FIXED | Announcement marquee text is 3.9:1 on blue on every page |
-| 35 | medium | OPEN | /collections renders four blank beige squares — no collection has an image |
+| 35 | medium | FIXED | /collections renders four blank beige squares — no collection has an image |
 | 36 | medium | FIXED | Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading |
 | 37 | medium | OPEN | Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints |
 | 38 | medium | OPEN | Product page editorial strip: 707 KB of hand-written imgs at fixed width=800 into 352x440 / 240x300 boxes |
-| 39 | medium | OPEN | /collections renders as four completely blank boxes — and it is the destination of the account area's only 'Start Shopping' CTA |
+| 39 | medium | FIXED | /collections renders as four completely blank boxes — and it is the destination of the account area's only 'Start Shopping' CTA |
 | 40 | medium | FIXED | Two empty collections are live, promoted in the site footer, and listed in the sitemap; the empty collection page still runs the 'Gear Up.' sell hero over zero products |
 | 41 | medium | OPEN | Sold-out variants are signalled by 35% opacity alone — still clickable, no accessible state, and no explanation once the shopper is in a dead end |
-| 42 | medium | OPEN | Product meta/og descriptions are missing spaces between sentences and run 60-150% over the SERP snippet limit |
+| 42 | medium | FIXED | Product meta/og descriptions are missing spaces between sentences and run 60-150% over the SERP snippet limit |
 | 43 | medium | FIXED | All four collection pages share one identical meta description, and no collection page has an og:image |
 | 44 | medium | DRAFTED | /policies/refund-policy serves the Privacy Policy text verbatim — there are no refund terms anywhere on the site |
 | 45 | medium | FIXED | Product page's main gallery image — the LCP element — is marked loading="lazy" |
@@ -62,16 +62,16 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 48 | medium | FIXED | The 404 page renders with no <title>, no meta description and no robots tag at all |
 | 49 | medium | FIXED | All four blog routes still carry stock Hydrogen-skeleton meta: no canonical, no description, no Open Graph, and "… blog" / "… article" titles |
 | 50 | low | OPEN | Invalid <legend> placement and unstyled <h3>s in the account body |
-| 51 | low | OPEN | Empty close-overlay button inside the cart dialog has no accessible name |
+| 51 | low | FIXED | Empty close-overlay button inside the cart dialog has no accessible name |
 | 52 | low | FIXED | Footer column headings are cream at 70% opacity over green — 3.67:1 |
 | 53 | low | OPEN | Keyboard focus ring is nearly invisible on the green footer and over the hero photo |
-| 54 | low | OPEN | Footer "Club" column is leftover old-theme navigation: Our Mission / Gallery / Join the Revolution all point at /about |
+| 54 | low | FIXED | Footer "Club" column is leftover old-theme navigation: Our Mission / Gallery / Join the Revolution all point at /about |
 | 55 | low | OPEN | The "What Makes Us Special" drawer sends customers to poreldeporte.com/pages/app, which renders an empty page titled "app" |
 | 56 | low | OPEN | Expired /cart/<lines> share links discard their helpful message and show the generic 'Something went wrong' 500 copy |
-| 57 | low | OPEN | The sitemap advertises two policy URLs that robots.txt blocks from being crawled |
-| 58 | low | OPEN | /collections is a fully SEO-tagged route that is in no sitemap and has no link from the public site |
-| 59 | low | OPEN | Account pages use bare, unbranded browser titles that break the site-wide "Por El Deporte \| X" pattern |
-| 60 | low | OPEN | The permanent /collections/all consolidation redirect returns 302 instead of 301 |
+| 57 | low | FIXED | The sitemap advertises two policy URLs that robots.txt blocks from being crawled |
+| 58 | low | FIXED | /collections is a fully SEO-tagged route that is in no sitemap and has no link from the public site |
+| 59 | low | FIXED | Account pages use bare, unbranded browser titles that break the site-wide "Por El Deporte \| X" pattern |
+| 60 | low | FIXED | The permanent /collections/all consolidation redirect returns 302 instead of 301 |
 | 61 | low | FIXED | Every 404 response ships with no <title> tag at all |
 | 62 | low | FIXED | Every page ships two <main> elements, one illegally nested inside <aside> |
 | 63 | low | FIXED | Every error page (404, 410, 500) renders with no <title> at all — the browser tab shows the raw URL |
@@ -343,7 +343,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add a confirm step (or a two-click "Delete → Confirm") before the DELETE submit; render a success line in profile when `action?.customer && !action.error`; key the address form's pending state to the submitting `addressId` (use a per-form `useFetcher`) instead of route-global navigation state.
 
-### 27. MEDIUM — OPEN — Cart line items display "Title: Default Title" for single-variant products
+### 27. MEDIUM — FIXED — Cart line items display "Title: Default Title" for single-variant products
 
 **Where:** `app/components/CartLineItem.tsx:66-74 (selectedOptions map) and :41-49 (alt={title}); visible in the drawer and on /cart`
 
@@ -373,7 +373,7 @@ Key Biscayne FL, United States
 
 **Fix:** Replace the `&nbsp;`/`<br />` spacing in CartSummary with real flex rows and a defined gap, and drop the trailing `<br />`.
 
-### 30. MEDIUM — OPEN — Quick-add-to-cart buttons on the shop grid have no accessible name
+### 30. MEDIUM — FIXED — Quick-add-to-cart buttons on the shop grid have no accessible name
 
 **Where:** `app/components/shop/ShopPage.tsx:209-217 (and app/components/AddToCartButton.tsx:28-35) — /collections/all-products`
 
@@ -423,7 +423,7 @@ Key Biscayne FL, United States
 
 **Fix:** Darken the marquee background (#3560AE against #F7F0DE gives ~5.2:1) or drop the blue band's text to `var(--pel-ink)`. The duplicated second `.pel-marquee__group` is already correctly `aria-hidden="true"`, so only the colour needs changing.
 
-### 35. MEDIUM — OPEN — /collections renders four blank beige squares — no collection has an image
+### 35. MEDIUM — FIXED — /collections renders four blank beige squares — no collection has an image
 
 **Where:** `app/routes/collections._index.tsx:93-103 (image is conditional) and app/styles/pel-chrome.css:946-952 (`.pel-collections__well` is a bordered 1:1 sand block)`
 
@@ -463,7 +463,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add srcset (400/500/800) and `sizes="(min-width: 60em) 352px, 240px"` to the img at ProductPage.tsx:350/357, or drop the hardcoded width from 800 to 500.
 
-### 39. MEDIUM — OPEN — /collections renders as four completely blank boxes — and it is the destination of the account area's only 'Start Shopping' CTA
+### 39. MEDIUM — FIXED — /collections renders as four completely blank boxes — and it is the destination of the account area's only 'Start Shopping' CTA
 
 **Where:** `/Users/francoviola/Desktop/ViolaCreative/por-el-deporte-ecommerce/app/routes/collections._index.tsx:93-103; style at app/styles/pel-chrome.css:946; inbound link at app/routes/account.orders._index.tsx:111`
 
@@ -493,7 +493,7 @@ Key Biscayne FL, United States
 
 **Fix:** On option values where `avail` is false: set aria-disabled="true", add a visually-hidden ' (sold out)' to the label, and add a strikethrough (Hydrogen's own convention) rather than relying on opacity. Keep the active chip at full opacity so the current selection is always legible. When selectedVariant.availableForSale is false, render a line under the CTA naming the available alternatives, e.g. 'Medium is sold out — try Large or X-Large.'
 
-### 42. MEDIUM — OPEN — Product meta/og descriptions are missing spaces between sentences and run 60-150% over the SERP snippet limit
+### 42. MEDIUM — FIXED — Product meta/og descriptions are missing spaces between sentences and run 60-150% over the SERP snippet limit
 
 **Where:** `app/routes/products.$handle.tsx:22-25 (`product.seo?.description || product.description`) — URL paths: /products/the-tote, /products/kit-launch, /products/ball-blueprint-tee, /products/drv-pnk-tee, /products/el-clasico-tote, /products/island-sketch-tee, /products/la-isla-tee, /products/game-shorts, /products/ocean-sunset-tee`
 
@@ -583,7 +583,7 @@ Key Biscayne FL, United States
 
 **Fix:** Move each `<legend>` inside its `<fieldset>` (or change it to an `<h3>`), and add a `.pel-account__body h3` rule using `var(--font-display)`.
 
-### 51. LOW — OPEN — Empty close-overlay button inside the cart dialog has no accessible name
+### 51. LOW — FIXED — Empty close-overlay button inside the cart dialog has no accessible name
 
 **Where:** `app/components/Aside.tsx:63`
 
@@ -613,7 +613,7 @@ Key Biscayne FL, United States
 
 **Fix:** Make the ring surface-aware: keep blue on cream, and override to `outline-color: var(--pel-cream)` (or #FFFFFF) for focusable elements inside `.pel-footer` and over the hero image. Adding a contrasting second layer (e.g. `box-shadow: 0 0 0 5px rgba(23,23,23,.6)` alongside the outline) makes it robust on any background, including photos.
 
-### 54. LOW — OPEN — Footer "Club" column is leftover old-theme navigation: Our Mission / Gallery / Join the Revolution all point at /about
+### 54. LOW — FIXED — Footer "Club" column is leftover old-theme navigation: Our Mission / Gallery / Join the Revolution all point at /about
 
 **Where:** `app/components/PelFooter.tsx:22-29 (and "Hats & Totes" → /collections/all-products at :17)`
 
@@ -643,7 +643,7 @@ Key Biscayne FL, United States
 
 **Fix:** In the root ErrorBoundary, branch on 4xx as well: render error.data (when it's a string) as the message, and use copy like 'That link no longer works' with the existing Back home / Shop all gear CTAs. Consider suppressing the numeric code for non-404 4xx statuses.
 
-### 57. LOW — OPEN — The sitemap advertises two policy URLs that robots.txt blocks from being crawled
+### 57. LOW — FIXED — The sitemap advertises two policy URLs that robots.txt blocks from being crawled
 
 **Where:** `app/routes/sitemap.$type.$page[.xml].tsx:133,137 (emits `/policies/${handle}`) vs app/routes/[robots.txt].tsx:73 (`Disallow: /policies/`) — URL paths: /sitemap/site/1.xml, /robots.txt`
 
@@ -653,7 +653,7 @@ Key Biscayne FL, United States
 
 **Fix:** Pick one side. Either drop `Disallow: /policies/` from [robots.txt].tsx:73 (keeping these pages crawlable is the intent implied by giving them canonicals and descriptions), or stop emitting `policyPaths` from the site sitemap at sitemap.$type.$page[.xml].tsx:133 and add `{name: 'robots', content: 'noindex, follow'}` to policies.$handle.tsx's meta — matching the exclude-plus-noindex pattern already implemented in app/lib/pages-seo.ts.
 
-### 58. LOW — OPEN — /collections is a fully SEO-tagged route that is in no sitemap and has no link from the public site
+### 58. LOW — FIXED — /collections is a fully SEO-tagged route that is in no sitemap and has no link from the public site
 
 **Where:** `app/routes/collections._index.tsx:8-14; app/routes/sitemap.$type.$page[.xml].tsx:137 (`const paths = ['/', '/about', '/policies', ...policyPaths]`) — URL path /collections`
 
@@ -663,7 +663,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add `/collections` to the `paths` array at sitemap.$type.$page[.xml].tsx:137, and either link it from the footer's Shop column (app/components/PelFooter.tsx:16-19) or, if the branded Shop page is meant to be the only browse surface, redirect /collections to /collections/all-products the way collections.all.tsx already does.
 
-### 59. LOW — OPEN — Account pages use bare, unbranded browser titles that break the site-wide "Por El Deporte | X" pattern
+### 59. LOW — FIXED — Account pages use bare, unbranded browser titles that break the site-wide "Por El Deporte | X" pattern
 
 **Where:** `app/routes/account.profile.tsx:19 (`{title: 'Profile'}`); app/routes/account.addresses.tsx:31 (`'Addresses'`); app/routes/account.orders._index.tsx:33 (`'Orders'`); app/routes/account.orders.$id.tsx:11 (`` `Order ${data?.order?.name}` ``)`
 
@@ -673,7 +673,7 @@ Key Biscayne FL, United States
 
 **Fix:** Prefix all four with `Por El Deporte | ` to match the rest of the app, and add a `meta` export to account.tsx so the account layout supplies a branded default for account._index.tsx and account.$.tsx.
 
-### 60. LOW — OPEN — The permanent /collections/all consolidation redirect returns 302 instead of 301
+### 60. LOW — FIXED — The permanent /collections/all consolidation redirect returns 302 instead of 301
 
 **Where:** `app/routes/collections.all.tsx:11 (`throw redirect('/collections/all-products')`) — URL path /collections/all`
 

@@ -213,6 +213,7 @@ function ShopCard({product}: {product: ShopProductFragment}) {
       ) : variant?.availableForSale ? (
         <AddToCartButton
           className="pel-shopcard__add"
+          ariaLabel={`Add ${product.title} to cart`}
           onClick={() => open('cart')}
           lines={[{merchandiseId: variant.id, quantity: 1, selectedVariant: variant}]}
         >

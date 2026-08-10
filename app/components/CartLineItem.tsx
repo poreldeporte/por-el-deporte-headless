@@ -63,14 +63,22 @@ export function CartLineItem({
             </p>
           </Link>
           <ProductPrice price={line?.cost?.totalAmount} />
+          {/* Shopify gives a single-variant product one option called "Title"
+              with the value "Default Title". Printing it verbatim put
+              "Title: Default Title" under every tote and cap in the cart. */}
           <ul>
-            {selectedOptions.map((option) => (
-              <li key={option.name}>
-                <small>
-                  {option.name}: {option.value}
-                </small>
-              </li>
-            ))}
+            {selectedOptions
+              .filter(
+                (option) =>
+                  option.name !== 'Title' && option.value !== 'Default Title',
+              )
+              .map((option) => (
+                <li key={option.name}>
+                  <small>
+                    {option.name}: {option.value}
+                  </small>
+                </li>
+              ))}
           </ul>
           <CartLineQuantity line={line} />
         </div>

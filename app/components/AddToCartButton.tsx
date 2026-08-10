@@ -3,6 +3,7 @@ import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
 
 export function AddToCartButton({
   analytics,
+  ariaLabel,
   children,
   className,
   disabled,
@@ -10,6 +11,8 @@ export function AddToCartButton({
   onClick,
 }: {
   analytics?: unknown;
+  /** Needed when the button's only child is an icon — a bare "+" has no name. */
+  ariaLabel?: string;
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
@@ -28,6 +31,7 @@ export function AddToCartButton({
           <button
             type="submit"
             className={className}
+            aria-label={ariaLabel}
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}
           >

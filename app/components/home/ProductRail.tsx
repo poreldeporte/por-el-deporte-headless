@@ -132,6 +132,7 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
         ) : (
           <AddToCartButton
             className="pel-btn-outline"
+            ariaLabel={`Add ${product.title} to cart`}
             disabled={!available}
             onClick={() => open('cart')}
             lines={

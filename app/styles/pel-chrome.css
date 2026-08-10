@@ -1421,3 +1421,17 @@ summary:focus-visible,
     font-size: 21px;
   }
 }
+
+/* An empty collection has no product image to borrow, so the tile says so
+   instead of rendering as a blank box with a name underneath. */
+.pel-collections__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}

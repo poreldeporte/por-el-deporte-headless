@@ -65,6 +65,27 @@ export type SeoInput = {
   type?: 'website' | 'product' | 'article';
 };
 
+/**
+ * Squeeze a product/collection description into a usable meta description.
+ *
+ * Shopify's `description` is the HTML flattened with the tags simply removed, so
+ * "…drawn by hand.</p><p>An artist…" arrives as "drawn by hand.An artist" — no
+ * space where the paragraph break was. Descriptions also ran 60-150% past the
+ * ~155 characters Google will show, so the tail was wasted. This restores the
+ * missing spaces and trims on a word boundary.
+ */
+export function metaDescription(raw?: string | null): string | undefined {
+  if (!raw) return undefined;
+  const text = raw
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/([.!?])(?=[A-Z])/g, '$1 ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return undefined;
+  if (text.length <= 155) return text;
+  return text.slice(0, 155).replace(/\s+\S*$/, '') + '…';
+}
+
 export function seoMeta({
   title,
   description,
@@ -81,8 +102,9 @@ export function seoMeta({
     {name: 'twitter:card', content: image ? 'summary_large_image' : 'summary'},
   ];
 
-  if (description) {
-    const clean = description.trim();
+  const cleaned = metaDescription(description);
+  if (cleaned) {
+    const clean = cleaned;
     tags.push(
       {name: 'description', content: clean},
       {property: 'og:description', content: clean},

@@ -70,7 +70,11 @@ Disallow: /blogs/*%2b*
 Disallow: /*/blogs/*+*
 Disallow: /*/blogs/*%2B*
 Disallow: /*/blogs/*%2b*
-Disallow: /policies/
+# /policies/ is deliberately crawlable. The storefront serves the real policy
+# pages there, the footer links them, and they are trust signals Google reads
+# for merchant listings — blocking them while the sitemap advertised them was a
+# straight contradiction.
+Allow: /policies/
 Disallow: /search
 Allow: /search/
 Disallow: /search/?*

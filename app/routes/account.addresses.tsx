@@ -28,7 +28,7 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Addresses'}];
+  return [{title: 'Por El Deporte | Addresses'}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {

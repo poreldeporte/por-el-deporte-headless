@@ -8,7 +8,9 @@ import type {Route} from './+types/collections.all';
  * here to that single canonical shopping surface.
  */
 export async function loader(_args: Route.LoaderArgs) {
-  throw redirect('/collections/all-products');
+  // 301, not the default 302. This consolidation is permanent, and a temporary
+  // redirect tells Google to keep the old URL in the index and keep checking it.
+  throw redirect('/collections/all-products', 301);
 }
 
 export default function CollectionsAll() {
