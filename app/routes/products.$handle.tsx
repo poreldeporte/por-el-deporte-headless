@@ -26,7 +26,11 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
 
   return [
     ...seoMeta({
-      title: `Por El Deporte | ${product.seo?.title || product.title}`,
+      // An SEO title set in Shopify admin is used verbatim — that field exists
+      // precisely so a merchant can control the whole tag, and prefixing the
+      // brand onto it produced "Por El Deporte | Cafe Tote | Por El Deporte".
+      // Only fall back to prefixing when no SEO title has been set.
+      title: product.seo?.title || `Por El Deporte | ${product.title}`,
       description,
       url: `${origin}${location.pathname}`,
       image: product.images.nodes[0]?.url,
