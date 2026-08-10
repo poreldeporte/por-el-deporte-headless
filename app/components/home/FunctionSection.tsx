@@ -2,9 +2,14 @@ import type {CSSProperties} from 'react';
 import {Link} from 'react-router';
 
 /**
- * "You Asked, We Delivered" — the current drop: the hoodie plus three tees,
- * laid out as a lightly overlapping row of product shots flanked by floating
- * cloud "sticker" callouts. Each garment links to its own product page.
+ * A cluster of four garments laid out as a lightly overlapping row of product
+ * shots flanked by floating cloud "sticker" callouts. Each links to its own
+ * product page.
+ *
+ * The copy is deliberately evergreen. It used to read "You Asked, We Delivered"
+ * over "the hoodie you kept asking for, plus three new tees", which pinned the
+ * section to one drop and to a specific product mix — both of which go stale the
+ * moment the cluster below is swapped for different items.
  * The row reveals with a stagger and the clouds gently float (CSS) + fade in
  * (anime.js via useScrollMotion).
  */
@@ -71,22 +76,22 @@ const SHOP_URL = '/collections/all-products';
 
 export function FunctionSection() {
   return (
-    <section className="pel-function" aria-label="The latest drop">
+    <section className="pel-function" aria-label="Our gear">
       <div className="pel-function__head">
         <h2 className="pel-function__title" data-reveal>
-          You Asked,
+          Made for
           <br />
-          We Delivered
+          the Heat
         </h2>
         <p className="pel-function__sub" data-reveal>
-          The hoodie you kept asking for, plus three new tees. Made for
-          Miami weather.
+          Heavy cotton that still breathes, cuts that move, and colours that
+          hold up to a Miami summer.
         </p>
         <div className="pel-function__cta" data-reveal>
           <Link to={SHOP_URL} className="pel-btn-outline">
-            Shop the Drop
+            Shop the Gear
           </Link>
-          <Link to={SHOP_URL} className="pel-icon-btn" aria-label="Shop the drop">
+          <Link to={SHOP_URL} className="pel-icon-btn" aria-label="Shop the gear">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
               <path d="M7 17L17 7M8.5 7H17v8.5" />
             </svg>

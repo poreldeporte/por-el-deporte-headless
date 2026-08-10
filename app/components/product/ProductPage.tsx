@@ -143,6 +143,52 @@ function splitDescription(html: string): {lead: string; rest: string} {
   return {lead, rest};
 }
 
+/**
+ * Which colour, if any, a given product image belongs to.
+ *
+ * Shopify has no first-class link from a media item to an option value, so the
+ * gallery showed every colour at once — pick Ivory on the Marado Tee and the
+ * black and bay shots sat in the thumbnails beside it. Two signals, in order of
+ * trust:
+ *
+ *  1. The image a colour's own variant points at. Authoritative, but Shopify
+ *     only surfaces one variant image per colour, so it never covers a colour's
+ *     second and third shots.
+ *  2. The colour named in the image's alt text. That is exactly what alt text
+ *     on a product mockup says ("Marado Tee in Bay, front"), and it picks up the
+ *     rest of the set. Only counted when precisely one colour name matches, so
+ *     an alt mentioning two colours attributes to neither.
+ *
+ * Anything left unattributed is treated as shared and always shown, which keeps
+ * lifestyle shots and single-colour products working untouched.
+ */
+function imageColorMap(
+  product: ProductFragment,
+  colorNames: string[],
+): Map<string, string> {
+  const owner = new Map<string, string>();
+
+  for (const option of product.options ?? []) {
+    if (!/colou?r/i.test(option.name)) continue;
+    for (const value of option.optionValues ?? []) {
+      const id = value.firstSelectableVariant?.image?.id;
+      if (id) owner.set(id, value.name);
+    }
+  }
+
+  for (const image of product.images?.nodes ?? []) {
+    if (!image.id || owner.has(image.id)) continue;
+    const alt = (image.altText ?? '').toLowerCase();
+    if (!alt) continue;
+    const hits = colorNames.filter((name) =>
+      new RegExp(`\\b${name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(alt),
+    );
+    if (hits.length === 1) owner.set(image.id, hits[0]);
+  }
+
+  return owner;
+}
+
 export function ProductPage({
   product,
   selectedVariant,
@@ -162,7 +208,7 @@ export function ProductPage({
   // beyond the fetched product media, in which case findIndex would miss it and
   // the stage would keep showing the wrong colour. Prepending guarantees the
   // gallery can follow the variant.
-  const images =
+  const allImages =
     variantImage && !baseImages.some((im) => im.id === variantImage.id)
       ? [variantImage, ...baseImages]
       : baseImages.length
@@ -170,6 +216,25 @@ export function ProductPage({
         : variantImage
           ? [variantImage]
           : [];
+
+  // Show only the selected colour's photos. Falls back to the full set whenever
+  // the filter would leave nothing, so a product whose media can't be attributed
+  // behaves exactly as before.
+  const colorNames = (product.options ?? [])
+    .filter((o) => /colou?r/i.test(o.name))
+    .flatMap((o) => (o.optionValues ?? []).map((v) => v.name));
+  const selectedColor = selectedVariant?.selectedOptions?.find((o) =>
+    /colou?r/i.test(o.name),
+  )?.value;
+  const images = (() => {
+    if (!selectedColor || colorNames.length < 2) return allImages;
+    const owner = imageColorMap(product, colorNames);
+    const kept = allImages.filter((im) => {
+      const c = im.id ? owner.get(im.id) : undefined;
+      return !c || c === selectedColor;
+    });
+    return kept.length ? kept : allImages;
+  })();
   const [activeImg, setActiveImg] = useState(0);
 
   // Keep the gallery in sync with the selected variant: when the shopper picks a

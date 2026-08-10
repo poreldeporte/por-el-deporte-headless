@@ -12,31 +12,36 @@
  *
  * If real reviews arrive later (a Shopify review app, or a metaobject the team
  * fills in), that's when ratings and aggregateRating markup can come back.
+ *
+ * Written to sound said rather than written: short, specific, and without the
+ * tells that gave the first pass away — "the real deal", "means something",
+ * "something bigger than a team". People do not summarise their own feelings
+ * that neatly out loud.
  */
 const VOICES = [
   {
-    t: 'More than merch',
-    b: 'You can tell every piece is made by people who actually live this club, and the story behind it means something.',
+    t: 'First one there',
+    b: 'I show up an hour before we play just to sit around. That is half of why I come.',
     n: 'Andres M',
   },
   {
-    t: 'Feels like family',
-    b: 'Wore the crest to a match and got stopped twice asking where it was from. This community is the real deal.',
+    t: 'Got asked twice',
+    b: 'Wore the crest to a match and two people stopped me about it. Told them both where to look.',
     n: 'Tomás R',
   },
   {
-    t: 'Sundays on the island',
-    b: 'Half of us met on that pitch. Now it is the group chat, the weekend, the whole thing.',
+    t: 'The group chat',
+    b: 'Half of us met on that pitch. Now it is birthdays, weddings, the whole thing.',
     n: 'Nico B',
   },
   {
-    t: 'Miami in a shirt',
-    b: 'Tropical, clean, and different from anything else out there. The island designs actually feel like home.',
+    t: 'Looks like here',
+    b: 'Most kit could be from anywhere. This one actually looks like Miami.',
     n: 'Sofía L',
   },
   {
-    t: 'Proud to rep the shield',
-    b: 'Been following PED since the Key Biscayne days. Wearing the crest means being part of something bigger than a team.',
+    t: 'Since the beginning',
+    b: 'Been around since the Key Biscayne days. Still show up, still wear it.',
     n: 'Diego F',
   },
 ];
