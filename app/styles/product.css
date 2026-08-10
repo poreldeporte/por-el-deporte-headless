@@ -81,11 +81,28 @@
   text-align: center;
 }
 .pel-pdp__stat-value {
+  /* Fixed box, not just a line of text. An empty or short value used to collapse
+     the div to nothing, which took 40px off that one card and left it visibly
+     shorter than the three beside it — the rule and label slid up and the card
+     read as missing its top half. Centring inside a reserved height means every
+     card in the rail is the same height whatever the value turns out to be. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
   font-family: var(--font-display);
   font-weight: 650;
   font-size: 40px;
   line-height: 1;
+  text-transform: uppercase;
   color: var(--pel-ink);
+}
+/* "3.8 OZ" and "S–2XL" are twice the width of "100%" and overflow a 160px card
+   at the full display size. Stepping down by length keeps them on one line
+   without shrinking the numbers that do fit. */
+.pel-pdp__stat-value[data-len='long'] {
+  font-size: 30px;
+  letter-spacing: -0.01em;
 }
 .pel-pdp__stat-rule {
   height: 1px;
@@ -93,6 +110,15 @@
   margin: 16px 12px;
 }
 .pel-pdp__stat-label {
+  /* Two lines are reserved whether or not they are used. "Ring-spun cotton" and
+     "Est. Key Biscayne" wrap where "Returns" and "Size" do not, so without this
+     the cards in a single rail ended up 16px apart from each other — and the
+     same card changed height between products. Centred inside the reserved box
+     so a one-line label still sits where the eye expects it. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.8em;
   font: 700 11px/1.4 var(--font-body);
   letter-spacing: 0.1em;
   text-transform: uppercase;

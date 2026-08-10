@@ -22,15 +22,61 @@ type Variant = ProductFragment['selectedOrFirstAvailableVariant'];
  * against real orders. Free U.S. shipping replaces it, which was verified
  * against the store's delivery profiles (the domestic zone's only rate is $0).
  */
+/**
+ * Every card is a big value over a small label, so a card with no value renders
+ * as a rule and a caption floating in a box 40px shorter than its neighbours —
+ * which is exactly what "Heavyweight" did on every tee, and what the fabric line
+ * did on the hoodie, jersey, shorts and long sleeves too. The old version built
+ * the value by string surgery (`fabric.startsWith('100%') ? '100%' : ''`) and
+ * handed the weight an empty value outright, so six of the eight garment kinds
+ * shipped at least one broken card.
+ *
+ * A spec only earns a card here if it contains something genuinely short and
+ * numeric — a percentage, an ounce weight, a size range. "Heavyweight" is a
+ * word, not a figure, so it belongs in the spec table and the wear bullets
+ * (where it already appears twice) rather than in a slot built for a number.
+ * Nothing is invented to fill space: when a garment has fewer than two usable
+ * figures the gap is taken by the 30-day return window, which is the store's
+ * actual stated policy.
+ */
 function statsFor(kind: Kind): {value: string; label: string}[] {
-  const fabric = SPECS[kind][0][1];
-  const weight = SPECS[kind].find(([k]) => k === 'Weight')?.[1];
+  const specs = SPECS[kind];
+  const spec = (key: string) => specs.find(([k]) => k === key)?.[1];
+  const fromSpecs: {value: string; label: string}[] = [];
+
+  // "100% ring-spun cotton" → 100% / RING-SPUN COTTON. A fabric without a stated
+  // percentage ("Cotton-rich fleece") gets no card rather than a blank one.
+  const pct = /^(\d+%)\s+(.+)$/.exec(specs[0][1]);
+  if (pct) fromSpecs.push({value: pct[1], label: pct[2]});
+
+  // "Lightweight, 3.8 oz" → 3.8 OZ / LIGHTWEIGHT. A bare "Heavyweight" has no
+  // figure in it and is skipped.
+  const weight = spec('Weight');
+  const oz = weight ? /([\d.]+\s*oz)/i.exec(weight) : null;
+  if (weight && oz) {
+    const rest = weight.replace(oz[0], '').replace(/^[\s,]+|[\s,]+$/g, '');
+    fromSpecs.push({
+      value: oz[1].toUpperCase().replace(/\s+/g, ' '),
+      label: rest || 'Fabric weight',
+    });
+  }
+
+  // "S to 2XL" → S–2XL / SIZE RANGE, "One size" → ONE / SIZE.
+  const sizes = spec('Sizes') ?? spec('Size') ?? spec('Fit');
+  if (sizes && / to /i.test(sizes)) {
+    fromSpecs.push({value: sizes.replace(/ to /i, '–'), label: 'Size range'});
+  } else if (sizes && /^one size$/i.test(sizes)) {
+    fromSpecs.push({value: 'One', label: 'Size'});
+  }
+
+  const head = fromSpecs.slice(0, 2);
+  while (head.length < 2) head.push({value: '30 Day', label: 'Returns'});
+
   return [
-    {value: fabric.startsWith('100%') ? '100%' : '', label: fabric.replace(/^100% /, '')},
-    ...(weight ? [{value: '', label: weight}] : []),
-    {value: 'FREE', label: 'U.S. Shipping'},
+    ...head,
+    {value: 'Free', label: 'U.S. Shipping'},
     {value: '2014', label: 'Est. Key Biscayne'},
-  ].slice(0, 4);
+  ];
 }
 
 const MOMENTS = [
@@ -320,7 +366,12 @@ export function ProductPage({
         <div className="pel-pdp__stats" data-reveal>
           {statsFor(kind).map((s) => (
             <div key={s.label} className="pel-pdp__stat">
-              <div className="pel-pdp__stat-value">{s.value}</div>
+              <div
+                className="pel-pdp__stat-value"
+                data-len={s.value.length > 4 ? 'long' : undefined}
+              >
+                {s.value}
+              </div>
               <div className="pel-pdp__stat-rule" />
               <div className="pel-pdp__stat-label">{s.label}</div>
             </div>
