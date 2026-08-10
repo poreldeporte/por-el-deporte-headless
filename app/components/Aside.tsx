@@ -3,6 +3,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import {useId} from 'react';
@@ -35,27 +36,56 @@ export function Aside({
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
+  const dialogRef = useRef<HTMLDivElement>(null);
   const id = useId();
   useEffect(() => {
-    const abortController = new AbortController();
+    if (!expanded) return;
 
-    if (expanded) {
-      document.addEventListener(
-        'keydown',
-        function handler(event: KeyboardEvent) {
-          if (event.key === 'Escape') {
-            close();
-          }
-        },
-        {signal: abortController.signal},
-      );
-    }
-    return () => abortController.abort();
+    // The dialog is marked aria-modal, which promises focus is inside it. It
+    // wasn't: focus stayed on the page behind, so a keyboard or screen-reader
+    // user tabbed through the whole storefront while the drawer sat open, and
+    // never got their place back on close.
+    const root = dialogRef.current;
+    const restoreTo = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(
+        root?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => el.offsetParent !== null);
+
+    focusables()[0]?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      restoreTo?.focus?.();
+    };
   }, [close, expanded]);
 
   return (
     <div
       aria-modal
+      ref={dialogRef}
       className={`overlay ${expanded ? 'expanded' : ''}`}
       role="dialog"
       aria-labelledby={id}

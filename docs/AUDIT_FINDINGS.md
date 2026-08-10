@@ -32,27 +32,27 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 18 | medium | FIXED | Cart line "Remove" button is styled as a 32px circle, drawing a stray circular border across its own text |
 | 19 | medium | FIXED | Order detail shipping address renders as one run-together string with the customer's name printed twice |
 | 20 | medium | FIXED | Order totals table prints every label twice — "Subtotal Subtotal", "Tax Tax", "Total Total" |
-| 21 | medium | OPEN | Address forms reuse the same DOM ids, so every label on a saved address wires to the empty "Create address" form |
+| 21 | medium | FIXED | Address forms reuse the same DOM ids, so every label on a saved address wires to the empty "Create address" form |
 | 22 | medium | FIXED | Order status shown to customers as raw API enums ("PAID", "SUCCESS", "PARTIALLY_REFUNDED") and "N/A" for unshipped orders |
-| 23 | medium | OPEN | "Set as default address" checkbox is stretched to full width and renders centered on its own line, detached from its label |
-| 24 | medium | OPEN | Account forms are capped at 400px by a leftover skeleton reset, leaving two-thirds of the branded card empty |
-| 25 | medium | OPEN | Address form demands raw ISO codes for country and state with no hint that codes are required |
-| 26 | medium | OPEN | Destructive address delete has no confirmation, profile save has no success feedback, and all address Save buttons disable together |
+| 23 | medium | FIXED | "Set as default address" checkbox is stretched to full width and renders centered on its own line, detached from its label |
+| 24 | medium | FIXED | Account forms are capped at 400px by a leftover skeleton reset, leaving two-thirds of the branded card empty |
+| 25 | medium | FIXED | Address form demands raw ISO codes for country and state with no hint that codes are required |
+| 26 | medium | FIXED | Destructive address delete has no confirmation, profile save has no success feedback, and all address Save buttons disable together |
 | 27 | medium | FIXED | Cart line items display "Title: Default Title" for single-variant products |
-| 28 | medium | OPEN | Invalid discount code fails completely silently — no error, no clearing, no feedback |
+| 28 | medium | FIXED | Invalid discount code fails completely silently — no error, no clearing, no feedback |
 | 29 | medium | FIXED | Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts |
 | 30 | medium | FIXED | Quick-add-to-cart buttons on the shop grid have no accessible name |
-| 31 | medium | OPEN | Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close |
+| 31 | medium | FIXED | Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close |
 | 32 | medium | FIXED | About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site |
 | 33 | medium | FIXED | Brand orange and cream fail 4.5:1 against each other, hitting the newsletter CTA, the active nav item and the PDP colour swatch |
 | 34 | medium | FIXED | Announcement marquee text is 3.9:1 on blue on every page |
 | 35 | medium | FIXED | /collections renders four blank beige squares — no collection has an image |
 | 36 | medium | FIXED | Every collection page is headed "Gear Up." with tees/hats/totes copy; the collection's own name never appears in a heading |
-| 37 | medium | OPEN | Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints |
-| 38 | medium | OPEN | Product page editorial strip: 707 KB of hand-written imgs at fixed width=800 into 352x440 / 240x300 boxes |
+| 37 | medium | FIXED | Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints |
+| 38 | medium | FIXED | Product page editorial strip: 707 KB of hand-written imgs at fixed width=800 into 352x440 / 240x300 boxes |
 | 39 | medium | FIXED | /collections renders as four completely blank boxes — and it is the destination of the account area's only 'Start Shopping' CTA |
 | 40 | medium | FIXED | Two empty collections are live, promoted in the site footer, and listed in the sitemap; the empty collection page still runs the 'Gear Up.' sell hero over zero products |
-| 41 | medium | OPEN | Sold-out variants are signalled by 35% opacity alone — still clickable, no accessible state, and no explanation once the shopper is in a dead end |
+| 41 | medium | FIXED | Sold-out variants are signalled by 35% opacity alone — still clickable, no accessible state, and no explanation once the shopper is in a dead end |
 | 42 | medium | FIXED | Product meta/og descriptions are missing spaces between sentences and run 60-150% over the SERP snippet limit |
 | 43 | medium | FIXED | All four collection pages share one identical meta description, and no collection page has an og:image |
 | 44 | medium | DRAFTED | /policies/refund-policy serves the Privacy Policy text verbatim — there are no refund terms anywhere on the site |
@@ -61,13 +61,13 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 47 | medium | FIXED | Any product/collection/page/blog URL containing a percent-encoded character (e.g. a trailing space) 302s to itself forever — the browser shows ERR_TOO_MANY_REDIRECTS instead of the branded 404 |
 | 48 | medium | FIXED | The 404 page renders with no <title>, no meta description and no robots tag at all |
 | 49 | medium | FIXED | All four blog routes still carry stock Hydrogen-skeleton meta: no canonical, no description, no Open Graph, and "… blog" / "… article" titles |
-| 50 | low | OPEN | Invalid <legend> placement and unstyled <h3>s in the account body |
+| 50 | low | FIXED | Invalid <legend> placement and unstyled <h3>s in the account body |
 | 51 | low | FIXED | Empty close-overlay button inside the cart dialog has no accessible name |
 | 52 | low | FIXED | Footer column headings are cream at 70% opacity over green — 3.67:1 |
-| 53 | low | OPEN | Keyboard focus ring is nearly invisible on the green footer and over the hero photo |
+| 53 | low | FIXED | Keyboard focus ring is nearly invisible on the green footer and over the hero photo |
 | 54 | low | FIXED | Footer "Club" column is leftover old-theme navigation: Our Mission / Gallery / Join the Revolution all point at /about |
-| 55 | low | OPEN | The "What Makes Us Special" drawer sends customers to poreldeporte.com/pages/app, which renders an empty page titled "app" |
-| 56 | low | OPEN | Expired /cart/<lines> share links discard their helpful message and show the generic 'Something went wrong' 500 copy |
+| 55 | low | FIXED | The "What Makes Us Special" drawer sends customers to poreldeporte.com/pages/app, which renders an empty page titled "app" |
+| 56 | low | FIXED | Expired /cart/<lines> share links discard their helpful message and show the generic 'Something went wrong' 500 copy |
 | 57 | low | FIXED | The sitemap advertises two policy URLs that robots.txt blocks from being crawled |
 | 58 | low | FIXED | /collections is a fully SEO-tagged route that is in no sitemap and has no link from the public site |
 | 59 | low | FIXED | Account pages use bare, unbranded browser titles that break the site-wide "Por El Deporte \| X" pattern |
@@ -283,7 +283,7 @@ Key Biscayne FL, United States
 
 **Fix:** Delete the duplicate `<th scope="row">` in each of the four `<tfoot>` rows and keep one label cell with `colSpan={3}` so each row totals 4 columns.
 
-### 21. MEDIUM — OPEN — Address forms reuse the same DOM ids, so every label on a saved address wires to the empty "Create address" form
+### 21. MEDIUM — FIXED — Address forms reuse the same DOM ids, so every label on a saved address wires to the empty "Create address" form
 
 **Where:** `app/routes/account.addresses.tsx:383-500 (AddressForm inputs) — /account/addresses`
 
@@ -303,7 +303,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add a small label map (PAID→"Paid", PARTIALLY_REFUNDED→"Partially refunded", SUCCESS→"Fulfilled", …) and use the already-fetched order-level `order.fulfillmentStatus` instead of `fulfillments.nodes[0].status`; replace the `'N/A'` fallback with "Not yet shipped".
 
-### 23. MEDIUM — OPEN — "Set as default address" checkbox is stretched to full width and renders centered on its own line, detached from its label
+### 23. MEDIUM — FIXED — "Set as default address" checkbox is stretched to full width and renders centered on its own line, detached from its label
 
 **Where:** `app/styles/pel-chrome.css:1173 (`.pel-account__body input {width:100%}`) applied to app/routes/account.addresses.tsx:493-499 — /account/addresses`
 
@@ -313,7 +313,7 @@ Key Biscayne FL, United States
 
 **Fix:** Scope the rule: `.pel-account__body input:not([type='checkbox']):not([type='radio'])`, and give the wrapper `<div>` at :492 `display:flex; align-items:center; gap:8px` with the checkbox at `width:auto`.
 
-### 24. MEDIUM — OPEN — Account forms are capped at 400px by a leftover skeleton reset, leaving two-thirds of the branded card empty
+### 24. MEDIUM — FIXED — Account forms are capped at 400px by a leftover skeleton reset, leaving two-thirds of the branded card empty
 
 **Where:** `app/styles/reset.css:99-104 (`form { @media (min-width:768px){ max-width:400px } }`) — /account/orders, /account/profile, /account/addresses`
 
@@ -323,7 +323,7 @@ Key Biscayne FL, United States
 
 **Fix:** Either scope the reset (`form:not(.pel-account__body form)`) or override in pel-chrome.css with `.pel-account__body form { max-width: 100% }`, and lay the address fields out as a 2-column grid at ≥768px.
 
-### 25. MEDIUM — OPEN — Address form demands raw ISO codes for country and state with no hint that codes are required
+### 25. MEDIUM — FIXED — Address form demands raw ISO codes for country and state with no hint that codes are required
 
 **Where:** `app/routes/account.addresses.tsx:447-457 (zoneCode) and :469-480 (territoryCode) — /account/addresses`
 
@@ -333,7 +333,7 @@ Key Biscayne FL, United States
 
 **Fix:** Replace both with `<select>`s (country list + zones for the selected country), or at minimum relabel to "State / Province code (e.g. FL)" and "Country code (e.g. US)" with matching placeholders.
 
-### 26. MEDIUM — OPEN — Destructive address delete has no confirmation, profile save has no success feedback, and all address Save buttons disable together
+### 26. MEDIUM — FIXED — Destructive address delete has no confirmation, profile save has no success feedback, and all address Save buttons disable together
 
 **Where:** `app/routes/account.addresses.tsx:347-353, :511; app/routes/account.profile.tsx:118-129`
 
@@ -353,7 +353,7 @@ Key Biscayne FL, United States
 
 **Fix:** Filter the options before rendering: `selectedOptions.filter(o => !(o.name === 'Title' && o.value === 'Default Title'))`, and use `product.title` (not the variant title) for the image alt.
 
-### 28. MEDIUM — OPEN — Invalid discount code fails completely silently — no error, no clearing, no feedback
+### 28. MEDIUM — FIXED — Invalid discount code fails completely silently — no error, no clearing, no feedback
 
 **Where:** `app/components/CartSummary.tsx:99-118 + app/components/CartMain.tsx:178-214 (CartMessages) + app/routes/cart.tsx:37-50`
 
@@ -383,7 +383,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add an optional `aria-label` prop to `AddToCartButton` and forward it to the `<button>`, then pass `aria-label={`Add ${product.title} to cart`}` in the ShopPage AddToCartButton branch, mirroring the `Choose options for …` label already used on the sibling Link branch.
 
-### 31. MEDIUM — OPEN — Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close
+### 31. MEDIUM — FIXED — Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close
 
 **Where:** `app/components/Aside.tsx:56-74 (aria-modal at :58) — reproduced on /collections/all-products`
 
@@ -443,7 +443,7 @@ Key Biscayne FL, United States
 
 **Fix:** Use the passed-in `title` in the eyebrow ("{title} • {n} Styles") and/or the H1, and let the collection's Shopify description override the hardcoded subline when present.
 
-### 37. MEDIUM — OPEN — Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints
+### 37. MEDIUM — FIXED — Render-blocking Google Fonts stylesheet gates first paint and delays the brand font, which is never preloaded; a third of that request is for a font that never paints
 
 **Where:** `app/root.tsx:68-76 (links export), app/styles/pel-tokens.css:10-18 and :60, both / and /products/*`
 
@@ -453,7 +453,7 @@ Key Biscayne FL, United States
 
 **Fix:** Add `<link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/TAYFlapjack.woff2">` to root.tsx's links so the font starts in the first RTT instead of at 144 ms; delete `family=Fraunces:opsz,wght@9..144,300..900` from the Google Fonts URL at root.tsx:76 and drop 'Fraunces' from `--font-display`; and self-host Montserrat (or load the Google stylesheet non-blocking) so first paint no longer depends on fonts.googleapis.com.
 
-### 38. MEDIUM — OPEN — Product page editorial strip: 707 KB of hand-written imgs at fixed width=800 into 352x440 / 240x300 boxes
+### 38. MEDIUM — FIXED — Product page editorial strip: 707 KB of hand-written imgs at fixed width=800 into 352x440 / 240x300 boxes
 
 **Where:** `app/components/product/ProductPage.tsx:350 and :357, URL path /products/artisan-ped-hoodie`
 
@@ -483,7 +483,7 @@ Key Biscayne FL, United States
 
 **Fix:** Repoint the 'Official Kits' footer link at a populated collection (or unpublish 2022-kits and 2023-por-el-deporte-kits from the Hydrogen sales channel so they leave the sitemap and 404 cleanly). In ShopPage, when products.length === 0 suppress the 'Shop All • N Styles' eyebrow and the 'grab your favorites' sell line and lead with the empty-state copy instead. Also fix the 'Hats & Totes' label or give it a real destination.
 
-### 41. MEDIUM — OPEN — Sold-out variants are signalled by 35% opacity alone — still clickable, no accessible state, and no explanation once the shopper is in a dead end
+### 41. MEDIUM — FIXED — Sold-out variants are signalled by 35% opacity alone — still clickable, no accessible state, and no explanation once the shopper is in a dead end
 
 **Where:** `/Users/francoviola/Desktop/ViolaCreative/por-el-deporte-ecommerce/app/components/product/ProductPage.tsx:238-239 (and the isDifferentProduct branch at :227)`
 
@@ -573,7 +573,7 @@ Key Biscayne FL, United States
 
 **Fix:** Route the three blog `meta()` exports through `seoMeta()` like collections.$handle.tsx does: title `Por El Deporte | ${title}` with no " blog"/" article" suffix (title-case the blog title, or set a proper title in Shopify admin for the all-caps one), description from `article.seo?.description || article.excerpt`, `url` from `siteOrigin(matches) + location.pathname`, `image` from `article.image?.url`, and `type: 'article'` on the article route.
 
-### 50. LOW — OPEN — Invalid <legend> placement and unstyled <h3>s in the account body
+### 50. LOW — FIXED — Invalid <legend> placement and unstyled <h3>s in the account body
 
 **Where:** `app/routes/account.profile.tsx:93, app/routes/account.addresses.tsx:269 and :330; app/routes/account.orders.$id.tsx:163,181`
 
@@ -603,7 +603,7 @@ Key Biscayne FL, United States
 
 **Fix:** Remove `opacity: 0.7` from `.pel-footer__colh` (full #F7F0DE on #2F6A44 is ~7.7:1), or raise it to ~0.85 if the softened look is wanted.
 
-### 53. LOW — OPEN — Keyboard focus ring is nearly invisible on the green footer and over the hero photo
+### 53. LOW — FIXED — Keyboard focus ring is nearly invisible on the green footer and over the hero photo
 
 **Where:** `app/styles/pel-chrome.css:797-806 (`outline: 3px solid var(--pel-blue)`) — footer on all pages; `.pel-btn` in the homepage hero`
 
@@ -623,7 +623,7 @@ Key Biscayne FL, United States
 
 **Fix:** Reduce the Club column to one honest link ("Our Story" → /about) plus something real, and drop "Gallery" and "Join the Revolution" until those pages exist. Point "Hats & Totes" at a real hats/totes collection or remove it.
 
-### 55. LOW — OPEN — The "What Makes Us Special" drawer sends customers to poreldeporte.com/pages/app, which renders an empty page titled "app"
+### 55. LOW — FIXED — The "What Makes Us Special" drawer sends customers to poreldeporte.com/pages/app, which renders an empty page titled "app"
 
 **Where:** `app/components/home/CommunityPanel.tsx:62 (`serving = 'Full details at poreldeporte.com/pages/app'`); the panel is mounted globally in app/components/PageLayout.tsx:51`
 
@@ -633,7 +633,7 @@ Key Biscayne FL, United States
 
 **Fix:** Replace the string with something real — e.g. "Est. 2014 Key Biscayne, Florida" (what the Club tab already uses) or "apps.apple.com/app/por-el-deporte" — or populate /pages/app in Shopify admin.
 
-### 56. LOW — OPEN — Expired /cart/<lines> share links discard their helpful message and show the generic 'Something went wrong' 500 copy
+### 56. LOW — FIXED — Expired /cart/<lines> share links discard their helpful message and show the generic 'Something went wrong' 500 copy
 
 **Where:** `/Users/francoviola/Desktop/ViolaCreative/por-el-deporte-ecommerce/app/routes/cart.$lines.tsx:52 throws the message; app/root.tsx:231-238 ignores it`
 

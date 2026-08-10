@@ -96,11 +96,12 @@ fieldset {
   padding: 1rem;
 }
 
+/* The skeleton capped every form on the site at 400px. That is fine for a bare
+   login box and wrong for the account cards, which are far wider — two thirds of
+   each card sat empty. Forms size to their container now; anything that wants a
+   narrow measure sets it itself. */
 form {
   max-width: 100%;
-  @media (min-width: 768px) {
-    max-width: 400px;
-  }
 }
 
 input {

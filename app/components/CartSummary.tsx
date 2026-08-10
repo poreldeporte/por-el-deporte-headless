@@ -68,6 +68,14 @@ function CartDiscounts({
   discountsHeadingId: string;
   discountCodeInputId: string;
 }) {
+  // Shopify keeps a code it would not accept on the cart with applicable:false.
+  // Nothing rendered it, so typing a bad code cleared the field and gave no
+  // error, no confirmation, nothing — indistinguishable from it having worked.
+  const rejected: string[] =
+    discountCodes
+      ?.filter((discount) => !discount.applicable)
+      .map(({code}) => code) || [];
+
   const codes: string[] =
     discountCodes
       ?.filter((discount) => discount.applicable)
@@ -113,6 +121,13 @@ function CartDiscounts({
           </button>
         </div>
       </UpdateDiscountForm>
+      {rejected.length ? (
+        <p className="cart-code-error" role="alert">
+          {rejected.length === 1
+            ? `“${rejected[0]}” isn’t a valid code.`
+            : `These codes aren’t valid: ${rejected.join(', ')}`}
+        </p>
+      ) : null}
     </section>
   );
 }

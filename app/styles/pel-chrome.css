@@ -1435,3 +1435,50 @@ summary:focus-visible,
   text-transform: uppercase;
   color: var(--text-muted);
 }
+
+/* The skeleton's `input { width: 100% }` caught the checkbox too, so "Set as
+   default address" rendered as a full-width bar centred on its own line with the
+   label stranded beneath it. Checkboxes size to themselves and sit inline with
+   their label. */
+.account-addresses input[type='checkbox'],
+.account-profile input[type='checkbox'] {
+  width: auto;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+}
+.account-addresses label:has(input[type='checkbox']),
+.account-profile label:has(input[type='checkbox']) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+}
+
+/* Account headings inherited nothing, so <h3> and <legend> rendered as raw
+   browser defaults inside the branded cards. */
+.account-addresses legend,
+.account-profile legend,
+.account-addresses h3,
+.account-profile h3 {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 20px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+  padding: 0;
+  margin: 0 0 14px;
+}
+
+/* The focus ring was --pel-blue, which all but vanishes on the green footer and
+   over the hero photograph. A cream ring with a dark outer edge stays visible on
+   any backdrop the site actually has. */
+.pel-footer :focus-visible,
+.pel-hero :focus-visible,
+.pel-subhero :focus-visible,
+.pel-shop__banner :focus-visible {
+  outline: 3px solid var(--pel-cream);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(23, 23, 23, 0.55);
+  border-radius: 4px;
+}

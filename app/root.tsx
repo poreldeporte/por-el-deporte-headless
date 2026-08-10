@@ -72,9 +72,25 @@ export function links() {
       href: 'https://fonts.gstatic.com',
       crossOrigin: 'anonymous',
     },
+    // The brand display face is served from our own origin and was never
+    // preloaded, so the headline swapped in late on every page. It is the one
+    // font above the fold, so it goes first.
+    {
+      rel: 'preload',
+      as: 'font',
+      type: 'font/woff2',
+      href: '/fonts/TAYFlapjack.woff2',
+      crossOrigin: 'anonymous',
+    },
+    // Google Fonts is a render-blocking stylesheet on a third-party origin.
+    // Loading it as `print` and flipping to `all` on load keeps it off the
+    // critical path; the <noscript> covers scripting being off. Both families
+    // already declare display=swap, so text is never invisible while it loads.
     {
       rel: 'stylesheet',
       href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Montserrat:wght@500;600;700;800&display=swap',
+      media: 'print',
+      onLoad: "this.media='all'",
     },
     // Icons are real files in public/ (served from the storefront origin), not
     // bundled assets, so /favicon.ico resolves for the crawlers and older
@@ -244,9 +260,24 @@ export default function App() {
 export function ErrorBoundary() {
   const error = useRouteError();
   let errorStatus = 500;
+  // Routes that throw a Response with a helpful sentence had it discarded in
+  // favour of the generic copy — an expired /cart/<lines> share link throws
+  // "Link may be expired. Try checking the URL." and the customer saw
+  // "Something went wrong" instead.
+  let detail: string | null = null;
 
   if (isRouteErrorResponse(error)) {
     errorStatus = error.status;
+    // Only for non-404s. The catch-all route throws the pathname as its data
+    // ("/nope not found"), so surfacing 404 data replaced friendly copy with a
+    // raw technical string — worse than what it fixed.
+    if (
+      error.status !== 404 &&
+      typeof error.data === 'string' &&
+      error.data.trim()
+    ) {
+      detail = error.data.trim();
+    }
   }
 
   const is404 = errorStatus === 404;
@@ -273,9 +304,10 @@ export function ErrorBoundary() {
         {is404 ? 'Off the pitch' : 'Something went wrong'}
       </h1>
       <p className="pel-error__msg">
-        {is404
-          ? "We could not find that page, but there is plenty of gear waiting for you."
-          : 'An unexpected error occurred. Try again in a moment, or head back home.'}
+        {detail ??
+          (is404
+            ? 'We could not find that page, but there is plenty of gear waiting for you.'
+            : 'An unexpected error occurred. Try again in a moment, or head back home.')}
       </p>
       <div className="pel-error__cta">
         <a href="/" className="pel-error__btn">

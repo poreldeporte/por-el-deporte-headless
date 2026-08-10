@@ -344,10 +344,21 @@ function ExistingAddresses({
               >
                 {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
               </button>
+              {/* Deleting an address is irreversible and the button sat right
+                  beside Save, with nothing between a misclick and losing it. */}
               <button
                 disabled={stateForMethod('DELETE') !== 'idle'}
                 formMethod="DELETE"
                 type="submit"
+                onClick={(event) => {
+                  if (
+                    !window.confirm(
+                      'Delete this address? This cannot be undone.',
+                    )
+                  ) {
+                    event.preventDefault();
+                  }
+                }}
               >
                 {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
               </button>
@@ -372,6 +383,13 @@ export function AddressForm({
     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
   }) => React.ReactNode;
 }) {
+  // This component renders once per saved address plus once for "create new",
+  // and every instance used the same literal ids. Every label on every saved
+  // address therefore pointed at the create form's field: clicking "City" on
+  // your home address focused the empty new-address input. Namespacing by the
+  // address id makes each instance's labels wire to its own inputs.
+  const fieldId = (name: string) =>
+    `${String(addressId).replace(/[^a-zA-Z0-9_-]/g, '')}-${name}`;
   const {state, formMethod} = useNavigation();
   const action = useActionData<ActionResponse>();
   const error = action?.error?.[addressId];
@@ -380,110 +398,110 @@ export function AddressForm({
     <Form id={addressId}>
       <fieldset>
         <input type="hidden" name="addressId" defaultValue={addressId} />
-        <label htmlFor="firstName">First name*</label>
+        <label htmlFor={fieldId('firstName')}>First name*</label>
         <input
           aria-label="First name"
           autoComplete="given-name"
           defaultValue={address?.firstName ?? ''}
-          id="firstName"
+          id={fieldId('firstName')}
           name="firstName"
           placeholder="First name"
           required
           type="text"
         />
-        <label htmlFor="lastName">Last name*</label>
+        <label htmlFor={fieldId('lastName')}>Last name*</label>
         <input
           aria-label="Last name"
           autoComplete="family-name"
           defaultValue={address?.lastName ?? ''}
-          id="lastName"
+          id={fieldId('lastName')}
           name="lastName"
           placeholder="Last name"
           required
           type="text"
         />
-        <label htmlFor="company">Company</label>
+        <label htmlFor={fieldId('company')}>Company</label>
         <input
           aria-label="Company"
           autoComplete="organization"
           defaultValue={address?.company ?? ''}
-          id="company"
+          id={fieldId('company')}
           name="company"
           placeholder="Company"
           type="text"
         />
-        <label htmlFor="address1">Address line*</label>
+        <label htmlFor={fieldId('address1')}>Address line*</label>
         <input
           aria-label="Address line 1"
           autoComplete="address-line1"
           defaultValue={address?.address1 ?? ''}
-          id="address1"
+          id={fieldId('address1')}
           name="address1"
           placeholder="Address line 1*"
           required
           type="text"
         />
-        <label htmlFor="address2">Address line 2</label>
+        <label htmlFor={fieldId('address2')}>Address line 2</label>
         <input
           aria-label="Address line 2"
           autoComplete="address-line2"
           defaultValue={address?.address2 ?? ''}
-          id="address2"
+          id={fieldId('address2')}
           name="address2"
           placeholder="Address line 2"
           type="text"
         />
-        <label htmlFor="city">City*</label>
+        <label htmlFor={fieldId('city')}>City*</label>
         <input
           aria-label="City"
           autoComplete="address-level2"
           defaultValue={address?.city ?? ''}
-          id="city"
+          id={fieldId('city')}
           name="city"
           placeholder="City"
           required
           type="text"
         />
-        <label htmlFor="zoneCode">State / Province*</label>
+        <label htmlFor={fieldId('zoneCode')}>State / Province* (2-letter code, e.g. FL)</label>
         <input
           aria-label="State/Province"
           autoComplete="address-level1"
           defaultValue={address?.zoneCode ?? ''}
-          id="zoneCode"
+          id={fieldId('zoneCode')}
           name="zoneCode"
-          placeholder="State / Province"
+          placeholder="FL"
           required
           type="text"
         />
-        <label htmlFor="zip">Zip / Postal Code*</label>
+        <label htmlFor={fieldId('zip')}>Zip / Postal Code*</label>
         <input
           aria-label="Zip"
           autoComplete="postal-code"
           defaultValue={address?.zip ?? ''}
-          id="zip"
+          id={fieldId('zip')}
           name="zip"
           placeholder="Zip / Postal Code"
           required
           type="text"
         />
-        <label htmlFor="territoryCode">Country Code*</label>
+        <label htmlFor={fieldId('territoryCode')}>Country Code*</label>
         <input
           aria-label="Country code"
           autoComplete="country"
           defaultValue={address?.territoryCode ?? ''}
-          id="territoryCode"
+          id={fieldId('territoryCode')}
           name="territoryCode"
-          placeholder="Country"
+          placeholder="US"
           required
           type="text"
           maxLength={2}
         />
-        <label htmlFor="phoneNumber">Phone</label>
+        <label htmlFor={fieldId('phoneNumber')}>Phone</label>
         <input
           aria-label="Phone Number"
           autoComplete="tel"
           defaultValue={address?.phoneNumber ?? ''}
-          id="phoneNumber"
+          id={fieldId('phoneNumber')}
           name="phoneNumber"
           placeholder="+16135551111"
           pattern="^\+?[1-9]\d{3,14}$"
@@ -492,11 +510,11 @@ export function AddressForm({
         <div>
           <input
             defaultChecked={isDefaultAddress}
-            id="defaultAddress"
+            id={fieldId('defaultAddress')}
             name="defaultAddress"
             type="checkbox"
           />
-          <label htmlFor="defaultAddress">Set as default address</label>
+          <label htmlFor={fieldId('defaultAddress')}>Set as default address</label>
         </div>
         {error ? (
           <p>

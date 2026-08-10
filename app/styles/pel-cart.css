@@ -439,3 +439,11 @@ aside .aside__body {
 .pel-cart-msg__close:hover {
   opacity: 1;
 }
+
+/* A discount code Shopify rejected. Previously silent: the field cleared and
+   nothing said whether it had worked. */
+.cart-code-error {
+  margin: 6px 0 0;
+  font: 600 12px/1.4 var(--font-body);
+  color: #a4331f;
+}

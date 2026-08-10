@@ -60,7 +60,9 @@ export function CommunityPanel() {
     ? ['Sort the teams, keep the scores, see who is playing.', 'sparkle']
     : ['More Than a Team. A Community That Looks Out for Each Other', 'sparkle'];
   const serving = isApp
-    ? 'Full details at poreldeporte.com/pages/app'
+    // Pointed people at /pages/app, a Shopify page with an empty body — it is
+    // noindexed for exactly that reason. The app itself is the real destination.
+    ? 'Free on the App Store and at app.poreldeporte.com'
     : 'Est. 2014 Key Biscayne, Florida';
 
   return (
