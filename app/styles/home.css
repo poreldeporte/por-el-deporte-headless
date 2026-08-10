@@ -405,6 +405,17 @@ body:has(.pel-home) {
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* The arrows land on exact card boundaries; this makes a flick or a trackpad
+     swipe do the same. `proximity` rather than `mandatory` on purpose — the last
+     position is flush with the right edge, which is not a card boundary, and
+     mandatory snapping would drag it back off the end. scroll-padding matches
+     the track's own left padding so a snapped card sits where card one sits at
+     rest, not jammed against the edge. */
+  scroll-snap-type: x proximity;
+  scroll-padding-left: 48px;
+}
+.pel-rail__track > * {
+  scroll-snap-align: start;
 }
 .pel-rail__track::-webkit-scrollbar {
   height: 0;
@@ -1386,6 +1397,8 @@ body:has(.overlay.expanded) .pel-fab {
   .pel-rail__track {
     padding: 4px 20px;
     gap: 20px;
+    /* Must track the padding above, or a snapped card sits 28px off. */
+    scroll-padding-left: 20px;
   }
   .pel-rail__ph {
     animation: none;

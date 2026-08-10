@@ -18,27 +18,71 @@ export function ProductRail({products}: {products: HomeRailProductFragment[]}) {
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
-  const sync = useCallback(() => {
+  /**
+   * Card pitch measured from layout rather than assumed. The gap is 34px on
+   * desktop and 20px below the breakpoint, so pitch is 334px or 320px and a
+   * constant would be wrong on one of them.
+   */
+  const metrics = useCallback(() => {
     const el = trackRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    const q = max > 0 ? el.scrollLeft / max : 0;
-    setPos(Math.min(total, Math.round(q * (total - 1)) + 1));
-    setAtStart(el.scrollLeft <= 2);
-    setAtEnd(el.scrollLeft >= max - 2);
-  }, [total]);
+    if (!el) return null;
+    const cards = Array.from(el.children) as HTMLElement[];
+    if (!cards.length) return null;
+    const pitch =
+      cards.length > 1
+        ? cards[1].offsetLeft - cards[0].offsetLeft
+        : cards[0].offsetWidth;
+    if (!pitch) return null;
+    return {el, pitch, max: Math.max(0, el.scrollWidth - el.clientWidth)};
+  }, []);
+
+  const sync = useCallback(() => {
+    const m = metrics();
+    if (!m) return;
+    const {el, pitch, max} = m;
+    // Which card is at the left edge. The old version mapped the scroll
+    // fraction across the whole rail onto 1..total, which counts positions the
+    // rail cannot stop at — the number jumped in twos and threes.
+    setPos(Math.min(total, Math.round(el.scrollLeft / pitch) + 1));
+    // Sub-pixel remainders are normal at the extremes; 1px of slack keeps a
+    // scroll that has genuinely finished from reading as "more to go", which is
+    // what left an arrow enabled with nothing left to scroll to.
+    setAtStart(el.scrollLeft <= 1);
+    setAtEnd(el.scrollLeft >= max - 1);
+  }, [metrics, total]);
 
   useEffect(() => {
     sync();
+    // Pitch changes at the breakpoint, so a resize invalidates both the counter
+    // and the arrow states.
+    window.addEventListener('resize', sync);
+    return () => window.removeEventListener('resize', sync);
   }, [sync]);
 
+  /**
+   * Advance by whole cards.
+   *
+   * This used to scroll by `min(clientWidth * 0.85, 460)`, a pixel distance with
+   * no relationship to how wide a card actually is. That worked out to 1.377
+   * cards per click on desktop and 1.036 on mobile, so the rail drifted a little
+   * further out of alignment on every press and never showed a clean row. The
+   * end was the visible symptom: with less than one nudge of travel left, the
+   * final click crawled forward 155px of a 320px card on mobile — a click that
+   * plainly did not move to the next item.
+   */
   const nudge = (dir: number) => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({
-      left: dir * Math.min(el.clientWidth * 0.85, 460),
-      behavior: 'smooth',
-    });
+    const m = metrics();
+    if (!m) return;
+    const {el, pitch, max} = m;
+    const perView = Math.max(1, Math.floor(el.clientWidth / pitch));
+    const current = Math.round(el.scrollLeft / pitch);
+    const target = Math.min(
+      Math.max(current + dir * perView, 0),
+      Math.max(total - 1, 0),
+    );
+    // Clamp to max so the last step ends flush with the right edge instead of
+    // stopping short and leaving a dead click behind it.
+    el.scrollTo({left: Math.min(target * pitch, max), behavior: 'smooth'});
   };
 
   if (!total) return null;
