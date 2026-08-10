@@ -79,6 +79,72 @@ function statsFor(kind: Kind): {value: string; label: string}[] {
   ];
 }
 
+/**
+ * The strip under the buy panel. It used to hard-code the same three claims on
+ * every product — "Plastic-Free / 100% ring-spun cotton / Super-soft
+ * heavyweight" — which was wrong on the bucket hat (organic cotton twill), the
+ * shorts (lightweight woven) and, worst of all, the jersey: performance knit is
+ * polyester, so the page claimed plastic-free directly above a synthetic
+ * garment. Derived from SPECS now, the same source as the spec table.
+ *
+ * "Plastic-free" is only claimed where the fabric is stated as 100% natural.
+ * Cotton-rich fleece is a blend and does not qualify.
+ */
+function trustBarFor(kind: Kind): string[] {
+  const specs = SPECS[kind];
+  const fabric = specs[0][1];
+  const spec = (key: string) => specs.find(([k]) => k === key)?.[1];
+  const second = spec('Weight');
+  const out: string[] = [];
+  if (/^100%/.test(fabric)) out.push('Plastic-free');
+  out.push(fabric);
+  if (second) out.push(second);
+  else {
+    const fit = spec('Fit');
+    if (fit) out.push(`${fit} fit`);
+  }
+  return out;
+}
+
+/**
+ * Sizes come back from the Storefront API in the order the values were created,
+ * not the order anyone wears them. Printful added S to most of these products
+ * after the others, so five of the six multi-size garments rendered
+ * "M L XL 2XL S" — with the smallest size orphaned on a second row at the end.
+ * (El Clásico Tee is the exception, and only because S happened to be created
+ * first there, which is exactly why this cannot be left to the source order.)
+ *
+ * Shopify's admin shows them correctly, so there is nothing to fix there; the
+ * ordering has to be imposed at render. Unknown values keep their original
+ * relative position at the end rather than being dropped or guessed at.
+ */
+const SIZE_ORDER = [
+  'xxxs', 'xxs', 'xs', 'extra small',
+  's', 'small',
+  'm', 'medium',
+  'l', 'large',
+  'xl', 'x-large', 'extra large',
+  '2xl', 'xxl', '2x-large',
+  '3xl', 'xxxl', '3x-large',
+  '4xl', '5xl',
+];
+function sizeRank(name: string): number {
+  const i = SIZE_ORDER.indexOf(name.trim().toLowerCase());
+  return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+}
+function sortedOptionValues<T extends {name: string}>(
+  optionName: string,
+  values: T[],
+): T[] {
+  if (!/size/i.test(optionName)) return values;
+  // Every value has to be recognised before reordering — a partial match would
+  // shuffle known sizes around unknown ones and make things worse.
+  if (values.some((v) => sizeRank(v.name) === Number.MAX_SAFE_INTEGER)) {
+    return values;
+  }
+  return [...values].sort((a, b) => sizeRank(a.name) - sizeRank(b.name));
+}
+
 const MOMENTS = [
   {id: 'm1', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=520', alt: 'Supporters together on match day'},
   {id: 'm2', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-856.jpg?v=1755701316&width=520', alt: 'Por El Deporte community'},
@@ -400,7 +466,7 @@ export function ProductPage({
               <div key={option.name} className="pel-pdp__opt">
                 <div className="pel-pdp__opt-label">{option.name}</div>
                 <div className={isColor ? 'pel-pdp__swatches' : 'pel-pdp__sizes'}>
-                  {option.optionValues.map((value) => {
+                  {sortedOptionValues(option.name, option.optionValues).map((value) => {
                     const {name, handle, variantUriQuery, selected, available: avail, exists, isDifferentProduct, swatch} = value;
                     const cls = isColor
                       ? `pel-pdp__swatch${selected ? ' is-active' : ''}`
@@ -464,13 +530,10 @@ export function ProductPage({
             );
           })}
 
-          <div className="pel-pdp__fabric" data-reveal>
-            <span>Plastic-Free</span>
-            <span className="pel-pdp__fabric-div" />
-            <span>100% ring-spun cotton</span>
-            <span className="pel-pdp__fabric-div" />
-            <span>Super-soft heavyweight</span>
-          </div>
+          {/* Swapped with the fabric strip, which now sits below the button. The
+              line about funding the club belongs next to the decision; the
+              material claims read as a footnote, not a banner over the CTA. */}
+          <p className="pel-pdp__note">Each purchase powers our Miami community.</p>
 
           <div className="pel-pdp__cart">
             <div className="pel-pdp__qty">
@@ -511,7 +574,11 @@ export function ProductPage({
             </AddToCartButton>
           </div>
 
-          <p className="pel-pdp__note">Each purchase powers our Miami community.</p>
+          <ul className="pel-pdp__fabric" data-reveal>
+            {trustBarFor(kind).map((claim) => (
+              <li key={claim}>{claim}</li>
+            ))}
+          </ul>
         </div>
       </section>
 

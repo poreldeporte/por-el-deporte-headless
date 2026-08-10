@@ -249,23 +249,39 @@
   background: var(--pel-ink);
   color: var(--pel-cream);
 }
+/* Claims strip. The dividers used to be empty <span>s with `align-self:
+   stretch`, which is fine on one line and falls apart the moment it wraps — a
+   stretched hairline ends up dangling at the start or end of a row with nothing
+   either side of it, and the claims themselves ran together. They are now
+   generated between items, so a divider can only ever exist between two of
+   them, and it flips to a horizontal rule when the strip stacks. */
 .pel-pdp__fabric {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 12px 16px;
+  list-style: none;
   background: var(--pel-orange-ink); /* cream text sits on this: 4.88:1 */
   border-radius: var(--radius-md);
   padding: 16px 24px;
-  margin: 32px 0 0;
+  margin: 20px 0 0;
   color: var(--pel-cream);
   flex-wrap: wrap;
   font: 700 11px/1.5 var(--font-body);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.pel-pdp__fabric-div {
+.pel-pdp__fabric li {
+  display: flex;
+  align-items: center;
+  gap: 12px 16px;
+  text-align: center;
+}
+.pel-pdp__fabric li + li::before {
+  content: '';
   width: 1px;
-  align-self: stretch;
+  height: 1.1em;
+  flex: none;
   background: rgba(247, 240, 222, 0.4);
 }
 .pel-pdp__cart {
@@ -327,7 +343,7 @@
   cursor: default;
 }
 .pel-pdp__note {
-  margin: 20px 0 0;
+  margin: 28px 0 0;
   font: 600 11px/1.7 var(--font-body);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -518,4 +534,54 @@
     font-size: 12px;
   }
 
+  /* Colour options were fixed-width 128px pills in a wrapping flex row. On a
+     390px screen that is two pills and a 78px hole, with the third dropped onto
+     a line of its own — the row looked broken rather than full. A grid divides
+     the width instead of chopping it up, so three colours share one row evenly
+     and any number wraps into even columns rather than a ragged edge. */
+  .pel-pdp__swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 10px;
+  }
+  .pel-home .pel-pdp__swatch,
+  .pel-pdp__swatch {
+    width: auto;
+    min-width: 0;
+    padding: 14px 8px 12px;
+  }
+  .pel-pdp__swatch-name {
+    overflow-wrap: anywhere;
+  }
+  /* Sizes get the same treatment so a 2XL never wraps alone. */
+  .pel-pdp__sizes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    gap: 10px;
+  }
+  .pel-home .pel-pdp__size,
+  .pel-pdp__size {
+    min-width: 0;
+    padding: 14px 8px;
+  }
+
+  /* Stacked, because three claims cannot share 350px without becoming three
+     cramped columns. Each gets its own line and the divider turns horizontal. */
+  .pel-pdp__fabric {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 4px 18px;
+  }
+  .pel-pdp__fabric li {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 11px 0;
+  }
+  .pel-pdp__fabric li + li::before {
+    width: 100%;
+    height: 1px;
+    margin-bottom: 11px;
+  }
 }

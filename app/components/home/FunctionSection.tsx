@@ -25,9 +25,11 @@ const CLUSTER: {
   dy: number;
 }[] = [
   {
-    img: `${CDN}/island-sketch-tee-1636967.png?v=1765300448&width=700`,
-    alt: 'Island Sketch Tee',
-    href: '/products/island-sketch-tee',
+    // Bay rather than Black: the cluster reads as a row of silhouettes, and two
+    // dark garments side by side lose their edges against each other.
+    img: `${CDN}/unisex-garment-dyed-heavyweight-t-shirt-bay-front-6a7a2d3cc4277.png?v=1786391876&width=700`,
+    alt: 'Members Tee',
+    href: '/products/members-tee',
     wrap: {width: '290px', height: '360px', marginRight: '-38px'},
     inner: {transform: 'rotate(-7deg) translateY(22px)'},
     dx: -90,
@@ -44,18 +46,20 @@ const CLUSTER: {
     dy: 72,
   },
   {
-    img: `${CDN}/futbol-mate-asado-tee-9742396.png?v=1756312839&width=700`,
-    alt: 'Futbol, Mate, Asado Tee',
-    href: '/products/futbol-mate-asado-tee',
+    // The back, not the front. The stacked lettering and the bicycle kick are
+    // the whole point of this one; its front is a plain tee.
+    img: `${CDN}/unisex-garment-dyed-heavyweight-t-shirt-ivory-back-6a79ea2dcdf9a.png?v=1786374723&width=700`,
+    alt: 'Marado Tee',
+    href: '/products/marado-tee',
     wrap: {width: '290px', height: '360px', zIndex: 2, marginLeft: '-38px'},
     inner: {transform: 'rotate(5deg) translateY(26px)'},
     dx: 60,
     dy: 40,
   },
   {
-    img: `${CDN}/athletic-club-shield-tee-2037918.png?v=1757529282&width=700`,
-    alt: 'Athletic Club Shield Tee',
-    href: '/products/athletic-club-shield-tee',
+    img: `${CDN}/unisex-hooded-long-sleeve-tee-black-front-6a79e997330da.png?v=1786374568&width=700`,
+    alt: 'La Isla Hooded Long Sleeve',
+    href: '/products/la-isla-hooded-long-sleeve',
     wrap: {width: '280px', height: '345px', marginLeft: '-34px'},
     inner: {transform: 'rotate(9deg) translateY(34px)'},
     dx: 120,
@@ -65,7 +69,9 @@ const CLUSTER: {
 
 const CLOUDS: {pos: CSSProperties; text: string}[] = [
   {pos: {left: '5%', top: '10%', width: '200px', height: '158px'}, text: 'The hoodie you asked for'},
-  {pos: {right: '5%', top: '12%', width: '210px', height: '165px'}, text: 'Three new tees to match'},
+  // Was "Three new tees to match", which counted the cluster below it — so it
+  // went wrong the moment the mix changed. This one survives a reshuffle.
+  {pos: {right: '5%', top: '12%', width: '210px', height: '165px'}, text: 'And the layers to go with it'},
   {pos: {left: '1%', top: '52%', width: '195px', height: '152px'}, text: '100% ring-spun cotton'},
   {pos: {right: '2%', top: '54%', width: '195px', height: '152px'}, text: 'Made and worn in Miami'},
   {pos: {left: '4%', bottom: '2%', width: '205px', height: '160px'}, text: 'Free shipping, about a week'},

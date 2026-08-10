@@ -316,12 +316,26 @@
      rather than clipped, and the count sits above it instead of stealing width. */
   .pel-shop__filter-inner {
     flex-direction: column;
+    /* nowrap matters as much as the direction. The base rule sets flex-wrap:
+       wrap for the desktop row, and in a *wrapping* column container
+       `align-items: stretch` stretches items to the flex line rather than to the
+       container — and the line is sized by its widest item. So the pill row was
+       stretched to its own 562px content width instead of being clamped to the
+       390px screen, and no amount of min-width:0 or overflow-x on the row itself
+       could have helped: it was never being constrained in the first place. */
+    flex-wrap: nowrap;
     align-items: stretch;
     gap: 12px;
     padding: 0 20px;
   }
   .pel-shop__chips {
     flex-wrap: nowrap;
+    /* Without this the row does not scroll, it overflows. A flex item defaults
+       to `min-width: auto`, which refuses to shrink below its content, so the
+       chips row sized itself to its full 562px inside a 390px screen —
+       scrollWidth equalled clientWidth, overflow-x had nothing to scroll
+       against, and the last pills simply ran off the edge of the page. */
+    min-width: 0;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -330,11 +344,16 @@
     margin: 0 -20px;
     padding: 2px 20px;
     scroll-padding-left: 20px;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
   }
   .pel-shop__chips::-webkit-scrollbar {
     display: none;
   }
   .pel-chip {
+    /* flex:none so a pill keeps its own width in the scroller rather than being
+       squeezed to fit — squeezing is what would clip the labels. */
+    flex: none;
     padding: 10px 16px;
     letter-spacing: 0.08em;
     scroll-snap-align: start;
