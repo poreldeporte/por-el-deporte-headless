@@ -447,3 +447,68 @@ aside .aside__body {
   font: 600 12px/1.4 var(--font-body);
   color: #a4331f;
 }
+
+/* ── Discount / gift-card rows ──
+   These were a styled pill input sitting beside a browser-default 16px "Apply"
+   in Times-ish body text, which is what made them look unfinished. Treated as
+   one control: the input flexes, the button is a solid pill matched to its
+   height, and both rows share the same rhythm. */
+.cart-summary-aside section > div,
+.cart-summary-page section > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cart-summary-aside section input[type='text'],
+.cart-summary-page section input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 18px;
+  border: var(--border-width) solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  background: var(--pel-white);
+  font: 600 12px/1 var(--font-body);
+  letter-spacing: 0.04em;
+  color: var(--pel-ink);
+}
+.cart-summary-aside section input[type='text']::placeholder,
+.cart-summary-page section input[type='text']::placeholder {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+.cart-summary-aside section input[type='text']:focus,
+.cart-summary-page section input[type='text']:focus {
+  outline: none;
+  border-color: var(--pel-ink);
+}
+.cart-summary-aside section button[type='submit'],
+.cart-summary-page section button[type='submit'] {
+  flex: none;
+  height: 42px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.cart-summary-aside section button[type='submit']:hover,
+.cart-summary-page section button[type='submit']:hover {
+  background: var(--pel-orange-ink);
+}
+/* The "remove applied code" button is a small text action, not a pill. */
+.cart-summary-aside dl button,
+.cart-summary-page dl button {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}

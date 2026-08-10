@@ -441,7 +441,7 @@ body:has(.pel-home) {
   object-fit: contain;
 }
 .pel-card__title {
-  margin: 26px 0 22px;
+  margin: 26px 0 12px;
   max-width: 14ch;
   font-family: var(--font-display);
   font-weight: 650;
@@ -451,9 +451,12 @@ body:has(.pel-home) {
   text-align: center;
   text-transform: uppercase;
 }
+/* Sat 28px under the title and flush against the button below it. Balanced
+   now, and given the size a price deserves on a product card. */
 .pel-card__price {
-  margin-top: 6px;
-  font: 700 14px/1 var(--font-body);
+  margin: 0 0 18px;
+  font: 700 17px/1 var(--font-body);
+  letter-spacing: 0.01em;
   color: var(--pel-ink);
 }
 
