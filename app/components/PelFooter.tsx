@@ -7,6 +7,10 @@ import {PelLogoMark} from '~/components/PelLogo';
  * Built to be reusable — Increment 6 lifts this into the global layout for all pages.
  */
 
+/** Same listing the community panel links to. */
+const APP_STORE_URL =
+  'https://apps.apple.com/us/app/por-el-deporte/id6756241207';
+
 type FooterLink = {t: string; to?: string; href?: string};
 const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
   {
@@ -14,25 +18,30 @@ const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
     items: [
       {t: '“Palmas” Jersey', to: '/products/kit-launch'},
       {t: 'Tropical Tees', to: '/collections/all-tees'},
-      {t: 'Hats & Totes', to: '/collections/all-products'},
       {t: 'Official Kits', to: '/collections/2022-kits'},
+      // "Hats & Totes" used to sit here pointing at /collections/all-products,
+      // the same place as "All Products". The shop page's category filter is
+      // component state rather than a URL param, so there was no filtered view
+      // to send anyone to.
       {t: 'All Products', to: '/collections/all-products'},
     ],
   },
   {
+    // All three of these used to land on /about. Three labels promising three
+    // different things and delivering the same page.
     h: 'Club',
     items: [
       {t: 'Our Mission', to: '/about'},
-      {t: 'Gallery', to: '/about'},
-      {t: 'Join the Revolution', to: '/about'},
+      // Replaces "Gallery", which had no gallery to point at. The journal is a
+      // real page and had no entry point anywhere on the site until now.
+      {t: 'Journal', to: '/blogs'},
+      {t: 'Join the Revolution', href: APP_STORE_URL},
     ],
   },
   {
+    // Was two rows, both going to the same Instagram profile.
     h: 'Follow',
-    items: [
-      {t: 'Instagram', href: 'https://www.instagram.com/poreldeporte/'},
-      {t: '@poreldeporte', href: 'https://www.instagram.com/poreldeporte/'},
-    ],
+    items: [{t: '@poreldeporte', href: 'https://www.instagram.com/poreldeporte/'}],
   },
   {
     h: 'Account',

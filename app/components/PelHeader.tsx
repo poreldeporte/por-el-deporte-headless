@@ -1,3 +1,4 @@
+import {useEffect, useState} from 'react';
 import {Link, NavLink} from 'react-router';
 import {CartButton} from '~/components/home/CartButton';
 import {PelLogoMark} from '~/components/PelLogo';
@@ -11,9 +12,35 @@ import {PelMarquee, MARQUEE_ITEMS} from '~/components/PelMarquee';
 const navClass = ({isActive}: {isActive: boolean}) =>
   isActive ? 'is-active' : undefined;
 
-export function PelHeader() {
+export function PelHeader({floating = false}: {floating?: boolean} = {}) {
+  // The homepage has no header of its own — its nav is absolutely positioned
+  // over the hero and scrolls away, leaving nothing to navigate or reach the
+  // cart with. In `floating` mode the same header is fixed off-screen and slides
+  // in once the hero is behind you, so every page keeps a header at all times.
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    if (!floating) return;
+    let ticking = false;
+    const read = () => {
+      ticking = false;
+      setShown(window.scrollY > window.innerHeight * 0.7);
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener('scroll', onScroll, {passive: true});
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [floating]);
+
+  const className = floating
+    ? `pel-siteheader pel-siteheader--floating${shown ? ' is-shown' : ''}`
+    : 'pel-siteheader';
+
   return (
-    <header className="pel-siteheader">
+    <header className={className}>
       <PelMarquee items={MARQUEE_ITEMS} />
       <div className="pel-siteheader__inner">
         <nav className="pel-siteheader__links" aria-label="Primary">

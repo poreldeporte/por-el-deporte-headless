@@ -65,7 +65,6 @@ export function ShopPage({
 
   return (
     <div className="pel-shop">
-      <Breadcrumbs items={[{name: 'Home', href: '/'}, {name: title}]} />
       <section
         className="pel-shop__banner"
         style={{backgroundImage: `url(${image || BANNER_IMG})`}}
@@ -83,6 +82,10 @@ export function ShopPage({
           </p>
         </div>
       </section>
+
+      {/* Under the banner, not above it. A trail stacked on top of a full-bleed
+          hero reads as a stray line before the page has introduced itself. */}
+      <Breadcrumbs items={[{name: 'Home', href: '/'}, {name: title}]} />
 
       <section className="pel-shop__filter">
         <div className="pel-shop__filter-inner">

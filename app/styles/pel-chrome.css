@@ -28,6 +28,30 @@ main h1 {
   background: var(--pel-cream);
   border-bottom: var(--border-width) solid var(--pel-ink);
 }
+/* Homepage variant: fixed rather than sticky, parked above the viewport and
+   slid in once the hero has scrolled past. The marquee is hidden here to keep
+   the revealed bar slim — the homepage already shows marquees in the page. */
+.pel-siteheader--floating {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-100%);
+  transition: transform var(--dur-med) ease;
+  will-change: transform;
+}
+.pel-siteheader--floating.is-shown {
+  transform: translateY(0);
+}
+.pel-siteheader--floating .pel-marquee {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pel-siteheader--floating {
+    transition: none;
+  }
+}
+
 .pel-siteheader__inner {
   position: relative;
   display: flex;
@@ -412,7 +436,7 @@ main h1 {
    top of the cart FAB — identical rects, and every click on "What makes us
    special" hit the cart button and opened the drawer instead. */
 .pel-fabs .pel-fab--community {
-  right: 98px; /* sits just left of the cart FAB */
+  right: 26px; /* the corner is its own now the cart FAB is gone */
 }
 .pel-community__scrim {
   position: fixed;

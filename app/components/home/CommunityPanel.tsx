@@ -1,8 +1,9 @@
 import {useState} from 'react';
+import {PelLogoMark} from '~/components/PelLogo';
 
 /**
  * "What Makes Us Special" — a left slide-in panel with App / Club tabs, opened by
- * a floating action button that sits beside the cart FAB. Self-contained (own
+ * a floating action button in the bottom-right corner. Self-contained (own
  * open + tab state). Static brand content.
  */
 const ICONS: Record<string, string> = {
@@ -136,7 +137,7 @@ export function CommunityPanel() {
                   <div className="pel-community__badge">
                     <div className="pel-community__badge-shadow" />
                     <div className="pel-community__badge-body">
-                      <span>PED</span>
+                      <PelLogoMark height={78} />
                     </div>
                   </div>
                   <h3 className="pel-community__apptitle">

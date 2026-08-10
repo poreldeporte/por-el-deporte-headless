@@ -8,7 +8,6 @@ import type {
 import {Aside} from '~/components/Aside';
 import {PelHeader} from '~/components/PelHeader';
 import {PelFooter} from '~/components/PelFooter';
-import {CartButton} from '~/components/home/CartButton';
 import {CommunityPanel} from '~/components/home/CommunityPanel';
 import {CartMain} from '~/components/CartMain';
 import {useScrollMotion} from '~/components/motion/useScrollMotion';
@@ -44,17 +43,17 @@ export function PageLayout({cart, children = null}: PageLayoutProps) {
           menu's links from every page's HTML; they pointed at empty Shopify
           pages, which was the site's only crawl path to them. */}
       <CartAside cart={cart} />
-      {!ownsHero && <PelHeader />}
+      {/* The homepage gets the same header, fixed and revealed on scroll, so
+          it is never left without navigation once the hero is gone. */}
+      <PelHeader floating={ownsHero} />
       <main>{children}</main>
       <PelFooter />
-      {/* `pel-fabs` marks the floating buttons so mobile CSS can hide them on
-          pages that keep a sticky header (its CART pill is always reachable, so
-          the FAB is redundant there and only ends up covering content). The
-          homepage keeps them: its nav is absolutely positioned over the hero and
-          scrolls away, so the FAB is the only cart access once you scroll. */}
-      <div className={ownsHero ? 'pel-fabs' : 'pel-fabs pel-fabs--redundant'}>
+      {/* Cart lives in the sticky header, which is now on every page including
+          the homepage, so a floating cart button was a second control for the
+          same thing in the same viewport. The community panel keeps the corner
+          — it has no other entry point. */}
+      <div className="pel-fabs">
         <CommunityPanel />
-        <CartButton variant="fab" />
       </div>
     </Aside.Provider>
   );

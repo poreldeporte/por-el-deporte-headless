@@ -424,18 +424,22 @@
 }
 
 /* ===== Beyond the Game ===== */
+/* No top padding: .pel-pdp__info already ends with 96px (56px on mobile), and
+   stacking another 96px here plus 64px of margin on the track put 249px between
+   the spec cards and the photo strip on desktop and 209px on mobile — a gap you
+   could fit a section in, and different at each breakpoint. The rhythm is now
+   whatever .pel-pdp__info uses, top and bottom, at both sizes. */
 .pel-pdp__beyond {
   position: sticky;
   top: 0;
   z-index: 1;
-  padding: 96px 0 120px;
+  padding: 0 0 120px;
   background: var(--pel-cream);
   overflow: hidden;
 }
 .pel-pdp__moments {
   overflow: hidden;
   width: 100%;
-  margin-top: 64px;
 }
 .pel-pdp__moments-track {
   display: flex;
