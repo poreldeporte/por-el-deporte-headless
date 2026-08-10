@@ -31,26 +31,78 @@ tok() {
   }
 }
 
+# x-goog-user-project bills the call to a Cloud project, and sending one the
+# signed-in account has no serviceusage permission on is worse than sending none
+# at all — the API rejects the header before it ever looks at the request. Only
+# attach it if ADC actually accepted the project as its quota project.
+ADC_FILE="${HOME}/.config/gcloud/application_default_credentials.json"
+quota_project() {
+  [ -f "$ADC_FILE" ] || return 0
+  python3 -c "
+import json,sys
+try: print(json.load(open('$ADC_FILE')).get('quota_project_id') or '')
+except Exception: print('')
+" 2>/dev/null
+}
+
 api() { # method url [body]
   local m=$1 u=$2 body=${3:-}
+  local qp; qp=$(quota_project)
+  local hdrs=(-H "Authorization: Bearer $(tok)")
+  [ -n "$qp" ] && hdrs+=(-H "x-goog-user-project: $qp")
   if [ -n "$body" ]; then
-    curl -sS -X "$m" "$u" \
-      -H "Authorization: Bearer $(tok)" \
-      -H 'Content-Type: application/json' \
-      -H "x-goog-user-project: $PROJECT" \
-      -d "$body"
+    curl -sS -X "$m" "$u" "${hdrs[@]}" -H 'Content-Type: application/json' -d "$body"
   else
-    curl -sS -X "$m" "$u" \
-      -H "Authorization: Bearer $(tok)" \
-      -H "x-goog-user-project: $PROJECT"
+    curl -sS -X "$m" "$u" "${hdrs[@]}"
   fi
 }
 
+# Fails loudly and early rather than letting the API return a confusing 403.
+require_scopes() {
+  local have
+  have=$(python3 -c "
+import json
+try:
+    d=json.load(open('$ADC_FILE'))
+    print(' '.join(d.get('scopes') or []))
+except Exception:
+    print('')
+" 2>/dev/null)
+  case "$have" in
+    *siteverification*) return 0 ;;
+  esac
+  cat >&2 <<'EOF'
+    ADC is missing the siteverification/webmasters scopes.
+
+    A plain `gcloud auth application-default login` only grants openid,
+    userinfo.email, cloud-platform and sqlservice.login — none of which let
+    these APIs run. Re-run the login with the scopes spelled out:
+
+      gcloud auth application-default login --scopes=openid,\
+https://www.googleapis.com/auth/userinfo.email,\
+https://www.googleapis.com/auth/cloud-platform,\
+https://www.googleapis.com/auth/siteverification,\
+https://www.googleapis.com/auth/webmasters
+
+    Sign in as the account that should OWN the Search Console property
+    long-term — whoever authorises here becomes its owner.
+EOF
+  exit 1
+}
+
 ensure_apis() {
-  echo "==> enabling APIs on $PROJECT (idempotent)"
+  require_scopes
+  # Both of these need permissions on the Cloud project that the signing-in
+  # account may not have, and neither is required for the verification and
+  # Search Console calls to work. Advisory only.
+  echo "==> enabling APIs on $PROJECT (optional, ignore failures)"
   gcloud services enable siteverification.googleapis.com searchconsole.googleapis.com \
-    --project "$PROJECT" 2>&1 | sed 's/^/    /' || true
-  gcloud auth application-default set-quota-project "$PROJECT" 2>&1 | sed 's/^/    /' || true
+    --project "$PROJECT" >/dev/null 2>&1 \
+    && echo "    enabled" \
+    || echo "    skipped (no permission on $PROJECT) — not required"
+  gcloud auth application-default set-quota-project "$PROJECT" >/dev/null 2>&1 \
+    && echo "    quota project set" \
+    || echo "    quota project not set — calls will run without one"
 }
 
 case "${1:-}" in
@@ -81,6 +133,7 @@ print("    Then run:  ./scripts/search-console.sh dns-verify")
     ;;
 
   dns-verify)
+    require_scopes
     echo "==> checking the TXT record has propagated"
     if ! dig +short TXT "$DOMAIN" | grep -q 'google-site-verification'; then
       echo "    no google-site-verification TXT found on $DOMAIN" >&2
