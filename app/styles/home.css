@@ -433,10 +433,20 @@ body:has(.pel-home) {
   flex-direction: column;
   align-items: center;
 }
-.pel-home .pel-card__link {
+/* The track is a flex row, so every card is already as tall as the tallest one
+   in the rail. Letting the link absorb that slack — and pushing the price down
+   with an auto top margin — lines the prices and the buttons up across all
+   cards whatever their titles do.
+
+   Deliberately not a two-line min-height on the title: that fixes today's names
+   and breaks again the first time one wraps to three. This makes no assumption
+   about line count at all. */
+.pel-home .pel-card__link,
+.pel-card__link {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
   color: inherit;
 }
 .pel-card__imgwell {
@@ -465,7 +475,9 @@ body:has(.pel-home) {
 /* Sat 28px under the title and flush against the button below it. Balanced
    now, and given the size a price deserves on a product card. */
 .pel-card__price {
-  margin: 0 0 18px;
+  /* auto top margin: soaks up the slack a shorter title leaves behind, so the
+     price sits at the same height on every card in the rail. */
+  margin: auto 0 18px;
   font: 700 17px/1 var(--font-body);
   letter-spacing: 0.01em;
   color: var(--pel-ink);
