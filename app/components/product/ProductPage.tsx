@@ -433,7 +433,16 @@ export function ProductPage({
               onClick={() => open('cart')}
               lines={
                 selectedVariant
-                  ? [{merchandiseId: selectedVariant.id, quantity: qty}]
+                  ? [
+                      {
+                        merchandiseId: selectedVariant.id,
+                        quantity: qty,
+                        // Without selectedVariant, useOptimisticCart has no product
+                        // data to build a pending line from, so the drawer opened
+                        // on "Your cart is empty" for ~900ms after every add.
+                        selectedVariant,
+                      },
+                    ]
                   : []
               }
             >

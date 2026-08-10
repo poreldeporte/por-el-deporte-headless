@@ -40,7 +40,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 26 | medium | OPEN | Destructive address delete has no confirmation, profile save has no success feedback, and all address Save buttons disable together |
 | 27 | medium | OPEN | Cart line items display "Title: Default Title" for single-variant products |
 | 28 | medium | OPEN | Invalid discount code fails completely silently — no error, no clearing, no feedback |
-| 29 | medium | OPEN | Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts |
+| 29 | medium | FIXED | Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts |
 | 30 | medium | OPEN | Quick-add-to-cart buttons on the shop grid have no accessible name |
 | 31 | medium | OPEN | Cart drawer is marked aria-modal but focus never enters it, is not trapped, and is not restored on close |
 | 32 | medium | FIXED | About-page mission copy is dark brown on orange at 2.47:1 — the worst contrast on the site |
@@ -363,7 +363,7 @@ Key Biscayne FL, United States
 
 **Fix:** After the DiscountCodesUpdate action, compare the submitted code against the returned `cart.discountCodes` and render an inline "That code isn't valid" message (and clear the field on success, the way the gift-card field already does at CartSummary.tsx:155-161).
 
-### 29. MEDIUM — OPEN — Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts
+### 29. MEDIUM — FIXED — Large unexplained vertical gaps between the discount and gift-card rows in both cart layouts
 
 **Where:** `app/components/CartSummary.tsx:99-118 and :223-244 (skeleton `&nbsp;` / `<br />` markup); rendered on /cart and in the drawer`
 

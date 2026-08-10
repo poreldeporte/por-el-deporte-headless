@@ -214,7 +214,7 @@ function ShopCard({product}: {product: ShopProductFragment}) {
         <AddToCartButton
           className="pel-shopcard__add"
           onClick={() => open('cart')}
-          lines={[{merchandiseId: variant.id, quantity: 1}]}
+          lines={[{merchandiseId: variant.id, quantity: 1, selectedVariant: variant}]}
         >
           {plusIcon}
         </AddToCartButton>

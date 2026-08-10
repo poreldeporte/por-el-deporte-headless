@@ -293,6 +293,40 @@ aside .aside__body {
   color: var(--pel-orange);
 }
 
+/* ── Summary rhythm ──
+   The discount and gift-card sections were each 113px tall around a 49px form —
+   32px of inherited margin above and below, plus a stray <br> after the checkout
+   link. That is where the "large unexplained gaps" came from. Spacing is set
+   here explicitly instead of inherited from the skeleton's generic element
+   rules, so both cart layouts stack predictably. */
+.cart-summary-aside,
+.cart-summary-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* reset.css applies `section { padding: 1rem 0 }` globally, which is what
+   actually inflated each discount/gift-card block to 113px around a 49px form.
+   Margin was never the problem. */
+.cart-summary-aside section,
+.cart-summary-page section,
+.cart-summary-aside form,
+.cart-summary-page form,
+.cart-summary-aside > div,
+.cart-summary-page > div {
+  margin: 0;
+  padding: 0;
+}
+.cart-summary-aside section > *,
+.cart-summary-page section > * {
+  margin: 0;
+}
+/* A <br> used as a spacer under the checkout link. */
+.cart-summary-aside br,
+.cart-summary-page br {
+  display: none;
+}
+
 /* Discount / gift-card inputs */
 .cart-summary-aside input[type='text'] {
   border: var(--border-width) solid var(--border-soft);

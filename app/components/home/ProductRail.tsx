@@ -134,7 +134,11 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
             className="pel-btn-outline"
             disabled={!available}
             onClick={() => open('cart')}
-            lines={variant ? [{merchandiseId: variant.id, quantity: 1}] : []}
+            lines={
+              variant
+                ? [{merchandiseId: variant.id, quantity: 1, selectedVariant: variant}]
+                : []
+            }
           >
             {available ? 'Quick Add' : 'Sold Out'}
           </AddToCartButton>
