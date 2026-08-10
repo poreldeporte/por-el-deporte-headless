@@ -33,10 +33,27 @@ const MOMENTS = [
  * inferred from the title. Set real product types in admin and this can read
  * them instead (it would also fix the Shop page's title-derived category chips).
  */
-type Kind = 'hoodie' | 'tee' | 'hat' | 'tote' | 'jersey' | 'shorts';
+type Kind =
+  | 'hoodie'
+  | 'tee'
+  | 'longsleeve'
+  | 'hoodedls'
+  | 'hat'
+  | 'tote'
+  | 'jersey'
+  | 'shorts';
 function kindOf(title: string): Kind {
   const t = title.toLowerCase();
-  if (t.includes('hoodie')) return 'hoodie';
+  // Order matters. A hooded long sleeve says both "hood" and "long sleeve", and
+  // it is neither a hoodie (no fleece, no kangaroo pocket) nor a plain long
+  // sleeve. Checking the compound cases before the single keywords keeps the
+  // spec card honest — matched first, so "Artisan PED Hoodie" still lands on
+  // 'hoodie' and a future plain long sleeve lands on 'longsleeve'.
+  const longSleeve = /long[\s-]?sleeve/.test(t);
+  const hooded = /hood/.test(t);
+  if (longSleeve && hooded) return 'hoodedls';
+  if (longSleeve) return 'longsleeve';
+  if (hooded) return 'hoodie';
   if (t.includes('cap') || t.includes('bucket') || t.includes('hat')) return 'hat';
   if (t.includes('tote')) return 'tote';
   if (t.includes('jersey') || t.includes('kit')) return 'jersey';
@@ -47,6 +64,8 @@ function kindOf(title: string): Kind {
 /** Card 2: why you'll actually wear it. Short lines, not a wall of grey text. */
 const WEAR: Record<Kind, string[]> = {
   tee: ['Heavyweight cotton that keeps its shape', 'Relaxed cut, true to size', 'Pre-shrunk, so it fits the same in a year', 'Soft enough for the flight home'],
+  hoodedls: ['A hood without the weight of a hoodie', 'Long sleeves for a breezy night game', 'Light enough to keep on all evening', 'Layers over a tee, under everything else'],
+  longsleeve: ['Light enough to layer under anything', 'Long sleeves without the bulk', 'Side-seamed so it holds its shape', 'The one for a breezy night on the island'],
   hoodie: ['Brushed fleece inside, heavy outside', 'Roomy without swimming in it', 'Ribbed cuffs that stay put', 'The one you will reach for all winter'],
   hat: ['Organic cotton twill, no plastic', 'Broken in from the first wear', 'Holds its shape in the sun', 'Adjustable, fits most heads'],
   tote: ['Thick canvas with a flat bottom', 'Handles long enough for a shoulder', 'Takes a full shop or a full kit', 'Washes and keeps going'],
@@ -57,6 +76,8 @@ const WEAR: Record<Kind, string[]> = {
 /** Card 3: the specs, tailored per garment. */
 const SPECS: Record<Kind, [string, string][]> = {
   tee: [['Fabric', '100% ring-spun cotton'], ['Weight', 'Heavyweight'], ['Fit', 'Relaxed, pre-shrunk'], ['Collar', 'Double-needle'], ['Neck', 'Twill-taped'], ['Sizes', 'S to 2XL']],
+  hoodedls: [['Fabric', 'Combed ring-spun cotton'], ['Weight', 'Lightweight, 3.8 oz'], ['Fit', 'Regular'], ['Hood', 'Unlined, no drawcord'], ['Construction', 'Side-seamed'], ['Sizes', 'S to 2XL']],
+  longsleeve: [['Fabric', 'Combed ring-spun cotton'], ['Weight', 'Lightweight'], ['Fit', 'Regular'], ['Sleeves', 'Long, set-in'], ['Construction', 'Side-seamed'], ['Sizes', 'S to 2XL']],
   hoodie: [['Fabric', 'Cotton-rich fleece'], ['Weight', 'Heavyweight'], ['Fit', 'Relaxed'], ['Hood', 'Double-lined'], ['Pocket', 'Front kangaroo'], ['Sizes', 'S to 2XL']],
   hat: [['Fabric', '100% organic cotton twill'], ['Weight', '8 oz'], ['Panels', 'Six, unstructured'], ['Closure', 'Adjustable'], ['Certified', 'GOTS and OEKO-TEX'], ['Fit', 'One size']],
   tote: [['Fabric', '100% cotton canvas'], ['Weight', 'Heavyweight'], ['Base', 'Flat bottom'], ['Handles', 'Shoulder length'], ['Care', 'Machine wash cold'], ['Size', 'One size']],
@@ -70,12 +91,56 @@ const SPECS: Record<Kind, [string, string][]> = {
  * first info card, which stops that column running twice as long as the others.
  */
 function splitDescription(html: string): {lead: string; rest: string} {
-  const paras = html.match(/<p[\s\S]*?<\/p>/gi);
-  if (!paras || paras.length === 0) return {lead: '', rest: html};
-  const strip = (x: string) => x.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  const lead = strip(paras[0]);
-  if (paras.length === 1) return {lead, rest: ''};
-  return {lead, rest: paras.slice(1).join('')};
+  const strip = (x: string) =>
+    x.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // Printful ships a whole description as ONE <p> (sometimes none at all) with
+  // <br><br> between blocks and a run of "•" spec lines. The old parser only
+  // understood <p> boundaries, so those products rendered two ways, both wrong:
+  // a single <p> made the entire 300+ char spec dump the subtitle and left the
+  // story card empty, and no <p> at all produced no subtitle whatsoever.
+  // Normalising <br><br> to a block break and lifting the bullets into a real
+  // list fixes both, and leaves hand-written multi-<p> descriptions untouched.
+  const SEP = '\u0000';
+  const blocks = (html || '')
+    .replace(/<\/p\s*>/gi, SEP)
+    .replace(/<p[^>]*>/gi, '')
+    .replace(/(<br\s*\/?>\s*){2,}/gi, SEP)
+    .split(SEP)
+    .map((b) => b.trim())
+    .filter(Boolean);
+  if (!blocks.length) return {lead: '', rest: ''};
+
+  const BULLET = /^\s*[•·\u25aa]/;
+  let lead = '';
+  const prose: string[] = [];
+  const bullets: string[] = [];
+
+  for (const block of blocks) {
+    const lines = block
+      .split(/<br\s*\/?>/i)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    for (const line of lines) {
+      const plain = strip(line);
+      if (!plain) continue;
+      if (BULLET.test(plain)) {
+        bullets.push(plain.replace(/^[•·\u25aa]\s*/, ''));
+        continue;
+      }
+      if (!lead) lead = plain;
+      else prose.push(line);
+    }
+  }
+
+  const rest =
+    prose.map((x) => `<p>${x}</p>`).join('') +
+    (bullets.length
+      ? `<ul class="pel-pdp__speclist">${bullets
+          .map((b) => `<li>${b}</li>`)
+          .join('')}</ul>`
+      : '');
+  return {lead, rest};
 }
 
 export function ProductPage({

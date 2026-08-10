@@ -340,6 +340,35 @@
   font: 600 14px/1.6 var(--font-body);
   color: var(--pel-ink);
 }
+.pel-pdp__card-body p + p {
+  margin-top: 12px;
+}
+/* Spec bullets lifted out of a supplier description by splitDescription().
+   Rendered as a real list rather than a run-on sentence, and set apart from the
+   prose above it so the card doesn't read as one grey block. */
+.pel-pdp__speclist {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+.pel-pdp__speclist li {
+  position: relative;
+  padding-left: 18px;
+  font: 600 13px/1.5 var(--font-body);
+  color: var(--text-muted);
+}
+.pel-pdp__speclist li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--pel-orange);
+}
 .pel-pdp__card-foot {
   margin-top: auto;
   padding-top: 24px;
