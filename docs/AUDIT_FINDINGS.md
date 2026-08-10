@@ -18,7 +18,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 4 | blocker | FIXED | On phones the cart drawer shows no product at all and the subtotal amount is clipped off-screen |
 | 5 | blocker | FIXED | Cart drawer promises 5-25% off spend tiers that are never applied to the cart or the checkout |
 | 6 | high | FIXED | The /cart page's checkout CTA and totals block render as unstyled stock Hydrogen skeleton — the same component is fully branded in the cart drawer |
-| 7 | high | OPEN | Order detail shows $0.00 in the per-item "Total" column (renders the discount, not the line total) |
+| 7 | high | FIXED | Order detail shows $0.00 in the per-item "Total" column (renders the discount, not the line total) |
 | 8 | high | FIXED | /cart page's Totals block is raw Hydrogen skeleton — the primary checkout CTA is unstyled plain text |
 | 9 | high | FIXED | "Remove" button is styled as a 32px circular icon button, so the word overflows and the circle strikes through the text |
 | 10 | high | FIXED | Homepage cart FAB sits exactly on top of the community FAB, making the community button unclickable |
@@ -30,10 +30,10 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 | 16 | high | DRAFTED | /policies/refund-policy serves the Privacy Policy verbatim — the store has no visible returns policy |
 | 17 | high | FIXED | Homepage hero (the LCP element) is a fixed width=2400 image with no srcset, no preload and no fetchpriority — 8.3s LCP on emulated 4G |
 | 18 | medium | FIXED | Cart line "Remove" button is styled as a 32px circle, drawing a stray circular border across its own text |
-| 19 | medium | OPEN | Order detail shipping address renders as one run-together string with the customer's name printed twice |
-| 20 | medium | OPEN | Order totals table prints every label twice — "Subtotal Subtotal", "Tax Tax", "Total Total" |
+| 19 | medium | FIXED | Order detail shipping address renders as one run-together string with the customer's name printed twice |
+| 20 | medium | FIXED | Order totals table prints every label twice — "Subtotal Subtotal", "Tax Tax", "Total Total" |
 | 21 | medium | OPEN | Address forms reuse the same DOM ids, so every label on a saved address wires to the empty "Create address" form |
-| 22 | medium | OPEN | Order status shown to customers as raw API enums ("PAID", "SUCCESS", "PARTIALLY_REFUNDED") and "N/A" for unshipped orders |
+| 22 | medium | FIXED | Order status shown to customers as raw API enums ("PAID", "SUCCESS", "PARTIALLY_REFUNDED") and "N/A" for unshipped orders |
 | 23 | medium | OPEN | "Set as default address" checkbox is stretched to full width and renders centered on its own line, detached from its label |
 | 24 | medium | OPEN | Account forms are capped at 400px by a leftover skeleton reset, leaving two-thirds of the branded card empty |
 | 25 | medium | OPEN | Address form demands raw ISO codes for country and state with no hint that codes are required |
@@ -140,7 +140,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Give `.cart-summary-page` the same brand treatment `.cart-summary-aside` already has in app/styles/pel-cart.css (pill checkout button, uppercase muted `Totals` label, pill discount/gift-card inputs), or better, have CartSummary emit shared `pel-` classes for both layouts and delete the reliance on stock app.css. Also drop the `<br/>`-based spacing in CartCheckoutActions.
 
-### 7. HIGH — OPEN — Order detail shows $0.00 in the per-item "Total" column (renders the discount, not the line total)
+### 7. HIGH — FIXED — Order detail shows $0.00 in the per-item "Total" column (renders the discount, not the line total)
 
 **Where:** `app/routes/account.orders.$id.tsx:218 (column header defined at :99) — /account/orders/:id`
 
@@ -260,7 +260,7 @@ written in `docs/POLICIES_TO_PASTE.md`, needs pasting into Shopify admin.
 
 **Fix:** Scope the circular sizing to the quantity steppers only (e.g. `.cart-line-quantity button[name^='decrease-quantity'], .cart-line-quantity button[name^='increase-quantity']`, or add a class in app/components/CartLineItem.tsx), and reset `width`, `height`, `border` and `border-radius` to `auto`/`none`/`0` on the Remove submit button that the `:last-child` rule already targets.
 
-### 19. MEDIUM — OPEN — Order detail shipping address renders as one run-together string with the customer's name printed twice
+### 19. MEDIUM — FIXED — Order detail shipping address renders as one run-together string with the customer's name printed twice
 
 **Where:** `app/routes/account.orders.$id.tsx:165-177 — /account/orders/:id`
 
@@ -273,7 +273,7 @@ Key Biscayne FL, United States
 
 **Fix:** Map the array: `{order.shippingAddress.formatted.map((line) => <p key={line}>{line}</p>)}`, drop the separate `<p>{name}</p>` at :166 (since `withName: true` already includes it) and drop the redundant `formattedArea` line at :172-176.
 
-### 20. MEDIUM — OPEN — Order totals table prints every label twice — "Subtotal Subtotal", "Tax Tax", "Total Total"
+### 20. MEDIUM — FIXED — Order totals table prints every label twice — "Subtotal Subtotal", "Tax Tax", "Total Total"
 
 **Where:** `app/routes/account.orders.$id.tsx:108-160 — /account/orders/:id`
 
@@ -293,7 +293,7 @@ Key Biscayne FL, United States
 
 **Fix:** Namespace the ids per form, e.g. `const uid = (f: string) => `${addressId}-${f}`` and use it for every `id`/`htmlFor` pair in `AddressForm` (the hidden `addressId` input already carries the identity, so the ids are free to change).
 
-### 22. MEDIUM — OPEN — Order status shown to customers as raw API enums ("PAID", "SUCCESS", "PARTIALLY_REFUNDED") and "N/A" for unshipped orders
+### 22. MEDIUM — FIXED — Order status shown to customers as raw API enums ("PAID", "SUCCESS", "PARTIALLY_REFUNDED") and "N/A" for unshipped orders
 
 **Where:** `app/routes/account.orders._index.tsx:214-215 and app/routes/account.orders.$id.tsx:42,183 — /account/orders, /account/orders/:id`
 

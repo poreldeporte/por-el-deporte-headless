@@ -112,9 +112,6 @@ export default function OrderRoute() {
                 <th scope="row" colSpan={3}>
                   <p>Discounts</p>
                 </th>
-                <th scope="row">
-                  <p>Discounts</p>
-                </th>
                 <td>
                   {discountPercentage ? (
                     <span>-{discountPercentage}% OFF</span>
@@ -128,18 +125,12 @@ export default function OrderRoute() {
               <th scope="row" colSpan={3}>
                 <p>Subtotal</p>
               </th>
-              <th scope="row">
-                <p>Subtotal</p>
-              </th>
               <td>
                 <Money data={order.subtotal!} />
               </td>
             </tr>
             <tr>
               <th scope="row" colSpan={3}>
-                Tax
-              </th>
-              <th scope="row">
                 <p>Tax</p>
               </th>
               <td>
@@ -148,9 +139,6 @@ export default function OrderRoute() {
             </tr>
             <tr>
               <th scope="row" colSpan={3}>
-                Total
-              </th>
-              <th scope="row">
                 <p>Total</p>
               </th>
               <td>
@@ -161,26 +149,22 @@ export default function OrderRoute() {
         </table>
         <div>
           <h3>Shipping Address</h3>
+          {/* `formatted` is queried with withName: true, so it already opens with
+              the recipient — printing `name` above it repeated them. It is also an
+              array of lines, and rendering it into a single <p> ran the whole
+              address together on one line. */}
           {order?.shippingAddress ? (
             <address>
-              <p>{order.shippingAddress.name}</p>
-              {order.shippingAddress.formatted ? (
-                <p>{order.shippingAddress.formatted}</p>
-              ) : (
-                ''
-              )}
-              {order.shippingAddress.formattedArea ? (
-                <p>{order.shippingAddress.formattedArea}</p>
-              ) : (
-                ''
-              )}
+              {order.shippingAddress.formatted.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
             </address>
           ) : (
             <p>No shipping address defined</p>
           )}
           <h3>Status</h3>
           <div>
-            <p>{fulfillmentStatus}</p>
+            <p>{fulfillmentLabel(fulfillmentStatus)}</p>
           </div>
         </div>
       </div>
@@ -192,6 +176,29 @@ export default function OrderRoute() {
       </p>
     </div>
   );
+}
+
+/**
+ * Customers were shown the raw API enum: "SUCCESS", "PARTIALLY_REFUNDED", and
+ * "N/A" for anything not yet shipped, which reads like an error rather than a
+ * perfectly normal state.
+ */
+function fulfillmentLabel(status?: string | null): string {
+  if (!status || status === 'N/A') return 'Not shipped yet';
+  const map: Record<string, string> = {
+    SUCCESS: 'Delivered',
+    FULFILLED: 'Shipped',
+    IN_PROGRESS: 'Being packed',
+    OPEN: 'Being packed',
+    PENDING_FULFILLMENT: 'Being packed',
+    PARTIALLY_FULFILLED: 'Partly shipped',
+    ON_HOLD: 'On hold',
+    SCHEDULED: 'Scheduled',
+    UNFULFILLED: 'Not shipped yet',
+    CANCELLED: 'Cancelled',
+    ERROR: 'There is a problem, please contact us',
+  };
+  return map[status] ?? status.replace(/_/g, ' ').toLowerCase();
 }
 
 function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
@@ -215,7 +222,17 @@ function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
       </td>
       <td>{lineItem.quantity}</td>
       <td>
-        <Money data={lineItem.totalDiscount!} />
+        {/* price x quantity. This rendered `totalDiscount`, which is $0.00 on
+            any order without one — so Total read $0.00 on every line of every
+            normal order. */}
+        <Money
+          data={{
+            amount: (
+              Number(lineItem.price?.amount ?? 0) * lineItem.quantity
+            ).toFixed(2),
+            currencyCode: lineItem.price?.currencyCode ?? 'USD',
+          }}
+        />
       </td>
     </tr>
   );
