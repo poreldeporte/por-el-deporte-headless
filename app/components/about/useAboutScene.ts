@@ -69,15 +69,37 @@ export function useAboutScene() {
       el.style.willChange = 'opacity, transform';
     });
 
+    /**
+     * The unit the cards move in has to be the same unit the scene is laid out
+     * in, and it wasn't.
+     *
+     * The scene is `height: 440vh` over a `height: 100vh` sticky panel. On a
+     * phone, CSS `vh` resolves against the *large* viewport — it deliberately
+     * does not change when the URL bar slides away. `window.innerHeight` does,
+     * by 60-100px, continuously, while you scroll. Every card position here is
+     * `y = (...) * vh`, so reading innerHeight per frame moved the cards against
+     * a layout that was standing still. That mismatch is the subtle judder: not
+     * the animation, the ruler changing length mid-measurement.
+     *
+     * Measuring the sticky panel instead means JS and CSS agree by construction
+     * — it *is* the element that is 100vh — so there is nothing left to drift.
+     */
+    const measureVh = () => sticky?.offsetHeight || window.innerHeight || 800;
+    let vh = measureVh();
+    let vw = window.innerWidth;
+    let sceneH = scene.offsetHeight;
+
     let ticking = false;
     const update = () => {
       ticking = false;
-      const vh = window.innerHeight || 800;
 
       // (No hero parallax: the subpage banner crossfades its frames, and moving
       // them would fight that opacity transition.)
       const rect = scene.getBoundingClientRect();
-      const dist = scene.offsetHeight - vh;
+      // sceneH is cached: reading offsetHeight forces a synchronous layout, and
+      // doing that every frame in between writing transforms to twelve cards is
+      // layout thrash on a phone. It only changes when the viewport does.
+      const dist = sceneH - vh;
       const p = clamp(dist > 0 ? -rect.top / dist : 0, 0, 1);
       const n = cards.length;
       for (let i = 0; i < n; i++) {
@@ -113,13 +135,23 @@ export function useAboutScene() {
         requestAnimationFrame(update);
       }
     };
+    const onResize = () => {
+      // Only a width change is a real layout change worth remeasuring for; a
+      // height-only resize on mobile is the URL bar and must not move the scene.
+      if (window.innerWidth !== vw) {
+        vw = window.innerWidth;
+        vh = measureVh();
+        sceneH = scene.offsetHeight;
+      }
+      onScroll();
+    };
     window.addEventListener('scroll', onScroll, {passive: true});
-    window.addEventListener('resize', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, {passive: true});
     update();
 
     return () => {
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 }

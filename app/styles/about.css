@@ -151,7 +151,16 @@
     grid-template-columns: 1fr;
     min-height: 0;
   }
+  /* The photo is portrait 700x1050 (2:3). `min-height: 60vw` gave it a 1.67:1
+     box on a phone, so object-fit: cover threw away about 60% of the frame — it
+     landed as a band across the three players' torsos with their heads and legs
+     both cut off. 3:4 is close enough to the source that cover only trims a
+     little sky and grass, and the bias upward keeps faces out of the crop. */
   .pel-mission__photo {
-    min-height: 60vw;
+    aspect-ratio: 3 / 4;
+    min-height: 0;
+  }
+  .pel-mission__photo img {
+    object-position: center 38%;
   }
 }

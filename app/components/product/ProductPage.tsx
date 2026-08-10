@@ -127,7 +127,9 @@ function kindOf(title: string): Kind {
 /** Card 2: why you'll actually wear it. Short lines, not a wall of grey text. */
 const WEAR: Record<Kind, string[]> = {
   tee: ['Heavyweight cotton that keeps its shape', 'Relaxed cut, true to size', 'Pre-shrunk, so it fits the same in a year', 'Soft enough for the flight home'],
-  hoodedls: ['A hood without the weight of a hoodie', 'Long sleeves for a breezy night game', 'Light enough to keep on all evening', 'Layers over a tee, under everything else'],
+  // Sun first, not cold. In Miami this is a sideline garment: the reason to
+  // reach for long sleeves here is four hours under the sun, not the weather.
+  hoodedls: ['Covers your arms when the sun is straight overhead', 'A hood without the weight of a hoodie', 'Light enough to keep on all afternoon', 'Goes straight over a tee at a night game'],
   longsleeve: ['Light enough to layer under anything', 'Long sleeves without the bulk', 'Side-seamed so it holds its shape', 'The one for a breezy night on the island'],
   hoodie: ['Brushed fleece inside, heavy outside', 'Roomy without swimming in it', 'Ribbed cuffs that stay put', 'The one you will reach for all winter'],
   hat: ['Organic cotton twill, no plastic', 'Broken in from the first wear', 'Holds its shape in the sun', 'Adjustable, fits most heads'],
@@ -139,7 +141,7 @@ const WEAR: Record<Kind, string[]> = {
 /** Card 3: the specs, tailored per garment. */
 const SPECS: Record<Kind, [string, string][]> = {
   tee: [['Fabric', '100% ring-spun cotton'], ['Weight', 'Heavyweight'], ['Fit', 'Relaxed, pre-shrunk'], ['Collar', 'Double-needle'], ['Neck', 'Twill-taped'], ['Sizes', 'S to 2XL']],
-  hoodedls: [['Fabric', 'Combed ring-spun cotton'], ['Weight', 'Lightweight, 3.8 oz'], ['Fit', 'Regular'], ['Hood', 'Unlined, no drawcord'], ['Construction', 'Side-seamed'], ['Sizes', 'S to 2XL']],
+  hoodedls: [['Fabric', '100% combed ring-spun cotton'], ['Weight', 'Lightweight, 3.8 oz'], ['Fit', 'Regular'], ['Hood', 'Unlined, no drawcord'], ['Construction', 'Side-seamed'], ['Sizes', 'S to 2XL']],
   longsleeve: [['Fabric', 'Combed ring-spun cotton'], ['Weight', 'Lightweight'], ['Fit', 'Regular'], ['Sleeves', 'Long, set-in'], ['Construction', 'Side-seamed'], ['Sizes', 'S to 2XL']],
   hoodie: [['Fabric', 'Cotton-rich fleece'], ['Weight', 'Heavyweight'], ['Fit', 'Relaxed'], ['Hood', 'Double-lined'], ['Pocket', 'Front kangaroo'], ['Sizes', 'S to 2XL']],
   hat: [['Fabric', '100% organic cotton twill'], ['Weight', '8 oz'], ['Panels', 'Six, unstructured'], ['Closure', 'Adjustable'], ['Certified', 'GOTS and OEKO-TEX'], ['Fit', 'One size']],
