@@ -9,12 +9,29 @@ import {swatchColor} from '~/lib/swatches';
 
 type Variant = ProductFragment['selectedOrFirstAvailableVariant'];
 
-const STATS = [
-  {value: '100%', label: 'Ring-Spun Cotton'},
-  {value: '0', label: 'Plastic'},
-  {value: '1 WK', label: 'To Your Door'},
-  {value: '2014', label: 'Est. Key Biscayne'},
-];
+/**
+ * The stat band, derived per garment rather than hardcoded.
+ *
+ * It used to read "100% Ring-Spun Cotton / 0 Plastic / 1 WK To Your Door /
+ * 2014" on every product, which contradicted the Specs card directly beneath it
+ * on anything that isn't a cotton tee — the hoodie's specs say cotton-rich
+ * fleece, the bucket hat's say organic cotton twill, the jersey's say
+ * performance knit. Two different fabrics for one garment, a screen apart.
+ *
+ * "1 WK To Your Door" also went: it is a delivery promise nobody has checked
+ * against real orders. Free U.S. shipping replaces it, which was verified
+ * against the store's delivery profiles (the domestic zone's only rate is $0).
+ */
+function statsFor(kind: Kind): {value: string; label: string}[] {
+  const fabric = SPECS[kind][0][1];
+  const weight = SPECS[kind].find(([k]) => k === 'Weight')?.[1];
+  return [
+    {value: fabric.startsWith('100%') ? '100%' : '', label: fabric.replace(/^100% /, '')},
+    ...(weight ? [{value: '', label: weight}] : []),
+    {value: 'FREE', label: 'U.S. Shipping'},
+    {value: '2014', label: 'Est. Key Biscayne'},
+  ].slice(0, 4);
+}
 
 const MOMENTS = [
   {id: 'm1', src: 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1207.jpg?v=1755704396&width=800', alt: 'Supporters together on match day'},
@@ -301,7 +318,7 @@ export function ProductPage({
 
         {/* Stat cards */}
         <div className="pel-pdp__stats" data-reveal>
-          {STATS.map((s) => (
+          {statsFor(kind).map((s) => (
             <div key={s.label} className="pel-pdp__stat">
               <div className="pel-pdp__stat-value">{s.value}</div>
               <div className="pel-pdp__stat-rule" />

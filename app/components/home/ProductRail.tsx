@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router';
-import {Image} from '@shopify/hydrogen';
+import {Image, Money} from '@shopify/hydrogen';
 import type {HomeRailProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
@@ -96,6 +96,10 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
   const image = product.featuredImage;
   const variant = product.selectedOrFirstAvailableVariant;
   const available = Boolean(variant?.availableForSale);
+  // Any option with more than one value is a decision the shopper has to make.
+  const needsChoice = (product.options ?? []).some(
+    (o) => (o.optionValues?.length ?? 0) > 1,
+  );
   return (
     <div className="pel-card">
       <Link className="pel-card__link" to={to}>
@@ -110,20 +114,31 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
           ) : null}
         </div>
         <h3 className="pel-card__title">{product.title}</h3>
+        {variant?.price ? (
+          <div className="pel-card__price">
+            <Money data={variant.price} />
+          </div>
+        ) : null}
       </Link>
       <div className="pel-card__actions">
-        {/* Quick Add: adds the first available variant, then opens the cart drawer.
-            (For products that require a size choice, the arrow → the PDP.) */}
-        <AddToCartButton
-          className="pel-btn-outline"
-          disabled={!available}
-          onClick={() => open('cart')}
-          lines={
-            variant ? [{merchandiseId: variant.id, quantity: 1}] : []
-          }
-        >
-          {available ? 'Quick Add' : 'Sold Out'}
-        </AddToCartButton>
+        {/* A product with a real choice to make (a size, a colour) does not get a
+            Quick Add. It used to, and it silently added whichever variant the API
+            happened to return first — you asked for a tee and got a Small. Those
+            send you to the page to choose instead. */}
+        {needsChoice ? (
+          <Link className="pel-btn-outline" to={to}>
+            {available ? 'Choose Options' : 'Sold Out'}
+          </Link>
+        ) : (
+          <AddToCartButton
+            className="pel-btn-outline"
+            disabled={!available}
+            onClick={() => open('cart')}
+            lines={variant ? [{merchandiseId: variant.id, quantity: 1}] : []}
+          >
+            {available ? 'Quick Add' : 'Sold Out'}
+          </AddToCartButton>
+        )}
         <Link
           to={to}
           className="pel-icon-btn"

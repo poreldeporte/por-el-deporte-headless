@@ -308,6 +308,16 @@ const HOME_RAIL_QUERY = `#graphql
     selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {
       id
       availableForSale
+      price {
+        amount
+        currencyCode
+      }
+    }
+    options {
+      name
+      optionValues {
+        name
+      }
     }
   }
   query HomeRailProducts(

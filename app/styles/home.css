@@ -451,6 +451,12 @@ body:has(.pel-home) {
   text-align: center;
   text-transform: uppercase;
 }
+.pel-card__price {
+  margin-top: 6px;
+  font: 700 14px/1 var(--font-body);
+  color: var(--pel-ink);
+}
+
 .pel-card__actions {
   display: flex;
   align-items: center;
