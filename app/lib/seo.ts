@@ -25,6 +25,36 @@ export function siteOrigin(
   return data?.origin ?? '';
 }
 
+/** Recommended Open Graph card size. 1.91:1 is what every platform crops to. */
+const SHARE_W = 1200;
+const SHARE_H = 630;
+
+/**
+ * Turn any Shopify CDN image into a share card.
+ *
+ * Product mockups are square PNGs straight off the supplier — up to 3.1 MB and
+ * 2000x2000. Shared as-is that fails in three ways: messaging apps skip
+ * previews over roughly half a megabyte, a 1:1 image gets cropped unpredictably
+ * by platforms expecting 1.91:1, and without og:image:width/height some
+ * scrapers won't render a card at all.
+ *
+ * Shopify's CDN honours width/height/crop (it ignores `format`, so transparent
+ * PNGs stay transparent — every major platform flattens those onto white, which
+ * for a garment mockup is what you'd want anyway). Existing sizing params are
+ * stripped first so callers can pass a URL that already carries `&width=`.
+ */
+export function shareImage(url?: string | null): string | undefined {
+  if (!url) return undefined;
+  if (!/cdn\.shopify\.com/.test(url)) return url;
+  const [base, query = ''] = url.split('?');
+  const params = new URLSearchParams(query);
+  ['width', 'height', 'crop', 'format'].forEach((k) => params.delete(k));
+  params.set('width', String(SHARE_W));
+  params.set('height', String(SHARE_H));
+  params.set('crop', 'center');
+  return `${base}?${params.toString()}`;
+}
+
 export type SeoInput = {
   title: string;
   description?: string | null;
@@ -69,10 +99,18 @@ export function seoMeta({
     );
   }
 
-  if (image) {
+  const card = shareImage(image);
+  if (card) {
     tags.push(
-      {property: 'og:image', content: image},
-      {name: 'twitter:image', content: image},
+      {property: 'og:image', content: card},
+      {property: 'og:image:secure_url', content: card},
+      // No og:image:width/height. Shopify's CDN will not upscale, so a source
+      // smaller than the card box comes back at its own size — one article
+      // image returns 803x558 — and a declared size that doesn't match the
+      // bytes is worse than none, since scrapers lay the card out from it.
+      {property: 'og:image:alt', content: title},
+      {name: 'twitter:image', content: card},
+      {name: 'twitter:image:alt', content: title},
     );
   }
 
