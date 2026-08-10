@@ -2,11 +2,19 @@ import {Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
 import {seoMeta, siteOrigin} from '~/lib/seo';
+import {resolvePolicy} from '~/lib/policies';
 
 type SelectedPolicies = keyof Pick<
   Shop,
   'privacyPolicy' | 'shippingPolicy' | 'termsOfService' | 'refundPolicy'
 >;
+
+const POLICY_FIELDS: SelectedPolicies[] = [
+  'privacyPolicy',
+  'shippingPolicy',
+  'termsOfService',
+  'refundPolicy',
+];
 
 export const meta: Route.MetaFunction = ({data, location, matches}) => {
   const title = data?.policy.title ?? '';
@@ -29,6 +37,12 @@ export async function loader({params, context}: Route.LoaderArgs) {
     (_: unknown, m1: string) => m1.toUpperCase(),
   ) as SelectedPolicies;
 
+  // An unrecognised handle used to be sent to the API as an undeclared variable,
+  // which fails the whole query and surfaces as a 500 rather than a 404.
+  if (!POLICY_FIELDS.includes(policyName)) {
+    throw new Response('Could not find the policy', {status: 404});
+  }
+
   const data = await context.storefront.query(POLICY_CONTENT_QUERY, {
     variables: {
       privacyPolicy: false,
@@ -40,7 +54,9 @@ export async function loader({params, context}: Route.LoaderArgs) {
     },
   });
 
-  const policy = data.shop?.[policyName];
+  // Shopify's copy wins whenever it holds real text; see lib/policies.ts for
+  // the three that currently don't, and for why a null policy is not a 404.
+  const policy = resolvePolicy(params.handle, data.shop?.[policyName]);
 
   if (!policy) {
     throw new Response('Could not find the policy', {status: 404});

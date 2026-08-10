@@ -107,7 +107,7 @@ export function About() {
                 came out rather than being restated as a claim we can't back. */}
             <div className="pel-about__rating">
               <a
-                href="https://www.instagram.com/poreldeporte"
+                href="https://www.instagram.com/poreldeporte/"
                 target="_blank"
                 rel="noreferrer"
                 className="pel-follow"

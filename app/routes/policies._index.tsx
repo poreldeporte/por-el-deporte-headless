@@ -2,6 +2,7 @@ import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/policies._index';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
 import {seoMeta, siteOrigin} from '~/lib/seo';
+import {POLICY_FALLBACKS} from '~/lib/policies';
 
 export const meta: Route.MetaFunction = ({location, matches}) =>
   seoMeta({
@@ -22,6 +23,16 @@ export async function loader({context}: Route.LoaderArgs) {
     shopPolicies?.refundPolicy,
     shopPolicies?.subscriptionPolicy,
   ].filter((policy): policy is PolicyItemFragment => policy != null);
+
+  // Policies with a blank body in the admin come back null, so listing only what
+  // the API returns hid two of the four. Anything we can serve from a fallback
+  // belongs on this list too, otherwise the shipping policy exists at its URL
+  // but nothing on the site points at it.
+  const listed = new Set(policies.map((p) => p.handle));
+  for (const [handle, fallback] of Object.entries(POLICY_FALLBACKS)) {
+    if (listed.has(handle)) continue;
+    policies.push({id: `local:${handle}`, handle, title: fallback.title});
+  }
 
   if (!policies.length) {
     throw new Response('No policies found', {status: 404});

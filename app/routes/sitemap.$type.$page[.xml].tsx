@@ -1,6 +1,7 @@
 import type {Route} from './+types/sitemap.$type.$page[.xml]';
 import {getSitemap} from '@shopify/hydrogen';
 import {shouldExcludePage} from '~/lib/pages-seo';
+import {FALLBACK_POLICY_HANDLES} from '~/lib/policies';
 
 export async function loader({
   request,
@@ -152,14 +153,21 @@ async function siteRoutesSitemap(
   const {shop} = await storefront.query(SITEMAP_POLICIES_QUERY, {
     cache: storefront.CacheLong(),
   });
-  const policyPaths = [
-    shop?.privacyPolicy,
-    shop?.shippingPolicy,
-    shop?.termsOfService,
-    shop?.refundPolicy,
-  ]
-    .filter((p): p is {handle: string} => Boolean(p?.handle))
-    .map((p) => `/policies/${p.handle}`);
+  // A policy with a blank body in the admin is returned as null, so this list
+  // alone would omit the two the storefront serves from a local fallback — real,
+  // indexable URLs that would appear in no sitemap at all.
+  const policyHandles = new Set([
+    ...[
+      shop?.privacyPolicy,
+      shop?.shippingPolicy,
+      shop?.termsOfService,
+      shop?.refundPolicy,
+    ]
+      .filter((p): p is {handle: string} => Boolean(p?.handle))
+      .map((p) => p.handle),
+    ...FALLBACK_POLICY_HANDLES,
+  ]);
+  const policyPaths = [...policyHandles].map((handle) => `/policies/${handle}`);
 
   // `/collections/all-products` is a real Shopify collection and is already
   // listed in the collections sitemap, so it is not repeated here.

@@ -1,4 +1,28 @@
-# Store policies — ready to paste
+# Store policies
+
+## Status: the storefront is fixed. Shopify's own copies are not.
+
+**The site is no longer serving wrong or missing policies.** `app/lib/policies.ts`
+now supplies the refund, shipping and terms text, and `/policies/*`, the policies
+index and the sitemap all serve the correct four. That happened because the
+Shopify admin copies are unusable and could not be written from here — the
+`shopPolicyUpdate` mutation needs the `write_legal_policies` scope, and the
+connected app is denied it (`Access denied for shopPolicyUpdate field`).
+
+What is still wrong **inside Shopify** (and therefore anywhere Shopify renders
+its own policy pages — checkout's footer links, and the Shop and Meta channels):
+
+| Policy | Body in Shopify |
+|---|---|
+| Refund policy | a byte-identical copy of the Privacy Policy |
+| Shipping policy | empty |
+| Terms of service | empty |
+| Contact information | empty |
+| Privacy policy | correct — leave it alone |
+
+Fixing those is a paste into Settings → Policies, or a one-off Admin API token
+with `write_legal_policies`. Until then the storefront is right and checkout is
+not, which is worth closing since checkout is where people actually read them.
 
 **Where:** Shopify admin → Settings → Policies. Each section below goes in the
 matching field. Paste as plain text; Shopify's editor will keep the headings.
