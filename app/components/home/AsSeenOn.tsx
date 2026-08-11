@@ -29,8 +29,21 @@ export function AsSeenOn() {
     <section className="pel-press" aria-label="Por El Deporte on CBS Sports Golazo Network">
       <div className="pel-press__inner">
         <div className="pel-press__head">
+          {/* The network's own mark carries more weight than the words do, and
+              it is the thing people recognise before they read anything. Kept
+              at a modest size and paired with the show name, which the logo
+              does not say. */}
+          <img
+            className="pel-press__logo"
+            src="/golazo-network.png"
+            alt="CBS Sports Golazo Network"
+            width={1000}
+            height={562}
+            loading="lazy"
+            data-reveal
+          />
           <div className="pel-press__eyebrow" data-reveal>
-            CBS Sports Golazo Network &bull; Morning Footy
+            Morning Footy
           </div>
           <h2 className="pel-press__title" data-reveal>
             They Wore Ours
@@ -38,10 +51,10 @@ export function AsSeenOn() {
             On Air
           </h2>
           <p className="pel-press__sub" data-reveal>
-            Nico Cantor presented Morning Footy in our kit and spent the segment
-            explaining what Por El Deporte is: for the sport. A Sunday league
-            side in Miami, founded by Franco and Marco Viola, that turned a group
-            of old high-school rivals into one team.
+            Nico Cantor presented Morning Footy in our kit and explained what
+            Por El Deporte means: for the sport. Franco and Marco Viola started
+            the club to give people in Miami a game to turn up to and a group to
+            belong to, and it has been free to turn up ever since.
           </p>
         </div>
 

@@ -1670,3 +1670,21 @@ body:has(.overlay.expanded) .pel-fab {
     font-size: 14px;
   }
 }
+
+/* The Golazo Network mark. Sized by height so the artwork decides its own
+   width. The PNG is transparent, and the shield is navy, which loses definition
+   against --pel-ink — so it runs larger than a wordmark would need to, and a
+   soft light glow lifts the dark edges off the background without putting a
+   white box on a black section. */
+.pel-press__logo {
+  display: block;
+  height: 96px;
+  width: auto;
+  margin-bottom: 22px;
+  filter: drop-shadow(0 0 14px rgba(247, 240, 222, 0.22));
+}
+@media (max-width: 60em) {
+  .pel-press__logo {
+    height: 72px;
+  }
+}
