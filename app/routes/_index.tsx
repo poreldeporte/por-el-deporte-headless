@@ -219,6 +219,7 @@ function Hero() {
           the preload in root.tsx links(). */}
       <img
         className="pel-hero__img"
+        data-bg-fixed
         src={`${HERO_SRC}&width=1600`}
         srcSet={HERO_SRCSET}
         sizes="100vw"

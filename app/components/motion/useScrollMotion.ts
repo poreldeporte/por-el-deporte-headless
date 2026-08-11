@@ -23,6 +23,8 @@ import {useLocation} from 'react-router';
  *   [data-reveal-stagger]    → container; its [data-reveal-item] children stagger
  *                              in from an offset read from data-dx/dy/scale/rot
  *   [data-bg-parallax]       → full-bleed image drifts within its <section>
+ *   [data-bg-fixed]          → full-bleed image locked to the viewport, so the
+ *                              section scrolls over it like a window
  *   [data-scroll-parallax]   → any element drifts as it crosses the viewport;
  *                              `data-speed` (default 12) is the travel in px,
  *                              negative moves against the scroll
@@ -134,6 +136,9 @@ export function useScrollMotion() {
       const bgs = Array.from(
         document.querySelectorAll<HTMLElement>('[data-bg-parallax]'),
       );
+      const fixedBgs = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-bg-fixed]'),
+      );
       const drifters = Array.from(
         document.querySelectorAll<HTMLElement>('[data-scroll-parallax]'),
       );
@@ -153,6 +158,30 @@ export function useScrollMotion() {
             if (r.bottom < 0 || r.top > vh) return; // off screen, skip the work
             const p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height)));
             img.style.transform = `translateY(${(p - 0.5) * 70}px) scale(1.16)`;
+          });
+
+          // `background-attachment: fixed`, done with a transform.
+          //
+          // The CSS property is the obvious answer and the wrong one here: iOS
+          // Safari ignores it outright, and it would mean turning these <img>
+          // elements into CSS backgrounds — costing the hero its preload,
+          // srcset and fetchPriority, which is the whole reason its LCP is
+          // reasonable on 4G.
+          //
+          // Instead the image is 100vh tall inside an overflow-hidden section,
+          // and translating it by -top pins it to the top of the viewport. The
+          // section then scrolls over a stationary image, which is exactly what
+          // the CSS property does, and it composites on the GPU.
+          //
+          // -top is a measured value, not a multiple of innerHeight, so this
+          // cannot drift when mobile browser chrome resizes the viewport — the
+          // bug that made the About page judder.
+          fixedBgs.forEach((img) => {
+            const sec = img.parentElement;
+            if (!sec) return;
+            const r = sec.getBoundingClientRect();
+            if (r.bottom < 0 || r.top > vh) return; // off screen, skip the work
+            img.style.transform = `translate3d(0, ${(-r.top).toFixed(1)}px, 0)`;
           });
 
           drifters.forEach((el) => {

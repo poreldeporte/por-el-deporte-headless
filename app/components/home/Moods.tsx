@@ -38,7 +38,7 @@ export function Moods() {
           the hero for bandwidth at 474 KB. lazy + a viewport-matched srcset. */}
       <img
         className="pel-moods__bg"
-        data-bg-parallax
+        data-bg-fixed
         src={`${MOODS_BG}&width=1600`}
         srcSet={[960, 1280, 1600, 2000]
           .map((w) => `${MOODS_BG}&width=${w} ${w}w`)

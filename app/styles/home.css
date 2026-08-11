@@ -104,12 +104,19 @@ body:has(.pel-home) {
   background: var(--pel-black);
   overflow: hidden;
 }
+/* 100vh, not 100%, and pinned to the top rather than stretched across the
+   section. useScrollMotion translates it by -top every frame, which holds it
+   still in the viewport while the section scrolls over it. The height has to be
+   viewport-sized for that to cover, and 100vh (not dvh) on purpose: dvh changes
+   as mobile browser chrome slides, which would resize the image mid-scroll. */
 .pel-hero__img {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   object-fit: cover;
+  will-change: transform;
 }
 .pel-hero__overlay {
   position: absolute;
@@ -656,13 +663,17 @@ body:has(.pel-home) {
   display: flex;
   flex-direction: column;
 }
+/* Same locked-to-viewport treatment as the hero. The scale(1.16) that used to
+   sit here went with it: it existed to hide the edges during a +/-35px drift,
+   and a pinned image has no edges to hide, so the photo is no longer being
+   blown up 16% for nothing. */
 .pel-moods__bg {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   object-fit: cover;
-  transform: scale(1.16);
   will-change: transform;
 }
 .pel-moods__overlay {
