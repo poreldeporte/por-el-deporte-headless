@@ -1,0 +1,269 @@
+{% comment %}
+  Por El Deporte — Shipping confirmation.
+
+  WHERE THIS GOES
+  Shopify admin > Settings > Notifications > Customer notifications >
+  Shipping confirmation > Edit code. Replace the whole body.
+  "Revert to default" in that editor restores Shopify's version.
+
+  SUBJECT LINE:
+      Your order {{ order_name }} is on the way
+
+  WHAT THIS EMAIL IS FOR
+  This is the most-opened email a shop sends, and the reader wants exactly one
+  thing: the tracking number. So it is first, big, and tappable, above
+  everything else. Shopify's stock template buries it in grey small print under
+  the buttons.
+
+  The second job is the only moment worth asking for anything: the thing is
+  about to arrive. That is where the tag-us line goes, not in a marketing blast.
+
+  VARIABLES, FROM THE STOCK TEMPLATE
+    fulfillment.item_count vs item_count       whether this is the whole order
+    fulfillment_status                          'fulfilled' = nothing left after this
+    fulfillment.tracking_numbers (array)        may hold more than one
+    fulfillment.tracking_company / tracking_url / tracking_urls
+    fulfillment.estimated_delivery_at
+    fulfillment.fulfillment_line_items          NOTE: each entry wraps the real
+                                                line as line.line_item, and
+                                                line.quantity is the amount in
+                                                THIS shipment, which can be less
+                                                than line.line_item.quantity
+    order_name  order_status_url  shop.email
+
+  NO RETURNS OR REFUNDS COPY ANYWHERE. All sales are final; the policy is
+  written separately in Shopify. Nothing in this file should imply otherwise.
+{% endcomment %}
+
+{% comment %} Partial vs complete, mirroring the stock template's branches. {% endcomment %}
+{% if fulfillment.item_count == item_count %}
+  {% assign ship_title = "It is on<br />the way" %}
+  {% assign ship_line = "Your order has left us." %}
+{% elsif fulfillment_status == 'fulfilled' %}
+  {% assign ship_title = "The rest is<br />on the way" %}
+  {% assign ship_line = "The last of your order has left us. Nothing else to come." %}
+{% else %}
+  {% assign ship_title = "Part of it is<br />on the way" %}
+  {% assign ship_line = "Some of your order has left us. The rest follows in its own shipment, with its own tracking." %}
+{% endif %}
+
+{% comment %} Primary link: the carrier if we have it, the order page if not. {% endcomment %}
+{% if fulfillment.tracking_url %}
+  {% assign primary_url = fulfillment.tracking_url %}
+{% else %}
+  {% assign primary_url = order_status_url %}
+{% endif %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order {{ order_name }} is on the way</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#efe7d3;">
+
+    <div style="display:none; font-size:1px; color:#efe7d3; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      {{ ship_line }}{% if fulfillment.estimated_delivery_at %} Estimated {{ fulfillment.estimated_delivery_at | date: format: 'date' }}.{% endif %}
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#efe7d3;">
+      <tr>
+        <td align="center" style="padding:28px 12px 40px 12px;">
+
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#f7f0de; border:2px solid #171717; border-radius:18px; overflow:hidden;">
+
+            <!-- Crest + order number -->
+            <tr>
+              <td bgcolor="#171717" style="background-color:#171717; padding:24px 30px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td width="52" valign="middle">
+                      <img src="https://poreldeporte.com/icon-192.png" width="52" height="52" alt="{{ shop.name }}"
+                           style="display:block; border:0; width:52px; height:52px; border-radius:12px;" />
+                    </td>
+                    <td align="right" valign="middle" style="font-family:Helvetica,Arial,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#c9c2ae;">
+                      Order {{ order_name }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Headline -->
+            <tr>
+              <td style="padding:40px 40px 0 40px;">
+                <h1 style="margin:0; font-family:Helvetica,Arial,sans-serif; font-size:38px; line-height:1.05; font-weight:bold; letter-spacing:-0.5px; text-transform:uppercase; color:#171717;">
+                  {{ ship_title }}
+                </h1>
+                <p style="margin:18px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#4a463d;">
+                  {{ ship_line }}
+                </p>
+              </td>
+            </tr>
+
+            <!-- Tracking. The reason this email gets opened, so it goes first. -->
+            {% if fulfillment.tracking_numbers.size > 0 %}
+            <tr>
+              <td style="padding:26px 40px 0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#171717; border-radius:14px;">
+                  <tr>
+                    <td style="padding:22px 24px; font-family:Helvetica,Arial,sans-serif;">
+                      <p style="margin:0 0 10px 0; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#c9c2ae;">
+                        {% if fulfillment.tracking_company %}{{ fulfillment.tracking_company }} tracking{% else %}Tracking{% endif %}
+                      </p>
+                      {% if fulfillment.tracking_numbers.size == 1 %}
+                        {% if fulfillment.tracking_url %}
+                          <a href="{{ fulfillment.tracking_url }}" style="font-size:20px; font-weight:bold; letter-spacing:0.5px; color:#f7f0de; text-decoration:none; word-break:break-all;">{{ fulfillment.tracking_numbers.first }}</a>
+                        {% else %}
+                          <span style="font-size:20px; font-weight:bold; letter-spacing:0.5px; color:#f7f0de; word-break:break-all;">{{ fulfillment.tracking_numbers.first }}</span>
+                        {% endif %}
+                      {% else %}
+                        {% for tracking_number in fulfillment.tracking_numbers %}
+                          {% if fulfillment.tracking_urls[forloop.index0] %}
+                            <a href="{{ fulfillment.tracking_urls[forloop.index0] }}" style="display:block; margin-bottom:6px; font-size:18px; font-weight:bold; color:#f7f0de; text-decoration:none; word-break:break-all;">{{ tracking_number }}</a>
+                          {% else %}
+                            <span style="display:block; margin-bottom:6px; font-size:18px; font-weight:bold; color:#f7f0de; word-break:break-all;">{{ tracking_number }}</span>
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                      {% if fulfillment.estimated_delivery_at %}
+                      <p style="margin:14px 0 0 0; font-size:14px; line-height:1.5; color:#c9c2ae;">
+                        Estimated delivery <strong style="color:#f7f0de;">{{ fulfillment.estimated_delivery_at | date: format: 'date' }}</strong>
+                      </p>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            {% elsif fulfillment.estimated_delivery_at %}
+            <tr>
+              <td style="padding:20px 40px 0 40px;">
+                <p style="margin:0; font-family:Helvetica,Arial,sans-serif; font-size:15px; line-height:1.6; color:#4a463d;">
+                  Estimated delivery <strong style="color:#171717;">{{ fulfillment.estimated_delivery_at | date: format: 'date' }}</strong>
+                </p>
+              </td>
+            </tr>
+            {% endif %}
+
+            <!-- CTA -->
+            {% if primary_url %}
+            <tr>
+              <td style="padding:26px 40px 0 40px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" bgcolor="#a55032" style="background-color:#a55032; border-radius:999px;">
+                      <a href="{{ primary_url }}"
+                         style="display:inline-block; padding:17px 46px; font-family:Helvetica,Arial,sans-serif; font-size:14px; font-weight:bold; letter-spacing:1.6px; text-transform:uppercase; color:#f7f0de; text-decoration:none; border-radius:999px;">
+                        Track your shipment
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                {% if fulfillment.tracking_url and order_status_url %}
+                <p style="margin:14px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:13px; color:#6b665b;">
+                  or <a href="{{ order_status_url }}" style="color:#6b665b;">see the whole order</a>
+                </p>
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+
+            <!-- What is in this shipment -->
+            <tr>
+              <td style="padding:34px 40px 0 40px;">
+                <p style="margin:0 0 18px 0; font-family:Helvetica,Arial,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#6b665b;">
+                  In this box
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  {% for line in fulfillment.fulfillment_line_items %}
+                  {% unless line.line_item.nested_line_child? %}
+                  <tr>
+                    <td width="84" valign="top" style="padding:0 16px 18px 0;">
+                      {% if line.line_item.image %}
+                        <img src="{{ line.line_item | img_url: 'medium' }}" width="84" alt=""
+                             style="display:block; border:0; width:84px; height:auto; background-color:#e6dcc4; border-radius:10px;" />
+                      {% else %}
+                        <div style="width:84px; height:84px; background-color:#e6dcc4; border-radius:10px;">&nbsp;</div>
+                      {% endif %}
+                    </td>
+                    <td valign="top" style="padding:0 0 18px 0; font-family:Helvetica,Arial,sans-serif;">
+                      <p style="margin:0 0 5px 0; font-size:15px; font-weight:bold; line-height:1.25; color:#171717; text-transform:uppercase; letter-spacing:0.3px;">
+                        {% if line.line_item.presentment_title %}{{ line.line_item.presentment_title }}
+                        {%- elsif line.line_item.title %}{{ line.line_item.title }}
+                        {%- else %}{{ line.line_item.product.title }}{% endif %}
+                      </p>
+                      {% if line.line_item.variant.title != 'Default Title' %}
+                      <p style="margin:0 0 4px 0; font-size:14px; line-height:1.4; color:#6b665b;">{{ line.line_item.variant.title }}</p>
+                      {% endif %}
+                      {% comment %}
+                        line.quantity is what is in THIS box, which can be fewer
+                        than the customer ordered when a shipment is split.
+                      {% endcomment %}
+                      <p style="margin:0; font-size:14px; line-height:1.4; color:#6b665b;">
+                        {% if line.quantity < line.line_item.quantity %}
+                          Qty {{ line.quantity }} of {{ line.line_item.quantity }}
+                        {% else %}
+                          Qty {{ line.quantity }}
+                        {% endif %}
+                      </p>
+                    </td>
+                  </tr>
+                  {% endunless %}
+                  {% endfor %}
+                </table>
+              </td>
+            </tr>
+
+            <!-- The one moment worth asking -->
+            <tr>
+              <td style="padding:30px 40px 0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#a55032; border-radius:12px;">
+                  <tr>
+                    <td style="padding:18px 22px; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.55; color:#f7f0de;">
+                      When it lands, put it on and tag
+                      <a href="https://www.instagram.com/poreldeporte/" style="color:#f7f0de; font-weight:bold;">@poreldeporte</a>.
+                      Half the reason this club exists is seeing where the crest ends up.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Help -->
+            <tr>
+              <td style="padding:30px 40px 40px 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #d8cdb2;">
+                  <tr>
+                    <td style="padding:20px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#6b665b;">
+                      If tracking has not moved in a few days, or it turns up damaged,
+                      reply to this email or write to
+                      <a href="mailto:{{ shop.email }}" style="color:#a55032;">{{ shop.email }}</a>
+                      and we will chase it with the carrier.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+          </table>
+
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+            <tr>
+              <td align="center" style="padding:24px 24px 0 24px; font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:1.7; color:#8a8577;">
+                <a href="https://poreldeporte.com" style="color:#8a8577; text-decoration:underline;">Por El Deporte</a>
+                &nbsp;&bull;&nbsp;
+                <a href="https://poreldeporte.com/collections/all-products" style="color:#8a8577; text-decoration:underline;">Shop</a>
+                &nbsp;&bull;&nbsp;
+                <a href="https://poreldeporte.com/policies" style="color:#8a8577; text-decoration:underline;">Policies</a>
+                <!-- shopify-shop-marketplace-footer -->
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
