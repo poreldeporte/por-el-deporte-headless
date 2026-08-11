@@ -1,7 +1,7 @@
 import {useLoaderData, data, type HeadersFunction} from 'react-router';
 import type {Route} from './+types/cart';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
-import {CartForm} from '@shopify/hydrogen';
+import {Analytics, CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 
 export const meta: Route.MetaFunction = () => {
@@ -109,6 +109,10 @@ export default function Cart() {
       <div className="cart__eyebrow">Por El Deporte</div>
       <h1 className="cart__title">Your Cart</h1>
       <CartMain layout="page" cart={cart} />
+      {/* The product, collection and search routes each emitted their view
+          event; the cart page did not, so the one step before checkout was the
+          only part of the funnel missing from Shopify's analytics. */}
+      <Analytics.CartView />
     </div>
   );
 }
