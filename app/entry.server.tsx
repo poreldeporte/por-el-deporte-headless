@@ -42,12 +42,27 @@ export default async function handleRequest(
       'data:',
       'https://cdn.shopify.com',
       'https://poreldeporte.com',
+      // The pixel's no-JS fallback and its tracking beacons are <img> requests.
+      'https://www.facebook.com',
     ],
     // The Morning Footy clip is served from cdn.shopify.com. Without an explicit
     // media-src the browser falls back to default-src and blocks it, which is
     // the same trap the Flapjack font fell into above — and a blocked <video>
     // fails silently, showing a poster that never plays.
     mediaSrc: ["'self'", 'https://cdn.shopify.com'],
+    // The Meta pixel loads fbevents.js from connect.facebook.net and then beacons
+    // to facebook.com/tr. Both hosts have to be named: a blocked pixel fails
+    // silently, so it would look installed and collect nothing.
+    // No 'unsafe-inline' here on purpose: that would defeat the nonce Hydrogen
+    // generates for every inline script. fbevents.js is allowed by host, and the
+    // tag we inject carries the nonce.
+    scriptSrc: ["'self'", 'https://cdn.shopify.com', 'https://connect.facebook.net'],
+    connectSrc: [
+      "'self'",
+      'https://monorail-edge.shopifysvc.com',
+      'https://connect.facebook.net',
+      'https://www.facebook.com',
+    ],
   });
 
   const body = await renderToReadableStream(

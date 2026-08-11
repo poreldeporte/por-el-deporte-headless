@@ -27,5 +27,11 @@ declare global {
      * it is meant to be visible in the markup; it grants nothing on its own.
      */
     PUBLIC_GOOGLE_SITE_VERIFICATION?: string;
+    /**
+     * Meta (Facebook) pixel id, from Events Manager > Data Sources. Numeric.
+     * Optional: with it unset the pixel never loads and nothing breaks, which
+     * is the correct state for a local clone.
+     */
+    PUBLIC_META_PIXEL_ID?: string;
   }
 }

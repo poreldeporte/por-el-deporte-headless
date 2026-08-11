@@ -20,6 +20,7 @@ import pelChrome from '~/styles/pel-chrome.css?url';
 import homeStyles from '~/styles/home.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
+import {MetaPixel} from '~/components/MetaPixel';
 import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
 
 export type RootLoader = typeof loader;
@@ -134,6 +135,9 @@ export async function loader(args: Route.LoaderArgs) {
     // claiming the property is a config change in Oxygen, not a code change —
     // and so the token isn't committed to a public repo. See docs/GOOGLE_SETUP.md.
     googleSiteVerification: env.PUBLIC_GOOGLE_SITE_VERIFICATION,
+    // Undefined until PUBLIC_META_PIXEL_ID is set, and MetaPixel renders
+    // nothing in that state rather than half-initialising.
+    metaPixelId: env.PUBLIC_META_PIXEL_ID,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,
@@ -250,6 +254,7 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
+      <MetaPixel pixelId={data.metaPixelId} />
       <PageLayout {...data}>
         <Outlet />
       </PageLayout>

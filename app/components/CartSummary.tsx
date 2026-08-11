@@ -2,6 +2,7 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useId} from 'react';
+import {trackInitiateCheckout} from '~/components/MetaPixel';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -56,7 +57,20 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       </dl>
 
       {checkoutUrl ? (
-        <a className="cart-checkout" href={checkoutUrl} target="_self">
+        <a
+          className="cart-checkout"
+          href={checkoutUrl}
+          target="_self"
+          // Fired here rather than on cart view. Opening the drawer to look at
+          // it is not beginning checkout, and counting it as such makes the
+          // funnel look far healthier than it is.
+          onClick={() =>
+            trackInitiateCheckout(
+              cart?.cost?.subtotalAmount?.amount,
+              cart?.cost?.subtotalAmount?.currencyCode,
+            )
+          }
+        >
           Checkout
         </a>
       ) : null}
