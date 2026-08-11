@@ -1,0 +1,129 @@
+{% comment %}
+  Por El Deporte — Customer account activation.
+
+  WHERE THIS GOES
+  Shopify admin > Settings > Notifications > Customer notifications >
+  Customer account activation > Edit code. Replace the whole body.
+  "Revert to default" restores Shopify's version.
+
+  SUBJECT LINE:
+      Activate your Por El Deporte account
+
+  DELIBERATELY SHORT
+  Every other template in this folder is long because it carries an order. This
+  one carries a single link, and the reader wants to press it and get on with
+  their day. Padding it with club copy would lower the thing it exists to do.
+  One screen, one button, no scrolling on a phone.
+
+  VARIABLES
+    {{ customer.account_activation_url }}   the activation link. Nothing else
+                                            in this email matters.
+    {{ custom_message }}                    optional note typed in the admin,
+                                            which REPLACES the body copy in the
+                                            stock template. Same here.
+    {{ shop.email }}
+
+  No returns or refunds copy. All sales are final.
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Activate your account</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#efe7d3;">
+
+    <div style="display:none; font-size:1px; color:#efe7d3; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      One link and your account is live.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#efe7d3;">
+      <tr>
+        <td align="center" style="padding:28px 12px 40px 12px;">
+
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#f7f0de; border:2px solid #171717; border-radius:18px; overflow:hidden;">
+
+            <!-- Crest -->
+            <tr>
+              <td align="center" bgcolor="#171717" style="background-color:#171717; padding:26px 24px;">
+                <img src="https://poreldeporte.com/icon-192.png" width="60" height="60" alt="{{ shop.name }}"
+                     style="display:block; border:0; width:60px; height:60px; border-radius:14px;" />
+              </td>
+            </tr>
+
+            <!-- Headline + body -->
+            <tr>
+              <td style="padding:40px 40px 0 40px;">
+                <p style="margin:0 0 14px 0; font-family:Helvetica,Arial,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#a55032;">
+                  Est. 2014 Key Biscayne
+                </p>
+                <h1 style="margin:0; font-family:Helvetica,Arial,sans-serif; font-size:36px; line-height:1.05; font-weight:bold; letter-spacing:-0.5px; text-transform:uppercase; color:#171717;">
+                  One click<br />and you are in
+                </h1>
+                {% if custom_message != blank %}
+                <p style="margin:18px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#4a463d;">
+                  {{ custom_message }}
+                </p>
+                {% else %}
+                <p style="margin:18px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#4a463d;">
+                  Activate your account and your orders, addresses and order
+                  history live in one place. Checkout gets quicker every time
+                  after that.
+                </p>
+                {% endif %}
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td style="padding:28px 40px 0 40px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" bgcolor="#171717" style="background-color:#171717; border-radius:999px;">
+                      <a href="{{ customer.account_activation_url }}"
+                         style="display:inline-block; padding:19px 50px; font-family:Helvetica,Arial,sans-serif; font-size:14px; font-weight:bold; letter-spacing:1.6px; text-transform:uppercase; color:#f7f0de; text-decoration:none; border-radius:999px;">
+                        Activate my account
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Help -->
+            <tr>
+              <td style="padding:32px 40px 40px 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #d8cdb2;">
+                  <tr>
+                    <td style="padding:20px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#6b665b;">
+                      Did not ask for this? Ignore it and nothing happens. Any
+                      questions, reply here or write to
+                      <a href="mailto:{{ shop.email }}" style="color:#a55032;">{{ shop.email }}</a>.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+          </table>
+
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+            <tr>
+              <td align="center" style="padding:24px 24px 0 24px; font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:1.7; color:#8a8577;">
+                <a href="https://poreldeporte.com" style="color:#8a8577; text-decoration:underline;">Por El Deporte</a>
+                &nbsp;&bull;&nbsp;
+                <a href="https://poreldeporte.com/collections/all-products" style="color:#8a8577; text-decoration:underline;">Shop</a>
+                &nbsp;&bull;&nbsp;
+                <a href="https://poreldeporte.com/policies" style="color:#8a8577; text-decoration:underline;">Policies</a>
+                <!-- shopify-shop-marketplace-footer -->
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
