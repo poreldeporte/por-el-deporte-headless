@@ -69,7 +69,7 @@ Attribution: 7-day click, 1-day view.
 
 ## The carousel
 
-Seven cards: four tees, the cap, two totes. Picked on two years of sales
+Nine cards: six tees, the cap, two totes. Picked on two years of sales
 rather than on how they look in the grid, with one deliberate exception noted
 below.
 
@@ -86,6 +86,8 @@ they are the cheapest way in, not because they are expected to carry the ad.
 | 5 | Por El Deporte Cap | $35 | $306, 12 orders | `/products/por-el-deporte-cap` |
 | 6 | DRV PNK Tote | $35 | $45, 5 orders | `/products/the-tote` |
 | 7 | El Clásico Tote | $35 | $35, 2 orders | `/products/el-clasico-tote` |
+| 8 | The Futbol Club Tee | $45 | $376, 16 orders | `/products/key-biscayne-shield-tee` |
+| 9 | Marado Tee | $40 | new, no sales yet | `/products/marado-tee` |
 
 Three things worth knowing about this list.
 
@@ -96,8 +98,11 @@ a place, but it is the only card here running on conviction rather than
 receipts. Watch it specifically: if it takes clicks and does not convert while
 cards 1 and 2 do, that is the store telling you something useful for free.
 
-**Marado Tee stays out.** Also new, also unsold, and one unproven card in a
-carousel is a test while two is a guess.
+**Marado Tee is card 9**, added at Franco's request. Also new and unsold, so
+the carousel now carries two unproven cards. That is a deliberate choice rather
+than an oversight: with "show best performing cards first" on, Meta demotes
+whichever of them fails to earn attention, so the cost of being wrong is
+smaller than it would be in a fixed running order.
 
 **Totes are the weakest category in the store**, $80 and seven orders across
 two years combined. They are in because a $35 entry point is worth having in
@@ -115,6 +120,8 @@ https://poreldeporte.com/products/futbol-mate-asado-tee?utm_source=facebook&utm_
 https://poreldeporte.com/products/por-el-deporte-cap?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=cap
 https://poreldeporte.com/products/the-tote?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=drv_pnk_tote
 https://poreldeporte.com/products/el-clasico-tote?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=el_clasico_tote
+https://poreldeporte.com/products/key-biscayne-shield-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=futbol_club_tee
+https://poreldeporte.com/products/marado-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=marado_tee
 ```
 
 Turn on **"Automatically show the best performing cards first"**. The order
@@ -127,7 +134,7 @@ Built and ready to upload, in `docs/ads/carousel/`, numbered in card order:
 ```
 1-golf-club-tee.jpg    2-el-clasico-tee.jpg   3-members-tee.jpg
 4-mate-asado-tee.jpg   5-ped-cap.jpg          6-drv-pnk-tote.jpg
-7-el-clasico-tote.jpg
+7-el-clasico-tote.jpg  8-futbol-club-tee.jpg  9-marado-tee.jpg
 ```
 
 1080x1080 JPEG, which is what Meta wants for a 1:1 carousel. `contact-sheet.png`
@@ -171,6 +178,8 @@ to fit without truncation.
 | 5 | Shade for the sideline | PED Cap, $35 |
 | 6 | Holds a full kit | DRV PNK Tote, $35 |
 | 7 | Market run and match day | El Clásico Tote, $35 |
+| 8 | The club on your chest | Futbol Club Tee, $45 |
+| 9 | Built to outlast the season | Marado Tee, $40 |
 
 Call to action: **Shop now** on every card.
 
