@@ -63,6 +63,15 @@ export default async function handleRequest(
       'https://connect.facebook.net',
       'https://www.facebook.com',
     ],
+    // fbevents.js does not always beacon with an image. Once an event carries
+    // enough payload — a product view with ids, value, currency and the
+    // microdata it scrapes — it switches to an iframe transport instead. With
+    // no frame-src that falls through to default-src, which does not list
+    // facebook.com, so the frame is blocked and the event is lost.
+    //
+    // This is why the bug looked so strange: the homepage's tiny PageView went
+    // out fine as an image while every product page silently sent nothing.
+    frameSrc: ["'self'", 'https://www.facebook.com'],
   });
 
   const body = await renderToReadableStream(

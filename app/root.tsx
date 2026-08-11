@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
 import {
   Outlet,
@@ -57,6 +58,9 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
  * It's a temporary fix until the issue is resolved.
  * https://github.com/remix-run/remix/issues/9242
  */
+const GOOGLE_FONTS_HREF =
+  'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Montserrat:wght@500;600;700;800&display=swap';
+
 export function links() {
   return [
     {
@@ -84,14 +88,19 @@ export function links() {
       crossOrigin: 'anonymous',
     },
     // Google Fonts is a render-blocking stylesheet on a third-party origin.
-    // Loading it as `print` and flipping to `all` on load keeps it off the
-    // critical path; the <noscript> covers scripting being off. Both families
-    // already declare display=swap, so text is never invisible while it loads.
+    // Loading it as `print` keeps it off the critical path; Layout flips it to
+    // `all` once mounted, and the <noscript> there covers scripting being off.
+    // Both families declare display=swap, so text is never invisible.
+    //
+    // The flip lives in an effect rather than an onLoad attribute here. React
+    // requires event handlers to be functions, and links() entries are
+    // serialised to HTML, so the `onLoad: "this.media='all'"` string this used
+    // to carry was dropped from the SSR output and then threw invariant 231 on
+    // hydration — which downgraded every page to a full client-side re-render.
     {
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Montserrat:wght@500;600;700;800&display=swap',
+      href: GOOGLE_FONTS_HREF,
       media: 'print',
-      onLoad: "this.media='all'",
     },
     // Icons are real files in public/ (served from the storefront origin), not
     // bundled assets, so /favicon.ico resolves for the crawlers and older
@@ -203,6 +212,18 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  // Promote the deferred Google Fonts stylesheet from `print` to `all`. It is
+  // fetched off the critical path (see links()) and only needs to start
+  // applying once we are on the client.
+  useEffect(() => {
+    document
+      .querySelectorAll<HTMLLinkElement>('link[media="print"][rel="stylesheet"]')
+      .forEach((link) => {
+        if (link.href.startsWith('https://fonts.googleapis.com/')) {
+          link.media = 'all';
+        }
+      });
+  }, []);
   // Read from root loader data rather than a meta() export: in React Router v7
   // the deepest matched route's meta() replaces its parents', so a root-level
   // meta tag would vanish on every page that defines its own. Optional-chained
@@ -231,6 +252,9 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={pelCart}></link>
         <Meta />
         <Links />
+        <noscript>
+          <link rel="stylesheet" href={GOOGLE_FONTS_HREF} />
+        </noscript>
       </head>
       <body>
         {children}
