@@ -46,26 +46,47 @@ That switch restarts learning, so make it once, deliberately, not weekly.
 
 ## Structure
 
-One campaign, objective **Sales**, two ad sets. Same creative in both so the
-comparison is clean.
+**Launched 2026-08-11** in ad account `326489121715713`, which is where the
+pixel and the payment method already lived. The PED business portfolio account
+(`994031924373521`) had neither, so it was abandoned mid-setup.
 
-| | Ad set A: the club | Ad set B: Miami |
-|---|---|---|
-| Who | Instagram and Facebook followers, plus anyone who engaged in 365 days | Miami-Dade and Key Biscayne, 18 to 45 |
-| Interests | none, the audience is the targeting | Soccer, Liga MLS, Inter Miami CF, Premier League, LaLiga |
-| Size | small, will run at low volume | broad enough to spend |
-| Why | they already know you, cheapest conversions available | where the club is real and people can recognise it |
+One campaign, objective **Sales**, **one** ad set. The original plan split
+$20/day across two ad sets (followers vs Miami); that was dropped because
+splitting a budget this size starves both below the volume Meta needs to leave
+the learning phase.
 
-Budget: start at **$20/day**, $8 to A and $12 to B. A will exhaust its audience
-quickly, that is expected and fine. Run 7 days before judging anything. Do not
-touch it mid-flight, every edit restarts learning.
+| | Ad set: `Miami + club` |
+|---|---|
+| Conversion location | Website |
+| Performance goal | Maximize number of conversions |
+| Conversion event | **Add to Cart** |
+| Daily budget | **$25** |
+| Locations (hard control) | Miami-Dade County + Key Biscayne |
+| Minimum age | 18 |
+| Audience | Advantage+ on, suggestions layered on top |
+| Placements | Advantage+ |
 
-Placements: Advantage+ placements on. Manually restricting placements on a
-budget this size starves delivery.
+Audience fell from 262 million (United States) to roughly 5 million once the
+location control was set. That single field is what makes $25/day viable.
 
-Attribution: 7-day click, 1-day view.
+**Settings that had to be turned off**, each of which quietly undoes part of
+the creative:
 
----
+- **Multi-advertiser ads** — lets Meta resize and crop the cards
+- **Profile end card** — appends a card sending people to the Facebook profile
+  instead of a product page
+- **Dynamic description** — rewrites the card descriptions
+- **Single media / Collection** display options — collapses nine products into
+  one image and destroys the per-card read
+- **URL parameters** field — Meta appends it to every card on top of the UTMs
+  already in each link, so every click would report `utm_content=main`
+
+A "won't deliver to Messenger Stories" warning is expected and safe to ignore.
+Carousel is not supported there; that one placement is skipped.
+
+Copy was finalised in Ads Manager rather than from this doc. Two things were
+cut during that pass and should stay cut: anything about what a purchase funds,
+and anything about the club being free to join. Neither is the story.
 
 ## The carousel
 
@@ -138,7 +159,7 @@ Built and ready to upload, in `docs/ads/carousel/`, numbered in card order:
 ```
 
 1080x1080 JPEG, which is what Meta wants for a 1:1 carousel. `contact-sheet.png`
-in the same folder shows all seven together.
+in the same folder shows all nine together.
 
 The product shots ship as transparent PNGs, so they need a background baked in
 rather than a crop. It is **brand orange `#A55032`**, and that was tested rather
