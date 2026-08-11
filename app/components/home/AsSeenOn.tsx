@@ -54,8 +54,7 @@ export function AsSeenOn() {
             Nico Cantor presented Morning Footy in our kit and explained what
             Por El Deporte means: for the sport. Franco and Marco Viola started
             it for the love of the game, and it became a brotherhood. Play hard,
-            shake hands after, look after the people around you. Nobody has ever
-            paid to belong.
+            shake hands after, look after the people around you.
           </p>
         </div>
 
