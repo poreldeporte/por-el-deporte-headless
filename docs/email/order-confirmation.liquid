@@ -1,0 +1,388 @@
+{% comment %}
+  Por El Deporte — Order confirmation.
+
+  WHERE THIS GOES
+  Shopify admin > Settings > Notifications > Customer notifications >
+  Order confirmation > Edit code. Replace the whole body.
+  "Revert to default" in that editor restores Shopify's version.
+
+  SUBJECT LINE:
+      Order {{ order_name }} is in
+
+  WHAT THIS EMAIL IS FOR
+  Not selling. The sale already happened. Its job is to reassure and to set the
+  expectation that stops the "where is my order" email four days from now: this
+  gear is printed and embroidered to order, so there is a making step before
+  anything ships. Saying that here is worth more than any design flourish.
+
+  VARIABLES TAKEN FROM THE STOCK TEMPLATE, NOT GUESSED
+    {{ order_name }} {{ order_status_url }} {{ customer.first_name }}
+    subtotal_line_items, line.final_line_price, line.nested_line_child?
+    subtotal_price total_discounts shipping_price tax_price total_price
+    total_duties requires_shipping shipping_address billing_address
+    shipping_methods / shipping_method  transactions  shop.email
+    has_pending_payment buyer_action_required payment_charged_on_fulfillment
+    consolidated_estimated_delivery_time delivery_instructions
+
+  DELIBERATELY DROPPED from Shopify's version: B2B payment terms, cash
+  rounding, WeChat/Alipay currency notes, split-cart delivery agreements,
+  bundles and nested line items, pickup and local delivery. This store has one
+  location, ships everything, and sells no bundles. Carrying that machinery
+  would mean 1,500 lines nobody can read for behaviour that cannot occur.
+
+  KEPT ON PURPOSE: the DE/DK policy PDF attachment block at the very bottom. It
+  is a legal requirement for German and Danish buyers, not decoration.
+{% endcomment %}
+
+{% comment %} Status line, mirroring the stock template's branches. {% endcomment %}
+{% capture status_line %}
+  {% if has_pending_payment %}
+    {% if buyer_action_required %}
+      You will get a confirmation from us once your payment goes through.
+    {% else %}
+      Your payment is being processed. We will email you the moment it clears.
+    {% endif %}
+  {% elsif payment_charged_on_fulfillment %}
+    We have your order. Your payment method is charged when it is ready to go out.
+  {% elsif requires_shipping %}
+    We are making it now. You will get tracking by email as soon as it ships.
+  {% else %}
+    We have your order.
+  {% endif %}
+{% endcapture %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order {{ order_name }}</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#efe7d3;">
+
+    <div style="display:none; font-size:1px; color:#efe7d3; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      {{ status_line | strip }}
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#efe7d3;">
+      <tr>
+        <td align="center" style="padding:28px 12px 40px 12px;">
+
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#f7f0de; border:2px solid #171717; border-radius:18px; overflow:hidden;">
+
+            <!-- Crest + order number -->
+            <tr>
+              <td bgcolor="#171717" style="background-color:#171717; padding:24px 30px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td width="52" valign="middle">
+                      <img src="https://poreldeporte.com/icon-192.png" width="52" height="52" alt="{{ shop.name }}"
+                           style="display:block; border:0; width:52px; height:52px; border-radius:12px;" />
+                    </td>
+                    <td align="right" valign="middle" style="font-family:Helvetica,Arial,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#c9c2ae;">
+                      Order {{ order_name }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Headline -->
+            <tr>
+              <td style="padding:40px 40px 0 40px;">
+                <h1 style="margin:0; font-family:Helvetica,Arial,sans-serif; font-size:36px; line-height:1.05; font-weight:bold; letter-spacing:-0.5px; text-transform:uppercase; color:#171717;">
+                  {% if customer.first_name %}Thanks,<br />{{ customer.first_name }}{% else %}Thanks for<br />your order{% endif %}
+                </h1>
+                <p style="margin:18px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#4a463d;">
+                  {{ status_line | strip }}
+                </p>
+                {% if delivery_instructions != blank %}
+                <p style="margin:12px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#6b665b;">
+                  <strong>Delivery notes:</strong> {{ delivery_instructions }}
+                </p>
+                {% endif %}
+                {% if consolidated_estimated_delivery_time %}
+                <p style="margin:12px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#6b665b;">
+                  Estimated delivery <strong style="color:#171717;">{{ consolidated_estimated_delivery_time }}</strong>
+                </p>
+                {% endif %}
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            {% if order_status_url %}
+            <tr>
+              <td style="padding:26px 40px 0 40px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" bgcolor="#171717" style="background-color:#171717; border-radius:999px;">
+                      <a href="{{ order_status_url }}"
+                         style="display:inline-block; padding:17px 44px; font-family:Helvetica,Arial,sans-serif; font-size:14px; font-weight:bold; letter-spacing:1.6px; text-transform:uppercase; color:#f7f0de; text-decoration:none; border-radius:999px;">
+                        Track your order
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            {% endif %}
+
+            <!-- What happens next -->
+            {% if requires_shipping and has_pending_payment != true %}
+            <tr>
+              <td style="padding:34px 40px 0 40px;">
+                <p style="margin:0 0 16px 0; font-family:Helvetica,Arial,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#a55032;">
+                  What happens next
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Helvetica,Arial,sans-serif;">
+                  <tr>
+                    <td width="30" valign="top" style="padding:0 0 14px 0; font-size:14px; font-weight:bold; color:#a55032;">1</td>
+                    <td valign="top" style="padding:0 0 14px 0; font-size:15px; line-height:1.55; color:#4a463d;">
+                      <strong style="color:#171717;">We make it.</strong> Your gear is printed and
+                      embroidered for you rather than pulled off a shelf, so give it a few days on the bench.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td width="30" valign="top" style="padding:0 0 14px 0; font-size:14px; font-weight:bold; color:#a55032;">2</td>
+                    <td valign="top" style="padding:0 0 14px 0; font-size:15px; line-height:1.55; color:#4a463d;">
+                      <strong style="color:#171717;">We ship it.</strong> Tracking lands in your
+                      inbox the moment it leaves. U.S. shipping is free, always.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td width="30" valign="top" style="font-size:14px; font-weight:bold; color:#a55032;">3</td>
+                    <td valign="top" style="font-size:15px; line-height:1.55; color:#4a463d;">
+                      <strong style="color:#171717;">You wear it.</strong> Thirty days to change
+                      your mind if the fit is not right.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            {% endif %}
+
+            <!-- Items -->
+            <tr>
+              <td style="padding:34px 40px 0 40px;">
+                <p style="margin:0 0 18px 0; font-family:Helvetica,Arial,sans-serif; font-size:12px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#6b665b;">
+                  Your order
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  {% for line in subtotal_line_items %}
+                  {% unless line.nested_line_child? %}
+                  <tr>
+                    <td width="84" valign="top" style="padding:0 16px 18px 0;">
+                      {% if line.image %}
+                        <img src="{{ line | img_url: 'medium' }}" width="84" alt=""
+                             style="display:block; border:0; width:84px; height:auto; background-color:#e6dcc4; border-radius:10px;" />
+                      {% else %}
+                        <div style="width:84px; height:84px; background-color:#e6dcc4; border-radius:10px;">&nbsp;</div>
+                      {% endif %}
+                    </td>
+                    <td valign="top" style="padding:0 0 18px 0; font-family:Helvetica,Arial,sans-serif;">
+                      <p style="margin:0 0 5px 0; font-size:15px; font-weight:bold; line-height:1.25; color:#171717; text-transform:uppercase; letter-spacing:0.3px;">
+                        {% if line.presentment_title %}{{ line.presentment_title }}
+                        {%- elsif line.title %}{{ line.title }}
+                        {%- else %}{{ line.product.title }}{% endif %}
+                      </p>
+                      {% if line.variant.title != 'Default Title' %}
+                      <p style="margin:0 0 4px 0; font-size:14px; line-height:1.4; color:#6b665b;">{{ line.variant.title }}</p>
+                      {% endif %}
+                      <p style="margin:0; font-size:14px; line-height:1.4; color:#6b665b;">Qty {{ line.quantity }}</p>
+                      {% if line.refunded_quantity > 0 %}
+                      <p style="margin:4px 0 0 0; font-size:13px; color:#a55032;">Refunded</p>
+                      {% endif %}
+                    </td>
+                    <td valign="top" align="right" style="padding:0 0 18px 0; font-family:Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; color:#171717; white-space:nowrap;">
+                      {% if line.original_line_price != line.final_line_price %}
+                        <span style="display:block; font-weight:normal; font-size:13px; color:#8a8577; text-decoration:line-through;">{{ line.original_line_price | money }}</span>
+                      {% endif %}
+                      {% if line.final_line_price > 0 %}{{ line.final_line_price | money }}{% else %}Free{% endif %}
+                    </td>
+                  </tr>
+                  {% endunless %}
+                  {% endfor %}
+                </table>
+              </td>
+            </tr>
+
+            <!-- Totals -->
+            <tr>
+              <td style="padding:6px 40px 0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #d8cdb2; font-family:Helvetica,Arial,sans-serif;">
+                  <tr>
+                    <td style="padding:18px 0 6px 0; font-size:14px; color:#6b665b;">Subtotal</td>
+                    <td align="right" style="padding:18px 0 6px 0; font-size:14px; color:#171717;">{{ subtotal_price | money }}</td>
+                  </tr>
+                  {% if total_discounts > 0 %}
+                  <tr>
+                    <td style="padding:0 0 6px 0; font-size:14px; color:#a55032;">Discounts</td>
+                    <td align="right" style="padding:0 0 6px 0; font-size:14px; color:#a55032;">&minus;{{ total_discounts | money }}</td>
+                  </tr>
+                  {% endif %}
+                  {% if requires_shipping %}
+                  <tr>
+                    <td style="padding:0 0 6px 0; font-size:14px; color:#6b665b;">Shipping</td>
+                    <td align="right" style="padding:0 0 6px 0; font-size:14px; color:#171717;">
+                      {% if shipping_price > 0 %}{{ shipping_price | money }}{% else %}Free{% endif %}
+                    </td>
+                  </tr>
+                  {% endif %}
+                  {% if total_duties %}
+                  <tr>
+                    <td style="padding:0 0 6px 0; font-size:14px; color:#6b665b;">Duties</td>
+                    <td align="right" style="padding:0 0 6px 0; font-size:14px; color:#171717;">{{ total_duties | money }}</td>
+                  </tr>
+                  {% endif %}
+                  <tr>
+                    <td style="padding:0 0 14px 0; font-size:14px; color:#6b665b;">Taxes</td>
+                    <td align="right" style="padding:0 0 14px 0; font-size:14px; color:#171717;">{{ tax_price | money }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:14px 0 0 0; border-top:1px solid #d8cdb2; font-size:13px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#6b665b;">Total</td>
+                    <td align="right" style="padding:14px 0 0 0; border-top:1px solid #d8cdb2; font-size:22px; font-weight:bold; color:#171717;">{{ total_price | money_with_currency }}</td>
+                  </tr>
+                  {% if total_discounts > 0 %}
+                  <tr>
+                    <td></td>
+                    <td align="right" style="padding:6px 0 0 0; font-size:13px; color:#a55032;">You saved {{ total_discounts | money }}</td>
+                  </tr>
+                  {% endif %}
+                </table>
+              </td>
+            </tr>
+
+            <!-- Community band -->
+            <tr>
+              <td style="padding:28px 40px 0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#a55032; border-radius:12px;">
+                  <tr>
+                    <td style="padding:18px 22px; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.55; color:#f7f0de;">
+                      This one pays for pitch time, balls and the next match. The
+                      games have always been free to turn up to, and buying this
+                      is what keeps it that way. Thank you.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Addresses + payment -->
+            <tr>
+              <td style="padding:32px 40px 0 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #d8cdb2; font-family:Helvetica,Arial,sans-serif;">
+                  <tr>
+                    {% if requires_shipping and shipping_address %}
+                    <td width="50%" valign="top" style="padding:20px 12px 0 0; font-size:14px; line-height:1.55; color:#4a463d;">
+                      <p style="margin:0 0 8px 0; font-size:12px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#6b665b;">Shipping to</p>
+                      {{ shipping_address | format_address }}
+                    </td>
+                    {% endif %}
+                    {% if billing_address %}
+                    <td width="50%" valign="top" style="padding:20px 0 0 12px; font-size:14px; line-height:1.55; color:#4a463d;">
+                      <p style="margin:0 0 8px 0; font-size:12px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#6b665b;">Billing</p>
+                      {{ billing_address | format_address }}
+                    </td>
+                    {% endif %}
+                  </tr>
+                  <tr>
+                    {% if requires_shipping and shipping_methods.size > 0 %}
+                    <td width="50%" valign="top" style="padding:20px 12px 0 0; font-size:14px; line-height:1.55; color:#4a463d;">
+                      <p style="margin:0 0 8px 0; font-size:12px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#6b665b;">Shipping method</p>
+                      {%- assign unique_shipping_titles = shipping_methods | map: 'title' | uniq -%}
+                      {%- for shipping_title in unique_shipping_titles -%}
+                        {{ shipping_title }}{% unless forloop.last %}<br />{% endunless %}
+                      {%- endfor -%}
+                    </td>
+                    {% elsif requires_shipping and shipping_method %}
+                    <td width="50%" valign="top" style="padding:20px 12px 0 0; font-size:14px; line-height:1.55; color:#4a463d;">
+                      <p style="margin:0 0 8px 0; font-size:12px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#6b665b;">Shipping method</p>
+                      {{ shipping_method.title }}
+                    </td>
+                    {% endif %}
+                    {% comment %}
+                      Built with a capture, the way the stock template does it, so the
+                      heading is printed once rather than once per transaction. An order
+                      paid with a gift card plus a card has two, and the naive version
+                      renders "Payment" twice.
+                    {% endcomment %}
+                    {% capture payment_lines %}
+                      {% for transaction in transactions %}
+                        {% if transaction.status == "success" or transaction.status == "pending" %}
+                          {% if transaction.kind == "capture" or transaction.kind == "sale" %}
+                            {% if transaction.payment_details.type == "card" %}
+                              {{ transaction.payment_details.credit_card_company }} ending {{ transaction.payment_details.credit_card_last_four_digits }}<br />
+                            {% elsif transaction.payment_details.gift_card_last_four_digits %}
+                              Gift card ending {{ transaction.payment_details.gift_card_last_four_digits }}<br />
+                            {% elsif transaction.payment_details.local_payment? %}
+                              {{ transaction.payment_details.payment_method_display_name }}<br />
+                            {% elsif transaction.gateway_display_name %}
+                              {{ transaction.gateway_display_name }}<br />
+                            {% endif %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    {% endcapture %}
+                    {% comment %} Filters are not allowed inside an if, so strip first. {% endcomment %}
+                    {% assign payment_lines_stripped = payment_lines | strip %}
+                    <td width="50%" valign="top" style="padding:20px 0 0 12px; font-size:14px; line-height:1.55; color:#4a463d;">
+                      {% if payment_lines_stripped != "" %}
+                        <p style="margin:0 0 8px 0; font-size:12px; font-weight:bold; letter-spacing:1.5px; text-transform:uppercase; color:#6b665b;">Payment</p>
+                        {{ payment_lines }}
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Help -->
+            <tr>
+              <td style="padding:30px 40px 40px 40px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #d8cdb2;">
+                  <tr>
+                    <td style="padding:20px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:14px; line-height:1.6; color:#6b665b;">
+                      Wrong size, wrong address, changed your mind? Reply to this
+                      email or write to
+                      <a href="mailto:{{ shop.email }}" style="color:#a55032;">{{ shop.email }}</a>.
+                      We can usually still change things before it goes into production.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+          </table>
+
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+            <tr>
+              <td align="center" style="padding:24px 24px 0 24px; font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:1.7; color:#8a8577;">
+                <a href="https://poreldeporte.com" style="color:#8a8577; text-decoration:underline;">Por El Deporte</a>
+                &nbsp;&bull;&nbsp;
+                <a href="https://poreldeporte.com/collections/all-products" style="color:#8a8577; text-decoration:underline;">Shop</a>
+                &nbsp;&bull;&nbsp;
+                <a href="https://poreldeporte.com/policies/refund-policy" style="color:#8a8577; text-decoration:underline;">Returns</a>
+                <!-- shopify-shop-marketplace-footer -->
+              </td>
+            </tr>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+
+{%- comment -%}
+  Legally required for German and Danish buyers: the policies travel with the
+  confirmation as PDFs. Carried over from the stock template unchanged.
+{%- endcomment -%}
+{%- if billing_address.country_code == 'DE' or billing_address.country_code == 'DK' -%}
+  {%- if shop.terms_of_service.body != blank -%}
+    {{ shop.terms_of_service | attach_as_pdf: "Terms of service" }}
+  {%- endif -%}
+
+  {%- if shop.refund_policy.body != blank -%}
+    {{ shop.refund_policy | attach_as_pdf: "Refund policy" }}
+  {%- endif -%}
+{%- endif -%}
