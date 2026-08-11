@@ -11,11 +11,16 @@ Search. Purchase already came from the Shopify checkout before that.
 
 ## Fix before spending
 
-**"Palmas" Jersey is overselling.** Every size is negative (M −6, L −16,
-XL −21, 2XL −3) and inventory policy is CONTINUE, so it still shows as
-available and will keep taking orders. It is the $78 item, the most expensive
-thing in the store. Either reconcile the count or set the policy to DENY.
-Do not put paid traffic on it until that is settled.
+**"Palmas" Jersey stays out of the ads.** Franco's call, and the inventory
+agrees: every size is negative (M −6, L −16, XL −21, 2XL −3) with inventory
+policy CONTINUE, so it still reads as available and keeps taking orders.
+
+Worth knowing what it is, though. At $2,745 across 34 orders it is the single
+best selling product the store has ever had, roughly five times the best tee.
+It is not being kept out because it fails, it is being kept out because it
+oversold and nobody wants to sell 47 of something that is not there. Reconcile
+the count or set the policy to DENY, then decide separately whether it comes
+back as a restock announcement. That is an email to the list, not an ad.
 
 **PED Shorts has 5 units left**, across three sizes. Medium and X-Large black
 are already sold out. Leave it out of the carousel. A card that leads to a
@@ -64,30 +69,56 @@ Attribution: 7-day click, 1-day view.
 
 ## The carousel
 
-Six cards, ordered deliberately. Card 1 is the hook, card 2 is the highest
-value item while attention is still there, and the cap closes on the cheapest
-entry point.
+Seven cards: four tees, the cap, two totes. Picked on two years of sales
+rather than on how they look in the grid, with one deliberate exception noted
+below.
 
-| # | Product | Price | Link |
-|---|---|---|---|
-| 1 | Members Tee | $45 | `/products/members-tee` |
-| 2 | Artisan PED Hoodie | $75 | `/products/artisan-ped-hoodie` |
-| 3 | Marado Tee | $40 | `/products/marado-tee` |
-| 4 | La Isla Hooded Long Sleeve | $65 | `/products/la-isla-hooded-long-sleeve` |
-| 5 | The Futbol Club Tee | $45 | `/products/key-biscayne-shield-tee` |
-| 6 | Por El Deporte Cap | $35 | `/products/por-el-deporte-cap` |
+Order matters. Meta shows cards left to right and the first two take most of
+the attention, so the two highest earning tees lead. The totes close because
+they are the cheapest way in, not because they are expected to carry the ad.
+
+| # | Product | Price | Lifetime | Link |
+|---|---|---|---|---|
+| 1 | The Golf Club Pocket Tee | $45 | $582, 15 orders | `/products/the-golf-club-pocket-tee` |
+| 2 | El Clásico Tee | $45 | $578, 13 orders | `/products/el-clasico-tee` |
+| 3 | Members Tee | $45 | new, no sales yet | `/products/members-tee` |
+| 4 | Futbol, Mate, Asado Tee | $40 | $386, 15 orders | `/products/futbol-mate-asado-tee` |
+| 5 | Por El Deporte Cap | $35 | $306, 12 orders | `/products/por-el-deporte-cap` |
+| 6 | DRV PNK Tote | $35 | $45, 5 orders | `/products/the-tote` |
+| 7 | El Clásico Tote | $35 | $35, 2 orders | `/products/el-clasico-tote` |
+
+Three things worth knowing about this list.
+
+**Members Tee is the one card with no track record.** It went in at Franco's
+call, replacing The Futbol Club Tee ($376, the lowest earner of the four tees
+that made the cut). It is the piece the homepage is built around, so it earns
+a place, but it is the only card here running on conviction rather than
+receipts. Watch it specifically: if it takes clicks and does not convert while
+cards 1 and 2 do, that is the store telling you something useful for free.
+
+**Marado Tee stays out.** Also new, also unsold, and one unproven card in a
+carousel is a test while two is a guess.
+
+**Totes are the weakest category in the store**, $80 and seven orders across
+two years combined. They are in because a $35 entry point is worth having in
+the carousel and because they cost nothing to include. If cards 6 and 7 take
+clicks without converting after a week, cut them and go to five cards.
 
 Full URLs with tracking, so Shopify analytics can separate paid from organic.
 Paste these as the card destinations exactly:
 
 ```
+https://poreldeporte.com/products/the-golf-club-pocket-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=golf_club_tee
+https://poreldeporte.com/products/el-clasico-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=el_clasico_tee
 https://poreldeporte.com/products/members-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=members_tee
-https://poreldeporte.com/products/artisan-ped-hoodie?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=hoodie
-https://poreldeporte.com/products/marado-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=marado_tee
-https://poreldeporte.com/products/la-isla-hooded-long-sleeve?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=hooded_ls
-https://poreldeporte.com/products/key-biscayne-shield-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=futbol_club_tee
+https://poreldeporte.com/products/futbol-mate-asado-tee?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=mate_asado_tee
 https://poreldeporte.com/products/por-el-deporte-cap?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=cap
+https://poreldeporte.com/products/the-tote?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=drv_pnk_tote
+https://poreldeporte.com/products/el-clasico-tote?utm_source=facebook&utm_medium=paid_social&utm_campaign=launch_carousel&utm_content=el_clasico_tote
 ```
+
+Turn on **"Automatically show the best performing cards first"**. The order
+above is the best guess from past sales; let Meta correct it with live data.
 
 ### Primary text
 
@@ -109,12 +140,13 @@ to fit without truncation.
 
 | # | Headline | Description |
 |---|---|---|
-| 1 | For the ones who turn up | Members Tee, $45 |
-| 2 | Heavyweight, made to order | Artisan Hoodie, $75 |
-| 3 | Worn for the love of it | Marado Tee, $40 |
-| 4 | Cover up after the match | Hooded Long Sleeve, $65 |
-| 5 | The club on your chest | Futbol Club Tee, $45 |
-| 6 | Start here | PED Cap, $35 |
+| 1 | The Golf Club, our way | Pocket Tee, $45 |
+| 2 | A classic, worn in | El Clásico Tee, $45 |
+| 3 | For the ones who turn up | Members Tee, $45 |
+| 4 | Futbol. Mate. Asado. | Heavyweight tee, $40 |
+| 5 | Shade for the sideline | PED Cap, $35 |
+| 6 | Holds a full kit | DRV PNK Tote, $35 |
+| 7 | Market run and match day | El Clásico Tote, $35 |
 
 Call to action: **Shop now** on every card.
 
