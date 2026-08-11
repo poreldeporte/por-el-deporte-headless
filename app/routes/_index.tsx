@@ -184,12 +184,17 @@ function TopMarquee() {
   // Duplicated phrase set fills the strip; the whole group is then mirrored
   // (aria-hidden) so the translateX(-50%) loop is seamless.
   const phrases = [
+    // "Building Community" and "Creating Memories" were the two most abstract
+    // lines left on the site — the same register stripped everywhere else, and
+    // missed in that sweep because they sit on their own lines here. Replaced
+    // with things the club actually does. "Beyond the Game" stays: it is the
+    // real tagline, and it also titles the About page.
     {id: 'btg-1', text: 'Beyond the Game'},
-    {id: 'bc-1', text: 'Building Community'},
-    {id: 'cm-1', text: 'Creating Memories'},
+    {id: 'bc-1', text: 'Free to Turn Up'},
+    {id: 'cm-1', text: 'Est. 2014 Key Biscayne'},
     {id: 'btg-2', text: 'Beyond the Game'},
-    {id: 'bc-2', text: 'Building Community'},
-    {id: 'cm-2', text: 'Creating Memories'},
+    {id: 'bc-2', text: 'Free to Turn Up'},
+    {id: 'cm-2', text: 'Est. 2014 Key Biscayne'},
   ];
   return <MarqueeRow items={phrases} variant="blue" sparkSize={14} />;
 }

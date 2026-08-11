@@ -92,6 +92,7 @@ function SubHero() {
           <img
             key={s.src}
             className={`pel-subhero__slide${i === active ? ' is-active' : ''}`}
+            data-bg-fixed
             src={s.src}
             // Only the first frame is described; the rest rotate decoratively.
             alt={i === 0 ? s.alt : ''}

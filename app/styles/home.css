@@ -98,9 +98,18 @@ body:has(.pel-home) {
 }
 
 /* ===== Hero ===== */
+/* One viewport exactly, matching the About banner, so the two landing screens
+   are the same shape. 89px is the chrome: the 32px announcement marquee above
+   and the 57px orange marquee below. (About's figure is 163px because it also
+   carries the sticky site header; the homepage header is fixed and parked off
+   screen until you scroll.)
+
+   Was min(92vh, 900px), which overshot the fold by 24px at 900px tall and then
+   stopped growing entirely on a larger display. */
 .pel-hero {
   position: relative;
-  min-height: min(92vh, 900px);
+  min-height: calc(100vh - 89px);
+  min-height: calc(100svh - 89px);
   background: var(--pel-black);
   overflow: hidden;
 }
@@ -231,7 +240,11 @@ body:has(.pel-home) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: min(92vh, 900px);
+  /* 153px = the 89px of chrome plus .pel-hero__'s own 32px top and bottom
+     padding. The section is border-box, so without subtracting that the content
+     box pushed it 64px past one viewport. */
+  min-height: calc(100vh - 153px);
+  min-height: calc(100svh - 153px);
   padding: 120px 48px 60px;
   text-align: center;
 }

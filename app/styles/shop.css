@@ -5,9 +5,15 @@
 }
 
 /* Banner */
+/* Deliberately shorter than the home and About banners, and deliberately
+   uncapped. A collection page has to put product above the fold, so it does not
+   get the full screen those two do — but the old min(48vh, 520px) froze at
+   520px, so on a large display it read as a stunted version of them rather than
+   a smaller one on purpose. */
 .pel-shop__banner {
   position: relative;
-  min-height: min(48vh, 520px);
+  min-height: 52vh;
+  min-height: 52svh;
   background: var(--pel-black) center / cover no-repeat;
   overflow: hidden;
   display: flex;
