@@ -43,6 +43,11 @@ export default async function handleRequest(
       'https://cdn.shopify.com',
       'https://poreldeporte.com',
     ],
+    // The Morning Footy clip is served from cdn.shopify.com. Without an explicit
+    // media-src the browser falls back to default-src and blocks it, which is
+    // the same trap the Flapjack font fell into above — and a blocked <video>
+    // fails silently, showing a poster that never plays.
+    mediaSrc: ["'self'", 'https://cdn.shopify.com'],
   });
 
   const body = await renderToReadableStream(

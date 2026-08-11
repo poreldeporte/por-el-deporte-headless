@@ -1560,3 +1560,113 @@ body:has(.overlay.expanded) .pel-fab {
     animation: none !important;
   }
 }
+
+/* ===== As seen on: Morning Footy segment =====
+   Sits between the community sections and the testimonials, because it is the
+   strongest outside proof the club has and it earns more attention there than
+   buried at the foot of the page. */
+.pel-press {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  padding: 90px 48px;
+}
+.pel-press__inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 56px;
+  align-items: center;
+}
+.pel-press__eyebrow {
+  font: 700 12px/1.5 var(--font-body);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pel-orange);
+  margin-bottom: 18px;
+}
+.pel-press__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: clamp(38px, 4.4vw, 72px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--pel-cream);
+}
+.pel-press__sub {
+  margin: 22px 0 0;
+  max-width: 42ch;
+  font: 500 15px/1.65 var(--font-body);
+  /* Cream at 82% on --pel-ink is 12.4:1 — comfortably past AA. */
+  color: rgba(247, 240, 222, 0.82);
+}
+.pel-press__frame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #000;
+  border: var(--border-width) solid var(--pel-cream);
+  aspect-ratio: 848 / 480;
+}
+.pel-press__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* The whole poster is the target, not a 60px circle in the middle of it. */
+.pel-press__play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.15),
+    rgba(10, 10, 10, 0.62)
+  );
+  color: var(--pel-cream);
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background var(--dur-fast);
+}
+.pel-press__play:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.05),
+    rgba(10, 10, 10, 0.5)
+  );
+}
+.pel-press__play svg {
+  width: 64px;
+  height: 64px;
+  padding: 16px;
+  border-radius: 50%;
+  background: var(--pel-orange);
+  color: #fff;
+}
+.pel-press__dur {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(247, 240, 222, 0.72);
+}
+
+@media (max-width: 60em) {
+  .pel-press {
+    padding: 56px 20px;
+  }
+  .pel-press__inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .pel-press__sub {
+    font-size: 14px;
+  }
+}

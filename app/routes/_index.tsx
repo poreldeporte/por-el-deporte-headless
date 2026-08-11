@@ -8,6 +8,7 @@ import {Moods} from '~/components/home/Moods';
 import {FunctionSection} from '~/components/home/FunctionSection';
 import {InstagramFeed} from '~/components/home/InstagramFeed';
 import {Testimonials} from '~/components/home/Testimonials';
+import {AsSeenOn} from '~/components/home/AsSeenOn';
 import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
@@ -123,6 +124,7 @@ export default function Homepage() {
       <About />
       <Moods />
       <FunctionSection />
+      <AsSeenOn />
       <InstagramFeed />
       <Testimonials />
     </div>
