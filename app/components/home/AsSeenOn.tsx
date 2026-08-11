@@ -53,8 +53,9 @@ export function AsSeenOn() {
           <p className="pel-press__sub" data-reveal>
             Nico Cantor presented Morning Footy in our kit and explained what
             Por El Deporte means: for the sport. Franco and Marco Viola started
-            the club to give people in Miami a game to turn up to and a group to
-            belong to, and it has been free to turn up ever since.
+            it for the love of the game, and it became a brotherhood. Play hard,
+            shake hands after, look after the people around you. Nobody has ever
+            paid to belong.
           </p>
         </div>
 
