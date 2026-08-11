@@ -120,6 +120,30 @@ https://poreldeporte.com/products/el-clasico-tote?utm_source=facebook&utm_medium
 Turn on **"Automatically show the best performing cards first"**. The order
 above is the best guess from past sales; let Meta correct it with live data.
 
+### Card images
+
+Built and ready to upload, in `docs/ads/carousel/`, numbered in card order:
+
+```
+1-golf-club-tee.jpg    2-el-clasico-tee.jpg   3-members-tee.jpg
+4-mate-asado-tee.jpg   5-ped-cap.jpg          6-drv-pnk-tote.jpg
+7-el-clasico-tote.jpg
+```
+
+1080x1080 JPEG, which is what Meta wants for a 1:1 carousel. `contact-sheet.png`
+in the same folder shows all seven together.
+
+The product shots ship as transparent PNGs, so they need a background baked in
+rather than a crop. It is **brand orange `#A55032`**, and that was tested rather
+than chosen. On cream the El Clásico Tee and the PED Cap nearly disappear, and
+those are the number two seller and the best selling accessory. On ink both
+black tees disappear. Orange is the only one of the three that holds every
+product in the carousel, and it has the side benefit of standing out in a feed
+that is mostly white product shots.
+
+No text is baked into the images. The headline and description sit underneath
+each card already, and doubling it up reads as a discount banner.
+
 ### Primary text
 
 The body above the carousel. Meta cuts it at roughly 125 characters on mobile
@@ -178,6 +202,38 @@ it on cost per landing page view and on whether the carousel's cost per Add to
 Cart drops while it runs, not on its own sales.
 
 ---
+
+## Building it in Ads Manager
+
+Everything above is paste-ready, so this is mechanical. About fifteen minutes.
+
+1. **adsmanager.facebook.com**, Create, objective **Sales**, Continue.
+2. Campaign name `PED Launch Carousel`. Leave Advantage campaign budget off,
+   the budget is being split deliberately between the two ad sets.
+3. **Ad set A**, name `Club followers`.
+   - Conversion location Website, pixel `Por El Deporte`, event **Add to Cart**
+     (not Purchase, see above).
+   - Budget $8/day.
+   - Audience: Create new, Custom audience, Instagram account, everyone who
+     engaged, 365 days. Repeat for Facebook page. Add both.
+   - Placements: Advantage+.
+4. **Ad set B**, name `Miami`. Duplicate A, then change:
+   - Budget $12/day.
+   - Remove the custom audiences.
+   - Location Miami-Dade County, plus Key Biscayne. Age 18 to 45.
+   - Detailed targeting: Soccer, Inter Miami CF, Liga MLS, Premier League,
+     LaLiga.
+5. **The ad**, in ad set A. Name `Carousel v1`.
+   - Facebook Page: Por El Deporte. Instagram account: @poreldeporte.
+   - Format **Carousel**.
+   - Primary text: paste from above.
+   - Add 7 cards. For each: upload the numbered image, paste the headline,
+     description and URL from the tables above. Keep them in order.
+   - Turn on "Automatically show the best performing cards first".
+   - Call to action **Shop now** on every card.
+6. Publish. Then **duplicate the ad into ad set B** rather than rebuilding it,
+   so the creative is byte-identical and the audience comparison is clean.
+7. Repeat for the Golazo video as a separate Traffic campaign.
 
 ## Before switching it on
 
