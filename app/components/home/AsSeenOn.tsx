@@ -38,18 +38,19 @@ export function AsSeenOn() {
             On Air
           </h2>
           <p className="pel-press__sub" data-reveal>
-            Nico Cantor presented Morning Footy in the club&rsquo;s kit and told
-            the story of how this started on Key Biscayne. Mate on the desk, as
-            it should be.
+            Nico Cantor presented Morning Footy in our kit and spent the segment
+            explaining what Por El Deporte is: for the sport. A Sunday league
+            side in Miami, founded by Franco and Marco Viola, that turned a group
+            of old high-school rivals into one team.
           </p>
         </div>
 
         <div className="pel-press__frame" data-reveal>
           {/* eslint-disable-next-line jsx-a11y/media-has-caption --
-              No caption file exists for this clip. A <track> pointing at a file
-              that is not there is worse than none: the browser advertises
-              captions in the UI and then shows nothing. Add one and the
-              attribute goes back. */}
+              Shipped without captions by decision, not oversight. A <track>
+              pointing at a file that is not there is worse than none: the
+              browser advertises captions in the player and then shows nothing.
+              If a caption file is ever added, drop this line. */}
           <video
             ref={videoRef}
             className="pel-press__video"
