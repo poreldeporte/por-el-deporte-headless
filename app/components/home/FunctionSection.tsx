@@ -90,7 +90,7 @@ export function FunctionSection() {
           the Heat
         </h2>
         <p className="pel-function__sub" data-reveal>
-          Heavy cotton that still breathes, cuts that move, and colours that
+          Heavy cotton that still breathes. Cuts that let you move. Colors that
           hold up to a Miami summer.
         </p>
         <div className="pel-function__cta" data-reveal>

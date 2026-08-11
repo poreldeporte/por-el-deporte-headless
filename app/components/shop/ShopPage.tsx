@@ -86,7 +86,7 @@ export function ShopPage({
                 favorites" above an empty shelf reads as a broken page rather
                 than one that hasn't been filled yet. */}
             {products.length
-              ? 'Every tee, hat, and tote supports our Key Biscayne community. Rep the club and grab your favorites.'
+              ? 'Every tee, hat, and tote supports our Key Biscayne community. Have a look through.'
               : "This one isn't stocked yet. Everything we do make is in the shop."}
           </p>
         </div>
@@ -153,7 +153,7 @@ export function ShopPage({
       <section className="pel-values" aria-label="Core values">
         <div className="pel-values__inner">
           <div className="pel-values__eyebrow" data-reveal>
-            Core Values of Por El Deporte
+            What Por El Deporte Is About
           </div>
           <div className="pel-values__grid">
             {VALUES.map((v) => (

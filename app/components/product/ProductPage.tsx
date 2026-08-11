@@ -60,7 +60,7 @@ function statsFor(kind: Kind): {value: string; label: string}[] {
   // "S to 2XL" → S–2XL / SIZE RANGE, "One size" → ONE / SIZE.
   const sizes = spec('Sizes') ?? spec('Size') ?? spec('Fit');
   if (sizes && / to /i.test(sizes)) {
-    fromSpecs.push({value: sizes.replace(/ to /i, '–'), label: 'Size range'});
+    fromSpecs.push({value: sizes.replace(/ to /i, '-'), label: 'Size range'});
   } else if (sizes && /^one size$/i.test(sizes)) {
     fromSpecs.push({value: 'One', label: 'Size'});
   }
@@ -529,7 +529,7 @@ export function ProductPage({
           {/* Swapped with the fabric strip, which now sits below the button. The
               line about funding the club belongs next to the decision; the
               material claims read as a footnote, not a banner over the CTA. */}
-          <p className="pel-pdp__note">Each purchase powers our Miami community.</p>
+          <p className="pel-pdp__note">Every order helps pay for the next match.</p>
 
           <div className="pel-pdp__cart">
             <div className="pel-pdp__qty">

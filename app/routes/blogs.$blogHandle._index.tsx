@@ -16,7 +16,7 @@ export const meta: Route.MetaFunction = ({data, location, matches}) => {
       title: `Por El Deporte | ${title}`,
       description:
         data?.blog.seo?.description ??
-        `${title} from the Por El Deporte community — match reports, tournaments, and days on the island.`,
+        `${title} from the Por El Deporte community. Match reports, tournaments, and days on the island.`,
       url: `${origin}${location.pathname}`,
     }),
     breadcrumbLd(origin, [

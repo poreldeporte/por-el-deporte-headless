@@ -199,7 +199,7 @@ function OrangeMarquee() {
     {id: 'ship', text: 'Free Shipping on U.S. Orders'},
     {id: 'est', text: 'Est. 2014 Key Biscayne'},
     {id: 'week', text: 'On Your Doorstep in 1 Week'},
-    {id: 'community', text: 'Powered by Community'},
+    {id: 'community', text: 'Every Order Funds Our Games'},
   ];
   return <MarqueeRow items={phrases} variant="orange" sparkSize={16} />;
 }

@@ -192,9 +192,8 @@ export function PelFooter() {
               abstractions and a phrase no one has ever said aloud. What the
               money actually does is concrete, so it says that instead. */}
           Founded in 2014 in Key Biscayne, FL. Free shipping on U.S. orders. What
-          you buy pays for pitch time, balls and the next match &mdash; the games
-          have always been free to turn up to, and we would like to keep it that
-          way.
+          you buy pays for pitch time, balls and the next match. The games have
+          always been free to turn up to and we would like to keep it that way.
         </p>
         <p className="pel-footer__credit">
           Design by{' '}

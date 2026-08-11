@@ -73,7 +73,7 @@ export function Testimonials() {
         Says
       </h2>
       <p className="pel-testi__sub" data-reveal>
-        Hover to pause · Voices from the PED community
+        From people who play with us. Hover to pause.
       </p>
       <div className="pel-testi__wrap">
         <div className="pel-testi__track">

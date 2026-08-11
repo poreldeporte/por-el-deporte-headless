@@ -5,8 +5,8 @@ import {useAboutScene} from './useAboutScene';
 const ORANGE_ITEMS = [
   'Beyond the Game',
   'Est. 2014 Key Biscayne',
-  'Powered by Community',
-  'Creating Memories',
+  'Built by the Community',
+  'Free to Turn Up',
 ];
 
 const CDN = 'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/';

@@ -53,13 +53,12 @@ export function Moods() {
 
       <div className="pel-moods__head">
         <h2 className="pel-moods__title" data-reveal>
-          More Than Just a Team.
+          We Started as a Team.
           <br />
-          This Is a Community.
+          Now We&rsquo;re a Community.
         </h2>
         <p className="pel-moods__sub" data-reveal>
-          The values of camaraderie and mutual support have shaped everything we do
-          since 2014.
+          Same people, same pitch, since 2014. That part has not changed.
         </p>
       </div>
 

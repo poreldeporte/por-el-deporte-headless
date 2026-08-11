@@ -30,7 +30,7 @@ const ING_APP: [string, string][] = [
 ];
 const ING_CLUB: [string, string][] = [
   ['Founded in 2014', 'sparkle'],
-  ['Key Biscayne, FL Roots', 'leaf'],
+  ['From Key Biscayne, FL', 'leaf'],
   ['A Miami Football Community', 'citrus'],
   ['Featured on CBS Golazo', 'molecule'],
   ['Shared Events & Matches', 'grapes'],
@@ -58,7 +58,7 @@ export function CommunityPanel() {
   const items = isApp ? ING_APP : ING_CLUB;
   const full: [string, string] = isApp
     ? ['Sort the teams, keep the scores, see who is playing.', 'sparkle']
-    : ['More Than a Team. A Community That Looks Out for Each Other', 'sparkle'];
+    : ['Teammates Who Look Out for Each Other', 'sparkle'];
   const serving = isApp
     // Pointed people at /pages/app, a Shopify page with an empty body — it is
     // noindexed for exactly that reason. The app itself is the real destination.

@@ -306,7 +306,7 @@ export function ErrorBoundary() {
       <p className="pel-error__msg">
         {detail ??
           (is404
-            ? 'We could not find that page, but there is plenty of gear waiting for you.'
+            ? 'We could not find that page. The shop is right here.'
             : 'An unexpected error occurred. Try again in a moment, or head back home.')}
       </p>
       <div className="pel-error__cta">

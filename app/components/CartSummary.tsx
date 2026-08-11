@@ -50,7 +50,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart.cost.subtotalAmount} />
           ) : (
-            '—'
+            'Calculating'
           )}
         </dd>
       </dl>
