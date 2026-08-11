@@ -65,8 +65,14 @@ function statsFor(kind: Kind): {value: string; label: string}[] {
     fromSpecs.push({value: 'One', label: 'Size'});
   }
 
+  // Filler when a garment has fewer than two usable figures. It used to be
+  // "30 Day / Returns", which advertised a return window on the product page of
+  // gear that is printed and embroidered per order — inviting exactly the
+  // outcome the store least wants. "Made to order" is true of every item here,
+  // explains the production step, and reads as a reason to wait rather than a
+  // reason to send it back.
   const head = fromSpecs.slice(0, 2);
-  while (head.length < 2) head.push({value: '30 Day', label: 'Returns'});
+  while (head.length < 2) head.push({value: 'Made', label: 'To order'});
 
   return [
     ...head,
