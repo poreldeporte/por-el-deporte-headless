@@ -86,7 +86,7 @@ function SubHero() {
   }, []);
 
   return (
-    <section className="pel-subhero" aria-label="Our story">
+    <section className="pel-subhero pel-subhero--full" aria-label="Our story">
       <div className="pel-subhero__slides">
         {HERO_SLIDES.map((s, i) => (
           <img

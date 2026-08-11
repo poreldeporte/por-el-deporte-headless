@@ -325,6 +325,28 @@ main h1 {
    only loaded on the shop route, so About could never have reused it there.
    About additionally crossfades between several frames; a single static frame
    just renders the first slide. */
+/* The About page's banner fills the first screen exactly, so the hero and the
+   orange marquee together are one viewport and the scroll scene begins at the
+   fold.
+
+   Without this the banner was min(48vh, 520px) and the scene below it starts
+   with a 100vh sticky panel that vertically centres its heading. That panel
+   began ~627px down the page, so its centre landed 627px below the viewport
+   centre and you were looking at its empty top third. The 520px cap made it
+   worse the bigger the screen: the banner stopped growing while the empty band
+   kept going, which is why it looked fine on a laptop and broken on a monitor.
+
+   163px is the chrome above and below it (announcement bar + sticky header +
+   marquee), measured identical at 1440x900, 1440x1400 and 390x844. svh rather
+   than vh so a phone fits it with the URL bar showing.
+
+   Compound selector, not a bare `.pel-subhero--full`: it has to outrank
+   `.pel-subhero` below, which sets its own min-height and would otherwise win
+   on source order at equal specificity. */
+.pel-subhero.pel-subhero--full {
+  min-height: calc(100vh - 163px);
+  min-height: calc(100svh - 163px);
+}
 .pel-subhero {
   position: relative;
   min-height: min(48vh, 520px);
