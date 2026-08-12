@@ -33,6 +33,26 @@ Customer Privacy API. Only the performance beacon was firing, which made the
 admin look alive. Now confirmed receiving `page_rendered`,
 `product_page_rendered`, `collection_page_rendered` and `product_added_to_cart`.
 
+**Checkout domain (2026-08-12)** — checkout was running on
+`por-el-deporte.myshopify.com`. Shoppers browsing poreldeporte.com were handed
+to an unfamiliar domain at the moment they reached for a card, and the funnel
+showed it: 1,597 sessions, 134 add-to-carts (a healthy 8.4%), then only **14**
+reaching checkout and 3 completing. A 90% loss at one step.
+
+Shopify runs checkout on the *Online Store's* primary domain, and the Online
+Store only had the myshopify domain because poreldeporte.com belongs to the
+Hydrogen storefront. Fixed with Shopify's documented pattern: a
+`checkout.poreldeporte.com` subdomain, targeted at Online Store and set primary.
+`PUBLIC_CHECKOUT_DOMAIN` moved with it, since the Customer Privacy API keys off
+that value and getting it wrong is what silently killed analytics before.
+
+Still open: `checkout.poreldeporte.com` serves the whole Online Store theme,
+product pages included, with self-referencing canonicals. That is a second copy
+of the catalogue competing with the real storefront. The fix is the
+[Hydrogen redirect theme](https://github.com/Shopify/hydrogen-redirect-theme),
+which adds `noindex`, canonicals pointing at the Hydrogen host, and a
+client-side redirect.
+
 **Search Console (2026-08-10)** — `sc-domain:poreldeporte.com` verified by DNS
 TXT, sitemap submitted, 0 errors. Owned by `franco.viola@live.com`.
 
