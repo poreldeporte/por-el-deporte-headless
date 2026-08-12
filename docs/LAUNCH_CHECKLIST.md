@@ -46,12 +46,27 @@ Hydrogen storefront. Fixed with Shopify's documented pattern: a
 `PUBLIC_CHECKOUT_DOMAIN` moved with it, since the Customer Privacy API keys off
 that value and getting it wrong is what silently killed analytics before.
 
-Still open: `checkout.poreldeporte.com` serves the whole Online Store theme,
-product pages included, with self-referencing canonicals. That is a second copy
-of the catalogue competing with the real storefront. The fix is the
-[Hydrogen redirect theme](https://github.com/Shopify/hydrogen-redirect-theme),
-which adds `noindex`, canonicals pointing at the Hydrogen host, and a
-client-side redirect.
+**Duplicate catalogue (2026-08-12, resolved)** — the checkout subdomain served
+the entire Online Store theme, product pages included, with self-referencing
+canonicals. A second copy of the catalogue competing with the real storefront,
+on a subdomain that looks legitimate.
+
+Fixed by publishing the
+[Hydrogen redirect theme](https://github.com/Shopify/hydrogen-redirect-theme)
+as the Online Store's main theme, with `storefront_hostname` set to
+poreldeporte.com. Every page there now returns `noindex`, canonicals pointing at
+the Hydrogen host, and a client-side redirect. Verified: a browser hitting
+`checkout.poreldeporte.com/products/el-clasico-tee` lands on the real storefront,
+checkout still renders on desktop and mobile, and the pixel reports the full
+funnel through InitiateCheckout.
+
+Rollback if ever needed is the previous main theme, **Taste**
+(`gid://shopify/OnlineStoreTheme/147522093103`).
+
+Note for anyone re-doing this: `themeCreate` rejects the GitHub archive URL with
+"Src is empty". GitHub streams archives without a `Content-Length` header, so
+Shopify's fetcher reads zero bytes. Repack with the theme files at the zip root
+and upload through `stagedUploadsCreate`, then pass that resource URL.
 
 **Search Console (2026-08-10)** — `sc-domain:poreldeporte.com` verified by DNS
 TXT, sitemap submitted, 0 errors. Owned by `franco.viola@live.com`.
