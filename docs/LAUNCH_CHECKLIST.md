@@ -1,7 +1,7 @@
 # Por El Deporte — status
 
 **poreldeporte.com is live** on the Hydrogen storefront, served by Oxygen.
-Last updated: 2026-08-10.
+Last updated: 2026-08-12.
 
 ## Commands
 
@@ -111,18 +111,28 @@ ones need checking.
       profile verified 60+ days.
 
 ### Ready when you are
-- [ ] **Hydrogen redirect theme.** `por-el-deporte.myshopify.com` is a second
-      live storefront that self-canonicalises, competing with poreldeporte.com in
-      Google. Password protection is NOT the fix — Shopify's docs are explicit
-      that it *prevents Hydrogen checkouts*. The redirect theme is. Installable
-      via `themeCreate` / `themePublish`; the current theme stays in the library
-      as a one-click revert.
-- [ ] **GA4 / Meta pixel.** Shopify analytics is session and product level only;
-      neither tells you scroll depth or on-page behaviour. Needs a measurement ID
-      and a pixel ID.
+- [ ] **GA4.** Shopify analytics is session and product level only; it does not
+      tell you scroll depth or on-page behaviour. Needs a measurement ID. The
+      Meta pixel is done (2026-08-11) and reporting the full funnel.
 - [ ] **Two empty collections** (Official Kits, 2023 PED Kits). Handled on the
       storefront — their tiles are non-clickable teasers and they are excluded
       from the sitemap — but they still exist in Shopify.
+
+### Revenue, in priority order
+- [ ] **"Palmas" Jersey is overselling.** Every size negative (M −6, L −16,
+      XL −21, 2XL −3) with inventory policy CONTINUE, so it still reads as
+      available and keeps taking orders. It is also the best selling product the
+      store has ever had: $2,745 across 34 orders, about five times the best tee.
+      Reconcile the count or set DENY, then decide whether it returns as a
+      restock announcement to the 230 existing customers. Proven demand, no
+      acquisition cost.
+- [ ] **No product reviews at all.** Costs twice over: no social proof at the
+      moment of decision, and no `aggregateRating` in the Product schema, which
+      is what puts star ratings in Google results. 230 past customers to seed
+      from.
+- [ ] **Email templates are written and unpasted.** Five branded Liquid files in
+      `docs/email/`. Note abandoned-cart recovery has almost nothing to recover
+      yet; that was a symptom of the checkout domain, not a separate problem.
 
 ## Gotchas worth remembering
 
