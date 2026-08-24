@@ -30,6 +30,8 @@ export const PAGE_CANONICAL_OVERRIDES: Readonly<Record<string, string>> = {
   'privacy-policy': '/policies/privacy-policy',
   // The club's founding story — /about is the designed surface for it.
   'our-mission': '/about',
+  // The old Shopify page is empty; the designed app landing page owns this URL.
+  app: '/app',
 };
 
 /**

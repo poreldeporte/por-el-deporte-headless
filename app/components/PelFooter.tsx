@@ -7,10 +7,6 @@ import {PelLogoMark} from '~/components/PelLogo';
  * Built to be reusable — Increment 6 lifts this into the global layout for all pages.
  */
 
-/** Same listing the community panel links to. */
-const APP_STORE_URL =
-  'https://apps.apple.com/us/app/por-el-deporte/id6756241207';
-
 type FooterLink = {t: string; to?: string; href?: string};
 const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
   {
@@ -37,7 +33,7 @@ const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
       // Replaces "Gallery", which had no gallery to point at. The journal is a
       // real page and had no entry point anywhere on the site until now.
       {t: 'Journal', to: '/blogs'},
-      {t: 'Join the Revolution', href: APP_STORE_URL},
+      {t: 'The App', to: '/app'},
     ],
   },
   {

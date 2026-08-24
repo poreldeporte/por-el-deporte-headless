@@ -1,0 +1,2023 @@
+/* Por El Deporte app landing page. Route-scoped through app.tsx links(). */
+
+.pel-app-page {
+  --pel-app-orange-text: #9f4c30;
+  overflow-x: clip;
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+}
+
+.pel-app-page *,
+.pel-app-page *::before,
+.pel-app-page *::after {
+  box-sizing: border-box;
+}
+
+.pel-app-page section {
+  padding: 0;
+}
+
+.pel-app-page a {
+  text-decoration: none;
+}
+
+.pel-app-page a:focus-visible,
+.pel-app-page button:focus-visible,
+.pel-app-page input:focus-visible,
+.pel-app-page textarea:focus-visible {
+  outline: 3px solid var(--pel-orange);
+  outline-offset: 4px;
+}
+
+.pel-app-kicker {
+  margin: 0;
+  font: 700 12px/1.4 var(--font-body);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Hero */
+.pel-app-hero {
+  position: relative;
+  min-height: calc(100vh - 108px);
+  min-height: calc(100svh - 108px);
+  overflow: hidden;
+  border-bottom: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+
+.pel-app-hero__inner {
+  position: relative;
+  z-index: 2;
+  width: min(100%, var(--container));
+  min-height: inherit;
+  margin: 0 auto;
+  padding: clamp(70px, 8vw, 124px) 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
+  align-items: center;
+  gap: clamp(46px, 7vw, 110px);
+}
+
+.pel-app-hero__copy {
+  position: relative;
+  z-index: 3;
+}
+
+.pel-app-hero .pel-app-kicker {
+  margin-bottom: 24px;
+  color: var(--pel-orange);
+}
+
+.pel-app-hero__title {
+  max-width: 850px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(58px, 7.5vw, 128px);
+  font-weight: 650;
+  line-height: 0.84;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  color: var(--pel-cream);
+}
+
+.pel-app-hero__title span {
+  color: var(--pel-orange);
+}
+
+.pel-app-hero__body {
+  max-width: 590px;
+  margin: 34px 0 0;
+  font: 600 clamp(14px, 1.25vw, 17px)/1.7 var(--font-body);
+  color: rgba(247, 240, 222, 0.8);
+}
+
+.pel-app-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 38px;
+}
+
+.pel-app-store {
+  min-height: 60px;
+  padding: 10px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background var(--dur-fast),
+    color var(--dur-fast);
+}
+
+.pel-app-store:hover {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.pel-app-store svg {
+  width: 25px;
+  height: 32px;
+  flex: none;
+  fill: currentColor;
+}
+
+.pel-app-store span {
+  display: flex;
+  flex-direction: column;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.pel-app-store small {
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pel-app-store--cream {
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+}
+
+.pel-app-store--cream:hover {
+  background: var(--pel-orange);
+  color: var(--pel-ink);
+}
+
+.pel-app-store--ink {
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+}
+
+.pel-app-store--ink:hover {
+  background: var(--pel-blue);
+  color: var(--pel-cream);
+}
+
+.pel-app-link-button {
+  min-height: 60px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: var(--border-width) solid rgba(247, 240, 222, 0.55);
+  border-radius: var(--radius-pill);
+  color: var(--pel-cream);
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition:
+    border-color var(--dur-fast),
+    background var(--dur-fast);
+}
+
+.pel-app-link-button:hover {
+  border-color: var(--pel-cream);
+  background: rgba(247, 240, 222, 0.1);
+  text-decoration: none;
+}
+
+.pel-app-hero__availability {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 700 10px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(247, 240, 222, 0.68);
+}
+
+.pel-app-hero__availability i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--pel-orange);
+}
+
+.pel-app-hero__availability a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.pel-app-hero__availability a:hover {
+  color: var(--pel-cream);
+}
+
+.pel-app-hero__visual {
+  position: relative;
+  width: min(100%, 570px);
+  aspect-ratio: 0.9;
+  justify-self: end;
+}
+
+.pel-app-field {
+  position: absolute;
+  inset: 3% 2% 3% 6%;
+  overflow: hidden;
+  border: var(--border-width) solid var(--pel-cream);
+  border-radius: 32px;
+  background: var(--pel-blue);
+  transform: rotate(4deg);
+  box-shadow: 18px 18px 0 var(--pel-orange);
+}
+
+.pel-app-field::before {
+  content: '';
+  position: absolute;
+  inset: 8%;
+  border: 2px solid rgba(247, 240, 222, 0.72);
+  border-radius: 4px;
+}
+
+.pel-app-field__line--half {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 8%;
+  right: 8%;
+  border-top: 2px solid rgba(247, 240, 222, 0.72);
+}
+
+.pel-app-field__circle {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 30%;
+  aspect-ratio: 1;
+  border: 2px solid rgba(247, 240, 222, 0.72);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pel-app-field__circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(247, 240, 222, 0.85);
+  transform: translate(-50%, -50%);
+}
+
+.pel-app-field__box {
+  position: absolute;
+  z-index: 1;
+  left: 32%;
+  width: 36%;
+  height: 18%;
+  border: 2px solid rgba(247, 240, 222, 0.72);
+}
+
+.pel-app-field__box--top {
+  top: 8%;
+  border-top: 0;
+}
+
+.pel-app-field__box--bottom {
+  bottom: 8%;
+  border-bottom: 0;
+}
+
+.pel-app-icon-card {
+  position: absolute;
+  z-index: 3;
+  top: -2%;
+  left: -4%;
+  width: 29%;
+  aspect-ratio: 1;
+  padding: 4%;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 28%;
+  background: var(--pel-cream);
+  transform: rotate(-7deg);
+  box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.3);
+}
+
+.pel-app-icon-card img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 23%;
+}
+
+.pel-app-game-card {
+  position: absolute;
+  z-index: 3;
+  right: -5%;
+  bottom: 5%;
+  width: 72%;
+  padding: clamp(18px, 3vw, 30px);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+  transform: rotate(-3deg);
+  box-shadow: 10px 12px 0 rgba(23, 23, 23, 0.22);
+}
+
+.pel-app-game-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(23, 23, 23, 0.22);
+  font: 700 9px/1 var(--font-body);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.pel-app-game-card__top span:last-child {
+  color: var(--pel-green);
+}
+
+.pel-app-game-card__main {
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.pel-app-game-card__time {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+
+.pel-app-game-card__time b {
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.pel-app-game-card__time strong {
+  margin-top: 5px;
+  color: var(--pel-orange);
+  font: 650 clamp(28px, 3.4vw, 44px)/0.9 var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+.pel-app-game-card__venue {
+  min-width: 0;
+}
+
+.pel-app-game-card__venue strong {
+  display: block;
+  font: 650 clamp(16px, 1.8vw, 23px)/1.05 var(--font-display);
+  text-transform: uppercase;
+}
+
+.pel-app-game-card__venue p {
+  margin-top: 8px;
+  font: 600 10px/1.35 var(--font-body);
+  color: var(--text-muted);
+}
+
+.pel-app-game-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(23, 23, 23, 0.22);
+  font: 700 10px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pel-app-game-card__footer b {
+  color: var(--pel-green);
+}
+
+.pel-app-game-card__action {
+  color: var(--pel-orange-text);
+}
+
+.pel-app-game-card__date {
+  width: 56px;
+  height: 64px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--pel-orange);
+}
+
+.pel-app-game-card__date b {
+  font: 650 27px/0.9 var(--font-display);
+}
+
+.pel-app-game-card__date span {
+  margin-top: 6px;
+  font: 700 9px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pel-app-game-card__main strong {
+  font: 650 clamp(19px, 2.2vw, 28px)/1 var(--font-display);
+  text-transform: uppercase;
+}
+
+.pel-app-game-card__main p {
+  margin-top: 7px;
+  font: 600 10px/1.35 var(--font-body);
+  color: var(--text-muted);
+}
+
+.pel-app-game-card__players {
+  display: flex;
+  align-items: center;
+}
+
+.pel-app-game-card__players i {
+  width: 27px;
+  height: 27px;
+  margin-left: -6px;
+  border: 2px solid var(--pel-cream);
+  border-radius: 50%;
+  background: var(--pel-orange);
+}
+
+.pel-app-game-card__players i:first-child {
+  margin-left: 0;
+  background: var(--pel-ink);
+}
+
+.pel-app-game-card__players i:nth-child(2) {
+  background: var(--pel-green);
+}
+
+.pel-app-game-card__players i:nth-child(3) {
+  background: #d9b382;
+}
+
+.pel-app-game-card__players span {
+  margin-left: 10px;
+  font: 700 9px/1 var(--font-body);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pel-app-hero__stamp {
+  position: absolute;
+  z-index: 4;
+  top: 24%;
+  right: -10%;
+  padding: 10px 16px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-pill);
+  background: var(--pel-orange);
+  color: var(--pel-ink);
+  font: 700 9px/1 var(--font-body);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  transform: rotate(7deg);
+}
+
+.pel-app-hero__orbit {
+  position: absolute;
+  border: 1px solid rgba(247, 240, 222, 0.09);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.pel-app-hero__orbit--one {
+  width: 46vw;
+  height: 46vw;
+  top: -27vw;
+  left: -15vw;
+}
+
+.pel-app-hero__orbit--two {
+  width: 38vw;
+  height: 38vw;
+  right: -19vw;
+  bottom: -20vw;
+}
+
+/* Feature details */
+.pel-app-details {
+  padding: clamp(84px, 10vw, 140px) 48px !important;
+  background: var(--pel-cream);
+}
+
+.pel-app-details__intro {
+  max-width: 880px;
+  margin: 0 auto clamp(50px, 6vw, 82px);
+  text-align: center;
+}
+
+.pel-app-details .pel-app-kicker,
+.pel-app-tour .pel-app-kicker {
+  margin-bottom: 20px;
+  color: var(--pel-app-orange-text);
+}
+
+.pel-app-details__intro h2,
+.pel-app-tour__head h2,
+.pel-app-download h2,
+.pel-app-contact__copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.pel-app-details__intro h2,
+.pel-app-tour__head h2 {
+  font-size: clamp(44px, 6vw, 88px);
+  line-height: 0.92;
+}
+
+.pel-app-details__intro > p:last-child,
+.pel-app-tour__head > p:last-child {
+  max-width: 620px;
+  margin: 26px auto 0;
+  font: 600 15px/1.7 var(--font-body);
+  color: var(--text-muted);
+}
+
+.pel-app-details__grid {
+  width: min(100%, var(--container));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: var(--border-width) solid var(--pel-ink);
+  border-bottom: var(--border-width) solid var(--pel-ink);
+}
+
+.pel-app-detail-card {
+  min-height: 370px;
+  padding: clamp(28px, 3.5vw, 50px);
+  display: flex;
+  flex-direction: column;
+  border-left: var(--border-width) solid var(--pel-ink);
+}
+
+.pel-app-detail-card:last-child {
+  border-right: var(--border-width) solid var(--pel-ink);
+}
+
+.pel-app-detail-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.16em;
+}
+
+.pel-app-detail-card__icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 50%;
+  background: var(--pel-green);
+  color: var(--pel-cream);
+}
+
+.pel-app-detail-card:nth-child(2) .pel-app-detail-card__icon,
+.pel-app-detail-card:nth-child(3) .pel-app-detail-card__icon {
+  background: var(--pel-green);
+  color: var(--pel-cream);
+}
+
+.pel-app-detail-card__icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+.pel-app-detail-card h3 {
+  max-width: 270px;
+  min-height: 2em;
+  margin: 54px 0 18px;
+  font: 650 clamp(31px, 3vw, 46px)/0.96 var(--font-display);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.pel-app-detail-card > p {
+  max-width: 38ch;
+  min-height: 5.2em;
+  font: 500 14px/1.65 var(--font-body);
+  color: var(--text-muted);
+}
+
+/* Scroll-led phone tour */
+.pel-app-tour {
+  position: relative;
+  padding: clamp(88px, 10vw, 142px) 48px 0 !important;
+  border-top: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-sand);
+}
+
+.pel-app-tour__head {
+  max-width: 830px;
+  margin: 0 auto clamp(50px, 7vw, 90px);
+  text-align: center;
+}
+
+.pel-app-tour__grid {
+  width: min(100%, var(--container));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.88fr) minmax(0, 1.12fr);
+  gap: clamp(54px, 8vw, 130px);
+}
+
+.pel-app-tour__stage {
+  position: sticky;
+  top: 118px;
+  height: calc(100vh - 136px);
+  height: calc(100svh - 136px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pel-app-tour__progress {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+.pel-app-tour__progress button {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pel-app-tour__progress button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(23, 23, 23, 0.28);
+  transform: translate(-50%, -50%);
+  transition:
+    width var(--dur-fast),
+    background var(--dur-fast);
+}
+
+.pel-app-tour__progress button.is-active::after {
+  width: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--pel-orange-ink);
+}
+
+.pel-app-tour-step {
+  min-height: 88vh;
+  min-height: 88svh;
+  padding: 12vh 0;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  align-content: center;
+  gap: clamp(24px, 4vw, 58px);
+  border-top: var(--border-width) solid rgba(23, 23, 23, 0.22);
+  opacity: 0.42;
+  transition: opacity var(--dur-med) ease;
+}
+
+.pel-app-tour-step:last-child {
+  border-bottom: var(--border-width) solid rgba(23, 23, 23, 0.22);
+}
+
+.pel-app-tour-step.is-active {
+  opacity: 1;
+}
+
+.pel-app-tour-step__number {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 50%;
+  font: 650 19px/1 var(--font-display);
+  transition:
+    background var(--dur-med),
+    color var(--dur-med);
+}
+
+.pel-app-tour-step.is-active .pel-app-tour-step__number {
+  background: var(--pel-orange);
+}
+
+.pel-app-tour-step__copy > p {
+  margin: 3px 0 17px;
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--pel-app-orange-text);
+}
+
+.pel-app-tour-step__copy h3 {
+  max-width: 590px;
+  margin: 0;
+  font: 650 clamp(39px, 4.6vw, 70px)/0.92 var(--font-display);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.pel-app-tour-step__copy > div {
+  max-width: 520px;
+  margin-top: 24px;
+  font: 500 15px/1.7 var(--font-body);
+  color: var(--text-muted);
+}
+
+/* iPhone frame */
+.pel-app-phone {
+  position: relative;
+  height: min(69vh, 720px);
+  height: min(69svh, 720px);
+  aspect-ratio: 393 / 852;
+  margin: 0;
+  /* An element cannot resolve container-query units against itself. Keep the
+     outer shell in fixed/clamped units; descendants use this element's cqw. */
+  padding: clamp(6px, 0.65vw, 9px);
+  border: 1px solid #4c4c4c;
+  border-radius: clamp(37px, 4vw, 52px);
+  background: #080808;
+  box-shadow:
+    0 30px 55px rgba(23, 23, 23, 0.2),
+    0 8px 0 rgba(23, 23, 23, 0.08);
+  container-type: inline-size;
+}
+
+.pel-app-phone__bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 0.7cqw solid #222;
+  border-radius: 12.2cqw;
+  background: #0c0c0c;
+}
+
+.pel-app-phone__screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 11.4cqw;
+  background: #f7f2e6;
+}
+
+.pel-app-phone__layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.025);
+  transition:
+    opacity 0.42s ease,
+    transform 0.5s var(--ease-out);
+  pointer-events: none;
+}
+
+.pel-app-phone__layer.is-active {
+  z-index: 1;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.pel-app-phone__layer > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.pel-app-phone__island {
+  position: absolute;
+  z-index: 5;
+  top: 3.3cqw;
+  left: 50%;
+  width: 31cqw;
+  height: 8.4cqw;
+  border-radius: var(--radius-pill);
+  background: #050505;
+  transform: translateX(-50%);
+  box-shadow: inset 0 0 0 0.25cqw #191919;
+}
+
+.pel-app-phone figcaption {
+  color: var(--pel-cream);
+}
+
+.pel-app-phone__button {
+  position: absolute;
+  width: 1.4cqw;
+  border-radius: 1cqw 0 0 1cqw;
+  background: #242424;
+}
+
+.pel-app-phone__button--mute {
+  top: 19cqw;
+  left: -1.4cqw;
+  height: 8cqw;
+}
+
+.pel-app-phone__button--up,
+.pel-app-phone__button--down {
+  left: -1.4cqw;
+  height: 14cqw;
+}
+
+.pel-app-phone__button--up {
+  top: 32cqw;
+}
+
+.pel-app-phone__button--down {
+  top: 49cqw;
+}
+
+.pel-app-phone__button--power {
+  top: 37cqw;
+  right: -1.4cqw;
+  height: 22cqw;
+  border-radius: 0 1cqw 1cqw 0;
+}
+
+/* Temporary app screen art. Replaced automatically when imageSrc is supplied. */
+.pel-app-mock {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #f8f5ec;
+  color: #171717;
+  font-family: var(--font-body);
+  font-size: 3.2cqw;
+}
+
+.pel-app-mock__status {
+  height: 12cqw;
+  padding: 3.9cqw 6.5cqw 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 2.8cqw;
+  font-weight: 700;
+}
+
+.pel-app-mock__status > div {
+  display: flex;
+  gap: 1.2cqw;
+}
+
+.pel-app-mock__status i {
+  width: 3.2cqw;
+  height: 2.2cqw;
+  display: block;
+  border-radius: 1cqw;
+  background: #171717;
+}
+
+.pel-app-mock__status i:nth-child(2) {
+  width: 2.4cqw;
+  border-radius: 50%;
+}
+
+.pel-app-mock__nav {
+  height: 13cqw;
+  padding: 0 6cqw;
+  display: flex;
+  align-items: center;
+  border-bottom: 0.3cqw solid rgba(23, 23, 23, 0.13);
+}
+
+.pel-app-mock__nav img {
+  width: 7cqw;
+  height: 7cqw;
+  border-radius: 2cqw;
+}
+
+.pel-app-mock__nav span {
+  margin-left: 2cqw;
+  font-family: var(--font-display);
+  font-size: 4.3cqw;
+  font-weight: 650;
+}
+
+.pel-app-mock__nav > i {
+  width: 6cqw;
+  height: 6cqw;
+  margin-left: auto;
+  border: 0.35cqw solid #171717;
+  border-radius: 50%;
+}
+
+.pel-app-mock__body {
+  padding: 6.5cqw 6cqw 16cqw;
+}
+
+.pel-app-mock__eyebrow {
+  margin: 0 0 1.8cqw;
+  font-size: 2.25cqw;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #9a4a30;
+}
+
+.pel-app-mock__body h4 {
+  margin: 0 0 5cqw;
+  font-family: var(--font-display);
+  font-size: 7.2cqw;
+  font-weight: 650;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__feature {
+  padding: 5.4cqw;
+  border-radius: 5cqw;
+  background: #3e6ab9;
+  color: #f7f0de;
+  box-shadow: 0 2.2cqw 5cqw rgba(23, 23, 23, 0.12);
+}
+
+.pel-app-mock__feature-top {
+  margin-bottom: 5cqw;
+  display: flex;
+  justify-content: space-between;
+  font-size: 2.1cqw;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__feature > strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 7cqw;
+  font-weight: 650;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__feature > p {
+  margin: 2cqw 0 4cqw;
+  font-size: 2.5cqw;
+  font-weight: 600;
+}
+
+.pel-app-mock__join {
+  width: 100%;
+  padding: 3.3cqw;
+  border-radius: 10cqw;
+  background: #ce643e;
+  color: #171717;
+  font: 700 2.5cqw/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__section-title {
+  margin: 6cqw 0 2.8cqw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 2.5cqw;
+}
+
+.pel-app-mock__section-title span {
+  font-size: 2.1cqw;
+  color: rgba(23, 23, 23, 0.68);
+}
+
+.pel-app-mock__game-row {
+  min-height: 13.5cqw;
+  padding: 2.4cqw 0;
+  display: grid;
+  grid-template-columns: 11cqw minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3cqw;
+  border-top: 0.3cqw solid rgba(23, 23, 23, 0.13);
+}
+
+.pel-app-mock__game-row > div {
+  height: 9cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2.2cqw;
+  background: #efe7d4;
+}
+
+.pel-app-mock__game-row > div span,
+.pel-app-mock__game-row > div b {
+  font-size: 2.15cqw;
+  line-height: 1.15;
+}
+
+.pel-app-mock__game-row > p {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 2.55cqw;
+  line-height: 1.25;
+}
+
+.pel-app-mock__game-row > p span {
+  margin-top: 0.8cqw;
+  font-size: 2.05cqw;
+  color: rgba(23, 23, 23, 0.68);
+}
+
+.pel-app-mock__game-row > strong {
+  font-size: 2.05cqw;
+  color: #2f6a44;
+}
+
+.pel-app-mock__tabs {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15cqw;
+  padding: 0 8cqw 4cqw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 0.3cqw solid rgba(23, 23, 23, 0.13);
+  background: rgba(248, 245, 236, 0.95);
+}
+
+.pel-app-mock__tabs i {
+  width: 5cqw;
+  height: 5cqw;
+  border: 0.5cqw solid rgba(23, 23, 23, 0.38);
+  border-radius: 50%;
+}
+
+.pel-app-mock__tabs i.is-active {
+  border-color: #ce643e;
+  background: #ce643e;
+  box-shadow: inset 0 0 0 1.2cqw #f8f5ec;
+}
+
+.pel-app-mock__calendar {
+  padding: 4.5cqw;
+  border-radius: 4cqw;
+  background: #171717;
+  color: #f7f0de;
+}
+
+.pel-app-mock__calendar > div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 3cqw;
+}
+
+.pel-app-mock__week {
+  margin: 4cqw 0 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1cqw;
+}
+
+.pel-app-mock__week li {
+  min-width: 0;
+  margin: 0;
+  padding: 1.7cqw 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5cqw;
+  border-radius: 5cqw;
+  font-size: 2.1cqw;
+}
+
+.pel-app-mock__week li.is-active {
+  background: #ce643e;
+  color: #171717;
+}
+
+.pel-app-mock__create {
+  margin-top: 5cqw;
+  padding: 3.5cqw;
+  border: 0.35cqw dashed rgba(23, 23, 23, 0.35);
+  border-radius: 4cqw;
+  text-align: center;
+  font-size: 2.4cqw;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__game-meta {
+  padding: 4.5cqw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4cqw;
+  border-radius: 4cqw;
+  background: #efe7d4;
+}
+
+.pel-app-mock__game-meta > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2cqw;
+}
+
+.pel-app-mock__game-meta span {
+  font-size: 2cqw;
+  color: rgba(23, 23, 23, 0.68);
+}
+
+.pel-app-mock__game-meta b {
+  font-size: 2.6cqw;
+}
+
+.pel-app-mock__roster-head {
+  margin: 5.5cqw 0 2cqw;
+  display: flex;
+  justify-content: space-between;
+  font-size: 2.6cqw;
+}
+
+.pel-app-mock__roster-head span {
+  color: #2f6a44;
+  font-weight: 700;
+}
+
+.pel-app-mock__people > div,
+.pel-app-mock__leader-list > div {
+  min-height: 10cqw;
+  display: grid;
+  align-items: center;
+  border-top: 0.3cqw solid rgba(23, 23, 23, 0.12);
+}
+
+.pel-app-mock__people > div {
+  grid-template-columns: 8cqw minmax(0, 1fr) auto;
+  gap: 3cqw;
+}
+
+.pel-app-mock__people i,
+.pel-app-mock__leader-list i,
+.pel-app-mock__podium i {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ce643e;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.pel-app-mock__people i {
+  width: 7cqw;
+  height: 7cqw;
+  font-size: 2cqw;
+}
+
+.pel-app-mock__people span {
+  font-size: 2.45cqw;
+  font-weight: 600;
+}
+
+.pel-app-mock__people b {
+  font-size: 2.1cqw;
+  color: #2f6a44;
+}
+
+.pel-app-mock__waitlist {
+  margin-top: 3cqw;
+  padding: 3.5cqw;
+  display: flex;
+  justify-content: space-between;
+  border-radius: 3cqw;
+  background: #171717;
+  color: #f7f0de;
+  font-size: 2.4cqw;
+}
+
+.pel-app-mock__score {
+  padding: 5cqw 4cqw;
+  border-radius: 5cqw;
+  background: #ce643e;
+  text-align: center;
+}
+
+.pel-app-mock__score > span {
+  font-size: 2.1cqw;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__score > div {
+  margin: 4cqw 0 2.5cqw;
+  display: grid;
+  grid-template-columns: 1fr auto auto auto 1fr;
+  align-items: center;
+  gap: 2.5cqw;
+}
+
+.pel-app-mock__score strong {
+  font-family: var(--font-display);
+  font-size: 10cqw;
+  line-height: 1;
+}
+
+.pel-app-mock__score b {
+  font-size: 2.2cqw;
+}
+
+.pel-app-mock__score i {
+  font-style: normal;
+  opacity: 0.45;
+}
+
+.pel-app-mock__score > p {
+  font-size: 2.3cqw;
+  font-weight: 600;
+}
+
+.pel-app-mock__stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2cqw;
+}
+
+.pel-app-mock__stat-grid > div {
+  padding: 3.5cqw 1cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 1cqw;
+  border-radius: 3cqw;
+  background: #efe7d4;
+  text-align: center;
+}
+
+.pel-app-mock__stat-grid b {
+  font-family: var(--font-display);
+  font-size: 5.5cqw;
+}
+
+.pel-app-mock__stat-grid span {
+  font-size: 1.9cqw;
+  text-transform: uppercase;
+}
+
+.pel-app-mock__result-row {
+  min-height: 11cqw;
+  display: grid;
+  grid-template-columns: 7cqw minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3cqw;
+  border-bottom: 0.3cqw solid rgba(23, 23, 23, 0.12);
+}
+
+.pel-app-mock__result-row:first-of-type {
+  margin-top: 4cqw;
+}
+
+.pel-app-mock__result-row > i {
+  width: 6cqw;
+  height: 6cqw;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #2f6a44;
+  color: #f7f0de;
+  font-size: 2.2cqw;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.pel-app-mock__result-row > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5cqw;
+  font-size: 2.3cqw;
+}
+
+.pel-app-mock__result-row small {
+  color: rgba(23, 23, 23, 0.68);
+}
+
+.pel-app-mock__result-row > strong {
+  font-size: 2.6cqw;
+}
+
+.pel-app-mock__leader-tabs {
+  padding: 1.5cqw;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-radius: 8cqw;
+  background: #efe7d4;
+  font-size: 2.2cqw;
+  text-align: center;
+}
+
+.pel-app-mock__leader-tabs > * {
+  padding: 2.3cqw;
+}
+
+.pel-app-mock__leader-tabs b {
+  border-radius: 5cqw;
+  background: #171717;
+  color: #f7f0de;
+}
+
+.pel-app-mock__podium {
+  height: 33cqw;
+  margin: 4cqw 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4cqw;
+  border-radius: 4cqw;
+  background: #3e6ab9;
+}
+
+.pel-app-mock__podium > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5cqw;
+  color: #f7f0de;
+  font-size: 2.3cqw;
+  font-weight: 700;
+}
+
+.pel-app-mock__podium > div:nth-child(2) {
+  align-self: center;
+  transform: translateY(-2cqw);
+}
+
+.pel-app-mock__podium i {
+  width: 11cqw;
+  height: 11cqw;
+  background: #f7f0de;
+  color: #171717;
+  font-size: 2.6cqw;
+}
+
+.pel-app-mock__podium > div:nth-child(2) i {
+  width: 14cqw;
+  height: 14cqw;
+  background: #ce643e;
+}
+
+.pel-app-mock__leader-list > div {
+  grid-template-columns: 4cqw 7cqw minmax(0, 1fr) auto;
+  gap: 2.5cqw;
+}
+
+.pel-app-mock__leader-list strong,
+.pel-app-mock__leader-list span,
+.pel-app-mock__leader-list b {
+  font-size: 2.2cqw;
+}
+
+.pel-app-mock__leader-list i {
+  width: 6cqw;
+  height: 6cqw;
+  font-size: 1.8cqw;
+}
+
+.pel-app-mock__leader-list b {
+  color: #9a4a30;
+}
+
+/* Download strip */
+.pel-app-download {
+  min-height: 330px;
+  padding: 58px max(48px, calc((100vw - var(--container)) / 2)) !important;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(28px, 4vw, 60px);
+  border-top: var(--border-width) solid var(--pel-ink);
+  border-bottom: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-orange);
+}
+
+.pel-app-download__mark {
+  width: clamp(120px, 13vw, 180px);
+  aspect-ratio: 1;
+  padding: 12px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 28%;
+  background: var(--pel-cream);
+  transform: rotate(-5deg);
+  box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.2);
+}
+
+.pel-app-download__mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 23%;
+}
+
+.pel-app-download .pel-app-kicker {
+  margin-bottom: 14px;
+}
+
+.pel-app-download h2 {
+  max-width: 770px;
+  font-size: clamp(38px, 5vw, 72px);
+  line-height: 0.92;
+}
+
+/* Contact */
+.pel-app-contact {
+  padding: clamp(88px, 10vw, 140px) 48px !important;
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+}
+
+.pel-app-contact__inner {
+  width: min(100%, var(--container));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(300px, 0.82fr) minmax(520px, 1.18fr);
+  align-items: start;
+  gap: clamp(54px, 8vw, 130px);
+}
+
+.pel-app-contact .pel-app-kicker {
+  margin-bottom: 20px;
+  color: var(--pel-ink);
+}
+
+.pel-app-contact__copy h2 {
+  max-width: 600px;
+  font-size: clamp(44px, 5.7vw, 82px);
+  line-height: 0.92;
+}
+
+.pel-app-contact__copy > p:not(.pel-app-kicker) {
+  max-width: 490px;
+  margin-top: 28px;
+  font: 500 15px/1.7 var(--font-body);
+  color: var(--pel-ink);
+}
+
+.pel-app-contact__copy > a {
+  margin-top: 28px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--pel-ink);
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  text-transform: uppercase;
+}
+
+.pel-app-contact__form {
+  position: relative;
+  padding: clamp(28px, 4vw, 52px);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+  box-shadow: 11px 12px 0 rgba(23, 23, 23, 0.2);
+}
+
+.pel-app-contact__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.pel-app-contact__form label {
+  display: block;
+  margin-bottom: 25px;
+}
+
+.pel-app-contact__form label > span {
+  display: block;
+  margin-bottom: 10px;
+  font: 700 10px/1.2 var(--font-body);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.pel-app-contact__form label small {
+  font-size: inherit;
+  font-weight: 600;
+  opacity: 0.72;
+}
+
+.pel-app-contact__form input,
+.pel-app-contact__form textarea {
+  width: 100%;
+  margin: 0;
+  padding: 15px 0;
+  border: 0;
+  border-bottom: var(--border-width) solid rgba(23, 23, 23, 0.4);
+  border-radius: 0;
+  background: transparent;
+  color: var(--pel-ink);
+  font: 600 13px/1.5 var(--font-body);
+  letter-spacing: 0.02em;
+  resize: vertical;
+  transition: border-color var(--dur-fast);
+}
+
+.pel-app-contact__form textarea {
+  min-height: 130px;
+}
+
+.pel-app-contact__form input::placeholder,
+.pel-app-contact__form textarea::placeholder {
+  color: rgba(23, 23, 23, 0.47);
+}
+
+.pel-app-contact__form input:hover,
+.pel-app-contact__form textarea:hover,
+.pel-app-contact__form input:focus,
+.pel-app-contact__form textarea:focus {
+  border-bottom-color: var(--pel-ink);
+}
+
+.pel-app-contact__form input:disabled,
+.pel-app-contact__form textarea:disabled {
+  opacity: 0.58;
+}
+
+.pel-app-contact__submit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.pel-app-contact__submit button {
+  min-height: 58px;
+  padding: 0 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-pill);
+  background: var(--pel-ink);
+  color: var(--pel-cream);
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.pel-app-contact__submit button:hover:not(:disabled) {
+  background: var(--pel-orange);
+  color: var(--pel-ink);
+  transform: translateY(-2px);
+}
+
+.pel-app-contact__submit button:disabled {
+  opacity: 0.64;
+  cursor: wait;
+}
+
+.pel-app-contact__privacy {
+  max-width: 210px;
+  font: 600 9px/1.5 var(--font-body);
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: uppercase;
+  color: rgba(23, 23, 23, 0.72);
+}
+
+.pel-app-contact__status {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font: 700 12px/1.5 var(--font-body);
+}
+
+.pel-app-contact__status.is-success {
+  background: rgba(47, 106, 68, 0.13);
+  color: var(--pel-green);
+}
+
+.pel-app-contact__status.is-error {
+  background: rgba(180, 71, 42, 0.12);
+  color: #873620;
+}
+
+.pel-app-contact__trap {
+  display: none;
+}
+
+@media (max-width: 68em) {
+  .pel-app-hero__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr);
+    gap: 40px;
+  }
+
+  .pel-app-hero__title {
+    font-size: clamp(58px, 7.8vw, 92px);
+  }
+
+  .pel-app-hero__stamp {
+    right: -2%;
+  }
+
+  .pel-app-tour__grid {
+    grid-template-columns: minmax(310px, 0.8fr) minmax(0, 1.2fr);
+    gap: 60px;
+  }
+
+  .pel-app-phone {
+    height: min(64svh, 650px);
+  }
+
+  .pel-app-contact__inner {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 54px;
+  }
+}
+
+@media (max-width: 54em) {
+  .pel-app-hero__inner {
+    padding-top: 88px;
+    padding-bottom: 88px;
+    grid-template-columns: 1fr;
+  }
+
+  .pel-app-hero__copy {
+    text-align: center;
+  }
+
+  .pel-app-hero__title,
+  .pel-app-hero__body {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pel-app-actions,
+  .pel-app-hero__availability {
+    justify-content: center;
+  }
+
+  .pel-app-hero__visual {
+    width: min(80vw, 560px);
+    margin: 20px auto 0;
+    justify-self: center;
+  }
+
+  .pel-app-details__grid {
+    grid-template-columns: 1fr;
+    border-bottom: 0;
+  }
+
+  .pel-app-detail-card {
+    min-height: 300px;
+    border-right: var(--border-width) solid var(--pel-ink);
+    border-bottom: var(--border-width) solid var(--pel-ink);
+  }
+
+  .pel-app-detail-card h3 {
+    max-width: none;
+  }
+
+  .pel-app-tour__grid {
+    display: block;
+  }
+
+  .pel-app-tour__stage {
+    top: 98px;
+    z-index: 1;
+    height: 64svh;
+    justify-content: flex-start;
+    padding-top: 16px;
+    pointer-events: none;
+  }
+
+  .pel-app-tour__stage .pel-app-phone {
+    height: min(56svh, 560px);
+  }
+
+  .pel-app-tour__progress {
+    display: none;
+  }
+
+  .pel-app-tour__steps {
+    position: relative;
+    z-index: 2;
+    margin-top: -2svh;
+  }
+
+  .pel-app-tour-step {
+    min-height: 72svh;
+    padding: 22px 0;
+    align-content: end;
+    border: 0;
+    opacity: 1;
+  }
+
+  .pel-app-tour-step:last-child {
+    border: 0;
+  }
+
+  .pel-app-tour-step__number {
+    align-self: end;
+    background: var(--pel-orange);
+  }
+
+  .pel-app-tour-step__copy {
+    padding: 24px;
+    border: var(--border-width) solid var(--pel-ink);
+    border-radius: var(--radius-lg);
+    background: rgba(247, 240, 222, 0.96);
+    box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.12);
+  }
+
+  .pel-app-download {
+    grid-template-columns: auto 1fr;
+  }
+
+  .pel-app-download .pel-app-store {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .pel-app-contact__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .pel-app-contact__copy {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 48em) {
+  .pel-app-hero {
+    min-height: auto;
+  }
+
+  .pel-app-hero__inner {
+    padding: 66px 20px 78px;
+    gap: 42px;
+  }
+
+  .pel-app-hero .pel-app-kicker {
+    margin-bottom: 18px;
+  }
+
+  .pel-app-hero__title {
+    font-size: clamp(52px, 17vw, 78px);
+    line-height: 0.87;
+  }
+
+  .pel-app-hero__body {
+    margin-top: 25px;
+    font-size: 14px;
+  }
+
+  .pel-app-actions {
+    margin-top: 30px;
+  }
+
+  .pel-app-store,
+  .pel-app-link-button {
+    width: 100%;
+  }
+
+  .pel-app-hero__availability {
+    flex-wrap: wrap;
+    line-height: 1.5;
+  }
+
+  .pel-app-hero__visual {
+    width: min(91vw, 500px);
+  }
+
+  .pel-app-game-card {
+    right: -1%;
+    width: 78%;
+  }
+
+  .pel-app-hero__stamp {
+    top: 20%;
+    right: 0;
+  }
+
+  .pel-app-details,
+  .pel-app-tour,
+  .pel-app-contact {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  .pel-app-details {
+    padding-top: 76px !important;
+    padding-bottom: 84px !important;
+  }
+
+  .pel-app-details__intro {
+    margin-bottom: 42px;
+  }
+
+  .pel-app-details__intro h2,
+  .pel-app-tour__head h2 {
+    font-size: clamp(41px, 13vw, 64px);
+  }
+
+  .pel-app-details__intro > p:last-child,
+  .pel-app-tour__head > p:last-child {
+    font-size: 14px;
+  }
+
+  .pel-app-detail-card {
+    min-height: 270px;
+    padding: 28px;
+  }
+
+  .pel-app-tour {
+    padding-top: 78px !important;
+  }
+
+  .pel-app-tour__head {
+    margin-bottom: 50px;
+  }
+
+  .pel-app-tour__stage {
+    top: 92px;
+    height: 61svh;
+  }
+
+  .pel-app-tour__stage .pel-app-phone {
+    height: min(53svh, 515px);
+  }
+
+  .pel-app-tour__steps {
+    margin-top: 0;
+  }
+
+  .pel-app-tour-step {
+    min-height: 69svh;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .pel-app-tour-step__number {
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .pel-app-tour-step__copy {
+    padding: 21px;
+  }
+
+  .pel-app-tour-step__copy > p {
+    margin-bottom: 12px;
+  }
+
+  .pel-app-tour-step__copy h3 {
+    font-size: clamp(31px, 9.5vw, 43px);
+  }
+
+  .pel-app-tour-step__copy > div {
+    margin-top: 16px;
+    font-size: 13px;
+  }
+
+  .pel-app-download {
+    min-height: 0;
+    padding: 62px 20px !important;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .pel-app-download__mark {
+    width: 130px;
+  }
+
+  .pel-app-download h2 {
+    font-size: clamp(39px, 12vw, 58px);
+  }
+
+  .pel-app-download .pel-app-store {
+    width: auto;
+    grid-column: auto;
+    justify-self: center;
+  }
+
+  .pel-app-contact {
+    padding-top: 78px !important;
+    padding-bottom: 90px !important;
+  }
+
+  .pel-app-contact__inner {
+    gap: 42px;
+  }
+
+  .pel-app-contact__copy h2 {
+    font-size: clamp(42px, 13vw, 62px);
+  }
+
+  .pel-app-contact__form {
+    padding: 27px 22px;
+    box-shadow: 7px 8px 0 rgba(23, 23, 23, 0.2);
+  }
+
+  .pel-app-contact__row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .pel-app-contact__submit {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pel-app-contact__submit button {
+    width: 100%;
+  }
+
+  .pel-app-contact__privacy {
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (max-width: 25em) {
+  .pel-app-game-card__players {
+    display: none;
+  }
+
+  .pel-app-game-card__main {
+    padding-bottom: 0;
+  }
+
+  .pel-app-hero__stamp {
+    display: none;
+  }
+
+  .pel-app-tour__stage {
+    height: 58svh;
+  }
+
+  .pel-app-tour__stage .pel-app-phone {
+    height: min(49svh, 470px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pel-app-store,
+  .pel-app-phone__layer,
+  .pel-app-tour-step,
+  .pel-app-tour-step__number,
+  .pel-app-tour__progress button::after,
+  .pel-app-contact__submit button {
+    transition: none !important;
+  }
+}

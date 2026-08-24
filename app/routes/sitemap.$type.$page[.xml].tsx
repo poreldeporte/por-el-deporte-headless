@@ -174,7 +174,7 @@ async function siteRoutesSitemap(
   // /collections is a real, SEO-tagged route (the account area's only "Start
   // Shopping" link lands there) but Shopify's collection sitemap only lists
   // individual collections, so the index page itself was in no sitemap at all.
-  const paths = ['/', '/about', '/collections', '/policies', ...policyPaths];
+  const paths = ['/', '/about', '/app', '/collections', '/policies', ...policyPaths];
 
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',

@@ -21,6 +21,16 @@ declare global {
     PRIVATE_ADMIN_API_TOKEN?: string;
 
     /**
+     * Server-only Resend key used by /api/contact. The contact form remains
+     * visible without it but reports a real delivery failure instead of
+     * pretending the message was sent.
+     */
+    PRIVATE_RESEND_API_KEY?: string;
+    /** Optional overrides for the app landing page contact email. */
+    PRIVATE_CONTACT_TO_EMAIL?: string;
+    PRIVATE_CONTACT_FROM_EMAIL?: string;
+
+    /**
      * Google Search Console HTML-tag verification token — the `content` value
      * from the <meta name="google-site-verification"> snippet it hands you.
      * Rendered into every page's <head> by root.tsx when set. PUBLIC_ because
