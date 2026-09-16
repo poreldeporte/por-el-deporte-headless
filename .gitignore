@@ -18,6 +18,9 @@ node_modules/
 dist/
 .react-router/
 .cache/
+# App Store marketing frames, rendered from /public/app-screens by
+# scripts/create-app-store-screenshots.mjs. 6.4MB of regenerable binaries.
+app-store-screenshots/
 .shopify/
 .wrangler/
 *.tsbuildinfo
