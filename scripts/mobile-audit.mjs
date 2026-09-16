@@ -23,6 +23,7 @@ mkdirSync(OUT, {recursive: true});
 const ROUTES = [
   ['home', '/', '.pel-hero'],
   ['about', '/about', '.pel-subhero'],
+  ['app', '/app', '.pel-app-hero'],
   ['shop', '/collections/all-products', '.pel-shop__grid'],
   ['product', '/products/el-clasico-tee', '.pel-pdp__buy'],
   ['cart', '/cart', '.cart'],

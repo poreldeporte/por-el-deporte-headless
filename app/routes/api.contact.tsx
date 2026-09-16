@@ -5,6 +5,9 @@ type ContactResult = {ok: boolean; message: string};
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const DEFAULT_TO = 'contact@poreldeporte.com';
 const DEFAULT_FROM = 'Por El Deporte Website <website@poreldeporte.com>';
+// One constant, so the honeypot's fake success and a real send cannot drift apart.
+const SUCCESS_MESSAGE =
+  'Thanks — we’ll write back from contact@poreldeporte.com within a day.';
 
 export function loader() {
   return Response.json(
@@ -41,14 +44,14 @@ export async function action({request, context}: Route.ActionArgs) {
   if (cleanMultiline(form.get('website'), 200)) {
     return Response.json({
       ok: true,
-      message: 'Thanks. Your message is on its way.',
+      message: SUCCESS_MESSAGE,
     } satisfies ContactResult);
   }
 
   const name = cleanSingleLine(form.get('name'), 80);
   const email = cleanSingleLine(form.get('email'), 254).toLowerCase();
   const community = cleanSingleLine(form.get('community'), 120);
-  const message = cleanMultiline(form.get('message'), 2000);
+  const cadence = cleanSingleLine(form.get('cadence'), 160);
 
   if (name.length < 2) {
     return invalid('Please enter your name.');
@@ -56,8 +59,11 @@ export async function action({request, context}: Route.ActionArgs) {
   if (!EMAIL_RE.test(email)) {
     return invalid('Please enter a valid email address.');
   }
-  if (message.length < 10) {
-    return invalid('Please add a little more detail to your message.');
+  if (community.length < 2) {
+    return invalid('Please tell us which community you play with.');
+  }
+  if (cadence.length < 2) {
+    return invalid('Please tell us how many play, and how often.');
   }
 
   const apiKey = context.env.PRIVATE_RESEND_API_KEY;
@@ -77,7 +83,6 @@ export async function action({request, context}: Route.ActionArgs) {
 
   const to = context.env.PRIVATE_CONTACT_TO_EMAIL?.trim() || DEFAULT_TO;
   const from = context.env.PRIVATE_CONTACT_FROM_EMAIL?.trim() || DEFAULT_FROM;
-  const communityLine = community || 'Not provided';
   const subjectName = name.replace(/[\r\n]+/g, ' ');
 
   try {
@@ -93,20 +98,14 @@ export async function action({request, context}: Route.ActionArgs) {
         from,
         to: [to],
         reply_to: email,
-        subject: `App inquiry from ${subjectName}`,
+        subject: `App inquiry from ${subjectName} — ${community}`,
         text: [
           `Name: ${name}`,
           `Email: ${email}`,
-          `Community or organization: ${communityLine}`,
-          '',
-          message,
+          `Community: ${community}`,
+          `How many play, and how often: ${cadence}`,
         ].join('\n'),
-        html: contactEmailHtml({
-          name,
-          email,
-          community: communityLine,
-          message,
-        }),
+        html: contactEmailHtml({name, email, community, cadence}),
         tags: [{name: 'source', value: 'app-landing-page'}],
       }),
     });
@@ -125,7 +124,7 @@ export async function action({request, context}: Route.ActionArgs) {
 
     return Response.json({
       ok: true,
-      message: 'Thanks. Your message is on its way.',
+      message: SUCCESS_MESSAGE,
     } satisfies ContactResult);
   } catch (error) {
     console.error('App contact email failed:', error);
@@ -194,14 +193,13 @@ function contactEmailHtml({
   name,
   email,
   community,
-  message,
+  cadence,
 }: {
   name: string;
   email: string;
   community: string;
-  message: string;
+  cadence: string;
 }) {
-  const safeMessage = escapeHtml(message).replace(/\n/g, '<br>');
   return `
     <div style="background:#f7f0de;color:#171717;font-family:Arial,sans-serif;padding:32px">
       <div style="margin:0 auto;max-width:620px;border:1px solid #171717;border-radius:18px;background:#fff;padding:32px">
@@ -211,8 +209,8 @@ function contactEmailHtml({
           <tr><td style="width:150px;padding:8px 0;border-top:1px solid #ddd;font-weight:700">Name</td><td style="padding:8px 0;border-top:1px solid #ddd">${escapeHtml(name)}</td></tr>
           <tr><td style="padding:8px 0;border-top:1px solid #ddd;font-weight:700">Email</td><td style="padding:8px 0;border-top:1px solid #ddd"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
           <tr><td style="padding:8px 0;border-top:1px solid #ddd;font-weight:700">Community</td><td style="padding:8px 0;border-top:1px solid #ddd">${escapeHtml(community)}</td></tr>
+          <tr><td style="padding:8px 0;border-top:1px solid #ddd;font-weight:700">How many play</td><td style="padding:8px 0;border-top:1px solid #ddd">${escapeHtml(cadence)}</td></tr>
         </table>
-        <div style="margin-top:24px;padding:20px;border-radius:12px;background:#f0e8d5;font-size:15px;line-height:1.65">${safeMessage}</div>
       </div>
     </div>
   `;

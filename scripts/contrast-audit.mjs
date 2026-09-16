@@ -16,10 +16,18 @@
 import {chromium} from 'playwright';
 
 const BASE = process.argv[2] ?? 'http://localhost:3000';
-const PAGES = ['/', '/about', '/collections/all-products', '/products/island-sketch-tee', '/cart', '/policies'];
+const PAGES = ['/', '/about', '/app', '/collections/all-products', '/products/island-sketch-tee', '/cart', '/policies'];
 
 const browser = await chromium.launch();
-const page = await browser.newPage({viewport: {width: 1440, height: 1000}});
+// Reduced motion, deliberately: useScrollMotion returns early under it, so no
+// element is ever parked at opacity:0 waiting to be revealed. Without this the
+// audit silently SKIPS every revealed element it has not scrolled past — on
+// /app that was 23 of 121 text runs, and it still printed "0 failures".
+const context = await browser.newContext({
+  viewport: {width: 1440, height: 1000},
+  reducedMotion: 'reduce',
+});
+const page = await context.newPage();
 const seen = new Map();
 
 for (const path of PAGES) {

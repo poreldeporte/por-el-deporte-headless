@@ -1,4 +1,18 @@
-/* Por El Deporte app landing page. Route-scoped through app.tsx links(). */
+/* Por El Deporte app landing page. Route-scoped through app.tsx links().
+ *
+ * Nine sections, top to bottom: hero, the Thursday, the trade, what stops
+ * being yours, the reversal, the week, one game, what it doesn't do, close.
+ *
+ * Two notes for whoever edits this next:
+ *  - There is no `section { padding: 0 }` reset any more. That reset was
+ *    (0,1,1) and out-ranked every bare section class, which is why the old
+ *    file carried !important on every section's padding. Sections now just
+ *    set their own.
+ *  - .pel-app-phone and .pel-app-tour__stage/__grid are load-bearing for the
+ *    scroll-driven phone in S6. The section wears BOTH .pel-app-tour and
+ *    .pel-week so it inherits every tuned sticky and phone dimension at
+ *    68em/54em/48em/25em. Renaming them means re-deriving all of it by hand.
+ */
 
 .pel-app-page {
   --pel-app-orange-text: #9f4c30;
@@ -13,10 +27,6 @@
   box-sizing: border-box;
 }
 
-.pel-app-page section {
-  padding: 0;
-}
-
 .pel-app-page a {
   text-decoration: none;
 }
@@ -29,11 +39,88 @@
   outline-offset: 4px;
 }
 
-.pel-app-kicker {
+/* ── Shared section scaffolding ───────────────────────────────────────────────
+   Nine sections need one rhythm. The previous build hand-rolled a clamp for
+   every heading and leaned on !important to beat its own `section{padding:0}`
+   reset; that reset is gone, so nothing here needs !important. Sizes come from
+   the design tokens (--t-h2, --gutter, --space-*) rather than fresh magic
+   numbers.
+
+   HEADINGS ARE SENTENCE CASE, not the uppercase this page used to use. Every
+   heading in the new copy is a full sentence with a period — "The chat keeps
+   the jokes. The app takes the job." — and 48 characters of all-caps display
+   face reads as shouting and wraps badly. `.pel-about__title` already sets the
+   site's one long heading this way, so this follows an existing convention
+   rather than inventing one. */
+.pel-app-sec {
+  padding: clamp(80px, 9vw, 132px) var(--gutter);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
+}
+
+.pel-app-sec__inner {
+  width: min(100%, var(--container-narrow));
+  margin: 0 auto;
+}
+
+.pel-app-h2 {
+  max-width: 30ch;
   margin: 0;
-  font: 700 12px/1.4 var(--font-body);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: var(--t-h2);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.pel-app-h2--center {
+  max-width: 26ch;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.pel-app-lead {
+  max-width: 64ch;
+  margin: clamp(22px, 2.4vw, 32px) 0 0;
+  font: 500 clamp(15px, 1.05vw, 17px)/1.68 var(--font-body);
+  color: var(--text-muted);
+}
+
+/* ── S4 / S8 · the shared list primitive ─────────────────────────────────────
+   A list, not cards. The bold lead-in does the work a card heading would, and
+   the hairline between items is the only structure — cards would flatten four
+   arguments into four features. S8 reuses this verbatim so the two sections
+   read as the matched pair they are. */
+.pel-app-leadlist {
+  width: min(100%, 78ch);
+  margin: clamp(38px, 4.4vw, 62px) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: var(--border-width) solid var(--border-soft);
+}
+
+.pel-app-leadlist > li {
+  /* reset.css sets li{margin-bottom:.5rem} site-wide; it would push the
+     hairline 8px off the next item. */
+  margin: 0;
+  padding: clamp(24px, 2.8vw, 36px) 0;
+  border-bottom: var(--border-width) solid var(--border-soft);
+  font: 500 clamp(15px, 1.05vw, 17px)/1.66 var(--font-body);
+  color: var(--text-muted);
+}
+
+.pel-app-leadlist > li > b {
+  font-family: var(--font-display);
+  font-size: clamp(21px, 1.9vw, 27px);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--pel-ink);
+}
+
+/* S4's own shell; S8's is in the S7/S8 block since it also takes the sand. */
+.pel-app-stops {
+  border-top: var(--border-width) solid var(--pel-ink);
 }
 
 /* Hero */
@@ -42,6 +129,11 @@
   min-height: calc(100vh - 108px);
   min-height: calc(100svh - 108px);
   overflow: hidden;
+  /* reset.css:85 sets `section { padding: 1rem 0 }` (2rem from 768px) site-wide.
+     Every other section here sets its own padding shorthand and so overrides
+     it; the hero's padding lives on __inner, which left this element exposed
+     and made the band 64px taller than its own min-height contract. */
+  padding: 0;
   border-bottom: var(--border-width) solid var(--pel-ink);
   background: var(--pel-ink);
   color: var(--pel-cream);
@@ -71,14 +163,18 @@
 }
 
 .pel-app-hero__title {
-  max-width: 850px;
+  max-width: 20ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(58px, 7.5vw, 128px);
+  /* Sentence case, and sized for a sentence. The old 128px maximum was set
+     for three short uppercase words ("Community sports, organized."); this H1
+     is a 41-character sentence, and all-caps display at that length reads as
+     shouting and wraps badly. `.pel-about__title` is the site's precedent for
+     setting its one long heading this way. */
+  font-size: clamp(40px, 5vw, 86px);
   font-weight: 650;
-  line-height: 0.84;
+  line-height: 0.98;
   letter-spacing: -0.025em;
-  text-transform: uppercase;
   color: var(--pel-cream);
 }
 
@@ -101,15 +197,23 @@
   margin-top: 38px;
 }
 
-.pel-app-store {
-  min-height: 60px;
-  padding: 10px 22px;
+/* ── S1 · the single CTA ─────────────────────────────────────────────────────
+   One button, per the spec. It carries the Apple mark and a destination
+   sublabel because its label is about moving your game, not about downloading,
+   and without that affordance an App Store link reads as an in-page jump.
+   Built on the old .pel-app-store pill; the --cream/--ink variants and the
+   outlined "See inside" secondary button are gone with the second CTA. */
+.pel-app-cta {
+  min-height: 64px;
+  padding: 12px 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 13px;
+  gap: 14px;
   border: var(--border-width) solid currentColor;
   border-radius: var(--radius-pill);
+  background: var(--pel-cream);
+  color: var(--pel-ink);
   font-family: var(--font-body);
   transition:
     transform var(--dur-fast) var(--ease-out),
@@ -117,110 +221,64 @@
     color var(--dur-fast);
 }
 
-.pel-app-store:hover {
+.pel-app-cta:hover {
+  background: var(--pel-orange);
+  color: var(--pel-ink);
   transform: translateY(-2px);
   text-decoration: none;
 }
 
-.pel-app-store svg {
-  width: 25px;
-  height: 32px;
+.pel-app-cta svg {
+  width: 24px;
+  height: 31px;
   flex: none;
   fill: currentColor;
 }
 
-.pel-app-store span {
+.pel-app-cta span {
   display: flex;
   flex-direction: column;
-  font-size: 18px;
+  font-size: clamp(15px, 1.2vw, 18px);
   font-weight: 700;
-  line-height: 1.04;
+  line-height: 1.06;
   letter-spacing: -0.02em;
 }
 
-.pel-app-store small {
-  margin-bottom: 2px;
-  font-size: 9px;
+.pel-app-cta small {
+  margin-top: 4px;
+  font-size: 10px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.pel-app-store--cream {
-  background: var(--pel-cream);
-  color: var(--pel-ink);
-}
-
-.pel-app-store--cream:hover {
-  background: var(--pel-orange);
-  color: var(--pel-ink);
-}
-
-.pel-app-store--ink {
-  background: var(--pel-ink);
-  color: var(--pel-cream);
-}
-
-.pel-app-store--ink:hover {
-  background: var(--pel-blue);
-  color: var(--pel-cream);
-}
-
-.pel-app-link-button {
-  min-height: 60px;
-  padding: 0 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border: var(--border-width) solid rgba(247, 240, 222, 0.55);
-  border-radius: var(--radius-pill);
-  color: var(--pel-cream);
-  font: 700 12px/1 var(--font-body);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition:
-    border-color var(--dur-fast),
-    background var(--dur-fast);
+  opacity: 0.68;
 }
 
-.pel-app-link-button:hover {
-  border-color: var(--pel-cream);
-  background: rgba(247, 240, 222, 0.1);
-  text-decoration: none;
-}
-
-.pel-app-hero__availability {
-  margin-top: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font: 700 10px/1 var(--font-body);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(247, 240, 222, 0.68);
-}
-
-.pel-app-hero__availability i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--pel-orange);
-}
-
-.pel-app-hero__availability a {
+/* The organiser's route out of the hero, and the page's only other hero link.
+   Replaces the deleted "Free on iPhone | Web app available" micro-copy row. */
+.pel-app-hero__aside {
   min-height: 44px;
+  margin-top: 26px;
   display: inline-flex;
   align-items: center;
-  color: inherit;
+  gap: 9px;
+  color: rgba(247, 240, 222, 0.82);
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  text-underline-offset: 5px;
+  transition: color var(--dur-fast);
 }
 
-.pel-app-hero__availability a:hover {
+.pel-app-hero__aside:hover {
   color: var(--pel-cream);
+}
+
+.pel-app-hero__aside svg {
+  width: 15px;
+  height: 15px;
 }
 
 .pel-app-hero__visual {
@@ -301,28 +359,6 @@
   border-bottom: 0;
 }
 
-.pel-app-icon-card {
-  position: absolute;
-  z-index: 3;
-  top: -2%;
-  left: -4%;
-  width: 29%;
-  aspect-ratio: 1;
-  padding: 4%;
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: 28%;
-  background: var(--pel-cream);
-  transform: rotate(-7deg);
-  box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.3);
-}
-
-.pel-app-icon-card img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border-radius: 23%;
-}
-
 .pel-app-game-card {
   position: absolute;
   z-index: 3;
@@ -383,14 +419,20 @@
   min-width: 0;
 }
 
+/* These two carry the values that actually rendered. A later pair of rules,
+   `.pel-app-game-card__main strong` and `__main p`, matched the same elements
+   as descendants at equal specificity and overrode the font and margin here.
+   Those rules were written for a card variant that no longer exists, so their
+   winning values are folded in and the duplicates are gone. Deleting them as
+   "dead" without this would have shrunk the widget. */
 .pel-app-game-card__venue strong {
   display: block;
-  font: 650 clamp(16px, 1.8vw, 23px)/1.05 var(--font-display);
+  font: 650 clamp(19px, 2.2vw, 28px)/1 var(--font-display);
   text-transform: uppercase;
 }
 
 .pel-app-game-card__venue p {
-  margin-top: 8px;
+  margin-top: 7px;
   font: 600 10px/1.35 var(--font-body);
   color: var(--text-muted);
 }
@@ -412,91 +454,11 @@
 }
 
 .pel-app-game-card__action {
-  color: var(--pel-orange-text);
-}
-
-.pel-app-game-card__date {
-  width: 56px;
-  height: 64px;
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  background: var(--pel-orange);
-}
-
-.pel-app-game-card__date b {
-  font: 650 27px/0.9 var(--font-display);
-}
-
-.pel-app-game-card__date span {
-  margin-top: 6px;
-  font: 700 9px/1 var(--font-body);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.pel-app-game-card__main strong {
-  font: 650 clamp(19px, 2.2vw, 28px)/1 var(--font-display);
-  text-transform: uppercase;
-}
-
-.pel-app-game-card__main p {
-  margin-top: 7px;
-  font: 600 10px/1.35 var(--font-body);
-  color: var(--text-muted);
-}
-
-.pel-app-game-card__players {
-  display: flex;
-  align-items: center;
-}
-
-.pel-app-game-card__players i {
-  width: 27px;
-  height: 27px;
-  margin-left: -6px;
-  border: 2px solid var(--pel-cream);
-  border-radius: 50%;
-  background: var(--pel-orange);
-}
-
-.pel-app-game-card__players i:first-child {
-  margin-left: 0;
-  background: var(--pel-ink);
-}
-
-.pel-app-game-card__players i:nth-child(2) {
-  background: var(--pel-green);
-}
-
-.pel-app-game-card__players i:nth-child(3) {
-  background: #d9b382;
-}
-
-.pel-app-game-card__players span {
-  margin-left: 10px;
-  font: 700 9px/1 var(--font-body);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.pel-app-hero__stamp {
-  position: absolute;
-  z-index: 4;
-  top: 24%;
-  right: -10%;
-  padding: 10px 16px;
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: var(--radius-pill);
-  background: var(--pel-orange);
-  color: var(--pel-ink);
-  font: 700 9px/1 var(--font-body);
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  transform: rotate(7deg);
+  /* Was var(--pel-orange-text), which is not defined anywhere — the token is
+     --pel-app-orange-text. An undefined custom property makes the declaration
+     invalid at computed-value time, so this inherited ink and never rendered
+     orange at all. */
+  color: var(--pel-app-orange-text);
 }
 
 .pel-app-hero__orbit {
@@ -520,121 +482,408 @@
   bottom: -20vw;
 }
 
-/* Feature details */
-.pel-app-details {
-  padding: clamp(84px, 10vw, 140px) 48px !important;
-  background: var(--pel-cream);
+/* ── S2 · The Thursday ───────────────────────────────────────────────────────
+   No imagery. Type and space only. A centred column at the spec's 60ch, each
+   line its own paragraph with generous leading so the five read as a list
+   rather than as prose, and the closing line separated from them by a rule and
+   a weight change. */
+.pel-app-thursday {
+  border-top: var(--border-width) solid var(--pel-ink);
 }
 
-.pel-app-details__intro {
-  max-width: 880px;
-  margin: 0 auto clamp(50px, 6vw, 82px);
+.pel-app-thursday__inner {
+  width: min(100%, 60ch);
+  margin: 0 auto;
   text-align: center;
 }
 
-.pel-app-details .pel-app-kicker,
-.pel-app-tour .pel-app-kicker {
-  margin-bottom: 20px;
+.pel-app-thursday__lines {
+  margin-top: clamp(40px, 5vw, 66px);
+}
+
+.pel-app-thursday__lines > p {
+  margin: 0;
+  padding: clamp(15px, 1.8vw, 22px) 0;
+  font: 500 clamp(16px, 1.25vw, 19px)/1.72 var(--font-body);
+  color: var(--text-muted);
+}
+
+.pel-app-thursday__close {
+  margin: clamp(34px, 4vw, 52px) 0 0;
+  padding-top: clamp(30px, 3.4vw, 44px);
+  border-top: var(--border-width) solid var(--pel-ink);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.3vw, 34px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--pel-ink);
+}
+
+/* ── S3 · The trade — one sheet, one fold ────────────────────────────────────
+   The page's key visual, and ONE object rather than two. A ruled team sheet
+   with a single fold down the middle: the frame is uncut, the feint paper rules
+   run straight ACROSS the fold, and the fold stops short of both ends and
+   carries a hinge that both halves share.
+
+   That is all in service of the spec's hardest constraint — nothing may imply
+   column 1 is being lost. A pitch split at the halfway line was the obvious
+   candidate and is the wrong one: a pitch divided at halfway IS two teams
+   facing each other, which is exactly the versus framing the copy denies. A
+   fold is reversible, destroys nothing, and is how a printed form actually gets
+   sorted into two duties while staying one sheet of paper.
+
+   Column 2 holds plain text and geometry only — no pill, no arrow, no currency
+   mark, nothing tappable — so "What it cost, split" cannot read as a
+   transaction. */
+.pel-app-trade {
+  --tr-pad: clamp(34px, 3.6vw, 48px);
+  --tr-gap: clamp(34px, 4vw, 52px);
+  --tr-seam: 8px; /* 1.5px fold + 3px gap + 3px tab */
+  /* Rule pitch. Stepped, not fluid: a fractional pitch puts type on half
+     pixels and drifts against the gradient.
+
+     These steps are keyed to the viewport, not to a container query on the
+     sheet. A container query was considered, on the theory that the panel
+     narrows before the viewport does and an item would wrap around 900px.
+     Measured, it does not: with these steps every item in the app column sits
+     on ONE rule from 1440px all the way down to 700px, and the only width
+     where any item wraps is 673px — a 1px band above the 42em stack — where it
+     takes exactly two whole rules and stays in register. So the container
+     query would add a containment context and a second source of truth for
+     zero behavioural gain. (The 48em gutter drop from 48px to 20px does make
+     the column WIDER at 768px than at 800px, which is real, but only ever
+     roomier.) */
+  --tr-rule-h: 38px;
+  --tr-item: 19px;
+  --tr-rail: 26px; /* marker rail — identical in both columns */
+  --tr-nudge: 1px; /* lifts markers off the line-box centre onto x-height */
+  /* Feint, and deliberately lighter than --border-soft (0.18): a repeating
+     field of five rules reads far heavier than one rule does. */
+  --tr-rule: rgba(23, 23, 23, 0.13);
+  --tr-paper: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--tr-rule-h) - 1px),
+    var(--tr-rule) calc(var(--tr-rule-h) - 1px) var(--tr-rule-h)
+  );
+
+  border-top: var(--border-width) solid var(--pel-ink);
+}
+
+/* One measure for the section, so the H2's left edge and the sheet's left edge
+   are the same line. */
+.pel-app-trade__head,
+.pel-app-trade__sheet {
+  width: min(100%, 980px);
+  margin-inline: auto;
+}
+
+/* One sentence per line at every width, whatever the display face's metrics
+   do — and it sets up the sheet's own two-part division before the reader
+   reaches it. */
+.pel-app-trade .pel-app-h2 {
+  max-width: none;
+  line-height: 0.98;
+}
+
+.pel-app-trade .pel-app-h2 span {
+  display: block;
+}
+
+.pel-app-trade .pel-app-lead {
+  max-width: 56ch;
+}
+
+/* ── The sheet ─────────────────────────────────────────────────────────────
+   No shadow: depth is not the idea, one flat printed sheet is. */
+.pel-app-trade__sheet {
+  margin-top: clamp(46px, 5.5vw, 76px);
+  padding: var(--tr-pad);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-md);
+  background: var(--pel-sand);
+}
+
+/* Rows 2 and 4 are pure spacers, so the paper gradient and the item line boxes
+   both start at exactly the top of row 5 with no margins to keep in sync. */
+.pel-app-trade__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--tr-seam) minmax(0, 1.06fr);
+  grid-template-rows: auto 22px var(--border-width) 26px auto;
+  column-gap: var(--tr-gap);
+  row-gap: 0;
+}
+
+.pel-app-trade__colhead--stays {
+  grid-area: 1 / 1 / 2 / 2;
+}
+
+.pel-app-trade__colhead--moves {
+  grid-area: 1 / 3 / 2 / 4;
+}
+
+.pel-app-trade__band {
+  grid-area: 3 / 1 / 4 / -1;
+  z-index: 1;
+  background: var(--pel-ink);
+}
+
+/* THE BAND CHANGES COLOUR AT THE FOLD. One continuous line across the sheet,
+   ink over the chat's half and brick over the app's, starting exactly at the
+   seam column so the change lands on the fold itself. It declares "two duties,
+   one of them is the app's" without dimming, shrinking or shadowing anything —
+   which is why the accent lives here and never as a box around column 2. */
+.pel-app-trade__band-app {
+  grid-area: 3 / 2 / 4 / -1;
+  z-index: 2;
+  background: var(--pel-orange);
+}
+
+/* The one ruled field, crossing the fold. This is the load-bearing device: a
+   rule that continues across the divider makes the whole thing read as one
+   sheet with a notation on it, not two lists that happen to be adjacent. */
+.pel-app-trade__paper {
+  grid-area: 5 / 1 / 6 / -1;
+  z-index: 0;
+  background-image: var(--tr-paper);
+  pointer-events: none;
+}
+
+.pel-app-trade__list--stays {
+  grid-area: 5 / 1 / 6 / 2;
+}
+
+.pel-app-trade__list--moves {
+  grid-area: 5 / 3 / 6 / 4;
+}
+
+/* Spans the band row too, so the fold grows out of the rule rather than
+   floating below it. */
+.pel-app-trade__seam {
+  grid-area: 3 / 2 / 6 / 3;
+  z-index: 3;
+  position: relative;
+  display: block;
+}
+
+/* ── Column headings. The hue differs; the presence never does. ───────────── */
+.pel-app-trade__colhead {
+  margin: 0;
+  font: 700 12px/1.4 var(--font-body);
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.pel-app-trade__colhead--stays {
+  color: var(--pel-ink); /* full strength, never muted */
+}
+
+.pel-app-trade__colhead--moves {
+  /* 4.81:1 on sand. Never --pel-orange at this size. */
   color: var(--pel-app-orange-text);
 }
 
-.pel-app-details__intro h2,
-.pel-app-tour__head h2,
-.pel-app-download h2,
-.pel-app-contact__copy h2 {
+/* ── The lists ─────────────────────────────────────────────────────────────*/
+.pel-app-trade__list {
+  position: relative;
+  z-index: 2;
+  align-self: start;
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
+  padding: 0;
+  list-style: none;
 }
 
-.pel-app-details__intro h2,
-.pel-app-tour__head h2 {
-  font-size: clamp(44px, 6vw, 88px);
-  line-height: 0.92;
+.pel-app-trade__list li {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 var(--tr-rail);
+  font-family: var(--font-body);
+  font-size: var(--tr-item);
+  font-weight: 600;
+  /* A LENGTH, not a number: the line box must equal the rule pitch exactly, so
+     a wrapped item takes two whole rules and the field stays in register. */
+  line-height: var(--tr-rule-h);
+  letter-spacing: -0.005em;
+  color: var(--pel-ink); /* identical in both columns */
 }
 
-.pel-app-details__intro > p:last-child,
-.pel-app-tour__head > p:last-child {
-  max-width: 620px;
-  margin: 26px auto 0;
-  font: 600 15px/1.7 var(--font-body);
-  color: var(--text-muted);
+.pel-app-trade__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
 }
 
-.pel-app-details__grid {
+/* Stays — an ink dash in the sheet's own colour. Linear. */
+.pel-app-trade__list--stays li::before {
+  top: calc((var(--tr-rule-h) - var(--border-width)) / 2 - var(--tr-nudge));
+  width: 13px;
+  height: var(--border-width);
+  background: var(--pel-ink);
+}
+
+/* Moves — a filled dot, a small echo of the hinge. A different species of
+   mark, not a louder one. 3.09:1 on sand, clearing the 3:1 non-text floor. */
+.pel-app-trade__list--moves li::before {
+  top: calc((var(--tr-rule-h) - 7px) / 2 - var(--tr-nudge));
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pel-orange);
+}
+
+/* The 4-vs-5 asymmetry is deliberately left alone. The rules run continuously
+   across both columns, so five rules are ruled and the chat column fills four
+   of them — and a blank ruled line on a ruled sheet is just what ruled paper
+   looks like. It reads as room left over: you keep everything AND you get
+   space back.
+
+   An earlier pass struck that fifth line through with a short rule, on the
+   bookkeeping convention for "no further entries". That was wrong and was
+   removed: a strike sitting on the CHAT column's last row is a cancellation
+   mark on the one thing the brief insists is not being lost. The blank line
+   was never the thing that read as a deficit; the strike was. */
+
+/* ── The fold ──────────────────────────────────────────────────────────────
+   Stops one whole rule short of the bottom: a divider that never reaches an
+   edge cannot have cut the sheet in two. */
+.pel-app-trade__fold {
+  position: absolute;
+  top: 0;
+  bottom: var(--tr-rule-h);
+  left: 0;
+  z-index: 2;
+  width: var(--border-width);
+  background: var(--pel-ink);
+}
+
+/* A printed dimension mark, not a wall. */
+.pel-app-trade__fold::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 12px;
+  height: var(--border-width);
+  margin-left: -6px;
+  background: var(--pel-ink);
+}
+
+/* A filing-tab edge on the half that got filed — the accent on the seam, not
+   around the column. */
+.pel-app-trade__tab {
+  position: absolute;
+  top: 0;
+  bottom: var(--tr-rule-h);
+  left: calc(var(--border-width) + 3px);
+  z-index: 1;
+  width: 3px;
+  background: var(--pel-orange);
+}
+
+/* The hinge — the one mark both halves share, lifted from the only mark on a
+   pitch that belongs to both sides and to neither. Child of the fold so it
+   tracks the fold's midpoint in both orientations, and its sand fill punches a
+   clean hole through the ink fold AND the orange tab. Centred with margins,
+   never a transform: useScrollMotion writes el.style.transform and would
+   clobber a translate() here. */
+.pel-app-trade__hinge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 15px;
+  height: 15px;
+  margin: -7.5px 0 0 -7.5px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 50%;
+  background: var(--pel-sand);
+}
+
+/* ── S5 · The reversal ───────────────────────────────────────────────────────
+   Copy left, the pre-match read right. The screenshot is the page's one
+   drifter; everything else rises. */
+.pel-app-reversal {
+  border-top: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-sand);
+}
+
+.pel-app-reversal__inner {
   width: min(100%, var(--container));
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: var(--border-width) solid var(--pel-ink);
-  border-bottom: var(--border-width) solid var(--pel-ink);
+  grid-template-columns: minmax(0, 1.12fr) minmax(260px, 0.88fr);
+  align-items: center;
+  gap: clamp(48px, 7vw, 110px);
 }
 
-.pel-app-detail-card {
-  min-height: 370px;
-  padding: clamp(28px, 3.5vw, 50px);
-  display: flex;
-  flex-direction: column;
-  border-left: var(--border-width) solid var(--pel-ink);
+.pel-app-reversal__list {
+  width: min(100%, 60ch);
+  margin: clamp(30px, 3.4vw, 44px) 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.pel-app-detail-card:last-child {
-  border-right: var(--border-width) solid var(--pel-ink);
+/* The orange dot, the same mark S3 gives the "moves to the app" column: every
+   one of these five bullets is something the app provides, so it reinforces
+   that notation. Deliberately NOT a diamond — S6's legend teaches a diamond as
+   "needs a human", and S5 is read first, so a diamond here would hand the
+   reader the wrong key before they reach it. */
+.pel-app-reversal__list > li {
+  position: relative;
+  margin: 0;
+  padding: clamp(9px, 1vw, 12px) 0 clamp(9px, 1vw, 12px) 30px;
+  font: 500 clamp(15px, 1.05vw, 17px)/1.62 var(--font-body);
+  color: var(--pel-ink);
 }
 
-.pel-app-detail-card__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
-  font: 700 11px/1 var(--font-body);
-  letter-spacing: 0.16em;
-}
-
-.pel-app-detail-card__icon {
-  width: 64px;
-  height: 64px;
-  display: grid;
-  place-items: center;
-  border: var(--border-width) solid var(--pel-ink);
+.pel-app-reversal__list > li::before {
+  content: '';
+  position: absolute;
+  top: calc(clamp(9px, 1vw, 12px) + 0.62em);
+  left: 3px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--pel-green);
-  color: var(--pel-cream);
+  background: var(--pel-orange);
 }
 
-.pel-app-detail-card:nth-child(2) .pel-app-detail-card__icon,
-.pel-app-detail-card:nth-child(3) .pel-app-detail-card__icon {
-  background: var(--pel-green);
-  color: var(--pel-cream);
+.pel-app-reversal__close {
+  max-width: 44ch;
+  margin: clamp(28px, 3.2vw, 40px) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(21px, 2.1vw, 31px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--pel-ink);
 }
 
-.pel-app-detail-card__icon svg {
-  width: 27px;
-  height: 27px;
+/* Transform-free wrapper: useScrollMotion writes its drift onto this element's
+   own transform, so anything of ours here would be overwritten. The tilt and
+   the offset register live on the inner frame instead. */
+.pel-app-reversal__shot {
+  justify-self: center;
+  width: min(100%, 320px);
 }
 
-.pel-app-detail-card h3 {
-  max-width: 270px;
-  min-height: 2em;
-  margin: 54px 0 18px;
-  font: 650 clamp(31px, 3vw, 46px)/0.96 var(--font-display);
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
+.pel-app-reversal__shot img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-cream);
+  transform: rotate(2deg);
+  box-shadow: 12px 14px 0 rgba(23, 23, 23, 0.16);
 }
 
-.pel-app-detail-card > p {
-  max-width: 38ch;
-  min-height: 5.2em;
-  font: 500 14px/1.65 var(--font-body);
-  color: var(--text-muted);
-}
-
-/* Scroll-led phone tour */
+/* ── S6 · the inherited tour shell ─────────────────────────────────────────
+   Kept under its original names on purpose: S6's <section> wears
+   `pel-app-tour pel-week`, so the sand ground, the top hairline, the centred
+   head and every sticky/phone dimension at 68em/54em/48em/25em keep applying
+   with nothing re-declared. .pel-week (below) is the new layer on top. */
 .pel-app-tour {
   position: relative;
-  padding: clamp(88px, 10vw, 142px) 48px 0 !important;
+  padding: clamp(88px, 10vw, 142px) 48px 0;
   border-top: var(--border-width) solid var(--pel-ink);
   background: var(--pel-sand);
 }
@@ -664,105 +913,378 @@
   justify-content: center;
 }
 
-.pel-app-tour__progress {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
+/* S6 · The week — the scroll-driven phone, rehoused. */
+.pel-week {
+  --wk-node: 13px;                      /* node + meter diamond box        */
+  --wk-rail: 42px;                      /* spine column                    */
+  --wk-gap: clamp(16px, 1.6vw, 24px);   /* rail → text                     */
+  --wk-box: clamp(20px, 2.2vw, 28px);   /* flagged well's x-padding        */
+  --wk-hair: rgba(23, 23, 23, 0.22);    /* matches the shipped tour rule   */
+  --wk-quiet: rgba(23, 23, 23, 0.62);   /* 4.65:1 on sand — AA at any size */
+
+  /* THE PACING DIAL for the whole section. One property, one place. The old
+     tour used 88vh, which can only ever show ONE step — you cannot perceive a
+     sequence through a letterbox. 56svh always shows the active moment plus
+     the next row's rule, label and node, with the spine running between. */
+  --wk-stride: 56svh;
+
+  /* .pel-app-tour ends at `padding-bottom: 0` because its 88vh steps carried
+     a 12vh tail. Shorter steps need a real one. Equal specificity with
+     `.pel-app-tour`, so this wins on source order — it must stay below it. */
+  padding-bottom: clamp(46px, 6vw, 96px);
 }
 
-.pel-app-tour__progress button {
+/* Insurance for /app#inside-the-app, which is live today. */
+.pel-week__legacy-anchor {
+  display: block;
+  height: 0;
+  scroll-margin-top: 130px;
+}
+
+/* ── Head legend ───────────────────────────────────────────────────────────
+   SPECIFICITY, load-bearing. The shipped
+     `.pel-app-details__intro > p:last-child, .pel-app-tour__head > p:last-child`
+   is (0,2,1) and would otherwise style this as a centred grey body paragraph.
+   `.pel-app-tour__head > .pel-week__legend` is only (0,2,0) and LOSES on
+   class count. Adding the section class makes it (0,3,0), which wins. */
+.pel-week .pel-app-tour__head > .pel-week__legend {
+  max-width: none;
+  margin: clamp(22px, 2.4vw, 30px) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 26px;
+  font: 700 11px/1.3 var(--font-body);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+
+.pel-week__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* The key marks are the step nodes, at the step nodes' size. */
+.pel-week__key-mark {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 50%;
+  background: var(--pel-sand);
+}
+
+.pel-week__key-mark--human {
+  border-radius: 3px;
+  background: var(--pel-ink);
+  transform: rotate(45deg);
+}
+
+/* ── Grid: steps LEFT, phone RIGHT ────────────────────────────────────────
+   Done with placement, not DOM order, so it evaporates the moment
+   .pel-app-tour__grid becomes display:block at =54em and the proven mobile
+   order survives untouched. */
+.pel-week__grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
+  gap: clamp(48px, 6vw, 104px);
+  align-items: start;
+}
+
+.pel-week__steps {
   position: relative;
-  width: 34px;
-  height: 34px;
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pel-week .pel-app-tour__stage {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* ── One step = one row of a printed schedule ─────────────────────────────
+   A full-width hairline opens the row, the node sits ON that hairline (a tick
+   on a schedule, not a bullet on a list), the time sets under it. Content is
+   anchored to the TOP; the remaining height is scroll runway, which is what
+   lets you see the next row while the current one is active. */
+.pel-week-step {
+  position: relative;
+  margin: 0; /* reset.css li{margin-bottom:.5rem} would break the spine overlap */
+  min-height: 56vh;             /* fallback for engines without svh */
+  min-height: var(--wk-stride);
+  padding: clamp(26px, 3vh, 38px) 0 clamp(30px, 5vh, 64px);
+  display: grid;
+  grid-template-columns: var(--wk-rail) minmax(0, 1fr);
+  align-content: start;
+  gap: 0 var(--wk-gap);
+  border-top: var(--border-width) solid var(--wk-hair);
+}
+
+/* The schedule opens with a rule and closes with a rule — a bounded span of
+   time, not an open-ended list. No separate end-cap tick needed. */
+.pel-week-step:last-child {
+  border-bottom: var(--border-width) solid var(--wk-hair);
+}
+
+/* The spine. Overlaps its neighbours by the border width so consecutive steps
+   read as one unbroken line through the rules, and inks in behind you, so the
+   week visibly accumulates as you read. */
+.pel-week-step::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--border-width) * -1);
+  bottom: calc(var(--border-width) * -1);
+  left: calc(var(--wk-node) / 2 - var(--border-width) / 2);
+  width: var(--border-width);
+  background: var(--wk-hair);
+  transition: background var(--dur-med) ease;
+}
+
+.pel-week-step.is-past::before,
+.pel-week-step.is-active::before {
+  background: var(--pel-ink);
+}
+
+.pel-week-step:last-child::before {
+  bottom: 0;
+}
+
+/* The active marker: an orange rule wiping left-to-right across the row's own
+   hairline, like a ruler sliding down a schedule. Replaces the opacity dim
+   that the quiet/active colour states no longer need. */
+.pel-week-step::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--border-width) * -1);
+  left: 0;
+  right: 0;
+  height: var(--border-width);
+  background: var(--pel-orange);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.55s var(--ease-out);
+}
+
+.pel-week-step.is-active::after {
+  transform: scaleX(1);
+}
+
+/* The node. Two ORTHOGONAL channels, so they compose:
+     SHAPE says WHO does it  — circle = the app, diamond = a person
+     FILL  says WHERE you are — hollow ahead, orange now, ink behind
+   z-index:2 keeps it above both the spine and the orange wipe, which run
+   underneath it; its sand ground punches it out of both. */
+.pel-week-step__node {
+  position: absolute;
+  z-index: 2;
+  top: calc((var(--wk-node) / 2 + var(--border-width) / 2) * -1);
+  left: 0;
+  width: var(--wk-node);
+  height: var(--wk-node);
+  border: var(--border-width) solid var(--wk-hair);
+  border-radius: 50%;
+  background: var(--pel-sand);
+  transition:
+    background var(--dur-med) ease,
+    border-color var(--dur-med) ease,
+    box-shadow var(--dur-med) ease;
+}
+
+.pel-week-step.is-past .pel-week-step__node {
+  border-color: var(--pel-ink);
+  background: var(--pel-ink);
+}
+
+/* Hard, un-blurred rings — a printed register mark, not elevation. Same
+   device as the file's existing `8px 9px 0` and `inset 0 0 0 .25cqw`. */
+.pel-week-step.is-active .pel-week-step__node {
+  border-color: var(--pel-ink);
+  background: var(--pel-orange);
+  box-shadow:
+    0 0 0 4px var(--pel-sand),
+    0 0 0 calc(4px + var(--border-width)) var(--pel-ink);
+}
+
+/* Declared AFTER .is-active and at equal specificity, so it wins the
+   properties it names (shape) and leaves `background` to the state above —
+   which is exactly how the two channels stay independent. */
+/* (0,3,0) on purpose. At (0,2,0) this tied with the .is-active / .is-past
+   state rules above, and a tie is decided by source order for EVERY property
+   they share — including border-color, which both set. Raising it one class
+   keeps the two channels genuinely independent: this rule owns the SHAPE, the
+   state rules own the FILL. */
+.pel-week-step.pel-week-step--human .pel-week-step__node {
+  border-color: var(--pel-ink);
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+
+/* ── Copy ─────────────────────────────────────────────────────────────────
+   NO OPACITY DIMMING ANYWHERE. Ink at 0.5 over sand measures 3.24:1 and the
+   shipped tour's 0.42 measures 2.60:1 — both fail AA. Quiet is carried on
+   colour alone, and both quiet values pass AA at every step:
+     --wk-quiet   rgba(23,23,23,.62) on sand = 4.65:1
+     --text-muted rgba(23,23,23,.65) on sand = 5.11:1
+   This is also why no `.is-lit` gate is needed: with JS off nothing gets
+   .is-active, so all six steps simply render in the quiet colour, fully
+   legible. Degradation, not breakage. */
+.pel-week-step__body {
+  grid-column: 2;
+  max-width: 44ch;
+}
+
+/* The TIME is the heading. This is the whole difference between a week and a
+   feature list, and it gives screen readers a heading outline that reads as
+   one. Set at --t-statement so it stays clearly subordinate to the section H2
+   at clamp(44px,6vw,88px) — a schedule label, not a second headline. */
+.pel-week-step__when {
+  margin: 0;
+  font: 650 var(--t-statement)/1.02 var(--font-display);
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  color: var(--wk-quiet);
+  transition: color var(--dur-med) ease;
+}
+
+.pel-week-step.is-active .pel-week-step__when,
+.pel-week-step.is-past .pel-week-step__when {
+  color: var(--pel-ink);
+}
+
+.pel-week-step__what {
+  max-width: 34ch;
+  margin: clamp(13px, 1.5vw, 18px) 0 0;
+  font: 500 clamp(15px, 1.05vw, 17px)/1.68 var(--font-body);
+  color: var(--text-muted);
+  transition: color var(--dur-med) ease;
+}
+
+.pel-week-step.is-active .pel-week-step__what {
+  color: var(--pel-ink);
+}
+
+/* THE MARGIN CHANNEL — the section's strongest signal, and the literal
+   reading of "the four unflagged steps render quiet". The two exceptions are
+   the ONLY rows whose text block is boxed, and the well is pulled left by
+   exactly its own x-padding so all six time labels keep one unbroken left
+   edge. Nothing whatsoever is added to the quiet four: quiet means quiet. */
+.pel-week-step--human .pel-week-step__body {
+  margin-left: calc(var(--wk-box) * -1);
+  padding: clamp(22px, 2.4vw, 30px) var(--wk-box) clamp(24px, 2.6vw, 32px);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-md);
+  background: var(--pel-cream);
+}
+
+/* The flag stamp. Smallest type in the section, so both colours are checked
+   at full opacity on cream: --text-muted 5.28:1, --pel-app-orange-text
+   (#9f4c30) 5.20:1. Both pass AA. */
+.pel-week-step__flag {
+  margin: clamp(17px, 1.9vw, 22px) 0 0;
+  display: inline-flex;
+  align-items: center;
+  /* Wraps at EVERY width, not just below 400px. The pill is squeezed at
+     401-427px and again at 865-938px, and a nowrap flex row there broke the
+     detail phrase mid-sentence inside the pill. Both children are nowrap, so
+     the only break point is between them. */
+  flex-wrap: wrap;
+  gap: 7px 11px;
+  padding: 8px 14px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-pill);
+  background: var(--pel-cream);
+  font: 700 10.5px/1 var(--font-body);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* No divider rule between the two: on a wrapped line it dangled at the end of
+   the first row. Colour and the gap carry the separation instead. */
+.pel-week-step__flag-label {
+  white-space: nowrap;
+  color: var(--pel-app-orange-text);
+}
+
+.pel-week-step__flag-detail {
+  white-space: nowrap;
+}
+
+/* ── The week meter (replaces .pel-app-tour__progress) ────────────────────
+   Six cells on a hairline: position in a week, not a slide counter. The two
+   diamonds let the reader see "only two of these need me" before reading a
+   word. Hidden =54em, the same call the old dots make — and forced anyway by
+   pointer-events:none on the mobile stage. */
+.pel-week__meter {
+  width: min(100%, 420px);
+  margin-top: clamp(18px, 2.4vh, 30px);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-top: var(--border-width) solid var(--wk-hair);
+}
+
+.pel-week__meter-cell {
+  position: relative;
+  height: 28px;              /* 28px tall x ~70px wide — comfortable target */
   padding: 0;
   border: 0;
-  border-radius: 50%;
   background: transparent;
   cursor: pointer;
 }
 
-.pel-app-tour__progress button::after {
+.pel-week__meter-cell::before {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(23, 23, 23, 0.28);
-  transform: translate(-50%, -50%);
+  top: calc(var(--border-width) * -1);
+  left: 1px;
+  right: 1px;
+  height: 3px;
+  background: transparent;
   transition:
-    width var(--dur-fast),
+    height var(--dur-fast) var(--ease-out),
     background var(--dur-fast);
 }
 
-.pel-app-tour__progress button.is-active::after {
-  width: 22px;
-  border-radius: var(--radius-pill);
-  background: var(--pel-orange-ink);
+.pel-week__meter-cell.is-past::before {
+  background: var(--pel-ink);
 }
 
-.pel-app-tour-step {
-  min-height: 88vh;
-  min-height: 88svh;
-  padding: 12vh 0;
-  display: grid;
-  grid-template-columns: 68px minmax(0, 1fr);
-  align-content: center;
-  gap: clamp(24px, 4vw, 58px);
-  border-top: var(--border-width) solid rgba(23, 23, 23, 0.22);
-  opacity: 0.42;
-  transition: opacity var(--dur-med) ease;
-}
-
-.pel-app-tour-step:last-child {
-  border-bottom: var(--border-width) solid rgba(23, 23, 23, 0.22);
-}
-
-.pel-app-tour-step.is-active {
-  opacity: 1;
-}
-
-.pel-app-tour-step__number {
-  width: 58px;
-  height: 58px;
-  display: grid;
-  place-items: center;
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: 50%;
-  font: 650 19px/1 var(--font-display);
-  transition:
-    background var(--dur-med),
-    color var(--dur-med);
-}
-
-.pel-app-tour-step.is-active .pel-app-tour-step__number {
+.pel-week__meter-cell.is-active::before {
+  height: 6px;
   background: var(--pel-orange);
 }
 
-.pel-app-tour-step__copy > p {
-  margin: 3px 0 17px;
-  font: 700 11px/1 var(--font-body);
-  letter-spacing: 0.17em;
+.pel-week__meter-cell.is-human::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 2px;
+  background: transparent;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.pel-week__meter-cell.is-human.is-past::after,
+.pel-week__meter-cell.is-human.is-active::after {
+  background: var(--pel-ink);
+}
+
+/* Fixed min-height, so swapping the label never nudges the phone. */
+.pel-week__now {
+  min-height: 1.1em;
+  margin: 12px 0 0;
+  font: 700 11px/1.1 var(--font-body);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--pel-app-orange-text);
-}
-
-.pel-app-tour-step__copy h3 {
-  max-width: 590px;
-  margin: 0;
-  font: 650 clamp(39px, 4.6vw, 70px)/0.92 var(--font-display);
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-}
-
-.pel-app-tour-step__copy > div {
-  max-width: 520px;
-  margin-top: 24px;
-  font: 500 15px/1.7 var(--font-body);
-  color: var(--text-muted);
 }
 
 /* iPhone frame */
@@ -878,643 +1400,139 @@
   border-radius: 0 1cqw 1cqw 0;
 }
 
-/* Temporary app screen art. Replaced automatically when imageSrc is supplied. */
-.pel-app-mock {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #f8f5ec;
-  color: #171717;
-  font-family: var(--font-body);
-  font-size: 3.2cqw;
-}
-
-.pel-app-mock__status {
-  height: 12cqw;
-  padding: 3.9cqw 6.5cqw 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  font-size: 2.8cqw;
-  font-weight: 700;
-}
-
-.pel-app-mock__status > div {
-  display: flex;
-  gap: 1.2cqw;
-}
-
-.pel-app-mock__status i {
-  width: 3.2cqw;
-  height: 2.2cqw;
-  display: block;
-  border-radius: 1cqw;
-  background: #171717;
-}
-
-.pel-app-mock__status i:nth-child(2) {
-  width: 2.4cqw;
-  border-radius: 50%;
-}
-
-.pel-app-mock__nav {
-  height: 13cqw;
-  padding: 0 6cqw;
-  display: flex;
-  align-items: center;
-  border-bottom: 0.3cqw solid rgba(23, 23, 23, 0.13);
-}
-
-.pel-app-mock__nav img {
-  width: 7cqw;
-  height: 7cqw;
-  border-radius: 2cqw;
-}
-
-.pel-app-mock__nav span {
-  margin-left: 2cqw;
-  font-family: var(--font-display);
-  font-size: 4.3cqw;
-  font-weight: 650;
-}
-
-.pel-app-mock__nav > i {
-  width: 6cqw;
-  height: 6cqw;
-  margin-left: auto;
-  border: 0.35cqw solid #171717;
-  border-radius: 50%;
-}
-
-.pel-app-mock__body {
-  padding: 6.5cqw 6cqw 16cqw;
-}
-
-.pel-app-mock__eyebrow {
-  margin: 0 0 1.8cqw;
-  font-size: 2.25cqw;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: #9a4a30;
-}
-
-.pel-app-mock__body h4 {
-  margin: 0 0 5cqw;
-  font-family: var(--font-display);
-  font-size: 7.2cqw;
-  font-weight: 650;
-  line-height: 0.96;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__feature {
-  padding: 5.4cqw;
-  border-radius: 5cqw;
-  background: #3e6ab9;
-  color: #f7f0de;
-  box-shadow: 0 2.2cqw 5cqw rgba(23, 23, 23, 0.12);
-}
-
-.pel-app-mock__feature-top {
-  margin-bottom: 5cqw;
-  display: flex;
-  justify-content: space-between;
-  font-size: 2.1cqw;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__feature > strong {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 7cqw;
-  font-weight: 650;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__feature > p {
-  margin: 2cqw 0 4cqw;
-  font-size: 2.5cqw;
-  font-weight: 600;
-}
-
-.pel-app-mock__join {
-  width: 100%;
-  padding: 3.3cqw;
-  border-radius: 10cqw;
-  background: #ce643e;
-  color: #171717;
-  font: 700 2.5cqw/1 var(--font-body);
-  letter-spacing: 0.08em;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__section-title {
-  margin: 6cqw 0 2.8cqw;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 2.5cqw;
-}
-
-.pel-app-mock__section-title span {
-  font-size: 2.1cqw;
-  color: rgba(23, 23, 23, 0.68);
-}
-
-.pel-app-mock__game-row {
-  min-height: 13.5cqw;
-  padding: 2.4cqw 0;
-  display: grid;
-  grid-template-columns: 11cqw minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 3cqw;
-  border-top: 0.3cqw solid rgba(23, 23, 23, 0.13);
-}
-
-.pel-app-mock__game-row > div {
-  height: 9cqw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 2.2cqw;
-  background: #efe7d4;
-}
-
-.pel-app-mock__game-row > div span,
-.pel-app-mock__game-row > div b {
-  font-size: 2.15cqw;
-  line-height: 1.15;
-}
-
-.pel-app-mock__game-row > p {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  font-size: 2.55cqw;
-  line-height: 1.25;
-}
-
-.pel-app-mock__game-row > p span {
-  margin-top: 0.8cqw;
-  font-size: 2.05cqw;
-  color: rgba(23, 23, 23, 0.68);
-}
-
-.pel-app-mock__game-row > strong {
-  font-size: 2.05cqw;
-  color: #2f6a44;
-}
-
-.pel-app-mock__tabs {
-  position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 15cqw;
-  padding: 0 8cqw 4cqw;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 0.3cqw solid rgba(23, 23, 23, 0.13);
-  background: rgba(248, 245, 236, 0.95);
-}
-
-.pel-app-mock__tabs i {
-  width: 5cqw;
-  height: 5cqw;
-  border: 0.5cqw solid rgba(23, 23, 23, 0.38);
-  border-radius: 50%;
-}
-
-.pel-app-mock__tabs i.is-active {
-  border-color: #ce643e;
-  background: #ce643e;
-  box-shadow: inset 0 0 0 1.2cqw #f8f5ec;
-}
-
-.pel-app-mock__calendar {
-  padding: 4.5cqw;
-  border-radius: 4cqw;
-  background: #171717;
-  color: #f7f0de;
-}
-
-.pel-app-mock__calendar > div {
-  display: flex;
-  justify-content: space-between;
-  font-size: 3cqw;
-}
-
-.pel-app-mock__week {
-  margin: 4cqw 0 0;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1cqw;
-}
-
-.pel-app-mock__week li {
-  min-width: 0;
-  margin: 0;
-  padding: 1.7cqw 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5cqw;
-  border-radius: 5cqw;
-  font-size: 2.1cqw;
-}
-
-.pel-app-mock__week li.is-active {
-  background: #ce643e;
-  color: #171717;
-}
-
-.pel-app-mock__create {
-  margin-top: 5cqw;
-  padding: 3.5cqw;
-  border: 0.35cqw dashed rgba(23, 23, 23, 0.35);
-  border-radius: 4cqw;
-  text-align: center;
-  font-size: 2.4cqw;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__game-meta {
-  padding: 4.5cqw;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4cqw;
-  border-radius: 4cqw;
-  background: #efe7d4;
-}
-
-.pel-app-mock__game-meta > div {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2cqw;
-}
-
-.pel-app-mock__game-meta span {
-  font-size: 2cqw;
-  color: rgba(23, 23, 23, 0.68);
-}
-
-.pel-app-mock__game-meta b {
-  font-size: 2.6cqw;
-}
-
-.pel-app-mock__roster-head {
-  margin: 5.5cqw 0 2cqw;
-  display: flex;
-  justify-content: space-between;
-  font-size: 2.6cqw;
-}
-
-.pel-app-mock__roster-head span {
-  color: #2f6a44;
-  font-weight: 700;
-}
-
-.pel-app-mock__people > div,
-.pel-app-mock__leader-list > div {
-  min-height: 10cqw;
-  display: grid;
-  align-items: center;
-  border-top: 0.3cqw solid rgba(23, 23, 23, 0.12);
-}
-
-.pel-app-mock__people > div {
-  grid-template-columns: 8cqw minmax(0, 1fr) auto;
-  gap: 3cqw;
-}
-
-.pel-app-mock__people i,
-.pel-app-mock__leader-list i,
-.pel-app-mock__podium i {
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #ce643e;
-  font-style: normal;
-  font-weight: 700;
-}
-
-.pel-app-mock__people i {
-  width: 7cqw;
-  height: 7cqw;
-  font-size: 2cqw;
-}
-
-.pel-app-mock__people span {
-  font-size: 2.45cqw;
-  font-weight: 600;
-}
-
-.pel-app-mock__people b {
-  font-size: 2.1cqw;
-  color: #2f6a44;
-}
-
-.pel-app-mock__waitlist {
-  margin-top: 3cqw;
-  padding: 3.5cqw;
-  display: flex;
-  justify-content: space-between;
-  border-radius: 3cqw;
-  background: #171717;
-  color: #f7f0de;
-  font-size: 2.4cqw;
-}
-
-.pel-app-mock__score {
-  padding: 5cqw 4cqw;
-  border-radius: 5cqw;
-  background: #ce643e;
-  text-align: center;
-}
-
-.pel-app-mock__score > span {
-  font-size: 2.1cqw;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__score > div {
-  margin: 4cqw 0 2.5cqw;
-  display: grid;
-  grid-template-columns: 1fr auto auto auto 1fr;
-  align-items: center;
-  gap: 2.5cqw;
-}
-
-.pel-app-mock__score strong {
-  font-family: var(--font-display);
-  font-size: 10cqw;
-  line-height: 1;
-}
-
-.pel-app-mock__score b {
-  font-size: 2.2cqw;
-}
-
-.pel-app-mock__score i {
-  font-style: normal;
-  opacity: 0.45;
-}
-
-.pel-app-mock__score > p {
-  font-size: 2.3cqw;
-  font-weight: 600;
-}
-
-.pel-app-mock__stat-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2cqw;
-}
-
-.pel-app-mock__stat-grid > div {
-  padding: 3.5cqw 1cqw;
-  display: flex;
-  flex-direction: column;
-  gap: 1cqw;
-  border-radius: 3cqw;
-  background: #efe7d4;
-  text-align: center;
-}
-
-.pel-app-mock__stat-grid b {
-  font-family: var(--font-display);
-  font-size: 5.5cqw;
-}
-
-.pel-app-mock__stat-grid span {
-  font-size: 1.9cqw;
-  text-transform: uppercase;
-}
-
-.pel-app-mock__result-row {
-  min-height: 11cqw;
-  display: grid;
-  grid-template-columns: 7cqw minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 3cqw;
-  border-bottom: 0.3cqw solid rgba(23, 23, 23, 0.12);
-}
-
-.pel-app-mock__result-row:first-of-type {
-  margin-top: 4cqw;
-}
-
-.pel-app-mock__result-row > i {
-  width: 6cqw;
-  height: 6cqw;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #2f6a44;
-  color: #f7f0de;
-  font-size: 2.2cqw;
-  font-style: normal;
-  font-weight: 700;
-}
-
-.pel-app-mock__result-row > span {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5cqw;
-  font-size: 2.3cqw;
-}
-
-.pel-app-mock__result-row small {
-  color: rgba(23, 23, 23, 0.68);
-}
-
-.pel-app-mock__result-row > strong {
-  font-size: 2.6cqw;
-}
-
-.pel-app-mock__leader-tabs {
-  padding: 1.5cqw;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-radius: 8cqw;
-  background: #efe7d4;
-  font-size: 2.2cqw;
-  text-align: center;
-}
-
-.pel-app-mock__leader-tabs > * {
-  padding: 2.3cqw;
-}
-
-.pel-app-mock__leader-tabs b {
-  border-radius: 5cqw;
-  background: #171717;
-  color: #f7f0de;
-}
-
-.pel-app-mock__podium {
-  height: 33cqw;
-  margin: 4cqw 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4cqw;
-  border-radius: 4cqw;
-  background: #3e6ab9;
-}
-
-.pel-app-mock__podium > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5cqw;
-  color: #f7f0de;
-  font-size: 2.3cqw;
-  font-weight: 700;
-}
-
-.pel-app-mock__podium > div:nth-child(2) {
-  align-self: center;
-  transform: translateY(-2cqw);
-}
-
-.pel-app-mock__podium i {
-  width: 11cqw;
-  height: 11cqw;
-  background: #f7f0de;
-  color: #171717;
-  font-size: 2.6cqw;
-}
-
-.pel-app-mock__podium > div:nth-child(2) i {
-  width: 14cqw;
-  height: 14cqw;
-  background: #ce643e;
-}
-
-.pel-app-mock__leader-list > div {
-  grid-template-columns: 4cqw 7cqw minmax(0, 1fr) auto;
-  gap: 2.5cqw;
-}
-
-.pel-app-mock__leader-list strong,
-.pel-app-mock__leader-list span,
-.pel-app-mock__leader-list b {
-  font-size: 2.2cqw;
-}
-
-.pel-app-mock__leader-list i {
-  width: 6cqw;
-  height: 6cqw;
-  font-size: 1.8cqw;
-}
-
-.pel-app-mock__leader-list b {
-  color: #9a4a30;
-}
-
-/* Download strip */
-.pel-app-download {
-  min-height: 330px;
-  padding: 58px max(48px, calc((100vw - var(--container)) / 2)) !important;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(28px, 4vw, 60px);
+/* ── S7 · One game ───────────────────────────────────────────────────────────
+   Single column. The closing line is emphasised; the pricing note is set apart
+   and quieter, below it. */
+.pel-app-onegame {
   border-top: var(--border-width) solid var(--pel-ink);
-  border-bottom: var(--border-width) solid var(--pel-ink);
-  background: var(--pel-orange);
 }
 
-.pel-app-download__mark {
-  width: clamp(120px, 13vw, 180px);
-  aspect-ratio: 1;
-  padding: 12px;
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: 28%;
-  background: var(--pel-cream);
-  transform: rotate(-5deg);
-  box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.2);
+.pel-app-onegame__inner {
+  width: min(100%, 72ch);
+  margin: 0 auto;
 }
 
-.pel-app-download__mark img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border-radius: 23%;
-}
-
-.pel-app-download .pel-app-kicker {
-  margin-bottom: 14px;
-}
-
-.pel-app-download h2 {
-  max-width: 770px;
-  font-size: clamp(38px, 5vw, 72px);
-  line-height: 0.92;
-}
-
-/* Contact */
-.pel-app-contact {
-  padding: clamp(88px, 10vw, 140px) 48px !important;
-  background: var(--pel-cream);
+.pel-app-onegame__close {
+  max-width: 46ch;
+  margin: clamp(28px, 3.2vw, 40px) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(21px, 2.1vw, 31px);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   color: var(--pel-ink);
 }
 
-.pel-app-contact__inner {
+/* Set apart: a sunken well with its own rule, so it reads as a footnote to the
+   section rather than as another paragraph of the argument. */
+.pel-app-onegame__pricing {
+  margin: clamp(38px, 4.4vw, 58px) 0 0;
+  padding: clamp(24px, 2.8vw, 34px) clamp(24px, 3vw, 38px);
+  border-left: 3px solid var(--pel-orange);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--pel-sand);
+  font: 500 clamp(14px, 1vw, 15.5px)/1.72 var(--font-body);
+  color: var(--text-muted);
+}
+
+.pel-app-onegame__pricing > b {
+  font-weight: 700;
+  color: var(--pel-ink);
+}
+
+/* ── S8 · What it doesn't do ─────────────────────────────────────────────────
+   Same list treatment as S4, deliberately. */
+.pel-app-wont {
+  border-top: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-sand);
+}
+
+.pel-app-wont__platform {
+  margin: clamp(30px, 3.4vw, 42px) 0 0;
+  font: 700 11px/1.5 var(--font-body);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* "web" is the site's only link to the web app now that the hero's
+   availability row is gone, so it has to be a real tap target. The padding
+   grows the hit area to 48x44 and the matching negative margin cancels its
+   effect on layout, so "and web today." sets exactly as it would unlinked. */
+.pel-app-wont__platform a {
+  display: inline-block;
+  padding: 15px 7px;
+  margin: -15px -7px;
+  color: var(--pel-app-orange-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.pel-app-wont__platform a:hover {
+  color: var(--pel-ink);
+}
+
+/* ── S9 · Close ──────────────────────────────────────────────────────────────
+   Copy and form left, proof right. Folds in the old separate "Get in touch"
+   section, keeping its form component. */
+.pel-app-close {
+  border-top: var(--border-width) solid var(--pel-ink);
+}
+
+/* The hero anchors here, and the sticky header is ~108px tall. */
+.pel-app-close {
+  scroll-margin-top: 96px;
+}
+
+.pel-app-close__inner {
   width: min(100%, var(--container));
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(300px, 0.82fr) minmax(520px, 1.18fr);
+  grid-template-columns: minmax(0, 1.34fr) minmax(230px, 0.66fr);
   align-items: start;
-  gap: clamp(54px, 8vw, 130px);
+  gap: clamp(48px, 7vw, 108px);
 }
 
-.pel-app-contact .pel-app-kicker {
-  margin-bottom: 20px;
+.pel-app-close__copy .pel-app-h2 {
+  max-width: 24ch;
+}
+
+/* The form is its own object, not the next paragraph. */
+.pel-app-close .pel-app-form {
+  margin-top: clamp(34px, 3.8vw, 50px);
+}
+
+/* The proof slot: a stat pair set as a printed stamp rather than a testimonial
+   card, because the claim is a date, not a quote. Sticks alongside the form on
+   desktop so it stays in view while the four fields are filled. */
+.pel-app-close__proof {
+  position: sticky;
+  top: 132px;
+  padding: clamp(26px, 3vw, 36px);
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-sand);
+}
+
+.pel-app-close__proof > p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.1vw, 31px);
+  text-wrap: balance;
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
   color: var(--pel-ink);
 }
 
-.pel-app-contact__copy h2 {
-  max-width: 600px;
-  font-size: clamp(44px, 5.7vw, 82px);
-  line-height: 0.92;
+.pel-app-close__proof b {
+  font-weight: 650;
+  color: var(--pel-app-orange-text);
 }
 
-.pel-app-contact__copy > p:not(.pel-app-kicker) {
-  max-width: 490px;
-  margin-top: 28px;
-  font: 500 15px/1.7 var(--font-body);
-  color: var(--pel-ink);
-}
-
-.pel-app-contact__copy > a {
-  margin-top: 28px;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: var(--pel-ink);
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.08em;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
-  text-transform: uppercase;
-}
-
-.pel-app-contact__form {
+/* ── The S9 form primitive (was the standalone contact section) ───────────*/
+.pel-app-form {
   position: relative;
   padding: clamp(28px, 4vw, 52px);
   border: var(--border-width) solid var(--pel-ink);
@@ -1524,18 +1542,18 @@
   box-shadow: 11px 12px 0 rgba(23, 23, 23, 0.2);
 }
 
-.pel-app-contact__row {
+.pel-app-form__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-.pel-app-contact__form label {
+.pel-app-form label {
   display: block;
   margin-bottom: 25px;
 }
 
-.pel-app-contact__form label > span {
+.pel-app-form label > span {
   display: block;
   margin-bottom: 10px;
   font: 700 10px/1.2 var(--font-body);
@@ -1543,14 +1561,14 @@
   text-transform: uppercase;
 }
 
-.pel-app-contact__form label small {
+.pel-app-form label small {
   font-size: inherit;
   font-weight: 600;
   opacity: 0.72;
 }
 
-.pel-app-contact__form input,
-.pel-app-contact__form textarea {
+.pel-app-form input,
+.pel-app-form textarea {
   width: 100%;
   margin: 0;
   padding: 15px 0;
@@ -1565,35 +1583,35 @@
   transition: border-color var(--dur-fast);
 }
 
-.pel-app-contact__form textarea {
+.pel-app-form textarea {
   min-height: 130px;
 }
 
-.pel-app-contact__form input::placeholder,
-.pel-app-contact__form textarea::placeholder {
+.pel-app-form input::placeholder,
+.pel-app-form textarea::placeholder {
   color: rgba(23, 23, 23, 0.47);
 }
 
-.pel-app-contact__form input:hover,
-.pel-app-contact__form textarea:hover,
-.pel-app-contact__form input:focus,
-.pel-app-contact__form textarea:focus {
+.pel-app-form input:hover,
+.pel-app-form textarea:hover,
+.pel-app-form input:focus,
+.pel-app-form textarea:focus {
   border-bottom-color: var(--pel-ink);
 }
 
-.pel-app-contact__form input:disabled,
-.pel-app-contact__form textarea:disabled {
+.pel-app-form input:disabled,
+.pel-app-form textarea:disabled {
   opacity: 0.58;
 }
 
-.pel-app-contact__submit {
+.pel-app-form__submit {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 22px;
 }
 
-.pel-app-contact__submit button {
+.pel-app-form__submit button {
   min-height: 58px;
   padding: 0 25px;
   display: inline-flex;
@@ -1613,18 +1631,19 @@
     transform var(--dur-fast) var(--ease-out);
 }
 
-.pel-app-contact__submit button:hover:not(:disabled) {
+.pel-app-form__submit button:hover:not([aria-disabled='true']) {
   background: var(--pel-orange);
   color: var(--pel-ink);
   transform: translateY(-2px);
 }
 
-.pel-app-contact__submit button:disabled {
+/* aria-disabled rather than :disabled — see the button in app.tsx. */
+.pel-app-form__submit button[aria-disabled='true'] {
   opacity: 0.64;
   cursor: wait;
 }
 
-.pel-app-contact__privacy {
+.pel-app-form__privacy {
   max-width: 210px;
   font: 600 9px/1.5 var(--font-body);
   letter-spacing: 0.06em;
@@ -1633,26 +1652,41 @@
   color: rgba(23, 23, 23, 0.72);
 }
 
-.pel-app-contact__status {
+/* Present in the accessibility tree at all times so it can act as a live
+   region; collapsed to nothing until there is a message. */
+.pel-app-form__status.is-idle {
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.pel-app-form__status {
   margin-top: 24px;
   padding: 14px 16px;
   border-radius: var(--radius-sm);
   font: 700 12px/1.5 var(--font-body);
 }
 
-.pel-app-contact__status.is-success {
+.pel-app-form__status.is-success {
   background: rgba(47, 106, 68, 0.13);
   color: var(--pel-green);
 }
 
-.pel-app-contact__status.is-error {
+.pel-app-form__status.is-error {
   background: rgba(180, 71, 42, 0.12);
   color: #873620;
 }
 
-.pel-app-contact__trap {
+.pel-app-form__trap {
   display: none;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Breakpoints, in the order this file has always used them: 68em / 54em /
+   48em / 25em, plus one section-scoped 42em step for S3's stack. Narrower
+   queries come later so they win at equal specificity.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 68em) {
   .pel-app-hero__inner {
@@ -1661,11 +1695,7 @@
   }
 
   .pel-app-hero__title {
-    font-size: clamp(58px, 7.8vw, 92px);
-  }
-
-  .pel-app-hero__stamp {
-    right: -2%;
+    font-size: clamp(40px, 6vw, 72px);
   }
 
   .pel-app-tour__grid {
@@ -1677,9 +1707,33 @@
     height: min(64svh, 650px);
   }
 
-  .pel-app-contact__inner {
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 54px;
+  /* MANDATORY, and the easiest rule on this page to miss. The rule directly
+     above was written for the old phone-LEFT order. S6 swaps the columns by
+     grid placement while reusing .pel-app-tour__grid, so without this patch
+     the 310px minimum and the 0.8fr land on the STEPS and the phone takes
+     1.2fr — the section inverts between 864px and 1088px only, which a
+     desktop-plus-375px check never sees. Verify at 1000px. */
+  .pel-week__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.82fr);
+    gap: 52px;
+  }
+
+  .pel-week {
+    --wk-stride: 54svh;
+  }
+
+  .pel-app-trade {
+    --tr-rule-h: 36px;
+    --tr-item: 18px;
+  }
+
+  .pel-app-reversal__inner {
+    gap: 52px;
+  }
+
+  .pel-app-close__inner {
+    grid-template-columns: minmax(0, 1.28fr) minmax(210px, 0.72fr);
+    gap: 56px;
   }
 }
 
@@ -1700,8 +1754,7 @@
     margin-right: auto;
   }
 
-  .pel-app-actions,
-  .pel-app-hero__availability {
+  .pel-app-actions {
     justify-content: center;
   }
 
@@ -1711,21 +1764,10 @@
     justify-self: center;
   }
 
-  .pel-app-details__grid {
-    grid-template-columns: 1fr;
-    border-bottom: 0;
-  }
-
-  .pel-app-detail-card {
-    min-height: 300px;
-    border-right: var(--border-width) solid var(--pel-ink);
-    border-bottom: var(--border-width) solid var(--pel-ink);
-  }
-
-  .pel-app-detail-card h3 {
-    max-width: none;
-  }
-
+  /* The mobile tour mode, inherited by S6 unchanged: the grid stops being a
+     grid, the phone becomes a sticky backdrop, and the step cards scroll over
+     it. pointer-events:none on the stage is what lets the cards be scrolled
+     through the phone. */
   .pel-app-tour__grid {
     display: block;
   }
@@ -1743,56 +1785,109 @@
     height: min(56svh, 560px);
   }
 
-  .pel-app-tour__progress {
-    display: none;
-  }
-
   .pel-app-tour__steps {
     position: relative;
     z-index: 2;
     margin-top: -2svh;
   }
 
-  .pel-app-tour-step {
-    min-height: 72svh;
-    padding: 22px 0;
+  /* The step column switches idiom here, because a 1.5px spine cannot read
+     behind a sticky phone: the schedule becomes six cards and the time labels
+     carry the sequence alone. */
+  .pel-week {
+    --wk-stride: 72svh;
+    padding-bottom: 60px;
+  }
+
+  .pel-week__meter,
+  .pel-week__now {
+    display: none;
+  }
+
+  .pel-week-step {
+    padding: 20px 0;
+    grid-template-columns: minmax(0, 1fr);
     align-content: end;
     border: 0;
-    opacity: 1;
   }
 
-  .pel-app-tour-step:last-child {
+  .pel-week-step:last-child {
     border: 0;
   }
 
-  .pel-app-tour-step__number {
-    align-self: end;
-    background: var(--pel-orange);
+  .pel-week-step::before,
+  .pel-week-step::after,
+  .pel-week-step__node {
+    display: none;
   }
 
-  .pel-app-tour-step__copy {
+  /* All six at full contrast: they overlap the phone and are read in passing,
+     not one at a time. */
+  .pel-week-step__when,
+  .pel-week-step__what {
+    color: var(--pel-ink);
+  }
+
+  .pel-week-step__body {
+    grid-column: 1;
+    max-width: none;
+    margin-left: 0;
     padding: 24px;
-    border: var(--border-width) solid var(--pel-ink);
+    border: var(--border-width) solid var(--border-soft);
     border-radius: var(--radius-lg);
     background: rgba(247, 240, 222, 0.96);
-    box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.12);
+    box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.1);
   }
 
-  .pel-app-download {
-    grid-template-columns: auto 1fr;
+  /* The contrast in the mobile idiom, still on two channels: an ink border and
+     an orange print offset on the two that need a person, a soft hairline and
+     a faint offset on the four that don't. Legible while scrolling, before
+     reading. */
+  .pel-week-step--human .pel-week-step__body {
+    /* The base rule pulls this card left by --wk-box to keep the desktop time
+       labels on one edge. Stacked there is no rail to align to, and the plain
+       `.pel-week-step__body { margin-left: 0 }` above is (0,1,0) — it loses to
+       this (0,2,0) selector, so the reset has to live here. */
+    margin-left: 0;
+    border-color: var(--pel-ink);
+    box-shadow: 7px 8px 0 var(--pel-orange);
   }
 
-  .pel-app-download .pel-app-store {
-    grid-column: 2;
-    justify-self: start;
+  .pel-week-step__when {
+    font-size: clamp(30px, 8.4vw, 40px);
   }
 
-  .pel-app-contact__inner {
+  /* The card lost its row rule, so the rule moves inside it. */
+  .pel-week-step__what {
+    max-width: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: var(--border-width) solid var(--border-soft);
+  }
+
+  .pel-app-trade {
+    --tr-rule-h: 34px;
+    --tr-item: 16px;
+    --tr-pad: 30px;
+    --tr-gap: 28px;
+  }
+
+  .pel-app-reversal__inner,
+  .pel-app-close__inner {
     grid-template-columns: 1fr;
   }
 
-  .pel-app-contact__copy {
-    max-width: 720px;
+  .pel-app-reversal__shot {
+    order: -1;
+    width: min(70vw, 280px);
+    justify-self: start;
+  }
+
+  /* Form first on mobile, per the spec; the proof follows it and stops
+     sticking, since there is nothing beside it to stick against. */
+  .pel-app-close__proof {
+    position: static;
+    max-width: 44ch;
   }
 }
 
@@ -1806,13 +1901,9 @@
     gap: 42px;
   }
 
-  .pel-app-hero .pel-app-kicker {
-    margin-bottom: 18px;
-  }
-
   .pel-app-hero__title {
-    font-size: clamp(52px, 17vw, 78px);
-    line-height: 0.87;
+    font-size: clamp(34px, 10vw, 52px);
+    line-height: 1;
   }
 
   .pel-app-hero__body {
@@ -1824,18 +1915,15 @@
     margin-top: 30px;
   }
 
-  .pel-app-store,
-  .pel-app-link-button {
+  .pel-app-cta {
     width: 100%;
   }
 
-  .pel-app-hero__availability {
-    flex-wrap: wrap;
-    line-height: 1.5;
-  }
-
+  /* 91vw exceeded the column's own width once the gutter dropped to 20px,
+     which pushed the H1, body and CTA to a ~14px right margin and clipped the
+     pitch card's hard offset shadow. 100% keeps it inside its track. */
   .pel-app-hero__visual {
-    width: min(91vw, 500px);
+    width: min(100%, 500px);
   }
 
   .pel-app-game-card {
@@ -1843,44 +1931,19 @@
     width: 78%;
   }
 
-  .pel-app-hero__stamp {
-    top: 20%;
-    right: 0;
+  /* The single rule that drops every light section from a 48px to a 20px side
+     gutter. */
+  .pel-app-sec {
+    padding: 76px 20px 84px;
   }
 
-  .pel-app-details,
-  .pel-app-tour,
-  .pel-app-contact {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-  }
-
-  .pel-app-details {
-    padding-top: 76px !important;
-    padding-bottom: 84px !important;
-  }
-
-  .pel-app-details__intro {
-    margin-bottom: 42px;
-  }
-
-  .pel-app-details__intro h2,
-  .pel-app-tour__head h2 {
-    font-size: clamp(41px, 13vw, 64px);
-  }
-
-  .pel-app-details__intro > p:last-child,
-  .pel-app-tour__head > p:last-child {
-    font-size: 14px;
-  }
-
-  .pel-app-detail-card {
-    min-height: 270px;
-    padding: 28px;
-  }
-
+  /* Longhands, not a shorthand: .pel-week supplies padding-bottom and a
+     shorthand here would reset it. S6 does not carry .pel-app-sec, so the
+     20px gutter rule above does not apply to it. */
   .pel-app-tour {
-    padding-top: 78px !important;
+    padding-top: 78px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .pel-app-tour__head {
@@ -1900,106 +1963,188 @@
     margin-top: 0;
   }
 
-  .pel-app-tour-step {
-    min-height: 69svh;
-    grid-template-columns: 48px minmax(0, 1fr);
-    gap: 12px;
+  .pel-app-h2 {
+    font-size: clamp(30px, 8.6vw, 42px);
   }
 
-  .pel-app-tour-step__number {
-    width: 44px;
-    height: 44px;
-    font-size: 15px;
+  .pel-week {
+    --wk-stride: 69svh;
+    padding-bottom: 52px;
   }
 
-  .pel-app-tour-step__copy {
-    padding: 21px;
+  .pel-week .pel-app-tour__head > .pel-week__legend {
+    margin-top: 20px;
+    gap: 9px 20px;
+    font-size: 10px;
+    letter-spacing: 0.13em;
   }
 
-  .pel-app-tour-step__copy > p {
-    margin-bottom: 12px;
+  .pel-week-step {
+    padding: 16px 0;
   }
 
-  .pel-app-tour-step__copy h3 {
-    font-size: clamp(31px, 9.5vw, 43px);
+  .pel-week-step__body {
+    padding: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 6px 7px 0 rgba(23, 23, 23, 0.1);
   }
 
-  .pel-app-tour-step__copy > div {
-    margin-top: 16px;
-    font-size: 13px;
+  .pel-week-step--human .pel-week-step__body {
+    box-shadow: 6px 7px 0 var(--pel-orange);
   }
 
-  .pel-app-download {
-    min-height: 0;
-    padding: 62px 20px !important;
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
+  .pel-week-step__when {
+    font-size: clamp(27px, 8.2vw, 34px);
   }
 
-  .pel-app-download__mark {
-    width: 130px;
+  .pel-week-step__what {
+    margin-top: 12px;
+    padding-top: 12px;
+    font-size: 13.5px;
   }
 
-  .pel-app-download h2 {
-    font-size: clamp(39px, 12vw, 58px);
+  .pel-week-step__flag {
+    margin-top: 15px;
+    gap: 9px;
+    padding: 7px 12px;
+    font-size: 9.5px;
+    letter-spacing: 0.13em;
   }
 
-  .pel-app-download .pel-app-store {
-    width: auto;
-    grid-column: auto;
-    justify-self: center;
+  .pel-app-thursday__lines > p,
+  .pel-app-reversal__list > li,
+  .pel-app-leadlist > li {
+    font-size: 14.5px;
   }
 
-  .pel-app-contact {
-    padding-top: 78px !important;
-    padding-bottom: 90px !important;
-  }
-
-  .pel-app-contact__inner {
-    gap: 42px;
-  }
-
-  .pel-app-contact__copy h2 {
-    font-size: clamp(42px, 13vw, 62px);
-  }
-
-  .pel-app-contact__form {
+  .pel-app-form {
     padding: 27px 22px;
     box-shadow: 7px 8px 0 rgba(23, 23, 23, 0.2);
   }
 
-  .pel-app-contact__row {
+  .pel-app-form__row {
     grid-template-columns: 1fr;
     gap: 0;
   }
 
-  .pel-app-contact__submit {
+  .pel-app-form__submit {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .pel-app-contact__submit button {
+  .pel-app-form__submit button {
     width: 100%;
   }
 
-  .pel-app-contact__privacy {
+  .pel-app-form__privacy {
     max-width: none;
     text-align: left;
   }
 }
 
-@media (max-width: 25em) {
-  .pel-app-game-card__players {
+/* ── S3 stacks here, not at 48em ────────────────────────────────────────────
+   48em resolves to 768px INCLUSIVE, which would stack iPad portrait — and the
+   spec requires the comparison side by side on tablet. This keeps every iPad
+   portrait width (768/810/820/834) in two columns and still stacks landscape
+   iPhone SE (667px).
+
+   696px rather than 672px: measured, the app column runs about 4px short of
+   its longest entry between 673 and 678px, which wrapped the item and grew the
+   ruled field to six or seven rules while the chat column still filled four.
+   Stacking a little earlier costs nothing and removes the whole band. */
+@media (max-width: 43.5em) {
+  .pel-app-trade {
+    --tr-rule-h: 32px;
+    --tr-item: 16px;
+    --tr-pad: 22px;
+  }
+
+  .pel-app-trade__grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(5, auto);
+    column-gap: 0;
+  }
+
+  .pel-app-trade__colhead--stays {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+
+  .pel-app-trade__list--stays {
+    grid-area: 2 / 1 / 3 / 2;
+  }
+
+  .pel-app-trade__seam {
+    grid-area: 3 / 1 / 4 / 2;
+  }
+
+  .pel-app-trade__colhead--moves {
+    grid-area: 4 / 1 / 5 / 2;
+  }
+
+  .pel-app-trade__list--moves {
+    grid-area: 5 / 1 / 6 / 2;
+  }
+
+  /* One spanning band and one spanning ruled field make no sense stacked, so
+     each column carries its own. The 4-vs-5 problem does not exist when
+     stacked, so the cancelled cell is not paid for here either. */
+  .pel-app-trade__band,
+  .pel-app-trade__band-app,
+  .pel-app-trade__paper {
     display: none;
   }
 
+  .pel-app-trade__colhead {
+    padding-bottom: 14px;
+    border-bottom: var(--border-width) solid var(--pel-ink);
+  }
+
+  .pel-app-trade__colhead--moves {
+    border-bottom-color: var(--pel-orange);
+  }
+
+  .pel-app-trade__list {
+    margin-top: 20px;
+    background-image: var(--tr-paper);
+  }
+
+  /* The fold becomes a horizontal crease: still short of both frame edges,
+     still hinged at its middle, orange tab still on the app side (below now).
+     Same three elements, rotated. */
+  .pel-app-trade__seam {
+    width: 100%;
+    height: 8px;
+    margin: 30px 0 34px;
+  }
+
+  .pel-app-trade__fold {
+    top: 0;
+    right: 14%;
+    bottom: auto;
+    left: 14%;
+    width: auto;
+    height: var(--border-width);
+  }
+
+  /* The 14% insets already say "short of the edges"; a terminal cap on a
+     free-floating hairline would be noise. */
+  .pel-app-trade__fold::after {
+    display: none;
+  }
+
+  .pel-app-trade__tab {
+    top: calc(var(--border-width) + 3px);
+    right: 14%;
+    bottom: auto;
+    left: 14%;
+    width: auto;
+    height: 3px;
+  }
+}
+
+@media (max-width: 25em) {
   .pel-app-game-card__main {
     padding-bottom: 0;
-  }
-
-  .pel-app-hero__stamp {
-    display: none;
   }
 
   .pel-app-tour__stage {
@@ -2009,15 +2154,69 @@
   .pel-app-tour__stage .pel-app-phone {
     height: min(49svh, 470px);
   }
+
+  .pel-week {
+    --wk-stride: 66svh;
+  }
+
+  .pel-week-step__body {
+    padding: 18px;
+  }
+
+  .pel-week-step__when {
+    font-size: clamp(25px, 7.6vw, 30px);
+  }
+
+  .pel-week-step__what {
+    font-size: 13px;
+  }
+
+  /* MEASURED, not assumed. One pill line needs ~301px; a 375px card gives
+     299px of measure (375 − 20 − 20 section padding − 18 − 18 card padding).
+     So below 400px the pill deliberately stops being a pill and becomes a
+     two-line stamp — a determined break, not a wrap we hope for. */
+  /* Wrapping is unconditional now (see the base rule); at this size the pill
+     is expected to be two lines, so it stops pretending to be a pill. */
+  .pel-week-step__flag {
+    padding: 8px 13px;
+    border-radius: var(--radius-md);
+  }
+
+  .pel-week-step__flag-label {
+    flex-basis: 100%;
+  }
+
+  .pel-app-trade {
+    --tr-rule-h: 30px;
+    --tr-item: 15px;
+    --tr-pad: 18px;
+    --tr-rail: 22px;
+  }
+
+  .pel-app-trade__colhead {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+  }
+
+  .pel-app-trade__seam {
+    margin: 26px 0 30px;
+  }
 }
 
+/* Every state change on this page stays fully legible with no motion at all:
+   the node fill and shape, the ink spine, the orange rule, the meter cell and
+   the caption are static properties, and no step is ever dimmed, so there is
+   no opacity flicker to suppress. The phone crossfade becomes an instant cut. */
 @media (prefers-reduced-motion: reduce) {
-  .pel-app-store,
+  .pel-app-cta,
   .pel-app-phone__layer,
-  .pel-app-tour-step,
-  .pel-app-tour-step__number,
-  .pel-app-tour__progress button::after,
-  .pel-app-contact__submit button {
+  .pel-week-step::before,
+  .pel-week-step::after,
+  .pel-week-step__node,
+  .pel-week-step__when,
+  .pel-week-step__what,
+  .pel-week__meter-cell::before,
+  .pel-app-form__submit button {
     transition: none !important;
   }
 }

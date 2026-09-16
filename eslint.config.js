@@ -128,6 +128,11 @@ export default [
     rules: {
       'jsx-a11y/control-has-associated-label': 'off',
       'jsx-a11y/label-has-for': 'off',
+      // Safari with VoiceOver deliberately drops list semantics from a ul/ol
+      // that sets `list-style: none`, which every styled list in this codebase
+      // does. role="list" there is a restoration, not a redundancy. The rule
+      // stays on for every other element and role.
+      'jsx-a11y/no-redundant-roles': ['error', {ul: ['list'], ol: ['list']}],
       'react/display-name': 'off',
       'react/no-array-index-key': 'warn',
       'react/prop-types': 'off',

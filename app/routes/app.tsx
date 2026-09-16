@@ -9,86 +9,176 @@ const APP_STORE_URL =
 const WEB_APP_URL = 'https://app.poreldeporte.com';
 
 type ContactResult = {ok: boolean; message: string};
-type MockScreen = 'home' | 'schedule' | 'roster' | 'results' | 'leaders';
-type AppScreen = {
-  id: string;
-  number: string;
-  eyebrow: string;
-  title: string;
-  body: string;
-  imageSrc: string | null;
-  imageAlt: string;
-  mock: MockScreen;
-};
 
 /**
- * Screenshot handoff point.
- *
- * The supplied product captures live in /public/app-screens. The phone,
- * crossfade, scroll tracking, and responsive crop are all wired to these
- * scroll states.
+ * S6's phone screens. FIVE screens for SIX steps, on purpose: "Midweek" and
+ * "Two hours out" are the same screen in real life, so both steps resolve to
+ * index 1. That means `active` never changes between them, so the phone is
+ * genuinely still rather than crossfading an image against itself — two layers
+ * of the same PNG composite to a visible wash toward the screen's own ground at
+ * the fade midpoint, and the scale(1.025) offset double-images the text through
+ * it. The caption under the phone is what changes instead.
  */
-const APP_SCREENS: AppScreen[] = [
+type PhoneScreen = {
+  id: string;
+  imageSrc: string;
+  imageAlt: string;
+};
+
+const WEEK_SCREENS: PhoneScreen[] = [
   {
     id: 'home',
-    number: '01',
-    eyebrow: 'Home',
-    title: 'The day starts here.',
-    body: 'Open the community hub to see the next game, open spots, roster status, and the fastest way to get involved.',
     imageSrc: '/app-screens/01-home.png',
     imageAlt:
-      'Por El Deporte home screen showing upcoming games and roster status',
-    mock: 'home',
+      'The Por El Deporte home screen: Saturday 9:15AM at Brickell Soccer & Padel, 12 of 12 rostered, a waitlist button, and this week’s slate below it.',
+  },
+  {
+    id: 'game',
+    imageSrc: '/app-screens/04-game-details.png',
+    imageAlt:
+      'A game screen: kickoff time, weather, and the full RSVP list of twelve players with their ratings and records.',
+  },
+  {
+    id: 'draft',
+    imageSrc: '/app-screens/05-draft-room.png',
+    imageAlt:
+      'The draft room: two team pitches filling up, a captain on the clock, and the remaining players waiting to be picked.',
   },
   {
     id: 'record',
-    number: '02',
-    eyebrow: 'Record',
-    title: 'Every result counts.',
-    body: 'Record the score, vote for MVP, and build a searchable match history that makes every week matter.',
     imageSrc: '/app-screens/02-record.png',
-    imageAlt: 'Por El Deporte record screen showing match results and history',
-    mock: 'results',
+    imageAlt:
+      'The record screen: the latest result at the top and a dated history of games below it.',
   },
   {
-    id: 'leaderboard',
-    number: '03',
-    eyebrow: 'Leaderboard',
-    title: 'Make your mark.',
-    body: 'Follow form, rankings, records, trophies, and head-to-head history across the players you know.',
+    id: 'table',
     imageSrc: '/app-screens/03-leaderboard.png',
-    imageAlt: 'Por El Deporte leaderboard screen showing player rankings',
-    mock: 'leaders',
+    imageAlt:
+      'The table screen: the month’s top three on a podium and the full ranked list of players underneath.',
+  },
+];
+
+type WeekStep = {
+  id: string;
+  /** The time. This is the step's heading — it is what makes it a week. */
+  when: string;
+  what: string;
+  /** Index into WEEK_SCREENS. 'drop' and 'confirm' deliberately share one. */
+  screen: number;
+  /**
+   * Present = this moment needs a person. The string is the detail, and it is
+   * deliberately specific. The spec offers a generic "needs a human" marker but
+   * leaves the wording open; "One person, 30 seconds" is the whole persuasive
+   * point of the section and a generic marker throws it away.
+   */
+  human?: string;
+};
+
+const WEEK_STEPS: WeekStep[] = [
+  {
+    id: 'opens',
+    when: 'Sunday, 3:00 PM',
+    what: 'The list opens. Everyone finds out at the same second. Twelve claim a spot, the rest queue in order.',
+    screen: 0,
   },
   {
-    id: 'game-details',
-    number: '04',
-    eyebrow: 'Game Details',
-    title: 'Nothing gets missed.',
-    body: 'Weather, venue, rules, capacity, attendance, and the full roster live on one game screen.',
-    imageSrc: '/app-screens/04-game-details.png',
-    imageAlt: 'Por El Deporte game details screen with weather and roster',
-    mock: 'schedule',
+    id: 'drop',
+    when: 'Midweek',
+    what: 'Someone drops. The next player is in and notified. You read about it; you don’t fix it.',
+    screen: 1,
   },
   {
-    id: 'draft-room',
-    number: '05',
-    eyebrow: 'Draft Room',
-    title: 'Draft the night.',
-    body: 'Pick teams, follow captain decisions, and turn a regular run into a shared community ritual.',
-    imageSrc: '/app-screens/05-draft-room.png',
-    imageAlt: 'Por El Deporte draft room screen with player picks',
-    mock: 'roster',
+    id: 'confirm',
+    when: 'Two hours out',
+    what: 'Everyone confirms. Anyone who hasn’t is visible — to you, and to them.',
+    screen: 1,
   },
   {
-    id: 'post-draft-analysis',
-    number: '06',
-    eyebrow: 'Post-Draft Analysis',
-    title: 'Keep talking after.',
-    body: 'AI-generated analysis turns the draft into a story—with the matchup, the edge, and the numbers to back it up.',
-    imageSrc: '/app-screens/06-post-draft-analysis.png',
-    imageAlt: 'Por El Deporte post-draft analysis screen comparing teams',
-    mock: 'results',
+    id: 'draft',
+    when: 'Before kickoff',
+    what: 'Captains draft the teams live. Everyone watches it happen.',
+    screen: 2,
+    human: 'Two captains',
+  },
+  {
+    id: 'fulltime',
+    when: 'Full time',
+    what: 'Someone puts the score in. The squad votes MVP.',
+    screen: 3,
+    human: 'One person, 30 seconds',
+  },
+  {
+    id: 'evening',
+    when: 'That evening',
+    what: 'The match report lands, the ratings move, and the argument restarts in the chat where it belongs.',
+    screen: 4,
+  },
+];
+
+/** S3's two columns. Four entries against five, and the difference is left
+    plain: the ruled field runs five rules deep and the chat column simply fills
+    four of them. Blank ruled paper reads as room left over, not as a deficit. */
+const TRADE_STAYS = [
+  'The banter',
+  'The photos',
+  'The post-match argument',
+  'Everyone you already have',
+];
+
+/*
+ * ACCURACY GUARD — read before editing this list or its CSS.
+ *
+ * "What it cost, split" is the page's most fragile line: the app shows who has
+ * paid and who has not, and never touches money (S4 and S8 both say so
+ * outright). This column must therefore stay plain text and geometry. Do NOT
+ * add, here or in .pel-app-trade__list--moves: a currency glyph, a numeral, a
+ * total, a progress or amount meter, a badge, a chip, a button, a link, or any
+ * affordance that looks tappable. Any of those turns a list of responsibilities
+ * into a transaction UI, and the claim stops being true.
+ */
+const TRADE_MOVES = [
+  'Twelve spots and the waitlist',
+  'Who’s actually coming',
+  'The teams',
+  'What it cost, split',
+  'The score, and what it meant',
+];
+
+/** S4 and S8 are a matched pair: same list treatment, same motion. */
+type LeadItem = {lead: string; rest: string};
+
+const STOPS_ITEMS: LeadItem[] = [
+  {
+    lead: 'Counting heads.',
+    rest: 'The list opens at the same time every week and fills itself. When someone drops, the next player is in and told before you’ve even read the message.',
+  },
+  {
+    lead: 'Being the bad guy.',
+    rest: 'Captains draft live, in turn, with the pick order drawn at random if you want it. The teams happen to everyone at once, in front of everyone. There’s no lineup with your name on it.',
+  },
+  {
+    lead: 'Chasing $12.',
+    rest: 'Put in what the pitch cost and everyone sees their share. Afterwards you get a paid and unpaid list. You still collect it however you do now — the app never touches the money.',
+  },
+  {
+    lead: 'Keeping score of people.',
+    rest: 'Who confirmed, who dropped late, who didn’t turn up. Recorded against them, so it isn’t carried around by you.',
+  },
+];
+
+const WONT_ITEMS: LeadItem[] = [
+  {
+    lead: 'It won’t take payments.',
+    rest: 'It tells you who has paid. You collect it the way you always have.',
+  },
+  {lead: 'It won’t replace your chat.', rest: 'That’s the point.'},
+  {
+    lead: 'It won’t invent a rating.',
+    rest: 'A new player has no number until there’s enough evidence for one to be fair.',
+  },
+  {
+    lead: 'It won’t run your club’s finances, kit or pitch bookings.',
+    rest: 'It runs the game.',
   },
 ];
 
@@ -97,9 +187,13 @@ export const meta: Route.MetaFunction = ({location, matches}) => {
   const url = `${origin}${location.pathname}`;
   return [
     ...seoMeta({
-      title: 'Por El Deporte App | Organize Your Sports Community',
+      // The old pair sold the opposite page: "Schedule games, fill rosters,
+      // manage waitlists, track scores, follow player stats" is, almost word for
+      // word, the five jobs this page now promises to take AWAY from the reader.
+      // A searcher seeing that snippet was being offered more work.
+      title: 'Por El Deporte App | Stop Running Your Game by Group Chat',
       description:
-        'Schedule games, fill rosters, manage waitlists, track scores, follow player stats, and keep your sports community together.',
+        'You didn’t volunteer to be a switchboard. Move one recurring game over and the roster, waitlist and teams run themselves. Free on iPhone and the web.',
       url,
       image: origin ? `${origin}/icon-512.png` : undefined,
     }),
@@ -110,9 +204,16 @@ export const meta: Route.MetaFunction = ({location, matches}) => {
         name: 'Por El Deporte',
         applicationCategory: 'SportsApplication',
         operatingSystem: 'iOS, Web',
+        // Every clause maps to a copy block on the page, and the last sentence
+        // restates S8's payments limit inside the markup, so the limitation
+        // travels with the graph instead of living only in prose a scraper may
+        // drop. Deliberately no `featureList`: it is where a future editor would
+        // paste S3's column 2, and "What it cost, split" lifted out of its
+        // surrounding qualifiers is a bald payments claim.
         description:
-          'A community sports app for organizing games, managing rosters, tracking scores, and following player history.',
+          'An app for the person who organises a recurring game: it opens the list, fills spots from a waitlist, drafts the teams, records the score, and keeps a paid and unpaid list. It tracks paid and unpaid only and never handles money.',
         url,
+        installUrl: APP_STORE_URL,
         image: origin ? `${origin}/icon-512.png` : undefined,
         offers: {'@type': 'Offer', price: '0', priceCurrency: 'USD'},
         publisher: {
@@ -133,14 +234,23 @@ export default function AppLandingPage() {
   return (
     <div className="pel-app-page">
       <AppHero />
-      <AppDetails />
-      <AppTour />
-      <DownloadBand />
-      <AppContact />
+      <TheThursday />
+      <TheTrade />
+      <WhatStopsBeingYours />
+      <TheReversal />
+      <TheWeek />
+      <OneGame />
+      <WhatItWontDo />
+      <TheClose />
     </div>
   );
 }
 
+/* ── S1 · Hero ───────────────────────────────────────────────────────────────
+   No reveal markup anywhere in here, on purpose. useScrollMotion's above-the-
+   fold guard makes reveals a no-op on tall viewports and a half-animated hero
+   on short ones; the H1 is the LCP element; and the hook writes an inline
+   transform, which would wipe the game card's rotate(-3deg). */
 function AppHero() {
   return (
     <section className="pel-app-hero" aria-labelledby="app-hero-title">
@@ -154,34 +264,45 @@ function AppHero() {
       />
       <div className="pel-app-hero__inner">
         <div className="pel-app-hero__copy">
-          <p className="pel-app-kicker">Por El Deporte &bull; The App</p>
           <h1 id="app-hero-title" className="pel-app-hero__title">
-            Community
-            <br />
-            sports,
-            <br />
-            <span>organized.</span>
+            You didn’t volunteer to be a <span>switchboard.</span>
           </h1>
           <p className="pel-app-hero__body">
-            Por El Deporte brings every part of your sports community
-            together—from the first open spot to the final whistle.
+            Por El Deporte takes the roster, the teams, the waitlist and the tab
+            off your plate — and leaves your group chat exactly where it is.
+            Free, on iPhone and the web.
           </p>
           <div className="pel-app-actions">
-            <AppStoreButton className="pel-app-store--cream" />
-            <a className="pel-app-link-button" href="#inside-the-app">
-              See inside
-              <ArrowDown />
+            {/* One CTA. It carries the Apple mark and a destination sublabel so
+                that a label about moving your game reads unmistakably as a
+                download rather than an in-page jump. */}
+            <a
+              className="pel-app-cta"
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <AppleIcon />
+              <span>
+                Move your Sunday game over
+                <small>On the App Store</small>
+              </span>
             </a>
           </div>
-          <div className="pel-app-hero__availability">
-            <span>Free on iPhone</span>
-            <i aria-hidden="true" />
-            <a href={WEB_APP_URL} target="_blank" rel="noreferrer">
-              Web app available
-            </a>
-          </div>
+          {/* The spec pointed this link at the App Store and the button at the
+              form. With the button now going to the App Store, that would be two
+              links to one place and no route from the hero to the form, so this
+              takes the form instead. */}
+          <a className="pel-app-hero__aside" href="#close">
+            Want us to set it up with you?
+            <ArrowRight />
+          </a>
         </div>
 
+        {/* aria-hidden as a whole: this is an illustration of the app, not
+            live data, and the previous build hid it too. Announcing "Sat
+            9:15AM, 12/12 rostered" as if it were the reader's own next game is
+            worse than silence. */}
         <div className="pel-app-hero__visual" aria-hidden="true">
           <div className="pel-app-field">
             <div className="pel-app-field__line pel-app-field__line--half" />
@@ -189,9 +310,8 @@ function AppHero() {
             <div className="pel-app-field__box pel-app-field__box--top" />
             <div className="pel-app-field__box pel-app-field__box--bottom" />
           </div>
-          <div className="pel-app-icon-card">
-            <img src="/icon-512.png" alt="" width="512" height="512" />
-          </div>
+          {/* The existing upcoming-game widget, reused as-is and still live DOM
+              rather than a screenshot. */}
           <div className="pel-app-game-card">
             <div className="pel-app-game-card__top">
               <span>Up next</span>
@@ -203,8 +323,10 @@ function AppHero() {
                 <strong>9:15AM</strong>
               </div>
               <div className="pel-app-game-card__venue">
+                {/* No date. It was hardcoded to a day that has since passed,
+                    and any hardcoded date here goes stale again. "Sat 9:15AM"
+                    reads as an upcoming game indefinitely. */}
                 <strong>Brickell Soccer &amp; Padel</strong>
-                <p>August 29, 2026</p>
               </div>
             </div>
             <div className="pel-app-game-card__footer">
@@ -216,66 +338,263 @@ function AppHero() {
               </span>
             </div>
           </div>
-          <div className="pel-app-hero__stamp">Built for the way we play</div>
         </div>
       </div>
     </section>
   );
 }
 
-function AppDetails() {
-  const details = [
-    {
-      number: '01',
-      title: 'Make the game',
-      body: 'Discover upcoming games, claim your place, and keep every detail in one community home hub.',
-      icon: <CalendarIcon />,
-    },
-    {
-      number: '02',
-      title: 'Fill the roster',
-      body: 'Manage capacity, attendance, waitlists, teams, and timely notifications without juggling chats.',
-      icon: <PlayersIcon />,
-    },
-    {
-      number: '03',
-      title: 'Track the story',
-      body: 'Record scores, vote for MVPs, compare players, and relive the action with AI-generated recaps.',
-      icon: <ChartIcon />,
-    },
+/* ── S2 · The Thursday ───────────────────────────────────────────────────────
+   Type and space only, in motion as well as in layout: the heading, the five
+   lines as ONE unit, and the closing line as its own beat. Five staggered lines
+   in a 60ch column is a typewriter effect that delays reading. */
+function TheThursday() {
+  const lines = [
+    'Sunday you post the game. Six say “in”. Two send a thumbs-up you have to interpret. One says “maybe”.',
+    'Thursday you count heads, come up two short, and start the DMs.',
+    'Friday someone drops, and you scroll back three hundred messages to find who asked to be next.',
+    'Saturday you write the teams yourself. Sunday you hear about it.',
+    'Sunday night you remind the same three people about the pitch money.',
   ];
 
   return (
-    <section className="pel-app-details" aria-labelledby="app-details-title">
-      <div className="pel-app-details__intro">
-        <p className="pel-app-kicker">Made for real communities</p>
-        <h2 id="app-details-title">Less chasing. More playing.</h2>
-        <p>
-          Build the squad. Settle it on the pitch. Keep the story going—from
-          open spots and attendance to scores, rankings, trophies, and shared
-          history.
+    <section
+      className="pel-app-sec pel-app-thursday"
+      aria-labelledby="app-thursday-title"
+    >
+      <div className="pel-app-thursday__inner">
+        <h2
+          id="app-thursday-title"
+          className="pel-app-h2 pel-app-h2--center"
+          data-reveal
+        >
+          Twelve spots. Forty-one messages. One of you.
+        </h2>
+        <div className="pel-app-thursday__lines" data-reveal>
+          {lines.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+        <p className="pel-app-thursday__close" data-reveal>
+          And nobody thanks you, because nobody saw any of it.
         </p>
-      </div>
-      <div className="pel-app-details__grid">
-        {details.map((detail) => (
-          <article key={detail.number} className="pel-app-detail-card">
-            <div className="pel-app-detail-card__head">
-              <span>{detail.number}</span>
-              <div className="pel-app-detail-card__icon">{detail.icon}</div>
-            </div>
-            <h3>{detail.title}</h3>
-            <p>{detail.body}</p>
-          </article>
-        ))}
       </div>
     </section>
   );
 }
 
-function AppTour() {
+/* ── S3 · The trade ─────────────────────────────────────────────────────────
+   The page's key visual, and ONE object rather than two: a ruled team sheet
+   with a single fold down the middle. A pitch split at the halfway line was the
+   obvious candidate and is the wrong one — a pitch divided at halfway IS two
+   teams facing each other, which is the versus framing this copy denies. A fold
+   is reversible and destroys nothing. */
+function TheTrade() {
+  return (
+    <section
+      className="pel-app-sec pel-app-trade"
+      aria-labelledby="app-trade-title"
+    >
+      <div className="pel-app-trade__head">
+        <h2 id="app-trade-title" className="pel-app-h2" data-reveal>
+          {/* One sentence per line, whatever the display face's metrics do. It
+              also teaches the sheet's two-part division before the reader
+              reaches it. Still one <h2>. */}
+          <span>The chat keeps the jokes.</span>{' '}
+          <span>The app takes the job.</span>
+        </h2>
+        <p className="pel-app-lead" data-reveal>
+          We’re not asking you to move your community. We’re asking you to move
+          the admin out of it. Leave the chat where it is — the slagging, the
+          photos, the argument about whether that was offside. Take the twelve
+          spots, the waitlist, the teams and the tab somewhere they look after
+          themselves.
+        </p>
+      </div>
+      <TradeColumns />
+    </section>
+  );
+}
+
+/**
+ * The sheet. One frame, one continuous ruled field, one fold.
+ *
+ * The load-bearing device is `__paper`: a single full-width element carrying
+ * the feint rules, so they run straight ACROSS the fold. Rules that cross the
+ * divider make this read as one sheet with a notation on it rather than two
+ * lists that happen to be adjacent. Neither column ever gets a border, a tint
+ * or a keyline of its own — the accent lives on the seam and on the band rule.
+ *
+ * Column 2 holds plain text and geometry only: no pill, no arrow, no currency
+ * mark, nothing tappable. That is what keeps "What it cost, split" from
+ * reading as a transaction, which the page must never imply.
+ */
+function TradeColumns() {
+  return (
+    <div className="pel-app-trade__sheet">
+      <div className="pel-app-trade__grid">
+        {/* DOM order is heading → its list → heading → its list, so the reading
+            order is right in both layouts. The decorative spans are placed by
+            grid-area, so their DOM position is free.
+
+            Headings are sentence case here and uppercased in CSS: the render is
+            the spec's literal STAYS IN YOUR CHAT / MOVES TO THE APP, while a
+            screen reader gets real words rather than risking letter-by-letter
+            spelling of all-caps text. <h3> is honest — these are S3's two real
+            subheads, whatever size they render at. */}
+        <h3
+          id="trade-stays"
+          className="pel-app-trade__colhead pel-app-trade__colhead--stays"
+        >
+          Stays in your chat
+        </h3>
+        <ul
+          className="pel-app-trade__list pel-app-trade__list--stays"
+          role="list"
+          aria-labelledby="trade-stays"
+          data-reveal-stagger
+        >
+          {TRADE_STAYS.map((item) => (
+            // No dx and no dy: the column that stays does not move. The spec
+            // says column 2 carries the accent, so the asymmetry is the point
+            // — and stillness reads as permanence, not as being diminished.
+            <li key={item} data-reveal-item data-scale="1">
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        <h3
+          id="trade-moves"
+          className="pel-app-trade__colhead pel-app-trade__colhead--moves"
+        >
+          Moves to the app
+        </h3>
+        <ul
+          className="pel-app-trade__list pel-app-trade__list--moves"
+          role="list"
+          aria-labelledby="trade-moves"
+          data-reveal-stagger
+        >
+          {TRADE_MOVES.map((item) => (
+            // Starts at the fold and settles outward: these are the entries
+            // being filed across.
+            <li key={item} data-reveal-item data-scale="1" data-dx="-14">
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        {/* One continuous band rule that changes colour at the fold — ink over
+            the chat's half, brick over the app's. It says "two duties, one of
+            them is the app's" without dimming, shrinking or shadowing
+            anything. */}
+        <span className="pel-app-trade__band" aria-hidden="true" />
+        <span className="pel-app-trade__band-app" aria-hidden="true" />
+        <span className="pel-app-trade__paper" aria-hidden="true" />
+        <span className="pel-app-trade__seam" aria-hidden="true">
+          <i className="pel-app-trade__fold">
+            {/* The one mark both halves share. */}
+            <i className="pel-app-trade__hinge" />
+          </i>
+          <i className="pel-app-trade__tab" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ── S4 · What stops being yours ─────────────────────────────────────────────
+   A list, not cards. One reveal per item so each fires at its own crossing;
+   four identical rises read as a list, four different entrances read as cards.
+   Not a stagger container — four items with a two-sentence body each exceed a
+   viewport, so one crossing would fire all four and leave 3 and 4 blank. */
+function WhatStopsBeingYours() {
+  return (
+    <section
+      className="pel-app-sec pel-app-stops"
+      aria-labelledby="app-stops-title"
+    >
+      <div className="pel-app-sec__inner">
+        <h2 id="app-stops-title" className="pel-app-h2" data-reveal>
+          Four things you stop doing on Thursday
+        </h2>
+        <LeadList items={STOPS_ITEMS} />
+      </div>
+    </section>
+  );
+}
+
+/* ── S5 · The reversal ──────────────────────────────────────────────────────*/
+function TheReversal() {
+  const bullets = [
+    'A rating that moves every week — and stays blank until they’ve played enough for it to be fair',
+    'The draft. Being picked. Being picked first',
+    'A written match report that names them, and a read on the matchup before kickoff',
+    'Calling the winner, and a record of how often they’re right',
+    'Leaderboards, form, MVP votes, trophies, and a history that goes back',
+  ];
+
+  return (
+    <section
+      className="pel-app-sec pel-app-reversal"
+      aria-labelledby="app-reversal-title"
+    >
+      <div className="pel-app-reversal__inner">
+        <div className="pel-app-reversal__copy">
+          <h2 id="app-reversal-title" className="pel-app-h2" data-reveal>
+            Then the strange part: they start chasing you.
+          </h2>
+          <p className="pel-app-lead" data-reveal>
+            A game with no memory is just exercise. Give it a record and people
+            start moving things around to be there.
+          </p>
+          {/* Short one-liners, so they read as one block rather than five
+              separate ideas the way S4's items do. No terminal full stops —
+              that is how the spec sets them, and it is consistent across all
+              five. */}
+          <ul className="pel-app-reversal__list" role="list" data-reveal>
+            {bullets.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
+          <p className="pel-app-reversal__close" data-reveal>
+            This is the half you don’t have to do. The game gets good enough to
+            sell itself.
+          </p>
+        </div>
+        {/* The page's ONE drifter. Every other section rises; pictures drift.
+            The wrapper is transform-free so the hook owns its transform. */}
+        <div
+          className="pel-app-reversal__shot"
+          data-scroll-parallax
+          data-speed="14"
+        >
+          <img
+            src="/app-screens/06-post-draft-analysis.png"
+            alt="A pre-match read inside the app: a projected score, a win probability split, team grades, and a written paragraph naming both captains and the players who decided the draft."
+            width="471"
+            height="1020"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── S6 · The week ───────────────────────────────────────────────────────────
+   The scroll-driven phone, rehoused. The section wears BOTH classes:
+   `pel-app-tour` is what inherits the sand ground, the top hairline, the
+   section padding and every tuned sticky/phone dimension at 68em / 54em / 48em
+   / 25em; `pel-week` is the new layer on top. */
+function TheWeek() {
   const [active, setActive] = useState(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
+  // Verbatim from the previous AppTour: marker at 53% of the viewport, nearest
+  // step centre wins, rAF-coalesced, passive scroll + resize, one synchronous
+  // read on mount so a deep link or a restored scroll position lands correct.
   useEffect(() => {
     let frame = 0;
 
@@ -314,7 +633,7 @@ function AppTour() {
     };
   }, []);
 
-  const goToScreen = (index: number) => {
+  const goToStep = (index: number) => {
     const reduceMotion = window.matchMedia?.(
       '(prefers-reduced-motion: reduce)',
     ).matches;
@@ -324,66 +643,145 @@ function AppTour() {
     });
   };
 
+  const current = WEEK_STEPS[active];
+
   return (
     <section
-      id="inside-the-app"
-      className="pel-app-tour"
-      aria-labelledby="app-tour-title"
+      id="the-week"
+      className="pel-app-tour pel-week"
+      aria-labelledby="app-week-title"
     >
+      {/* /app#inside-the-app is live today. Nothing in the repo points at it
+          any more — only the deleted hero button did — but a campaign URL might. */}
+      <span
+        id="inside-the-app"
+        className="pel-week__legacy-anchor"
+        aria-hidden="true"
+      />
+
       <div className="pel-app-tour__head">
-        <p className="pel-app-kicker">Inside the app</p>
-        <h2 id="app-tour-title">One place for every game.</h2>
-        <p>
-          From the community home to post-game analysis, every part of the match
-          day has a place.
+        <h2
+          id="app-week-title"
+          className="pel-app-h2 pel-app-h2--center"
+          data-reveal
+        >
+          You set one time. The week does the rest.
+        </h2>
+        {/* Teaches the notation AND states the tally, in one line. The key marks
+            are the same two shapes as the step nodes and the meter. */}
+        <p className="pel-week__legend" data-reveal>
+          <span className="pel-week__key">
+            <i className="pel-week__key-mark" aria-hidden="true" />
+            Four run themselves
+          </span>
+          <span className="pel-week__key">
+            <i
+              className="pel-week__key-mark pel-week__key-mark--human"
+              aria-hidden="true"
+            />
+            Two need a human
+          </span>
         </p>
       </div>
 
-      <div className="pel-app-tour__grid">
+      {/* The stage stays FIRST in the DOM. At 54em the grid becomes
+          display:block, grid-column goes inert, and mobile keeps the proven
+          order: sticky phone, cards scrolling underneath it. */}
+      <div className="pel-app-tour__grid pel-week__grid">
         <div className="pel-app-tour__stage">
-          <Phone screens={APP_SCREENS} active={active} />
+          <Phone screens={WEEK_SCREENS} active={current.screen} />
+
           <div
-            className="pel-app-tour__progress"
-            aria-label="Choose an app screen"
+            className="pel-week__meter"
+            role="group"
+            aria-label="Jump to a moment in the week"
           >
-            {APP_SCREENS.map((screen, index) => (
+            {WEEK_STEPS.map((step, index) => (
               <button
-                key={screen.id}
+                key={step.id}
                 type="button"
-                className={index === active ? 'is-active' : undefined}
-                aria-label={`Show ${screen.eyebrow} screen`}
+                className={[
+                  'pel-week__meter-cell',
+                  step.human ? 'is-human' : '',
+                  index === active ? 'is-active' : '',
+                  index < active ? 'is-past' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-label={`Jump to ${step.when}`}
                 aria-current={index === active ? 'step' : undefined}
-                onClick={() => goToScreen(index)}
+                onClick={() => goToStep(index)}
               />
             ))}
           </div>
+
+          {/* Ties the screen to the moment — and it is the thing that changes
+              when the phone does not. Steps 2 and 3 share one screenshot, so
+              this caption swapping under an unchanged screen is what makes the
+              pair read as "same game screen; it updated itself twice while you
+              weren't looking". Duplicates the step heading, so hidden from AT. */}
+          <p className="pel-week__now" aria-hidden="true">
+            {current.when}
+          </p>
         </div>
 
-        <div className="pel-app-tour__steps">
-          {APP_SCREENS.map((screen, index) => (
-            <article
-              key={screen.id}
+        {/* role="list" because list-style:none strips list semantics in
+            Safari/VoiceOver. */}
+        <ol className="pel-app-tour__steps pel-week__steps" role="list">
+          {WEEK_STEPS.map((step, index) => (
+            <li
+              key={step.id}
               ref={(node) => {
                 stepRefs.current[index] = node;
               }}
-              className={`pel-app-tour-step${index === active ? ' is-active' : ''}`}
-              data-screen={screen.id}
+              className={[
+                'pel-week-step',
+                step.human ? 'pel-week-step--human' : '',
+                index === active ? 'is-active' : '',
+                index < active ? 'is-past' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              data-step={step.id}
             >
-              <div className="pel-app-tour-step__number">{screen.number}</div>
-              <div className="pel-app-tour-step__copy">
-                <p>{screen.eyebrow}</p>
-                <h3>{screen.title}</h3>
-                <div>{screen.body}</div>
+              <span className="pel-week-step__node" aria-hidden="true" />
+              {/* data-reveal goes HERE, on the inner body, never on the <li>.
+                  The hook sets an inline translateY(28px) on its targets; the
+                  li is what stepRefs measures, and a 28px offset feeds a wrong
+                  rect.top straight into the nearest-centre tracker. A transform
+                  on a CHILD does not affect the parent's box. Same reason
+                  nothing on the sticky stage or its ancestors carries reveal or
+                  parallax markup — an inline transform on an ancestor makes it
+                  a containing block and drags the sticky phone. */}
+              <div className="pel-week-step__body" data-reveal>
+                <h3 className="pel-week-step__when">{step.when}</h3>
+                <p className="pel-week-step__what">{step.what}</p>
+                {step.human ? (
+                  <p className="pel-week-step__flag">
+                    <span className="pel-week-step__flag-label">
+                      Needs a human
+                    </span>
+                    <span className="pel-week-step__flag-detail">
+                      {step.human}
+                    </span>
+                  </p>
+                ) : (
+                  /* The four-against-two contrast, for screen readers. Sighted
+                     readers get it from shape and margin; without this line AT
+                     users hear two marked steps and four silent ones and have
+                     to infer the pattern. */
+                  <p className="sr-only">Needs nothing from you.</p>
+                )}
               </div>
-            </article>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );
 }
 
-function Phone({screens, active}: {screens: AppScreen[]; active: number}) {
+function Phone({screens, active}: {screens: PhoneScreen[]; active: number}) {
   return (
     <figure className="pel-app-phone">
       <span
@@ -411,312 +809,100 @@ function Phone({screens, active}: {screens: AppScreen[]; active: number}) {
               className={`pel-app-phone__layer${index === active ? ' is-active' : ''}`}
               aria-hidden={index !== active}
             >
-              {screen.imageSrc ? (
-                <img src={screen.imageSrc} alt={screen.imageAlt} />
-              ) : (
-                <ScreenMock variant={screen.mock} />
-              )}
+              <img
+                src={screen.imageSrc}
+                alt={screen.imageAlt}
+                width="471"
+                height="1020"
+                loading={index === 0 ? undefined : 'lazy'}
+              />
             </div>
           ))}
         </div>
       </div>
-      <figcaption className="sr-only">{screens[active]?.imageAlt}</figcaption>
+      {/* No figcaption: it duplicated the active layer's alt text word for
+          word, so each screen was announced twice. The per-layer alt carries
+          it, and inactive layers are aria-hidden. */}
     </figure>
   );
 }
 
-function ScreenMock({variant}: {variant: MockScreen}) {
-  const titles: Record<MockScreen, string> = {
-    home: 'Good afternoon',
-    schedule: 'Schedule',
-    roster: 'Tuesday Run',
-    results: 'Match recap',
-    leaders: 'Leaderboard',
-  };
-
+/* ── S7 · One game ──────────────────────────────────────────────────────────*/
+function OneGame() {
   return (
-    <div className={`pel-app-mock pel-app-mock--${variant}`}>
-      <div className="pel-app-mock__status">
-        <span>9:41</span>
-        <div>
-          <i />
-          <i />
-          <i />
-        </div>
+    <section
+      className="pel-app-sec pel-app-onegame"
+      aria-labelledby="app-onegame-title"
+    >
+      <div className="pel-app-onegame__inner">
+        <h2 id="app-onegame-title" className="pel-app-h2" data-reveal>
+          One game. That’s the whole commitment.
+        </h2>
+        <p className="pel-app-lead" data-reveal>
+          Don’t migrate anybody. Don’t announce anything. Run one game on the app
+          and post the link in the chat you already have. People claim their own
+          spot — you’re not adding anyone, and you’re not chasing anyone to sign
+          up.
+        </p>
+        <p className="pel-app-onegame__close" data-reveal>
+          If Thursday still comes with DMs, you’ve lost one week and nothing
+          else.
+        </p>
+        {/* Set apart and quieter, and arriving a beat after the line above it. */}
+        <p className="pel-app-onegame__pricing" data-reveal>
+          <b>And it’s free.</b> Free for your community, free for your players,
+          not a trial. The kit and the merch pay for pitch time, balls and the
+          next match. The games have always been free to turn up to, and we’d
+          like to keep it that way.
+        </p>
       </div>
-      <div className="pel-app-mock__nav">
-        <img src="/icon-96.png" alt="" width="96" height="96" />
-        <span>PEL</span>
-        <i />
-      </div>
-      <div className="pel-app-mock__body">
-        <p className="pel-app-mock__eyebrow">Por El Deporte</p>
-        <h4>{titles[variant]}</h4>
-        {variant === 'home' ? <MockHome /> : null}
-        {variant === 'schedule' ? <MockSchedule /> : null}
-        {variant === 'roster' ? <MockRoster /> : null}
-        {variant === 'results' ? <MockResults /> : null}
-        {variant === 'leaders' ? <MockLeaders /> : null}
-      </div>
-      <MockTabBar active={variant} />
-    </div>
-  );
-}
-
-function MockHome() {
-  return (
-    <>
-      <div className="pel-app-mock__feature">
-        <div className="pel-app-mock__feature-top">
-          <span>Next up</span>
-          <b>14 / 16</b>
-        </div>
-        <strong>Tuesday Run</strong>
-        <p>Key Biscayne &bull; 7:00 PM</p>
-        <div className="pel-app-mock__join">You&apos;re in</div>
-      </div>
-      <div className="pel-app-mock__section-title">
-        <b>This week</b>
-        <span>See all</span>
-      </div>
-      <MockGameRow day="THU" date="28" name="Thursday Lights" count="11 / 16" />
-      <MockGameRow day="SUN" date="31" name="Sunday Club" count="8 / 12" />
-    </>
-  );
-}
-
-function MockSchedule() {
-  const days = [
-    {id: 'mon', label: 'M'},
-    {id: 'tue', label: 'T'},
-    {id: 'wed', label: 'W'},
-    {id: 'thu', label: 'T'},
-    {id: 'fri', label: 'F'},
-    {id: 'sat', label: 'S'},
-    {id: 'sun', label: 'S'},
-  ];
-  return (
-    <>
-      <div className="pel-app-mock__calendar">
-        <div>
-          <b>August</b>
-          <span>&lsaquo;&nbsp;&nbsp;&rsaquo;</span>
-        </div>
-        <ul className="pel-app-mock__week">
-          {days.map((day, index) => (
-            <li key={day.id} className={index === 1 ? 'is-active' : undefined}>
-              <span>{day.label}</span>
-              <b>{25 + index}</b>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="pel-app-mock__section-title">
-        <b>Tuesday, Aug 26</b>
-        <span>2 games</span>
-      </div>
-      <MockGameRow day="7:00" date="PM" name="Tuesday Run" count="2 spots" />
-      <MockGameRow
-        day="8:30"
-        date="PM"
-        name="Late Night Five"
-        count="Waitlist"
-      />
-      <div className="pel-app-mock__create">+ Create a game</div>
-    </>
-  );
-}
-
-function MockRoster() {
-  const players = ['FV', 'AM', 'JL', 'CR', 'LS', 'MP'];
-  return (
-    <>
-      <div className="pel-app-mock__game-meta">
-        <div>
-          <span>Tue, Aug 26</span>
-          <b>7:00 PM</b>
-        </div>
-        <div>
-          <span>Location</span>
-          <b>Key Biscayne</b>
-        </div>
-      </div>
-      <div className="pel-app-mock__roster-head">
-        <b>Confirmed</b>
-        <span>14 / 16</span>
-      </div>
-      <div className="pel-app-mock__people">
-        {players.map((player, index) => (
-          <div key={player}>
-            <i>{player}</i>
-            <span>Player {index + 1}</span>
-            <b>In</b>
-          </div>
-        ))}
-      </div>
-      <div className="pel-app-mock__waitlist">
-        <span>Waitlist</span>
-        <b>2 players</b>
-      </div>
-    </>
-  );
-}
-
-function MockResults() {
-  return (
-    <>
-      <div className="pel-app-mock__score">
-        <span>Full time</span>
-        <div>
-          <b>Orange</b>
-          <strong>6</strong>
-          <i>-</i>
-          <strong>4</strong>
-          <b>Cream</b>
-        </div>
-        <p>Tuesday Run &bull; August 19</p>
-      </div>
-      <div className="pel-app-mock__section-title">
-        <b>Match notes</b>
-        <span>12 players</span>
-      </div>
-      <div className="pel-app-mock__stat-grid">
-        <div>
-          <b>10</b>
-          <span>Goals</span>
-        </div>
-        <div>
-          <b>4</b>
-          <span>Assists</span>
-        </div>
-        <div>
-          <b>2</b>
-          <span>Badges</span>
-        </div>
-      </div>
-      <div className="pel-app-mock__result-row">
-        <i>W</i>
-        <span>
-          <b>Sunday Club</b>
-          <small>Aug 17</small>
-        </span>
-        <strong>5 - 3</strong>
-      </div>
-      <div className="pel-app-mock__result-row">
-        <i>D</i>
-        <span>
-          <b>Thursday Lights</b>
-          <small>Aug 14</small>
-        </span>
-        <strong>4 - 4</strong>
-      </div>
-    </>
-  );
-}
-
-function MockLeaders() {
-  const leaders = [
-    ['1', 'FV', 'Franco V.', '24'],
-    ['2', 'AM', 'Alex M.', '21'],
-    ['3', 'JL', 'Jamie L.', '18'],
-    ['4', 'CR', 'Chris R.', '15'],
-    ['5', 'LS', 'Leo S.', '14'],
-  ];
-  return (
-    <>
-      <div className="pel-app-mock__leader-tabs">
-        <b>Overall</b>
-        <span>Goals</span>
-        <span>Wins</span>
-      </div>
-      <div className="pel-app-mock__podium">
-        <div>
-          <i>AM</i>
-          <span>2</span>
-        </div>
-        <div>
-          <i>FV</i>
-          <span>1</span>
-        </div>
-        <div>
-          <i>JL</i>
-          <span>3</span>
-        </div>
-      </div>
-      <div className="pel-app-mock__leader-list">
-        {leaders.map(([place, initials, name, points]) => (
-          <div key={place}>
-            <strong>{place}</strong>
-            <i>{initials}</i>
-            <span>{name}</span>
-            <b>{points} pts</b>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function MockGameRow({
-  day,
-  date,
-  name,
-  count,
-}: {
-  day: string;
-  date: string;
-  name: string;
-  count: string;
-}) {
-  return (
-    <div className="pel-app-mock__game-row">
-      <div>
-        <span>{day}</span>
-        <b>{date}</b>
-      </div>
-      <p>
-        <b>{name}</b>
-        <span>Key Biscayne</span>
-      </p>
-      <strong>{count}</strong>
-    </div>
-  );
-}
-
-function MockTabBar({active}: {active: MockScreen}) {
-  return (
-    <div className="pel-app-mock__tabs">
-      {(
-        ['home', 'schedule', 'roster', 'results', 'leaders'] as MockScreen[]
-      ).map((tab) => (
-        <i key={tab} className={tab === active ? 'is-active' : undefined} />
-      ))}
-    </div>
-  );
-}
-
-function DownloadBand() {
-  return (
-    <section className="pel-app-download" aria-labelledby="app-download-title">
-      <div className="pel-app-download__mark" aria-hidden="true">
-        <img
-          src="/icon-512.png"
-          alt=""
-          width="512"
-          height="512"
-          loading="lazy"
-        />
-      </div>
-      <div className="pel-app-download__copy">
-        <p className="pel-app-kicker">Ready when you are</p>
-        <h2 id="app-download-title">Build the squad. Keep the story going.</h2>
-      </div>
-      <AppStoreButton className="pel-app-store--ink" />
     </section>
   );
 }
 
-function AppContact() {
+/* ── S8 · What it doesn't do ─────────────────────────────────────────────────
+   Deliberately identical to S4 in layout and motion: the two sections are a
+   matched pair, and the same treatment makes them read as one. This is also the
+   section carrying the hard accuracy statement about payments, and a section
+   that behaves oddly gets read as spin. */
+function WhatItWontDo() {
+  return (
+    <section
+      className="pel-app-sec pel-app-wont"
+      aria-labelledby="app-wont-title"
+    >
+      <div className="pel-app-sec__inner">
+        <h2 id="app-wont-title" className="pel-app-h2" data-reveal>
+          Four things it won’t do
+        </h2>
+        <LeadList items={WONT_ITEMS} />
+        <p className="pel-app-wont__platform" data-reveal>
+          iPhone and{' '}
+          <a href={WEB_APP_URL} target="_blank" rel="noreferrer">
+            web
+          </a>{' '}
+          today.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/** The shared S4 / S8 list primitive. */
+function LeadList({items}: {items: LeadItem[]}) {
+  return (
+    <ul className="pel-app-leadlist" role="list">
+      {items.map((item) => (
+        <li key={item.lead} data-reveal>
+          <b>{item.lead}</b> {item.rest}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* ── S9 · Close ─────────────────────────────────────────────────────────────*/
+function TheClose() {
   const fetcher = useFetcher<ContactResult>();
   const formRef = useRef<HTMLFormElement>(null);
   const sending = fetcher.state !== 'idle';
@@ -727,122 +913,139 @@ function AppContact() {
   }, [result]);
 
   return (
-    <section className="pel-app-contact" aria-labelledby="app-contact-title">
-      <div className="pel-app-contact__inner">
-        <div className="pel-app-contact__copy">
-          <p className="pel-app-kicker">Get in touch</p>
-          <h2 id="app-contact-title">Have a community in mind?</h2>
-          <p>
-            Questions, partnerships, or want to bring your own group onto the
-            app? Send us a note and a real person will write back.
+    <section
+      id="close"
+      className="pel-app-sec pel-app-close"
+      aria-labelledby="app-close-title"
+    >
+      <div className="pel-app-close__inner">
+        <div className="pel-app-close__copy">
+          <h2 id="app-close-title" className="pel-app-h2" data-reveal>
+            Give us your Sunday game. We’ll give you your Thursday back.
+          </h2>
+          <p className="pel-app-lead" data-reveal>
+            Tell us about your community and we’ll set it up with you. A real
+            person writes back.
           </p>
-          <a href="mailto:contact@poreldeporte.com">contact@poreldeporte.com</a>
+
+          {/* No reveal markup on the form or its fields: controls at opacity 0
+              are focusable, and this is the target of the hero anchor — a #close
+              jump should not hand the reader a 900ms fade on the thing they
+              asked to be taken to. */}
+          <fetcher.Form
+            ref={formRef}
+            method="post"
+            action="/api/contact"
+            className="pel-app-form"
+            onSubmit={(event) => {
+              if (sending) event.preventDefault();
+            }}
+          >
+            <div className="pel-app-form__row">
+              <label>
+                <span>Name</span>
+                <input
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  maxLength={80}
+                  required
+                  disabled={sending}
+                  placeholder="YOUR NAME"
+                />
+              </label>
+              <label>
+                <span>Email</span>
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  maxLength={254}
+                  required
+                  disabled={sending}
+                  placeholder="YOU@EXAMPLE.COM"
+                />
+              </label>
+            </div>
+            <label>
+              <span>Community name</span>
+              <input
+                type="text"
+                name="community"
+                autoComplete="organization"
+                maxLength={120}
+                required
+                disabled={sending}
+                placeholder="WHO DO YOU PLAY WITH?"
+              />
+            </label>
+            <label>
+              <span>How many play, and how often</span>
+              <input
+                type="text"
+                name="cadence"
+                maxLength={160}
+                required
+                disabled={sending}
+                placeholder="ABOUT 18 OF US, EVERY SUNDAY"
+              />
+            </label>
+            <div className="pel-app-form__trap" aria-hidden="true">
+              <label>
+                Website
+                <input
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </label>
+            </div>
+            <div className="pel-app-form__submit">
+              {/* aria-disabled, not disabled: disabling the element that has
+                  focus drops focus to <body>, and the success path also resets
+                  the form, so the reader lands nowhere with four empty fields.
+                  The onSubmit guard above is what prevents a double send. */}
+              <button type="submit" aria-disabled={sending}>
+                {sending ? 'Sending…' : 'Move your Sunday game over'}
+                <ArrowRight />
+              </button>
+              <p className="pel-app-form__privacy">
+                We only use these details to write back.
+              </p>
+            </div>
+            {/* One node, always present, with a fixed role. It collapses to
+                zero height when empty rather than unmounting or using
+                display:none — either of those takes it out of the
+                accessibility tree, and a live region that appears at the same
+                moment as its text is not reliably announced. */}
+            <p
+              className={`pel-app-form__status${
+                result ? (result.ok ? ' is-success' : ' is-error') : ' is-idle'
+              }`}
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {result?.message ?? ''}
+            </p>
+          </fetcher.Form>
         </div>
 
-        <fetcher.Form
-          ref={formRef}
-          method="post"
-          action="/api/contact"
-          className="pel-app-contact__form"
-        >
-          <div className="pel-app-contact__row">
-            <label>
-              <span>Name</span>
-              <input
-                type="text"
-                name="name"
-                autoComplete="name"
-                maxLength={80}
-                required
-                disabled={sending}
-                placeholder="YOUR NAME"
-              />
-            </label>
-            <label>
-              <span>Email</span>
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                maxLength={254}
-                required
-                disabled={sending}
-                placeholder="YOU@EXAMPLE.COM"
-              />
-            </label>
-          </div>
-          <label>
-            <span>
-              Community or organization <small>(optional)</small>
-            </span>
-            <input
-              type="text"
-              name="community"
-              autoComplete="organization"
-              maxLength={120}
-              disabled={sending}
-              placeholder="WHO DO YOU PLAY WITH?"
-            />
-          </label>
-          <label>
-            <span>Message</span>
-            <textarea
-              name="message"
-              rows={6}
-              minLength={10}
-              maxLength={2000}
-              required
-              disabled={sending}
-              placeholder="TELL US A LITTLE ABOUT IT..."
-            />
-          </label>
-          <div className="pel-app-contact__trap" aria-hidden="true">
-            <label>
-              Website
-              <input
-                name="website"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-              />
-            </label>
-          </div>
-          <div className="pel-app-contact__submit">
-            <button type="submit" disabled={sending}>
-              {sending ? 'Sending...' : 'Send message'}
-              <ArrowRight />
-            </button>
-            <p className="pel-app-contact__privacy">
-              We only use these details to reply to your message.
-            </p>
-          </div>
-          {result ? (
-            <p
-              className={`pel-app-contact__status${result.ok ? ' is-success' : ' is-error'}`}
-              role={result.ok ? 'status' : 'alert'}
-            >
-              {result.message}
-            </p>
-          ) : null}
-        </fetcher.Form>
+        {/* A <div>, deliberately not an <aside>. app.css styles the bare
+            `aside` element as the cart drawer — height:100vh, position:fixed,
+            a 50px shadow — so any <aside> outside that drawer inherits a
+            full-viewport fixed panel. It would also add a stray complementary
+            landmark for one line of proof. */}
+        <div className="pel-app-close__proof" data-reveal>
+          {/* No hard break: it orphaned "game" on its own line at most
+              desktop widths. text-wrap: balance in the CSS evens the lines. */}
+          <p>
+            Running the same game since <b>2014</b>.
+          </p>
+        </div>
       </div>
     </section>
-  );
-}
-
-function AppStoreButton({className}: {className: string}) {
-  return (
-    <a
-      className={`pel-app-store ${className}`}
-      href={APP_STORE_URL}
-      target="_blank"
-      rel="noreferrer"
-    >
-      <AppleIcon />
-      <span>
-        <small>Download on the</small>App Store
-      </span>
-    </a>
   );
 }
 
@@ -850,22 +1053,6 @@ function AppleIcon() {
   return (
     <svg viewBox="0 0 384 512" aria-hidden="true">
       <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.7-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
-    </svg>
-  );
-}
-
-function ArrowDown() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      aria-hidden="true"
-    >
-      <path d="M12 4v15M6 13l6 6 6-6" />
     </svg>
   );
 }
@@ -882,51 +1069,6 @@ function ArrowRight() {
       aria-hidden="true"
     >
       <path d="M4 12h15M13 6l6 6-6 6" />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      aria-hidden="true"
-    >
-      <rect x="3" y="5" width="18" height="16" rx="2" />
-      <path d="M8 3v4M16 3v4M3 10h18M8 14h2M14 14h2M8 17h2" />
-    </svg>
-  );
-}
-
-function PlayersIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      aria-hidden="true"
-    >
-      <circle cx="9" cy="8" r="3" />
-      <path d="M3.5 20c.4-4 2.7-6 5.5-6s5.1 2 5.5 6M15 5.5a3 3 0 0 1 0 5.8M16.5 14c2.3.5 3.7 2.4 4 5" />
-    </svg>
-  );
-}
-
-function ChartIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      aria-hidden="true"
-    >
-      <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
-      <path d="m4 7 6-5 6 7 5-4" />
     </svg>
   );
 }
