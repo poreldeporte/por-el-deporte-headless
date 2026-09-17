@@ -967,12 +967,15 @@ a.pel-app-hero__aside:hover {
 /* No day beside it, because it is not a day: it hangs off the sentence edge
    with the day track deliberately empty. The ink rule above already ended the
    week, so it needs no rule of its own. */
+/* No max-width and no left inset. The inset used to hang this line off the
+   sentence edge with the day track empty, which was fine when the ledger had
+   the whole column — but the body track is 600px now, and 190px of inset left
+   410px for a line that needs 423px, so it broke onto two lines at the widest
+   and narrowest ends and fit by two pixels at 1440. It sits flush with the
+   ledger's own left edge instead, under the closing rule, where it reads as
+   the week's total and has the full track to set in. */
 .pel-app-thursday__close {
-  /* px, not ch: on the display face `ch` is the width of its own "0", so 46ch
-     resolved to 1062px at 42px type and constrained nothing — the line ran to
-     the exact edge of its column. */
-  max-width: 24em;
-  margin: clamp(28px, 2.8vw, 40px) 0 0 calc(var(--th-day) + var(--th-gap));
+  margin: clamp(28px, 2.8vw, 40px) 0 0;
   font-family: var(--font-display);
   font-size: clamp(23px, 2.9vw, 42px);
   font-weight: 650;
