@@ -944,7 +944,10 @@ a.pel-app-hero__aside:hover {
    with the day track deliberately empty. The ink rule above already ended the
    week, so it needs no rule of its own. */
 .pel-app-thursday__close {
-  max-width: 46ch;
+  /* px, not ch: on the display face `ch` is the width of its own "0", so 46ch
+     resolved to 1062px at 42px type and constrained nothing — the line ran to
+     the exact edge of its column. */
+  max-width: 24em;
   margin: clamp(28px, 2.8vw, 40px) 0 0 calc(var(--th-day) + var(--th-gap));
   font-family: var(--font-display);
   font-size: clamp(23px, 2.9vw, 42px);
@@ -952,10 +955,6 @@ a.pel-app-hero__aside:hover {
   line-height: 1.06;
   letter-spacing: -0.02em;
   color: var(--pel-ink);
-}
-
-.pel-app-thursday__close span {
-  display: block;
 }
 
 /* ── S3 · The trade — one sheet, one fold ────────────────────────────────────
@@ -1711,7 +1710,11 @@ a.pel-app-hero__aside:hover {
   width: min(100%, 420px);
   margin-top: clamp(18px, 2.4vh, 30px);
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  /* Auto columns, not repeat(6): the meter is generated from WEEK_STEPS, and
+     hard-coding the count wrapped it onto a second row the moment a seventh
+     step was added. */
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   border-top: var(--border-width) solid var(--wk-hair);
 }
 

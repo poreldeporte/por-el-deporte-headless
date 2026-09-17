@@ -12,13 +12,13 @@ const WEB_APP_URL = 'https://app.poreldeporte.com';
 type ContactResult = {ok: boolean; message: string};
 
 /**
- * S6's phone screens. FIVE screens for SIX steps, on purpose: "Midweek" and
- * "Two hours out" are the same screen in real life, so both steps resolve to
+ * S6's phone screens. SIX screens for SEVEN steps, on purpose: "Midweek" and
+ * "24 hours out" are the same screen in real life, so both steps resolve to
  * index 1. That means `active` never changes between them, so the phone is
  * genuinely still rather than crossfading an image against itself — two layers
  * of the same PNG composite to a visible wash toward the screen's own ground at
  * the fade midpoint, and the scale(1.025) offset double-images the text through
- * it. The caption under the phone is what changes instead.
+ * it. The step heading beside it is what changes.
  */
 type PhoneScreen = {
   id: string;
@@ -31,7 +31,7 @@ const WEEK_SCREENS: PhoneScreen[] = [
     id: 'home',
     imageSrc: '/app-screens/01-home.png',
     imageAlt:
-      'The Por El Deporte home screen: Saturday 9:15AM at Brickell Soccer & Padel, 12 of 12 rostered, a waitlist button, and this week’s slate below it.',
+      'The Por El Deporte home screen: Saturday 9:15AM at Brickell Soccer & Padel, 12 of 12 rostered, a waitlist button, and this week\u2019s slate below it.',
   },
   {
     id: 'game',
@@ -46,6 +46,12 @@ const WEEK_SCREENS: PhoneScreen[] = [
       'The draft room: two team pitches filling up, a captain on the clock, and the remaining players waiting to be picked.',
   },
   {
+    id: 'read',
+    imageSrc: '/app-screens/06-post-draft-analysis.png',
+    imageAlt:
+      'The post-draft read: a projected score, a win probability split between the two captains, a grade for each side, and a written paragraph naming the players who decided it.',
+  },
+  {
     id: 'record',
     imageSrc: '/app-screens/02-record.png',
     imageAlt:
@@ -55,7 +61,7 @@ const WEEK_SCREENS: PhoneScreen[] = [
     id: 'table',
     imageSrc: '/app-screens/03-leaderboard.png',
     imageAlt:
-      'The table screen: the month’s top three on a podium and the full ranked list of players underneath.',
+      'The table screen: the month\u2019s top three on a podium and the full ranked list of players underneath.',
   },
 ];
 
@@ -85,34 +91,40 @@ const WEEK_STEPS: WeekStep[] = [
   {
     id: 'drop',
     when: 'Midweek',
-    what: 'Someone drops. The next player is in and notified. You read about it. You don’t fix it.',
+    what: 'Someone drops. The next player is in and notified. You read about it. You don\u2019t fix it.',
     screen: 1,
   },
   {
     id: 'confirm',
-    when: 'Two hours out',
-    what: 'Everyone confirms. Anyone who hasn’t is visible, to you and to them.',
+    when: '24 hours out',
+    what: 'Everyone confirms. Anyone who hasn\u2019t is visible, to you and to them, with a day still to fill the gap.',
     screen: 1,
   },
   {
     id: 'draft',
-    when: 'Before kickoff',
-    what: 'Captains draft the teams live. Everyone watches it happen.',
+    when: 'Hours before',
+    what: 'Captains draft the teams live, pick by pick, in a room the whole squad watches. Every pick lands in the log.',
     screen: 2,
     human: 'Two captains',
+  },
+  {
+    id: 'read',
+    when: 'Teams set',
+    what: 'The read lands: a projected score, a win probability, a grade for each side. Everyone calls it before a ball is kicked.',
+    screen: 3,
   },
   {
     id: 'fulltime',
     when: 'Full time',
     what: 'Someone puts the score in. The squad votes MVP.',
-    screen: 3,
+    screen: 4,
     human: 'One person, 30 seconds',
   },
   {
     id: 'evening',
     when: 'That evening',
     what: 'The match report lands, the ratings move, and the argument restarts in the chat where it belongs.',
-    screen: 4,
+    screen: 5,
   },
 ];
 
@@ -151,7 +163,7 @@ type LeadItem = {lead: string; rest: string};
 const STOPS_ITEMS: LeadItem[] = [
   {
     lead: 'Counting heads.',
-    rest: 'The list opens at the same time every week and fills itself. When someone drops, the next player is in and told before you’ve even read the message.',
+    rest: 'The list opens at the same time every week and fills itself in minutes. Everyone after the twelfth queues in order, so nobody asks you for a spot and you never tell anyone no.',
   },
   {
     lead: 'Being the bad guy.',
@@ -397,18 +409,19 @@ function AppHero() {
    paragraph and does no structural work. A <dl> because that is exactly what
    this is: five terms and what each one costs you.
 
-   Reading order and textContent are unchanged — "Sunday you post the game.
-   Six say..." — so the copy is still the spec's, word for word. */
+   Reading order and textContent read as one sentence per row: "Sunday you
+   post the game. Forty say..." — the day is the row's term, not a heading
+   bolted on. */
 function TheThursday() {
   const week: Array<[string, string]> = [
     [
       'Sunday',
-      'you post the game. Six say \u201Cin\u201D. Two send a thumbs-up you have to interpret. One says \u201Cmaybe\u201D.',
+      'you post the game. Forty say “in” for twelve spots. A dozen send a thumbs-up you have to interpret. Nine say “maybe”.',
     ],
-    ['Thursday', 'you count heads, come up two short, and start the DMs.'],
+    ['Thursday', 'you pick twelve, and tell the rest of your friends no.'],
     [
       'Friday',
-      'someone drops, and you scroll back three hundred messages to find who asked to be next.',
+      'someone drops at midnight, and you scroll back three hundred messages to find who asked first.',
     ],
     ['Saturday', 'you write the teams yourself. Sunday you hear about it.'],
     ['Sunday night', 'you remind the same three people about the pitch money.'],
@@ -425,7 +438,7 @@ function TheThursday() {
             real space between the blocks so selecting and copying the heading
             still yields the sentence. */}
         <h2 id="app-thursday-title" className="pel-app-h2" data-reveal>
-          <span>Twelve spots.</span> <span>Forty-one messages.</span>{' '}
+          <span>Twelve spots.</span> <span>Forty replies.</span>{' '}
           <span>One of you.</span>
         </h2>
 
@@ -440,8 +453,7 @@ function TheThursday() {
           </dl>
 
           <p className="pel-app-thursday__close" data-reveal>
-            <span>And nobody thanks you,</span>
-            <span>because nobody saw any of it.</span>
+            And nobody thanks you.
           </p>
         </div>
       </div>
@@ -637,8 +649,8 @@ function TheReversal() {
           data-speed="14"
         >
           <img
-            src="/app-screens/06-post-draft-analysis.png"
-            alt="A pre-match read inside the app: a projected score, a win probability split, team grades, and a written paragraph naming both captains and the players who decided the draft."
+            src="/app-screens/03-leaderboard.png"
+            alt="The table screen: the month’s top three on a podium and the full ranked list of players underneath, each with a rating and a win-loss record."
             width="471"
             height="1020"
             loading="lazy"
@@ -734,7 +746,7 @@ function TheWeek() {
         <p className="pel-week__legend" data-reveal>
           <span className="pel-week__key">
             <i className="pel-week__key-mark" aria-hidden="true" />
-            Four run themselves
+            Five run themselves
           </span>
           <span className="pel-week__key">
             <i
