@@ -133,7 +133,14 @@
   color: var(--text-muted);
 }
 
+/* A block, not inline. Inline, each item's body began wherever its lead-in
+   happened to end — four different x positions — so the four things the
+   heading promises never formed a column and could not be counted, compared
+   or skimmed. At 375px it was worse: the longest lead-in ate 222px of a 335px
+   measure and left a four-character first line. */
 .pel-app-leadlist > li > b {
+  display: block;
+  margin-bottom: clamp(8px, 0.9vw, 12px);
   font-family: var(--font-display);
   font-size: clamp(21px, 1.9vw, 27px);
   font-weight: 650;
