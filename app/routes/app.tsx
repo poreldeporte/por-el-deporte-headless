@@ -163,7 +163,7 @@ type LeadItem = {lead: string; rest: string};
 const STOPS_ITEMS: LeadItem[] = [
   {
     lead: 'Counting heads.',
-    rest: 'The list opens at the same time every week and fills itself in minutes. Everyone after the twelfth queues in order, so nobody asks you for a spot and you never tell anyone no.',
+    rest: 'The list opens at the same time every week and fills itself. Everyone after the twelfth queues in order, so nobody has to ask you who was first, and there is only ever one version of the list.',
   },
   {
     lead: 'Being the bad guy.',
@@ -409,22 +409,35 @@ function AppHero() {
    paragraph and does no structural work. A <dl> because that is exactly what
    this is: five terms and what each one costs you.
 
-   Reading order and textContent read as one sentence per row: "Sunday you
-   post the game. Forty say..." — the day is the row's term, not a heading
-   bolted on. */
+   Reading order and textContent read as one sentence per row: "Sunday, 3PM
+   you post the game. Names arrive..." — the day is the row's term, not a
+   heading bolted on. */
 function TheThursday() {
   const week: Array<[string, string]> = [
     [
-      'Sunday',
-      'you post the game. Forty say “in” for twelve spots. A dozen send a thumbs-up you have to interpret. Nine say “maybe”.',
+      'Sunday, 3PM',
+      'you post the game. Names arrive faster than you can read them, and you become the record of who was first.',
     ],
-    ['Thursday', 'you pick twelve, and tell the rest of your friends no.'],
     [
-      'Friday',
-      'someone drops at midnight, and you scroll back three hundred messages to find who asked first.',
+      'Midweek',
+      'two drop. You retype the list, paste it back, and hope nobody replies underneath it.',
     ],
-    ['Saturday', 'you write the teams yourself. Sunday you hear about it.'],
-    ['Sunday night', 'you remind the same three people about the pitch money.'],
+    [
+      'Saturday',
+      'you paste the list again and ask twelve people to confirm. Three go quiet. Two say out.',
+    ],
+    [
+      'Saturday night',
+      'you paste it again. Then you pick two even teams, or find two captains who will.',
+    ],
+    [
+      'Sunday morning',
+      'you hope twelve people turn up at the same field at the same time.',
+    ],
+    [
+      'Full time',
+      'the game ends and nothing keeps it. No score, no record, nothing to carry into next week.',
+    ],
   ];
 
   return (

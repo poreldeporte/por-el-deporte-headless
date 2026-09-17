@@ -868,7 +868,10 @@ a.pel-app-hero__aside:hover {
    the same week, once as a ledger you administer, once as a timeline that runs
    itself. */
 .pel-app-thursday {
-  --th-day: clamp(96px, 8.4vw, 120px);
+  /* Wide enough for the longest label on one line. "Saturday night" and
+     "Sunday morning" were wrapping in a 120px track, which broke the ledger's
+     single baseline per row. */
+  --th-day: clamp(104px, 10vw, 156px);
   --th-gap: clamp(18px, 2.4vw, 34px);
   /* Slightly tighter than the shared section rhythm: this section carries
      three full-ink rules of its own, so it has hard edges the others do not
