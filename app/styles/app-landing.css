@@ -2265,7 +2265,7 @@ a.pel-app-hero__aside:hover {
   .pel-week {
     /* The gap between one card and the next, and therefore how long the phone
        screen is left clear. Sized against the phone (53svh), not the copy. */
-    --wk-runway: clamp(250px, 34vh, 340px);
+    --wk-runway: clamp(330px, 46vh, 470px);
     padding-bottom: 60px;
   }
 
@@ -2332,6 +2332,9 @@ a.pel-app-hero__aside:hover {
        `.pel-week-step__body { margin-left: 0 }` above is (0,1,0) — it loses to
        this (0,2,0) selector, so the reset has to live here. */
     margin-left: 0;
+    /* (0,2,0) beats the plain .pel-week-step__body padding above, so the top
+       space the node needs has to be repeated here. */
+    padding: 46px 24px 24px;
     border-color: var(--pel-ink);
     box-shadow: 7px 8px 0 var(--pel-orange);
   }
@@ -2416,7 +2419,7 @@ a.pel-app-hero__aside:hover {
   }
 
   .pel-week {
-    --wk-runway: clamp(230px, 32vh, 310px);
+    --wk-runway: clamp(310px, 44vh, 430px);
     padding-bottom: 52px;
   }
 
@@ -2427,17 +2430,15 @@ a.pel-app-hero__aside:hover {
     letter-spacing: 0.13em;
   }
 
-  .pel-week-step {
-    padding: 16px 0;
-  }
-
   .pel-week-step__body {
-    padding: 20px;
+    /* Top padding keeps the register mark off the heading. */
+    padding: 44px 20px 20px;
     border-radius: var(--radius-md);
     box-shadow: 6px 7px 0 rgba(23, 23, 23, 0.1);
   }
 
   .pel-week-step--human .pel-week-step__body {
+    padding: 44px 20px 20px;
     box-shadow: 6px 7px 0 var(--pel-orange);
   }
 
@@ -2599,11 +2600,11 @@ a.pel-app-hero__aside:hover {
   }
 
   .pel-week {
-    --wk-runway: clamp(210px, 30vh, 280px);
+    --wk-runway: clamp(290px, 42vh, 390px);
   }
 
   .pel-week-step__body {
-    padding: 18px;
+    padding: 42px 18px 18px;
   }
 
   .pel-week-step__when {
