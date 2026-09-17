@@ -249,23 +249,38 @@ export default function AppLandingPage() {
 /* ── S1 · Hero ───────────────────────────────────────────────────────────────
    No reveal markup anywhere in here, on purpose. useScrollMotion's above-the-
    fold guard makes reveals a no-op on tall viewports and a half-animated hero
-   on short ones; the H1 is the LCP element; and the hook writes an inline
-   transform, which would wipe the game card's rotate(-3deg). */
+   on short ones, and the H1 is the LCP element. The only CSS transforms left
+   in this section are .pel-app-cta:hover and the sheet's tick marks
+   (rotate -45deg), so if drift is ever wanted, [data-scroll-parallax] belongs
+   on .pel-app-hero__sheet and on nothing else in here. */
 function AppHero() {
   return (
     <section className="pel-app-hero" aria-labelledby="app-hero-title">
-      <div
-        className="pel-app-hero__orbit pel-app-hero__orbit--one"
-        aria-hidden="true"
-      />
-      <div
-        className="pel-app-hero__orbit pel-app-hero__orbit--two"
-        aria-hidden="true"
-      />
       <div className="pel-app-hero__inner">
         <div className="pel-app-hero__copy">
+          {/* HARD BREAKS, MEASURED. Do not remove them.
+              Flapjack 650 at -0.025em, width per 100px of font-size:
+                "You didn't volunteer"  8.698x  ┐ 0.76% apart — the only
+                "to be a switchboard."  8.632x  ┘ balanced pair in the sentence
+                "volunteer to be a"     7.494x  <- the phone's binding line
+                "switchboard."          5.329x  <- widest unbreakable token
+              Left to wrap, this H1 takes FIVE shapes across the range, and not
+              monotonically: 2 lines at 375/390/768/1100/1280, 3 lines at
+              900/992/1024/1440/1600/1920. The 1440 rag is 302.5 / 539.6 /
+              383.7 — line 1 at 56% of line 2 — and it flips back to 2 lines at
+              1100 and 1280 before flipping again. That is the LCP element
+              reflowing as the window widens.
+              --lg is the balanced pair, live from 43.5em up. --sm is the
+              three-line poster stack below it: the shorter binding line is
+              what lets a 375px phone set 41.25px instead of 38.5px.
+              The {' '} are load-bearing. JSX strips per-line leading
+              whitespace, so they are the space that rejoins the halves when
+              the <br> next to them is display:none. */}
           <h1 id="app-hero-title" className="pel-app-hero__title">
-            You didn’t volunteer to be a <span>switchboard.</span>
+            You didn’t
+            <br className="pel-app-hero__brk--sm" /> volunteer
+            <br className="pel-app-hero__brk--lg" /> to be a
+            <br className="pel-app-hero__brk--sm" /> <span>switchboard.</span>
           </h1>
           <p className="pel-app-hero__body">
             Por El Deporte takes the roster, the teams, the waitlist and the tab
@@ -299,44 +314,64 @@ function AppHero() {
           </a>
         </div>
 
-        {/* aria-hidden as a whole: this is an illustration of the app, not
-            live data, and the previous build hid it too. Announcing "Sat
-            9:15AM, 12/12 rostered" as if it were the reader's own next game is
-            worse than silence. */}
-        <div className="pel-app-hero__visual" aria-hidden="true">
-          <div className="pel-app-field">
-            <div className="pel-app-field__line pel-app-field__line--half" />
-            <div className="pel-app-field__circle" />
-            <div className="pel-app-field__box pel-app-field__box--top" />
-            <div className="pel-app-field__box pel-app-field__box--bottom" />
-          </div>
-          {/* The existing upcoming-game widget, reused as-is and still live DOM
-              rather than a screenshot. */}
-          <div className="pel-app-game-card">
-            <div className="pel-app-game-card__top">
-              <span>Up next</span>
-              <span>Roster</span>
-            </div>
-            <div className="pel-app-game-card__main">
-              <div className="pel-app-game-card__time">
-                <b>Sat</b>
-                <strong>9:15AM</strong>
-              </div>
-              <div className="pel-app-game-card__venue">
-                {/* No date. It was hardcoded to a day that has since passed,
-                    and any hardcoded date here goes stale again. "Sat 9:15AM"
-                    reads as an upcoming game indefinitely. */}
-                <strong>Brickell Soccer &amp; Padel</strong>
-              </div>
-            </div>
-            <div className="pel-app-game-card__footer">
-              <span>
-                <b>12/12</b> rostered
-              </span>
-              <span className="pel-app-game-card__action">
-                On waitlist&nbsp; →
-              </span>
-            </div>
+        {/* THE TEAM SHEET — the upcoming-game widget, recomposed.
+            Still live DOM rather than a screenshot, and still aria-hidden as a
+            whole: this is an illustration of the app, not the reader's own
+            next game, and announcing "Sat 9:15AM, 12 of 12 rostered" as if it
+            were their fixture is worse than silence. Every string in here
+            already existed on the old card.
+
+            ACCURACY GUARD. Twelve ticked slots and three queued boxes are the
+            only state here, and a tick means CLAIMED, never PAID. Do NOT add
+            to this sheet: a currency glyph, an amount, a total, a progress or
+            amount meter, a badge, a chip, a button, a link, or anything that
+            looks tappable — the old card's "On waitlist →" arrow sat on an
+            aria-hidden element and implied a tap that did not exist, and is
+            deliberately gone. The app tracks paid/unpaid and never touches
+            money. Read the S4/S8 accuracy guard before editing this; the sheet
+            is now the second place on the page where that claim can be broken. */}
+        <div className="pel-app-hero__sheet" aria-hidden="true">
+          <p className="pel-app-sheet__eyebrow">
+            Up next
+            <b>Sat 9:15AM</b>
+          </p>
+          {/* No date. It was hardcoded to a day that has since passed, and any
+              hardcoded date here goes stale again. */}
+          <p className="pel-app-sheet__venue">Brickell Soccer &amp; Padel</p>
+          <p className="pel-app-sheet__count">
+            <b>12/12</b> rostered
+          </p>
+          {/* Twelve slots, two columns of six, row-major — so slot 12 lands at
+              the foot of column 2, directly above box 13 in the well below it.
+              That vertical alignment is what lets the hook be a straight
+              hairline instead of an elbow. */}
+          <ol className="pel-app-sheet__roster">
+            {[
+              '01',
+              '02',
+              '03',
+              '04',
+              '05',
+              '06',
+              '07',
+              '08',
+              '09',
+              '10',
+              '11',
+              '12',
+            ].map((n) => (
+              <li key={n} className={n === '12' ? 'is-promoted' : undefined}>
+                <span>{n}</span>
+              </li>
+            ))}
+          </ol>
+          <div className="pel-app-sheet__queue">
+            <p className="pel-app-sheet__queue-head">On waitlist</p>
+            <ol>
+              <li>13</li>
+              <li>14</li>
+              <li>15</li>
+            </ol>
           </div>
         </div>
       </div>
@@ -345,16 +380,27 @@ function AppHero() {
 }
 
 /* ── S2 · The Thursday ───────────────────────────────────────────────────────
-   Type and space only, in motion as well as in layout: the heading, the five
-   lines as ONE unit, and the closing line as its own beat. Five staggered lines
-   in a 60ch column is a typewriter effect that delays reading. */
+   Type and space only, as the spec asks — but with structure. The day word is
+   pulled out of each sentence into its own column, which is what gives the
+   five rows a shared left edge; left in place it is just the first word of a
+   paragraph and does no structural work. A <dl> because that is exactly what
+   this is: five terms and what each one costs you.
+
+   Reading order and textContent are unchanged — "Sunday you post the game.
+   Six say..." — so the copy is still the spec's, word for word. */
 function TheThursday() {
-  const lines = [
-    'Sunday you post the game. Six say “in”. Two send a thumbs-up you have to interpret. One says “maybe”.',
-    'Thursday you count heads, come up two short, and start the DMs.',
-    'Friday someone drops, and you scroll back three hundred messages to find who asked to be next.',
-    'Saturday you write the teams yourself. Sunday you hear about it.',
-    'Sunday night you remind the same three people about the pitch money.',
+  const week: Array<[string, string]> = [
+    [
+      'Sunday',
+      'you post the game. Six say \u201Cin\u201D. Two send a thumbs-up you have to interpret. One says \u201Cmaybe\u201D.',
+    ],
+    ['Thursday', 'you count heads, come up two short, and start the DMs.'],
+    [
+      'Friday',
+      'someone drops, and you scroll back three hundred messages to find who asked to be next.',
+    ],
+    ['Saturday', 'you write the teams yourself. Sunday you hear about it.'],
+    ['Sunday night', 'you remind the same three people about the pitch money.'],
   ];
 
   return (
@@ -363,20 +409,27 @@ function TheThursday() {
       aria-labelledby="app-thursday-title"
     >
       <div className="pel-app-thursday__inner">
-        <h2
-          id="app-thursday-title"
-          className="pel-app-h2 pel-app-h2--center"
-          data-reveal
-        >
-          Twelve spots. Forty-one messages. One of you.
+        {/* One sentence per line. Set as one run it hyphen-broke "Forty-one"
+            across two lines and stranded "you." on a third; the {' '} keeps a
+            real space between the blocks so selecting and copying the heading
+            still yields the sentence. */}
+        <h2 id="app-thursday-title" className="pel-app-h2" data-reveal>
+          <span>Twelve spots.</span> <span>Forty-one messages.</span>{' '}
+          <span>One of you.</span>
         </h2>
-        <div className="pel-app-thursday__lines" data-reveal>
-          {lines.map((line) => (
-            <p key={line}>{line}</p>
+
+        <dl className="pel-app-thursday__week" data-reveal>
+          {week.map(([day, rest]) => (
+            <div className="pel-app-thursday__row" key={day}>
+              <dt>{day}</dt>
+              <dd>{rest}</dd>
+            </div>
           ))}
-        </div>
+        </dl>
+
         <p className="pel-app-thursday__close" data-reveal>
-          And nobody thanks you, because nobody saw any of it.
+          <span>And nobody thanks you,</span>
+          <span>because nobody saw any of it.</span>
         </p>
       </div>
     </section>
@@ -660,11 +713,7 @@ function TheWeek() {
       />
 
       <div className="pel-app-tour__head">
-        <h2
-          id="app-week-title"
-          className="pel-app-h2 pel-app-h2--center"
-          data-reveal
-        >
+        <h2 id="app-week-title" className="pel-app-h2" data-reveal>
           You set one time. The week does the rest.
         </h2>
         {/* Teaches the notation AND states the tally, in one line. The key marks
@@ -714,15 +763,6 @@ function TheWeek() {
               />
             ))}
           </div>
-
-          {/* Ties the screen to the moment — and it is the thing that changes
-              when the phone does not. Steps 2 and 3 share one screenshot, so
-              this caption swapping under an unchanged screen is what makes the
-              pair read as "same game screen; it updated itself twice while you
-              weren't looking". Duplicates the step heading, so hidden from AT. */}
-          <p className="pel-week__now" aria-hidden="true">
-            {current.when}
-          </p>
         </div>
 
         {/* role="list" because list-style:none strips list semantics in
@@ -732,7 +772,11 @@ function TheWeek() {
             <li
               key={step.id}
               ref={(node) => {
-                stepRefs.current[index] = node;
+                // The body, not the <li>: the row's padding-bottom is the
+                // scroll runway, and including it puts the row's centre in
+                // empty space well below the sentence the reader is on.
+                stepRefs.current[index] =
+                  node?.querySelector('.pel-week-step__body') ?? null;
               }}
               className={[
                 'pel-week-step',
@@ -745,15 +789,16 @@ function TheWeek() {
               data-step={step.id}
             >
               <span className="pel-week-step__node" aria-hidden="true" />
-              {/* data-reveal goes HERE, on the inner body, never on the <li>.
-                  The hook sets an inline translateY(28px) on its targets; the
-                  li is what stepRefs measures, and a 28px offset feeds a wrong
-                  rect.top straight into the nearest-centre tracker. A transform
-                  on a CHILD does not affect the parent's box. Same reason
-                  nothing on the sticky stage or its ancestors carries reveal or
-                  parallax markup — an inline transform on an ancestor makes it
-                  a containing block and drags the sticky phone. */}
-              <div className="pel-week-step__body" data-reveal>
+              {/* NO data-reveal here: this element is what stepRefs measures
+                  now, and the hook writes an inline translateY(28px) on its
+                  targets, which would feed a wrong rect.top straight into the
+                  nearest-centre tracker. The steps carry their own
+                  scroll-driven motion anyway — colour, node fill and the
+                  orange rule wiping across the row. Nothing on the sticky
+                  stage or its ancestors carries reveal or parallax markup
+                  either: an inline transform on an ancestor makes it a
+                  containing block and drags the sticky phone. */}
+              <div className="pel-week-step__body">
                 <h3 className="pel-week-step__when">{step.when}</h3>
                 <p className="pel-week-step__what">{step.what}</p>
                 {step.human ? (
@@ -839,10 +884,10 @@ function OneGame() {
           One game. That’s the whole commitment.
         </h2>
         <p className="pel-app-lead" data-reveal>
-          Don’t migrate anybody. Don’t announce anything. Run one game on the app
-          and post the link in the chat you already have. People claim their own
-          spot — you’re not adding anyone, and you’re not chasing anyone to sign
-          up.
+          Don’t migrate anybody. Don’t announce anything. Run one game on the
+          app and post the link in the chat you already have. People claim their
+          own spot — you’re not adding anyone, and you’re not chasing anyone to
+          sign up.
         </p>
         <p className="pel-app-onegame__close" data-reveal>
           If Thursday still comes with DMs, you’ve lost one week and nothing
@@ -928,122 +973,120 @@ function TheClose() {
             person writes back.
           </p>
 
-          {/* No reveal markup on the form or its fields: controls at opacity 0
-              are focusable, and this is the target of the hero anchor — a #close
-              jump should not hand the reader a 900ms fade on the thing they
-              asked to be taken to. */}
-          <fetcher.Form
-            ref={formRef}
-            method="post"
-            action="/api/contact"
-            className="pel-app-form"
-            onSubmit={(event) => {
-              if (sending) event.preventDefault();
-            }}
-          >
-            <div className="pel-app-form__row">
-              <label>
-                <span>Name</span>
-                <input
-                  type="text"
-                  name="name"
-                  autoComplete="name"
-                  maxLength={80}
-                  required
-                  disabled={sending}
-                  placeholder="YOUR NAME"
-                />
-              </label>
-              <label>
-                <span>Email</span>
-                <input
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  maxLength={254}
-                  required
-                  disabled={sending}
-                  placeholder="YOU@EXAMPLE.COM"
-                />
-              </label>
-            </div>
+          {/* The proof closes the copy column: a ruled stamp under the
+              subhead, where the eye lands before crossing to the form. It used
+              to sit in a track of its own beside the form, filling the top
+              142px of a 770px slot — 600px of bare cream next to the page's
+              conversion point. */}
+          <div className="pel-app-close__proof" data-reveal>
+            <p>
+              Running the same game since <b>2014</b>.
+            </p>
+          </div>
+        </div>
+
+        {/* No reveal markup on the form or its fields: controls at opacity 0
+            are focusable, and this is the target of the hero anchor — a #close
+            jump should not hand the reader a 900ms fade on the thing they
+            asked to be taken to. */}
+        <fetcher.Form
+          ref={formRef}
+          method="post"
+          action="/api/contact"
+          className="pel-app-form"
+          onSubmit={(event) => {
+            if (sending) event.preventDefault();
+          }}
+        >
+          <div className="pel-app-form__row">
             <label>
-              <span>Community name</span>
+              <span>Name</span>
               <input
                 type="text"
-                name="community"
-                autoComplete="organization"
-                maxLength={120}
+                name="name"
+                autoComplete="name"
+                maxLength={80}
                 required
                 disabled={sending}
-                placeholder="WHO DO YOU PLAY WITH?"
+                placeholder="YOUR NAME"
               />
             </label>
             <label>
-              <span>How many play, and how often</span>
+              <span>Email</span>
               <input
-                type="text"
-                name="cadence"
-                maxLength={160}
+                type="email"
+                name="email"
+                autoComplete="email"
+                maxLength={254}
                 required
                 disabled={sending}
-                placeholder="ABOUT 18 OF US, EVERY SUNDAY"
+                placeholder="YOU@EXAMPLE.COM"
               />
             </label>
-            <div className="pel-app-form__trap" aria-hidden="true">
-              <label>
-                Website
-                <input
-                  name="website"
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                />
-              </label>
-            </div>
-            <div className="pel-app-form__submit">
-              {/* aria-disabled, not disabled: disabling the element that has
+          </div>
+          <label>
+            <span>Community name</span>
+            <input
+              type="text"
+              name="community"
+              autoComplete="organization"
+              maxLength={120}
+              required
+              disabled={sending}
+              placeholder="WHO DO YOU PLAY WITH?"
+            />
+          </label>
+          <label>
+            <span>How many play, and how often</span>
+            <input
+              type="text"
+              name="cadence"
+              maxLength={160}
+              required
+              disabled={sending}
+              placeholder="ABOUT 18 OF US, EVERY SUNDAY"
+            />
+          </label>
+          <div className="pel-app-form__trap" aria-hidden="true">
+            <label>
+              Website
+              <input
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </label>
+          </div>
+          <div className="pel-app-form__submit">
+            {/* aria-disabled, not disabled: disabling the element that has
                   focus drops focus to <body>, and the success path also resets
                   the form, so the reader lands nowhere with four empty fields.
                   The onSubmit guard above is what prevents a double send. */}
-              <button type="submit" aria-disabled={sending}>
-                {sending ? 'Sending…' : 'Move your Sunday game over'}
-                <ArrowRight />
-              </button>
-              <p className="pel-app-form__privacy">
-                We only use these details to write back.
-              </p>
-            </div>
-            {/* One node, always present, with a fixed role. It collapses to
+            <button type="submit" aria-disabled={sending}>
+              {sending ? 'Sending…' : 'Move your Sunday game over'}
+              <ArrowRight />
+            </button>
+            <p className="pel-app-form__privacy">
+              We only use these details to write back.
+            </p>
+          </div>
+          {/* One node, always present, with a fixed role. It collapses to
                 zero height when empty rather than unmounting or using
                 display:none — either of those takes it out of the
                 accessibility tree, and a live region that appears at the same
                 moment as its text is not reliably announced. */}
-            <p
-              className={`pel-app-form__status${
-                result ? (result.ok ? ' is-success' : ' is-error') : ' is-idle'
-              }`}
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {result?.message ?? ''}
-            </p>
-          </fetcher.Form>
-        </div>
-
-        {/* A <div>, deliberately not an <aside>. app.css styles the bare
-            `aside` element as the cart drawer — height:100vh, position:fixed,
-            a 50px shadow — so any <aside> outside that drawer inherits a
-            full-viewport fixed panel. It would also add a stray complementary
-            landmark for one line of proof. */}
-        <div className="pel-app-close__proof" data-reveal>
-          {/* No hard break: it orphaned "game" on its own line at most
-              desktop widths. text-wrap: balance in the CSS evens the lines. */}
-          <p>
-            Running the same game since <b>2014</b>.
+          <p
+            className={`pel-app-form__status${
+              result ? (result.ok ? ' is-success' : ' is-error') : ' is-idle'
+            }`}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {result?.message ?? ''}
           </p>
-        </div>
+        </fetcher.Form>
       </div>
     </section>
   );

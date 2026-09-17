@@ -52,7 +52,15 @@ export function PageLayout({cart, children = null}: PageLayoutProps) {
           the homepage, so a floating cart button was a second control for the
           same thing in the same viewport. The community panel keeps the corner
           — it has no other entry point. */}
-      <div className="pel-fabs">
+      {/* --redundant is wired here rather than decoration: pel-chrome.css
+          already defines `.pel-fabs--redundant .pel-fab { display: none }`
+          inside its 48em block for exactly this reason — every page but the
+          homepage shows CART in the sticky header at all times, so a fixed
+          bottom-right button is redundant there AND covers whatever is under
+          it. The modifier was never applied, so on phones it was sitting on
+          live body copy at 12 of 30 scroll stops on /app. The homepage keeps
+          its FAB: its nav is absolute over the hero and scrolls away. */}
+      <div className={ownsHero ? 'pel-fabs' : 'pel-fabs pel-fabs--redundant'}>
         <CommunityPanel />
       </div>
     </Aside.Provider>

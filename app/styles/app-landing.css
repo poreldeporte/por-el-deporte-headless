@@ -16,6 +16,19 @@
 
 .pel-app-page {
   --pel-app-orange-text: #9f4c30;
+  /* The page's hairline, for rules DRAWN AS GEOMETRY — a background, a
+     box-shadow, a grid track. --border-width is 1.5px, but Chromium floors
+     border-width to 1px for anything in [1px, 2px) at every device pixel
+     ratio, while backgrounds and shadows do not floor. Using the same token
+     for both made the house's primary device paint at two different weights
+     inches apart. Borders keep --border-width (and land on 1px); everything
+     drawn by hand uses this, so they match. */
+  --pel-app-rule: 1px;
+  /* One shared column, so every section begins on the same x. Nine sections
+     previously centred their own wrapper at their own width and started at
+     seven different left edges, which is most of why the page read as
+     assembled rather than designed. */
+  --pel-app-col: 1180px;
   overflow-x: clip;
   background: var(--pel-cream);
   color: var(--pel-ink);
@@ -59,28 +72,38 @@
 }
 
 .pel-app-sec__inner {
-  width: min(100%, var(--container-narrow));
+  width: min(100%, var(--pel-app-col));
   margin: 0 auto;
 }
 
 .pel-app-h2 {
-  max-width: 30ch;
+  /* px, not ch: `ch` is the "0" advance (0.706em in Montserrat) against an
+     average lowercase of 0.555em, so a ch measure runs ~27% wider than the
+     character count implies — and on a heading it resolved against the
+     INHERITED body font, not the display face. */
+  max-width: 17em;
   margin: 0;
   font-family: var(--font-display);
   font-weight: 650;
   font-size: var(--t-h2);
-  line-height: 1.04;
+  /* 0.88, not 1.04. Flapjack has a 0.59em cap height and no descenders, so
+     1.04 left a gap 75% of the cap height between rows; all-caps display
+     wants 25-35%. This is the single biggest change to how the page reads. */
+  line-height: 0.88;
   letter-spacing: -0.02em;
+  /* Seven of the nine headings had a one-word widow or a bad break. */
+  text-wrap: balance;
 }
 
-.pel-app-h2--center {
-  max-width: 26ch;
-  margin-inline: auto;
-  text-align: center;
+/* The two list-label headings are doing the least rhetorical work on the
+   page and were set at the same 66px as its thesis. */
+.pel-app-stops .pel-app-h2,
+.pel-app-wont .pel-app-h2 {
+  font-size: clamp(30px, 3.4vw, 46px);
 }
 
 .pel-app-lead {
-  max-width: 64ch;
+  max-width: 580px;
   margin: clamp(22px, 2.4vw, 32px) 0 0;
   font: 500 clamp(15px, 1.05vw, 17px)/1.68 var(--font-body);
   color: var(--text-muted);
@@ -92,7 +115,8 @@
    arguments into four features. S8 reuses this verbatim so the two sections
    read as the matched pair they are. */
 .pel-app-leadlist {
-  width: min(100%, 78ch);
+  /* ~72 characters. 78ch measured 104. */
+  width: min(100%, 640px);
   margin: clamp(38px, 4.4vw, 62px) 0 0;
   padding: 0;
   list-style: none;
@@ -123,109 +147,164 @@
   border-top: var(--border-width) solid var(--pel-ink);
 }
 
-/* Hero */
+/* ── S1 · Hero ───────────────────────────────────────────────────────────────
+   An ink band with two objects: a two-line masthead and one printed team
+   sheet. No min-height, no centring slack, no illustration.
+
+   THE BAND IS CONTENT-SIZED. `min-height: calc(100svh - 108px)` forced 793px
+   at 1440x900, and `align-items: center` then split the surplus into 156.8px
+   of empty ink above the H1's box and 157.8px below the text link — 314.6px,
+   39.7% of the band. At 1100 it was worse: 210px above, 211px below, 421px of
+   793 = 53.1%. Measured after: 630.7px at 1440, 588px at 900–1100.
+
+   `border-bottom` is gone. 1.5px of ink at the bottom of an ink band has never
+   been visible; the cream of S2 is the seam. The two `__orbit` circles are
+   gone with it — 1px at 9% cream is 2.0:1 on ink, and they were the only
+   curved geometry on a page built from hairlines.
+
+   `padding: 0 var(--gutter)` mirrors `.pel-app-sec` exactly, so the hero's
+   left edge equals every other section's at every width. Verified: hero copy x
+   == `.pel-app-sec__inner` x at all 22 widths tested. (This declaration landed
+   upstream during review — it is preserved here, not introduced.) */
 .pel-app-hero {
   position: relative;
-  min-height: calc(100vh - 108px);
-  min-height: calc(100svh - 108px);
-  overflow: hidden;
-  /* reset.css:85 sets `section { padding: 1rem 0 }` (2rem from 768px) site-wide.
-     Every other section here sets its own padding shorthand and so overrides
-     it; the hero's padding lives on __inner, which left this element exposed
-     and made the band 64px taller than its own min-height contract. */
-  padding: 0;
-  border-bottom: var(--border-width) solid var(--pel-ink);
+  /* clip, not hidden: nothing overflows now, and clip avoids making this a
+     scroll container. */
+  overflow: clip;
+  /* reset.css:85 sets `section { padding: 1rem 0 }` (2rem from 768px). */
+  padding: 0 var(--gutter);
   background: var(--pel-ink);
   color: var(--pel-cream);
 }
 
+/* `align-items: start` is load-bearing and quiet: it is what removes the
+   centring slack, and it is why the sheet carries its own 8px top offset to
+   reach the H1's cap line. Anyone "tidying" this back to `center` silently
+   restores half the dead ink.
+
+   Tracks: the copy gets 1fr, the sheet 0.72fr with a 330px floor, and the
+   sheet element caps at 460px. Derived from the headline, not from taste —
+   the binding line needs 8.698x the font-size, so at 1920 the copy track is
+   644.2px and 70px of Flapjack measures 608.9px: 5.5% of slack for the
+   font-load swap. The 330px floor is what holds two roster columns (a 16px
+   display figure plus an 11px tick per column) down to the 865px stack edge. */
 .pel-app-hero__inner {
   position: relative;
   z-index: 2;
-  width: min(100%, var(--container));
-  min-height: inherit;
+  width: min(100%, var(--pel-app-col));
   margin: 0 auto;
-  padding: clamp(70px, 8vw, 124px) 48px;
+  /* 69.1px / 77.8px at 1440, against 93.6px + 63.2px of slack before. */
+  padding: clamp(56px, 4.8vw, 80px) 0 clamp(64px, 5.4vw, 88px);
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
-  align-items: center;
-  gap: clamp(46px, 7vw, 110px);
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 0.72fr);
+  align-items: start;
+  column-gap: clamp(40px, 4.4vw, 72px);
+  row-gap: 0;
 }
 
 .pel-app-hero__copy {
   position: relative;
   z-index: 3;
+  text-align: left;
 }
 
-.pel-app-hero .pel-app-kicker {
-  margin-bottom: 24px;
-  color: var(--pel-orange);
-}
+/* 70px, not 86. The cap is set by the measure: the copy track is 644–649px
+   from 1400px up (it stops growing because --pel-app-col caps at 1180px), and
+   the binding line is 8.698x the font-size, so 74.5px is the hard ceiling and
+   70 leaves 5.5%. 5vw reaches 70 at exactly 1400px, so the headline is ONE
+   shape — 608.9 / 582.8 — at every width from 1400 to 1920. The old
+   clamp(40px, 5vw, 86px) kept growing while the column did not, which is why
+   the H1 reflowed between two and three lines as the window widened.
 
+   0.82, not 0.86. Flapjack's cap height is 0.583em (canvas actualBoundingBox
+   at 100px: ascent 58.3, descent -0.2) and there are no descenders, so 0.86
+   sets a cap-to-cap gap of 47.5% of the cap height. 0.82 gives 40.7%, which is
+   what a two-line masthead wants; the file's own .pel-app-h2 comment says
+   all-caps display wants 25–35%. */
 .pel-app-hero__title {
-  max-width: 20ch;
+  max-width: none;
   margin: 0;
   font-family: var(--font-display);
-  /* Sentence case, and sized for a sentence. The old 128px maximum was set
-     for three short uppercase words ("Community sports, organized."); this H1
-     is a 41-character sentence, and all-caps display at that length reads as
-     shouting and wraps badly. `.pel-about__title` is the site's precedent for
-     setting its one long heading this way. */
-  font-size: clamp(40px, 5vw, 86px);
+  font-size: clamp(38px, 5vw, 70px);
   font-weight: 650;
-  line-height: 0.98;
+  line-height: 0.82;
   letter-spacing: -0.025em;
   color: var(--pel-cream);
 }
 
 .pel-app-hero__title span {
+  /* #ce643e on #171717 is 4.81:1 — the ink band is the one place in this brand
+     where the orange is safe for type. */
   color: var(--pel-orange);
 }
 
+/* Desktop takes the balanced two-line break; the phone takes three. See the
+   43.5em block, and the derivation in the JSX comment. */
+.pel-app-hero__brk--sm {
+  display: none;
+}
+
+/* --prose (470px) measures 3 lines at 1440: 459.4 / 430.2 / 452, last line 98%
+   full. The 16.5px cap rather than 17px is measured: 1.15vw only reaches 17px
+   above 1478px, and at 17px the same sentence breaks to 4 lines with a 75.7px
+   widow from 1600 up. 16.5px holds 3 lines from 1280 to 1920. */
 .pel-app-hero__body {
-  max-width: 590px;
-  margin: 34px 0 0;
-  font: 600 clamp(14px, 1.25vw, 17px)/1.7 var(--font-body);
-  color: rgba(247, 240, 222, 0.8);
+  max-width: var(--prose);
+  margin: clamp(24px, 2.1vw, 30px) 0 0;
+  font: 600 clamp(15px, 1.15vw, 16.5px) / 1.6 var(--font-body);
+  color: rgba(247, 240, 222, 0.82); /* 11.0:1 on ink */
 }
 
 .pel-app-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
-  margin-top: 38px;
+  margin-top: clamp(26px, 2.3vw, 34px);
 }
 
 /* ── S1 · the single CTA ─────────────────────────────────────────────────────
-   One button, per the spec. It carries the Apple mark and a destination
-   sublabel because its label is about moving your game, not about downloading,
-   and without that affordance an App Store link reads as an in-page jump.
-   Built on the old .pel-app-store pill; the --cream/--ink variants and the
-   outlined "See inside" secondary button are gone with the second CTA. */
+   The pill stays — home.css, pel-chrome.css and pel-cart.css are all
+   pill-based and a square hero button would read as foreign. Two things
+   change.
+
+   It gains the house hard offset (6px 7px 0, the same device already used at
+   app-landing.css:2092 and, as 6px 9px 0, at home.css:744), so it is the one
+   raised object in the copy column rather than the fourth text block down.
+
+   The hover stops being a soft lift. `translateY(-2px)` is elevation, which
+   this house style does not use; and the old hover set the ground to
+   --pel-orange with ink type, which the token file's own comment measures at
+   3.35:1 and calls a failure "at any size under 24px" — the sublabel is 10px.
+   Now it presses into its own shadow, which is the print idiom. */
 .pel-app-cta {
-  min-height: 64px;
-  padding: 12px 26px;
+  min-height: 66px;
+  padding: 12px 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  border: var(--border-width) solid currentColor;
+  border: var(--border-width) solid var(--pel-cream);
   border-radius: var(--radius-pill);
   background: var(--pel-cream);
   color: var(--pel-ink);
   font-family: var(--font-body);
+  box-shadow: 6px 7px 0 var(--pel-orange);
   transition:
     transform var(--dur-fast) var(--ease-out),
-    background var(--dur-fast),
-    color var(--dur-fast);
+    box-shadow var(--dur-fast) var(--ease-out);
 }
 
 .pel-app-cta:hover {
-  background: var(--pel-orange);
-  color: var(--pel-ink);
-  transform: translateY(-2px);
+  transform: translate(3px, 3px);
+  box-shadow: 3px 4px 0 var(--pel-orange);
   text-decoration: none;
+}
+
+.pel-app-cta:active {
+  transform: translate(6px, 7px);
+  box-shadow: 0 0 0 var(--pel-orange);
 }
 
 .pel-app-cta svg {
@@ -242,282 +321,547 @@
   font-weight: 700;
   line-height: 1.06;
   letter-spacing: -0.02em;
+  /* At 320 the label needs two lines; balance gives "Move your Sunday" /
+     "game over" instead of orphaning "over". */
+  text-wrap: balance;
 }
 
 .pel-app-cta small {
   margin-top: 4px;
-  font-size: 10px;
-  font-weight: 600;
+  /* 11px at 0.74, not 10px at 0.68. */
+  font-size: 11px;
+  font-weight: 700;
   line-height: 1;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.68;
+  opacity: 0.74;
 }
 
-/* The organiser's route out of the hero, and the page's only other hero link.
-   Replaces the deleted "Free on iPhone | Web app available" micro-copy row. */
-.pel-app-hero__aside {
+/* ── S1 · the route to the form ──────────────────────────────────────────────
+   `a.pel-app-hero__aside`, not `.pel-app-hero__aside`. This link has never
+   been underlined: `.pel-app-page a { text-decoration: none }` is (0,1,1) and
+   out-ranks the (0,1,0) class, so the `text-decoration: underline` in the old
+   rule was dead. Confirmed in the browser — computed text-decoration-line was
+   `none`. Adding the type selector ties the specificity, and this rule is
+   later in the file, so the underline finally renders.
+
+   12px/0.10em rather than 11px/0.12em: this was the least legible text in the
+   band and it is the hero's only route to the lead form. */
+a.pel-app-hero__aside {
   min-height: 44px;
-  margin-top: 26px;
+  margin-top: 18px;
   display: inline-flex;
   align-items: center;
   gap: 9px;
   color: rgba(247, 240, 222, 0.82);
-  font: 700 11px/1 var(--font-body);
-  letter-spacing: 0.12em;
+  font: 700 12px/1 var(--font-body);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
-  transition: color var(--dur-fast);
+  text-decoration-color: rgba(247, 240, 222, 0.42);
+  text-underline-offset: 6px;
+  transition:
+    color var(--dur-fast),
+    text-decoration-color var(--dur-fast);
 }
 
-.pel-app-hero__aside:hover {
+a.pel-app-hero__aside:hover {
   color: var(--pel-cream);
+  text-decoration-color: var(--pel-cream);
 }
 
 .pel-app-hero__aside svg {
   width: 15px;
   height: 15px;
+  color: var(--pel-orange);
+  transition: transform var(--dur-fast) var(--ease-out);
 }
 
-.pel-app-hero__visual {
-  position: relative;
-  width: min(100%, 570px);
-  aspect-ratio: 0.9;
+.pel-app-hero__aside:hover svg {
+  transform: translateX(3px);
+}
+
+/* ── S1 · THE TEAM SHEET ─────────────────────────────────────────────────────
+   Replaces .pel-app-field + .pel-app-game-card. ONE object, not a stack: two
+   overlapping rounded rectangles of similar radius at opposing rotations
+   (32px/+4deg and 22px/-3deg) is precisely what made the old visual read as a
+   tablet with a widget on it, and the pitch's markings only ever covered its
+   top half.
+
+   Square-ish corners and no rotation are the point. 6px against the file's
+   --radius-lg 22px, because this is paper: the radius and the tilt were doing
+   more to say "app card" than the contents were doing to say "team sheet". A
+   rotated sheet also cannot align to anything.
+
+   margin-top: 8px puts the sheet's top edge on the H1's cap line rather than
+   its box top. Measured: Flapjack's cap sits 0.583em below the ascent, so at
+   70px/0.82 the cap top is ~8px below the box top; across the two-column range
+   (45–70px) that offset runs 5–8px, so 8px holds it to within 3px everywhere.
+
+   ACCENT BUDGET: exactly three orange marks — the offset, slot 12's rule and
+   tick, and the hook. The old card ran green ROSTER, green 12/12 and orange
+   ON WAITLIST inside 382px. Green is gone from the hero. */
+.pel-app-hero__sheet {
+  --sh-pad: clamp(22px, 1.9vw, 28px);
+  --sh-row: 36px;
+  align-self: start;
   justify-self: end;
-}
-
-.pel-app-field {
-  position: absolute;
-  inset: 3% 2% 3% 6%;
-  overflow: hidden;
-  border: var(--border-width) solid var(--pel-cream);
-  border-radius: 32px;
-  background: var(--pel-blue);
-  transform: rotate(4deg);
+  position: relative;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 460px;
+  /* no bottom pad: the queue well is flush to the sheet's bottom edge. */
+  padding: var(--sh-pad) var(--sh-pad) 0;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: 6px;
+  background: var(--pel-cream);
+  color: var(--pel-ink);
   box-shadow: 18px 18px 0 var(--pel-orange);
 }
 
-.pel-app-field::before {
-  content: '';
-  position: absolute;
-  inset: 8%;
-  border: 2px solid rgba(247, 240, 222, 0.72);
-  border-radius: 4px;
-}
-
-.pel-app-field__line--half {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 8%;
-  right: 8%;
-  border-top: 2px solid rgba(247, 240, 222, 0.72);
-}
-
-.pel-app-field__circle {
-  position: absolute;
-  z-index: 1;
-  top: 50%;
-  left: 50%;
-  width: 30%;
-  aspect-ratio: 1;
-  border: 2px solid rgba(247, 240, 222, 0.72);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.pel-app-field__circle::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(247, 240, 222, 0.85);
-  transform: translate(-50%, -50%);
-}
-
-.pel-app-field__box {
-  position: absolute;
-  z-index: 1;
-  left: 32%;
-  width: 36%;
-  height: 18%;
-  border: 2px solid rgba(247, 240, 222, 0.72);
-}
-
-.pel-app-field__box--top {
-  top: 8%;
-  border-top: 0;
-}
-
-.pel-app-field__box--bottom {
-  bottom: 8%;
-  border-bottom: 0;
-}
-
-.pel-app-game-card {
-  position: absolute;
-  z-index: 3;
-  right: -5%;
-  bottom: 5%;
-  width: 72%;
-  padding: clamp(18px, 3vw, 30px);
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: var(--radius-lg);
-  background: var(--pel-cream);
-  color: var(--pel-ink);
-  transform: rotate(-3deg);
-  box-shadow: 10px 12px 0 rgba(23, 23, 23, 0.22);
-}
-
-.pel-app-game-card__top {
+.pel-app-sheet__eyebrow {
+  margin: 0;
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(23, 23, 23, 0.22);
-  font: 700 9px/1 var(--font-body);
-  letter-spacing: 0.11em;
+  font: 700 10px/1 var(--font-body);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-
-.pel-app-game-card__top span:last-child {
-  color: var(--pel-green);
-}
-
-.pel-app-game-card__main {
-  padding: 20px 0;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.pel-app-game-card__time {
-  display: flex;
-  flex-direction: column;
-  flex: none;
-}
-
-.pel-app-game-card__time b {
-  font: 700 12px/1 var(--font-body);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.pel-app-game-card__time strong {
-  margin-top: 5px;
-  color: var(--pel-orange);
-  font: 650 clamp(28px, 3.4vw, 44px)/0.9 var(--font-display);
-  letter-spacing: -0.04em;
-}
-
-.pel-app-game-card__venue {
-  min-width: 0;
-}
-
-/* These two carry the values that actually rendered. A later pair of rules,
-   `.pel-app-game-card__main strong` and `__main p`, matched the same elements
-   as descendants at equal specificity and overrode the font and margin here.
-   Those rules were written for a card variant that no longer exists, so their
-   winning values are folded in and the duplicates are gone. Deleting them as
-   "dead" without this would have shrunk the widget. */
-.pel-app-game-card__venue strong {
-  display: block;
-  font: 650 clamp(19px, 2.2vw, 28px)/1 var(--font-display);
-  text-transform: uppercase;
-}
-
-.pel-app-game-card__venue p {
-  margin-top: 7px;
-  font: 600 10px/1.35 var(--font-body);
   color: var(--text-muted);
 }
 
-.pel-app-game-card__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(23, 23, 23, 0.22);
-  font: 700 10px/1 var(--font-body);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.pel-app-game-card__footer b {
-  color: var(--pel-green);
-}
-
-.pel-app-game-card__action {
-  /* Was var(--pel-orange-text), which is not defined anywhere — the token is
-     --pel-app-orange-text. An undefined custom property makes the declaration
-     invalid at computed-value time, so this inherited ink and never rendered
-     orange at all. */
+/* --pel-app-orange-text (#9f4c30), not --pel-orange: the token file's own note
+   says the brand orange is for shape only, and this is 17px of type. */
+.pel-app-sheet__eyebrow b {
+  font: 650 17px/1 var(--font-display);
+  letter-spacing: 0.01em;
   color: var(--pel-app-orange-text);
 }
 
-.pel-app-hero__orbit {
+/* 6.55em forces "BRICKELL / SOCCER & PADEL" at every size, and does it in em
+   so it survives the clamp. Measured in Flapjack 650 at -0.012em:
+   "SOCCER & PADEL" is 6.34em and "BRICKELL SOCCER" is 6.775em, so any cap in
+   that 0.435em window breaks after BRICKELL; 6.55 is the midpoint. Left to
+   itself the line sets "BRICKELL SOCCER &" and strands the ampersand.
+   Rendered: 106.0 / 191.7 at 1440, 91.2 / 164.8 at 390. */
+.pel-app-sheet__venue {
+  margin: 14px 0 0;
+  max-width: 6.55em;
+  font: 650 clamp(25px, 2.1vw, 31px) / 1 var(--font-display);
+  letter-spacing: -0.012em;
+}
+
+/* "12/12" is the most persuasive fact on the page and it was 10px of body
+   type in a card footer. In the display face at 17px it leads the roster. */
+.pel-app-sheet__count {
+  margin: 16px 0 0;
+  padding-top: 11px;
+  border-top: var(--border-width) solid var(--pel-ink);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font: 700 10px/1 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pel-app-sheet__count b {
+  font: 650 17px/1 var(--font-display);
+  letter-spacing: 0;
+  color: var(--pel-ink);
+}
+
+/* Twelve slots, six rows, row-major. 36px a row is the smallest that gives a
+   16px display figure and an 11x6 tick air on a 1.5px rule.
+   `margin-bottom: 26px` is NOT decorative: with 0 there, the last row's
+   bottom border and the queue well's top border abut and paint a 3px double
+   rule. 26px also gives the hook its clear run. */
+.pel-app-sheet__roster {
+  margin: 8px 0 26px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: clamp(18px, 1.6vw, 24px);
+}
+
+.pel-app-sheet__roster li {
+  /* reset.css sets li{margin-bottom:.5rem} site-wide. */
+  margin: 0;
+  height: var(--sh-row);
+  display: flex;
+  align-items: center;
+  border-bottom: var(--border-width) solid rgba(23, 23, 23, 0.9);
+}
+
+.pel-app-sheet__roster li span {
+  font: 650 16px/1 var(--font-display);
+  letter-spacing: 0.02em;
+  color: var(--pel-ink);
+}
+
+/* The claim mark: a hand tick from two 1.5px borders. Not a filled chip and
+   not a grey bar — a grey bar is a loading skeleton, which is the exact
+   opposite of "these twelve are taken". Twelve ruled lines with numbers and
+   no marks read as a BLANK sign-up sheet; the ticks are what make it 12/12. */
+.pel-app-sheet__roster li::after {
+  content: '';
+  margin: -4px 1px 0 auto;
+  width: 11px;
+  height: 6px;
+  flex: none;
+  border-left: var(--border-width) solid var(--pel-ink);
+  border-bottom: var(--border-width) solid var(--pel-ink);
+  transform: rotate(-45deg);
+}
+
+/* Slot 12 is the one the app filled. Its rule takes --pel-orange (a shape);
+   its figure and tick take --pel-app-orange-text (marks at type scale). */
+.pel-app-sheet__roster li.is-promoted {
+  border-bottom-color: var(--pel-orange);
+}
+
+.pel-app-sheet__roster li.is-promoted span,
+.pel-app-sheet__roster li.is-promoted::after {
+  color: var(--pel-app-orange-text);
+  border-color: var(--pel-app-orange-text);
+}
+
+/* The queue, as the brand's sunken well (--pel-sand), flush to the sheet's
+   bottom edge and bled past the padding by the negative margin so its 1.5px
+   top rule runs the sheet's full width. Same two columns as the roster, so
+   the head sits under column 1 and the boxes under column 2 — which is what
+   puts box 13 directly below slot 12 and lets the hook be a straight line. */
+.pel-app-sheet__queue {
+  position: relative;
+  margin: 0 calc(var(--sh-pad) * -1);
+  padding: 13px var(--sh-pad) 15px;
+  border-top: var(--border-width) solid var(--pel-ink);
+  border-radius: 0 0 5px 5px;
+  background: var(--pel-sand);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: clamp(18px, 1.6vw, 24px);
+  align-items: center;
+}
+
+.pel-app-sheet__queue-head {
+  grid-column: 1;
+  margin: 0;
+  font: 700 10px/1 var(--font-body);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pel-app-sheet__queue ol {
+  grid-column: 2;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 7px;
+}
+
+/* Outlined, not filled, at 0.34 ink: waiting, not in. 34x31 is a box, not a
+   button — no fill, no shadow, no radius above 3px. */
+.pel-app-sheet__queue ol li {
+  margin: 0;
+  width: 34px;
+  height: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(23, 23, 23, 0.34);
+  border-radius: 3px;
+  font: 650 16px/1 var(--font-display);
+  letter-spacing: 0.02em;
+  color: rgba(23, 23, 23, 0.5);
+}
+
+/* THE HOOK — the argument of the section in two pseudo-elements. A 1.5px
+   orange hairline rises 30px out of the centre of box 13 (left:16px is half of
+   the 34px box less half the rule) and tips an arrowhead just under slot 12's
+   orange rule, so the rule and the arrow read as one gesture.
+
+   THE 30px IS DERIVED AND COUPLED. The clear run from the ol's top edge to the
+   roster's bottom rule is 26 (roster margin-bottom) + 1.5 (well border) + 13
+   (well padding-top) = 40.5px; the 5px border triangle sits from 30 to 40. I
+   first drew this at 41px, which put the arrowhead ON the "12" numeral — it
+   read as a glyph error, not a promotion. If --sh-row or the roster's bottom
+   margin changes at any breakpoint, BOTH numbers move with it; the 48em block
+   already does this. Nothing here is interactive and nothing here is a meter. */
+.pel-app-sheet__queue ol::before {
+  content: '';
   position: absolute;
-  border: 1px solid rgba(247, 240, 222, 0.09);
-  border-radius: 50%;
-  pointer-events: none;
+  left: 16px;
+  bottom: 100%;
+  width: 0;
+  height: 30px;
+  border-left: var(--border-width) solid var(--pel-orange);
 }
 
-.pel-app-hero__orbit--one {
-  width: 46vw;
-  height: 46vw;
-  top: -27vw;
-  left: -15vw;
+.pel-app-sheet__queue ol::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  bottom: calc(100% + 30px);
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-bottom-color: var(--pel-orange);
 }
 
-.pel-app-hero__orbit--two {
-  width: 38vw;
-  height: 38vw;
-  right: -19vw;
-  bottom: -20vw;
+/* ── stacked · one column below 54em ─────────────────────────────────────────
+   54em (864px) is an existing breakpoint, so no new media query is needed and
+   no rules have to be moved between blocks. Measured at the narrowest
+   two-column case (865px): the sheet takes its 330px floor, the copy track is
+   399px, the H1 sets at 43.25px and its longest line is 376.2px — 5.7% slack.
+   Holding two columns any lower starves the copy; stacking any higher costs
+   ~400px of band, because 900–1088 is where the two-column hero is at its best
+   (588px, against 793px today). */
+@media (max-width: 54em) {
+  .pel-app-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: clamp(52px, 5.4vw, 64px);
+    padding-bottom: clamp(60px, 6vw, 76px);
+  }
+
+  /* Stacked, the H1 owns the full column, so it grows: 8.4vw fills 75–84% of
+     the measure from 769 to 864. */
+  .pel-app-hero__title {
+    font-size: clamp(46px, 8.4vw, 80px);
+  }
+
+  .pel-app-hero__body {
+    max-width: 52ch;
+  }
+
+  .pel-app-hero__sheet {
+    --sh-row: 34px;
+    justify-self: start;
+    max-width: 540px;
+    margin-top: clamp(34px, 4.4vw, 48px);
+    box-shadow: 14px 15px 0 var(--pel-orange);
+  }
+}
+
+@media (max-width: 48em) {
+  /* Matches `.pel-app-sec`'s 20px gutter at this breakpoint. */
+  .pel-app-hero {
+    padding: 0 20px;
+  }
+
+  .pel-app-hero__inner {
+    padding: 44px 0 56px;
+  }
+
+  /* 33ch = ~327px. Swept 270–352px: only this band sets four lines with no
+     widow at the contract widths — 327.4 / 305.9 / 321.9 / 260.4, last line
+     80% full, identical at 375 and 390. 31ch pushes it to five lines with a
+     66.8px widow; the old full-width measure gives 333.7/337.5/314.4/149. */
+  .pel-app-hero__body {
+    margin-top: 20px;
+    max-width: 33ch;
+    font-size: 15px;
+  }
+
+  .pel-app-actions {
+    margin-top: 24px;
+  }
+
+  .pel-app-cta {
+    width: 100%;
+  }
+
+  .pel-app-hero__sheet {
+    --sh-pad: 20px;
+    --sh-row: 32px;
+    max-width: 520px;
+    margin-top: 28px;
+    /* 10px keeps the shadow inside a 375px viewport: 335 + 20 + 10 = 365. */
+    box-shadow: 10px 11px 0 var(--pel-orange);
+  }
+
+  .pel-app-sheet__venue {
+    font-size: 26px;
+  }
+
+  .pel-app-sheet__roster li span {
+    font-size: 15px;
+  }
+
+  .pel-app-sheet__queue ol li {
+    width: 32px;
+    height: 29px;
+    font-size: 15px;
+  }
+
+  /* the hook, re-derived for a 32px row */
+  .pel-app-sheet__queue ol::before {
+    height: 28px;
+  }
+
+  .pel-app-sheet__queue ol::after {
+    bottom: calc(100% + 28px);
+  }
+}
+
+/* ── the phone · three lines ─────────────────────────────────────────────────
+   43.5em (696px), also an existing breakpoint. Below it the two-line break
+   would cap the H1 at measure/8.698 — 38.5px at 375. The three-line break's
+   binding line is 7.494x, which raises the ceiling to 44.7px, so the phone can
+   set 41.25px at 375 and 42.9px at 390 AND give "SWITCHBOARD." its own line in
+   orange. 11vw fills 90–96% of the measure from 320 to 480.
+   0.88 rather than 0.82: three lines of 40px want marginally more separation
+   than two lines of 70px. */
+@media (max-width: 43.5em) {
+  .pel-app-hero__title {
+    font-size: clamp(36px, 11vw, 74px);
+    line-height: 0.88;
+  }
+
+  .pel-app-hero__brk--sm {
+    display: inline;
+  }
+
+  .pel-app-hero__brk--lg {
+    display: none;
+  }
+}
+
+@media (max-width: 25em) {
+  /* At 320 the sheet's content box is 320 − 40 − 34 = 246px; two columns plus
+     a 14px gap need 2 x 116, which holds a 16px figure and an 11px tick. At
+     the base 24px gap it does not. */
+  .pel-app-hero__sheet {
+    --sh-pad: 17px;
+    --sh-row: 31px;
+  }
+
+  .pel-app-sheet__roster,
+  .pel-app-sheet__queue {
+    column-gap: 14px;
+  }
+
+  .pel-app-sheet__queue ol {
+    gap: 6px;
+  }
+
+  .pel-app-sheet__queue ol li {
+    width: 29px;
+  }
 }
 
 /* ── S2 · The Thursday ───────────────────────────────────────────────────────
-   No imagery. Type and space only. A centred column at the spec's 60ch, each
-   line its own paragraph with generous leading so the five read as a list
-   rather than as prose, and the closing line separated from them by a rule and
-   a weight change. */
+   The week as a ruled ledger, not a centred poem.
+
+   What was here was five <p> elements in a centred box: no edges, no
+   hierarchy, no relationship between the five lines. Four of the five wrapped,
+   so each rendered as a ragged centred wedge, and the last one dropped the
+   word "money." onto its own line. The gap between paragraphs was 2.4x the
+   leading inside one, which is the signal for "unrelated block" — so the
+   reader got five separate assertions instead of one week getting worse.
+
+   Now there are TWO edges: the H2 and the five day words share one, the five
+   sentences and the closing line share the other. Hairlines bind the days; the
+   single full-ink rule under SUNDAY NIGHT is what ends the week, which is how
+   the closing line earns its separation without a box or a fill. Still type,
+   rules and space only.
+
+   Day labels stay ink, not orange. Orange marks the column that MOVES in S3
+   just below; orange here would read as positive on the section whose whole
+   job is to feel exhausting. It also sets up S6 rather than competing with it:
+   the same week, once as a ledger you administer, once as a timeline that runs
+   itself. */
 .pel-app-thursday {
+  --th-day: clamp(96px, 8.4vw, 120px);
+  --th-gap: clamp(18px, 2.4vw, 34px);
+  /* Slightly tighter than the shared section rhythm: this section carries
+     three full-ink rules of its own, so it has hard edges the others do not
+     and needs less air to sit apart. Longhand, so the shared side gutter
+     survives. */
+  padding-block: clamp(76px, 7.6vw, 110px);
   border-top: var(--border-width) solid var(--pel-ink);
 }
 
 .pel-app-thursday__inner {
-  width: min(100%, 60ch);
-  margin: 0 auto;
-  text-align: center;
+  /* Shares S3's shell so the two land on one left edge. The centring was the
+     defect and is gone. */
+  width: min(100%, var(--pel-app-col));
+  margin-inline: auto;
 }
 
-.pel-app-thursday__lines {
-  margin-top: clamp(40px, 5vw, 66px);
+/* The font-size lives on the WEEK, not on dd, so this 46ch and dd's 46ch
+   resolve against the same character. Setting it on dd is how the old code
+   ended up with a "60ch" wrapper that actually measured 53.3ch. */
+.pel-app-thursday__week {
+  width: min(100%, calc(var(--th-day) + var(--th-gap) + 46ch));
+  margin: clamp(34px, 3.4vw, 48px) 0 0;
+  font: 500 clamp(15.5px, 1.22vw, 17.5px)/1.56 var(--font-body);
+  border-top: var(--border-width) solid var(--pel-ink);
 }
 
-.pel-app-thursday__lines > p {
+.pel-app-thursday__row {
+  display: grid;
+  grid-template-columns: var(--th-day) minmax(0, 1fr);
+  column-gap: var(--th-gap);
+  /* baseline, so the display-face day and the body-face sentence sit on one
+     line despite two different sets of font metrics. */
+  align-items: baseline;
+  padding: clamp(14px, 1.35vw, 19px) 0;
+  border-bottom: var(--border-width) solid var(--border-soft);
+}
+
+/* The week's one hard edge. Hairline = still inside the week; ink = the week
+   is over. This is the entire separation mechanism for the closing line. */
+.pel-app-thursday__row:last-child {
+  border-bottom-color: var(--pel-ink);
+}
+
+.pel-app-thursday__row dt {
   margin: 0;
-  padding: clamp(15px, 1.8vw, 22px) 0;
-  font: 500 clamp(16px, 1.25vw, 19px)/1.72 var(--font-body);
+  font-family: var(--font-display);
+  font-size: clamp(14px, 1.28vw, 18px);
+  font-weight: 650;
+  line-height: inherit;
+  letter-spacing: 0.04em;
+  /* A no-op with Flapjack, which is unicase — but NOT with the
+     Fraunces/Georgia fallback, which would otherwise render "Sunday night"
+     in mixed case if the webfont fails. */
+  text-transform: uppercase;
+  color: var(--pel-ink);
+}
+
+.pel-app-thursday__row dd {
+  /* 46ch is the only measure that keeps Thursday, Saturday and Sunday night
+     on one line while giving Sunday and Friday a balanced second line. Below
+     44ch all five wrap; at 50ch and up "money." drops alone onto line 2. */
+  max-width: 46ch;
+  margin: 0;
   color: var(--text-muted);
 }
 
+/* No day beside it, because it is not a day: it hangs off the sentence edge
+   with the day track deliberately empty. The ink rule above already ended the
+   week, so it needs no rule of its own. */
 .pel-app-thursday__close {
-  margin: clamp(34px, 4vw, 52px) 0 0;
-  padding-top: clamp(30px, 3.4vw, 44px);
-  border-top: var(--border-width) solid var(--pel-ink);
+  max-width: 46ch;
+  margin: clamp(28px, 2.8vw, 40px) 0 0 calc(var(--th-day) + var(--th-gap));
   font-family: var(--font-display);
-  font-size: clamp(22px, 2.3vw, 34px);
+  font-size: clamp(23px, 2.9vw, 42px);
   font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -0.015em;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
   color: var(--pel-ink);
+}
+
+.pel-app-thursday__close span {
+  display: block;
 }
 
 /* ── S3 · The trade — one sheet, one fold ────────────────────────────────────
@@ -537,6 +881,7 @@
    mark, nothing tappable — so "What it cost, split" cannot read as a
    transaction. */
 .pel-app-trade {
+  background: var(--pel-sand);
   --tr-pad: clamp(34px, 3.6vw, 48px);
   --tr-gap: clamp(34px, 4vw, 52px);
   --tr-seam: 8px; /* 1.5px fold + 3px gap + 3px tab */
@@ -560,7 +905,7 @@
   --tr-nudge: 1px; /* lifts markers off the line-box centre onto x-height */
   /* Feint, and deliberately lighter than --border-soft (0.18): a repeating
      field of five rules reads far heavier than one rule does. */
-  --tr-rule: rgba(23, 23, 23, 0.13);
+  --tr-rule: rgba(23, 23, 23, 0.16);
   --tr-paper: repeating-linear-gradient(
     to bottom,
     transparent 0 calc(var(--tr-rule-h) - 1px),
@@ -572,10 +917,22 @@
 
 /* One measure for the section, so the H2's left edge and the sheet's left edge
    are the same line. */
-.pel-app-trade__head,
+.pel-app-trade__head {
+  width: min(100%, var(--pel-app-col));
+  margin-inline: auto;
+}
+
+/* The sheet starts on the page's axis but stops short of the full column:
+   at 1180 it letterboxed to 3.34:1 and each column carried more air than
+   type ("The teams" in a 590px cell). 980 keeps it a sheet. */
 .pel-app-trade__sheet {
   width: min(100%, 980px);
-  margin-inline: auto;
+  /* Left-aligned ON THE PAGE'S AXIS, not on the section's gutter. The sheet is
+     a direct child of the section, so plain `margin-inline: 0` would start it
+     at x=48 while its own heading — which sits inside the centred column —
+     starts at x=130. This reproduces the column's own left offset and
+     collapses to the gutter once the viewport is narrower than the column. */
+  margin-inline: max(0px, (100% - var(--pel-app-col)) / 2) auto;
 }
 
 /* One sentence per line at every width, whatever the display face's metrics
@@ -586,8 +943,17 @@
   line-height: 0.98;
 }
 
-.pel-app-trade .pel-app-h2 span {
+/* One sentence per line. S2's heading carries the same three-span treatment:
+   set as one run it hyphen-breaks "Forty-one" across two lines at the hard
+   hyphen in the copy — `hyphens: manual` cannot prevent that, because the
+   hyphen is a real character — and then strands "you." on a third line. */
+.pel-app-trade .pel-app-h2 span,
+.pel-app-thursday .pel-app-h2 span {
   display: block;
+}
+
+.pel-app-thursday .pel-app-h2 {
+  max-width: none;
 }
 
 .pel-app-trade .pel-app-lead {
@@ -600,16 +966,23 @@
   margin-top: clamp(46px, 5.5vw, 76px);
   padding: var(--tr-pad);
   border: var(--border-width) solid var(--pel-ink);
-  border-radius: var(--radius-md);
-  background: var(--pel-sand);
+  /* Square. A 16px radius plus a sand fill plus no shadow is the exact spec of
+     a UI card, which is why this read as "a beige box" rather than a sheet of
+     paper. Cream on the section's sand now, so the sheet LIES ON the table
+     instead of being inset into it — and it takes the house's one legal
+     elevation, the hard print offset. */
+  border-radius: 2px;
+  background: var(--pel-cream);
+  box-shadow: 14px 14px 0 rgba(23, 23, 23, 0.1);
 }
 
 /* Rows 2 and 4 are pure spacers, so the paper gradient and the item line boxes
    both start at exactly the top of row 5 with no margins to keep in sync. */
 .pel-app-trade__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--tr-seam) minmax(0, 1.06fr);
-  grid-template-rows: auto 22px var(--border-width) 26px auto;
+  /* Symmetric, so the fold lands on the sheet's true centre line. */
+  grid-template-columns: minmax(0, 1fr) var(--tr-seam) minmax(0, 1fr);
+  grid-template-rows: auto 22px var(--pel-app-rule) 26px auto;
   column-gap: var(--tr-gap);
   row-gap: 0;
 }
@@ -715,9 +1088,9 @@
 
 /* Stays — an ink dash in the sheet's own colour. Linear. */
 .pel-app-trade__list--stays li::before {
-  top: calc((var(--tr-rule-h) - var(--border-width)) / 2 - var(--tr-nudge));
+  top: calc((var(--tr-rule-h) - var(--pel-app-rule)) / 2 - var(--tr-nudge));
   width: 13px;
-  height: var(--border-width);
+  height: var(--pel-app-rule);
   background: var(--pel-ink);
 }
 
@@ -752,7 +1125,7 @@
   bottom: var(--tr-rule-h);
   left: 0;
   z-index: 2;
-  width: var(--border-width);
+  width: var(--pel-app-rule);
   background: var(--pel-ink);
 }
 
@@ -763,7 +1136,7 @@
   bottom: 0;
   left: 50%;
   width: 12px;
-  height: var(--border-width);
+  height: var(--pel-app-rule);
   margin-left: -6px;
   background: var(--pel-ink);
 }
@@ -774,7 +1147,7 @@
   position: absolute;
   top: 0;
   bottom: var(--tr-rule-h);
-  left: calc(var(--border-width) + 3px);
+  left: calc(var(--pel-app-rule) + 3px);
   z-index: 1;
   width: 3px;
   background: var(--pel-orange);
@@ -790,12 +1163,14 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 15px;
-  height: 15px;
-  margin: -7.5px 0 0 -7.5px;
+  /* Bigger: at 15px on a 354px-tall sheet the one mark both halves share was
+     4% of the object's height and invisible in a screenshot. */
+  width: 21px;
+  height: 21px;
+  margin: -10.5px 0 0 -10.5px;
   border: var(--border-width) solid var(--pel-ink);
   border-radius: 50%;
-  background: var(--pel-sand);
+  background: var(--pel-cream);
 }
 
 /* ── S5 · The reversal ───────────────────────────────────────────────────────
@@ -807,7 +1182,7 @@
 }
 
 .pel-app-reversal__inner {
-  width: min(100%, var(--container));
+  width: min(100%, var(--pel-app-col));
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(260px, 0.88fr);
@@ -862,7 +1237,7 @@
    the offset register live on the inner frame instead. */
 .pel-app-reversal__shot {
   justify-self: center;
-  width: min(100%, 320px);
+  width: min(100%, 420px);
 }
 
 .pel-app-reversal__shot img {
@@ -888,14 +1263,24 @@
   background: var(--pel-sand);
 }
 
+/* Left-aligned on the page's axis. It was centred, which put S6's heading at
+   x=305 while the six steps directly beneath it started at x=130 — the
+   section disagreed with itself. */
+/* The head is a sibling of __grid, not a child, so it only ever picked up the
+   section's own side padding and sat at x=48 while its six steps started at
+   x=130. It carries the shared column now; the measure moves onto the heading
+   itself. */
 .pel-app-tour__head {
+  width: min(100%, var(--pel-app-col));
+  margin: 0 auto clamp(44px, 5.5vw, 76px);
+}
+
+.pel-app-tour__head .pel-app-h2 {
   max-width: 830px;
-  margin: 0 auto clamp(50px, 7vw, 90px);
-  text-align: center;
 }
 
 .pel-app-tour__grid {
-  width: min(100%, var(--container));
+  width: min(100%, var(--pel-app-col));
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(360px, 0.88fr) minmax(0, 1.12fr);
@@ -915,18 +1300,24 @@
 
 /* S6 · The week — the scroll-driven phone, rehoused. */
 .pel-week {
-  --wk-node: 13px;                      /* node + meter diamond box        */
-  --wk-rail: 42px;                      /* spine column                    */
-  --wk-gap: clamp(16px, 1.6vw, 24px);   /* rail → text                     */
-  --wk-box: clamp(20px, 2.2vw, 28px);   /* flagged well's x-padding        */
-  --wk-hair: rgba(23, 23, 23, 0.22);    /* matches the shipped tour rule   */
-  --wk-quiet: rgba(23, 23, 23, 0.62);   /* 4.65:1 on sand — AA at any size */
+  --wk-node: 13px; /* node + meter diamond box        */
+  --wk-rail: 42px; /* spine column                    */
+  --wk-gap: clamp(16px, 1.6vw, 24px); /* rail → text                     */
+  --wk-box: clamp(20px, 2.2vw, 28px); /* flagged well's x-padding        */
+  --wk-hair: rgba(23, 23, 23, 0.22); /* matches the shipped tour rule   */
+  --wk-quiet: rgba(23, 23, 23, 0.62); /* 4.65:1 on sand — AA at any size */
 
-  /* THE PACING DIAL for the whole section. One property, one place. The old
-     tour used 88vh, which can only ever show ONE step — you cannot perceive a
-     sequence through a letterbox. 56svh always shows the active moment plus
-     the next row's rule, label and node, with the spine running between. */
-  --wk-stride: 56svh;
+  /* THE PACING DIAL. A fixed ROW HEIGHT (the old 56svh, and 88vh before it)
+     charges the same scroll for a two-line step as for a boxed one, and the
+     surplus is dead: measured 316, 341, 341, 260, 260, 316px of empty cream
+     under the six steps, 52% of the section. Pace with a fixed RUNWAY after
+     each step instead and let the row be content-height, so every step costs
+     what it is worth. */
+  --wk-runway: clamp(150px, 19vh, 208px);
+  /* One measure for the step text. The old 44ch never bound — it computed to
+     470px inside a 601px track, so the row rule overhung its own sentence by
+     258px. */
+  --wk-measure: clamp(330px, 37vw, 524px);
 
   /* .pel-app-tour ends at `padding-bottom: 0` because its 88vh steps carried
      a 12vh tail. Shorter steps need a real one. Equal specificity with
@@ -953,7 +1344,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   gap: 10px 26px;
   font: 700 11px/1.3 var(--font-body);
   letter-spacing: 0.15em;
@@ -988,8 +1378,8 @@
    .pel-app-tour__grid becomes display:block at =54em and the proven mobile
    order survives untouched. */
 .pel-week__grid {
-  grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
-  gap: clamp(48px, 6vw, 104px);
+  grid-template-columns: minmax(0, 1fr) 364px;
+  gap: clamp(56px, 6vw, 104px);
   align-items: start;
 }
 
@@ -1015,9 +1405,8 @@
 .pel-week-step {
   position: relative;
   margin: 0; /* reset.css li{margin-bottom:.5rem} would break the spine overlap */
-  min-height: 56vh;             /* fallback for engines without svh */
-  min-height: var(--wk-stride);
-  padding: clamp(26px, 3vh, 38px) 0 clamp(30px, 5vh, 64px);
+  min-height: 0;
+  padding: clamp(24px, 2.7vh, 34px) 0 var(--wk-runway);
   display: grid;
   grid-template-columns: var(--wk-rail) minmax(0, 1fr);
   align-content: start;
@@ -1028,6 +1417,7 @@
 /* The schedule opens with a rule and closes with a rule — a bounded span of
    time, not an open-ended list. No separate end-cap tick needed. */
 .pel-week-step:last-child {
+  padding-bottom: clamp(30px, 4vh, 48px);
   border-bottom: var(--border-width) solid var(--wk-hair);
 }
 
@@ -1037,10 +1427,10 @@
 .pel-week-step::before {
   content: '';
   position: absolute;
-  top: calc(var(--border-width) * -1);
-  bottom: calc(var(--border-width) * -1);
-  left: calc(var(--wk-node) / 2 - var(--border-width) / 2);
-  width: var(--border-width);
+  top: calc(var(--pel-app-rule) * -1);
+  bottom: calc(var(--pel-app-rule) * -1);
+  left: calc(var(--wk-node) / 2 - var(--pel-app-rule) / 2);
+  width: var(--pel-app-rule);
   background: var(--wk-hair);
   transition: background var(--dur-med) ease;
 }
@@ -1060,10 +1450,11 @@
 .pel-week-step::after {
   content: '';
   position: absolute;
-  top: calc(var(--border-width) * -1);
+  top: calc(var(--pel-app-rule) * -1);
   left: 0;
-  right: 0;
-  height: var(--border-width);
+  right: auto;
+  width: calc(var(--wk-node) / 2 + var(--wk-gap) + var(--wk-measure));
+  height: var(--pel-app-rule);
   background: var(--pel-orange);
   transform: scaleX(0);
   transform-origin: left center;
@@ -1082,7 +1473,7 @@
 .pel-week-step__node {
   position: absolute;
   z-index: 2;
-  top: calc((var(--wk-node) / 2 + var(--border-width) / 2) * -1);
+  top: calc((var(--wk-node) / 2 + var(--pel-app-rule) / 2) * -1);
   left: 0;
   width: var(--wk-node);
   height: var(--wk-node);
@@ -1107,7 +1498,7 @@
   background: var(--pel-orange);
   box-shadow:
     0 0 0 4px var(--pel-sand),
-    0 0 0 calc(4px + var(--border-width)) var(--pel-ink);
+    0 0 0 calc(4px + var(--pel-app-rule)) var(--pel-ink);
 }
 
 /* Declared AFTER .is-active and at equal specificity, so it wins the
@@ -1135,7 +1526,7 @@
    legible. Degradation, not breakage. */
 .pel-week-step__body {
   grid-column: 2;
-  max-width: 44ch;
+  max-width: var(--wk-measure);
 }
 
 /* The TIME is the heading. This is the whole difference between a week and a
@@ -1157,9 +1548,10 @@
 }
 
 .pel-week-step__what {
-  max-width: 34ch;
+  max-width: none;
   margin: clamp(13px, 1.5vw, 18px) 0 0;
-  font: 500 clamp(15px, 1.05vw, 17px)/1.68 var(--font-body);
+  font: 500 clamp(15.5px, 1.2vw, 17px)/1.68 var(--font-body);
+  text-wrap: pretty;
   color: var(--text-muted);
   transition: color var(--dur-med) ease;
 }
@@ -1230,7 +1622,7 @@
 
 .pel-week__meter-cell {
   position: relative;
-  height: 28px;              /* 28px tall x ~70px wide — comfortable target */
+  height: 28px; /* 28px tall x ~70px wide — comfortable target */
   padding: 0;
   border: 0;
   background: transparent;
@@ -1240,7 +1632,7 @@
 .pel-week__meter-cell::before {
   content: '';
   position: absolute;
-  top: calc(var(--border-width) * -1);
+  top: calc(var(--pel-app-rule) * -1);
   left: 1px;
   right: 1px;
   height: 3px;
@@ -1277,14 +1669,12 @@
   background: var(--pel-ink);
 }
 
-/* Fixed min-height, so swapping the label never nudges the phone. */
-.pel-week__now {
-  min-height: 1.1em;
-  margin: 12px 0 0;
-  font: 700 11px/1.1 var(--font-body);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--pel-app-orange-text);
+/* The screen is the section's entire argument and it was at 0.672 of design
+   scale, which renders the app's 13pt type at 8.7px — unreadable. The cap is
+   expressed against the stage so it cannot squash at short viewport heights. */
+.pel-week .pel-app-phone {
+  height: min(calc(100svh - 196px), 734px);
+  flex: 0 0 auto;
 }
 
 /* iPhone frame */
@@ -1408,7 +1798,7 @@
 }
 
 .pel-app-onegame__inner {
-  width: min(100%, 72ch);
+  width: min(100%, var(--pel-app-col));
   margin: 0 auto;
 }
 
@@ -1426,12 +1816,16 @@
 /* Set apart: a sunken well with its own rule, so it reads as a footnote to the
    section rather than as another paragraph of the argument. */
 .pel-app-onegame__pricing {
+  max-width: 640px;
   margin: clamp(38px, 4.4vw, 58px) 0 0;
-  padding: clamp(24px, 2.8vw, 34px) clamp(24px, 3vw, 38px);
-  border-left: 3px solid var(--pel-orange);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  background: var(--pel-sand);
-  font: 500 clamp(14px, 1vw, 15.5px)/1.72 var(--font-body);
+  padding: clamp(22px, 2.4vw, 30px) 0 0;
+  /* A ruled footnote, not a callout. The old shape — coloured left bar, tinted
+     fill, asymmetric radius — is the grammar of a warning, and it was wrapped
+     around the word "free" on the section that exists to say the app never
+     touches money. And it is the page's best fact, so it is no longer the
+     smallest type in its own section. */
+  border-top: var(--border-width) solid var(--pel-ink);
+  font: 500 clamp(15px, 1.05vw, 16.5px)/1.7 var(--font-body);
   color: var(--text-muted);
 }
 
@@ -1486,33 +1880,34 @@
 }
 
 .pel-app-close__inner {
-  width: min(100%, var(--container));
+  width: min(100%, var(--pel-app-col));
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.34fr) minmax(230px, 0.66fr);
+  /* Copy column first, form second. The old split put copy AND form in one
+     1.34fr track and left the 0.66fr track holding eleven words over 600px of
+     bare cream. Now both tracks are full to the bottom. */
+  grid-template-columns: minmax(0, 0.82fr) minmax(430px, 1fr);
   align-items: start;
-  gap: clamp(48px, 7vw, 108px);
+  gap: clamp(44px, 5vw, 80px);
 }
 
 .pel-app-close__copy .pel-app-h2 {
-  max-width: 24ch;
+  max-width: 14em;
 }
 
-/* The form is its own object, not the next paragraph. */
-.pel-app-close .pel-app-form {
-  margin-top: clamp(34px, 3.8vw, 50px);
+.pel-app-close__copy .pel-app-lead {
+  max-width: 40ch;
 }
 
-/* The proof slot: a stat pair set as a printed stamp rather than a testimonial
-   card, because the claim is a date, not a quote. Sticks alongside the form on
-   desktop so it stays in view while the four fields are filled. */
+/* The proof now closes the copy column instead of floating in a track of its
+   own: a ruled stamp under the subhead, which is where the eye goes after
+   reading it and before crossing to the form. No box — the rule and the
+   display face carry it, and a bordered panel beside a bordered form card was
+   two depth languages side by side. */
 .pel-app-close__proof {
-  position: sticky;
-  top: 132px;
-  padding: clamp(26px, 3vw, 36px);
-  border: var(--border-width) solid var(--pel-ink);
-  border-radius: var(--radius-lg);
-  background: var(--pel-sand);
+  margin-top: clamp(34px, 4vw, 54px);
+  padding-top: clamp(22px, 2.4vw, 30px);
+  border-top: var(--border-width) solid var(--pel-ink);
 }
 
 .pel-app-close__proof > p {
@@ -1577,7 +1972,10 @@
   border-radius: 0;
   background: transparent;
   color: var(--pel-ink);
-  font: 600 13px/1.5 var(--font-body);
+  /* 16px is the floor: mobile Safari zooms the viewport on focus for
+     anything smaller and never zooms back out. Four fields, four forced
+     zooms, on the page's only conversion surface. */
+  font: 600 16px/1.5 var(--font-body);
   letter-spacing: 0.02em;
   resize: vertical;
   transition: border-color var(--dur-fast);
@@ -1689,15 +2087,6 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 68em) {
-  .pel-app-hero__inner {
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr);
-    gap: 40px;
-  }
-
-  .pel-app-hero__title {
-    font-size: clamp(40px, 6vw, 72px);
-  }
-
   .pel-app-tour__grid {
     grid-template-columns: minmax(310px, 0.8fr) minmax(0, 1.2fr);
     gap: 60px;
@@ -1719,7 +2108,7 @@
   }
 
   .pel-week {
-    --wk-stride: 54svh;
+    --wk-runway: clamp(140px, 18vh, 196px);
   }
 
   .pel-app-trade {
@@ -1738,32 +2127,6 @@
 }
 
 @media (max-width: 54em) {
-  .pel-app-hero__inner {
-    padding-top: 88px;
-    padding-bottom: 88px;
-    grid-template-columns: 1fr;
-  }
-
-  .pel-app-hero__copy {
-    text-align: center;
-  }
-
-  .pel-app-hero__title,
-  .pel-app-hero__body {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .pel-app-actions {
-    justify-content: center;
-  }
-
-  .pel-app-hero__visual {
-    width: min(80vw, 560px);
-    margin: 20px auto 0;
-    justify-self: center;
-  }
-
   /* The mobile tour mode, inherited by S6 unchanged: the grid stops being a
      grid, the phone becomes a sticky backdrop, and the step cards scroll over
      it. pointer-events:none on the stage is what lets the cards be scrolled
@@ -1774,40 +2137,48 @@
 
   .pel-app-tour__stage {
     top: 98px;
-    z-index: 1;
-    height: 64svh;
+    /* z-index 2, not 1: the shelf is IN FRONT now. */
+    z-index: 2;
+    top: 113px;
+    height: 21svh;
     justify-content: flex-start;
-    padding-top: 16px;
+    padding-top: 0;
+    /* The crop. A band showing the top of the screen — which on every one of
+       these five screens is the part that names it. */
+    overflow: hidden;
+    background: var(--pel-sand);
+    border-bottom: var(--border-width) solid var(--wk-hair);
     pointer-events: none;
   }
 
+  .pel-week .pel-app-phone,
   .pel-app-tour__stage .pel-app-phone {
-    height: min(56svh, 560px);
+    height: min(62svh, 560px);
   }
 
   .pel-app-tour__steps {
     position: relative;
-    z-index: 2;
-    margin-top: -2svh;
+    /* Behind the shelf, so cards slide under it instead of over the screen. */
+    z-index: 1;
+    margin-top: clamp(20px, 3vh, 34px);
   }
 
   /* The step column switches idiom here, because a 1.5px spine cannot read
      behind a sticky phone: the schedule becomes six cards and the time labels
      carry the sequence alone. */
   .pel-week {
-    --wk-stride: 72svh;
+    --wk-runway: clamp(118px, 15vh, 168px);
     padding-bottom: 60px;
   }
 
-  .pel-week__meter,
-  .pel-week__now {
+  .pel-week__meter {
     display: none;
   }
 
   .pel-week-step {
-    padding: 20px 0;
+    padding: 0 0 var(--wk-runway);
     grid-template-columns: minmax(0, 1fr);
-    align-content: end;
+    align-content: start;
     border: 0;
   }
 
@@ -1815,10 +2186,19 @@
     border: 0;
   }
 
+  /* The spine and the wipe genuinely cannot read under a shelf, so they go —
+     but the NODE stays. It was hidden here, which meant the legend above
+     taught two marks that did not exist on this breakpoint, and mobile had no
+     active state whatsoever. It becomes a register mark inside the card. */
   .pel-week-step::before,
-  .pel-week-step::after,
-  .pel-week-step__node {
+  .pel-week-step::after {
     display: none;
+  }
+
+  .pel-week-step__node {
+    display: block;
+    top: 20px;
+    left: 20px;
   }
 
   /* All six at full contrast: they overlap the phone and are read in passing,
@@ -1829,10 +2209,13 @@
   }
 
   .pel-week-step__body {
+    /* The node is absolute against this box on mobile only; on desktop the
+       body stays static and the node resolves against the <li>. */
+    position: relative;
     grid-column: 1;
     max-width: none;
     margin-left: 0;
-    padding: 24px;
+    padding: 46px 24px 24px;
     border: var(--border-width) solid var(--border-soft);
     border-radius: var(--radius-lg);
     background: rgba(247, 240, 222, 0.96);
@@ -1877,9 +2260,13 @@
     grid-template-columns: 1fr;
   }
 
+  /* No order:-1. Stacked, the picture was placed BEFORE the heading, so the
+     reader scrolled 643px — 76% of a viewport, 45% of the section — of a
+     0.70x-scale screenshot before reaching a word. It reads after the copy it
+     illustrates, and it is capped so it can never set the section's height
+     again. */
   .pel-app-reversal__shot {
-    order: -1;
-    width: min(70vw, 280px);
+    width: min(58vw, 240px);
     justify-self: start;
   }
 
@@ -1892,45 +2279,6 @@
 }
 
 @media (max-width: 48em) {
-  .pel-app-hero {
-    min-height: auto;
-  }
-
-  .pel-app-hero__inner {
-    padding: 66px 20px 78px;
-    gap: 42px;
-  }
-
-  .pel-app-hero__title {
-    font-size: clamp(34px, 10vw, 52px);
-    line-height: 1;
-  }
-
-  .pel-app-hero__body {
-    margin-top: 25px;
-    font-size: 14px;
-  }
-
-  .pel-app-actions {
-    margin-top: 30px;
-  }
-
-  .pel-app-cta {
-    width: 100%;
-  }
-
-  /* 91vw exceeded the column's own width once the gutter dropped to 20px,
-     which pushed the H1, body and CTA to a ~14px right margin and clipped the
-     pitch card's hard offset shadow. 100% keeps it inside its track. */
-  .pel-app-hero__visual {
-    width: min(100%, 500px);
-  }
-
-  .pel-app-game-card {
-    right: -1%;
-    width: 78%;
-  }
-
   /* The single rule that drops every light section from a 48px to a 20px side
      gutter. */
   .pel-app-sec {
@@ -1950,13 +2298,11 @@
     margin-bottom: 50px;
   }
 
+  /* Keeps the shelf crop set at 54em — these used to restore a full-height
+     phone here, which is what put 515px of sticky phone over the cards. */
   .pel-app-tour__stage {
-    top: 92px;
-    height: 61svh;
-  }
-
-  .pel-app-tour__stage .pel-app-phone {
-    height: min(53svh, 515px);
+    top: 105px;
+    height: 20svh;
   }
 
   .pel-app-tour__steps {
@@ -1968,7 +2314,7 @@
   }
 
   .pel-week {
-    --wk-stride: 69svh;
+    --wk-runway: clamp(108px, 14vh, 150px);
     padding-bottom: 52px;
   }
 
@@ -2011,7 +2357,6 @@
     letter-spacing: 0.13em;
   }
 
-  .pel-app-thursday__lines > p,
   .pel-app-reversal__list > li,
   .pel-app-leadlist > li {
     font-size: 14.5px;
@@ -2143,20 +2488,12 @@
 }
 
 @media (max-width: 25em) {
-  .pel-app-game-card__main {
-    padding-bottom: 0;
-  }
-
   .pel-app-tour__stage {
-    height: 58svh;
-  }
-
-  .pel-app-tour__stage .pel-app-phone {
-    height: min(49svh, 470px);
+    height: 19svh;
   }
 
   .pel-week {
-    --wk-stride: 66svh;
+    --wk-runway: 104px;
   }
 
   .pel-week-step__body {
@@ -2209,6 +2546,7 @@
    no opacity flicker to suppress. The phone crossfade becomes an instant cut. */
 @media (prefers-reduced-motion: reduce) {
   .pel-app-cta,
+  .pel-app-hero__aside svg,
   .pel-app-phone__layer,
   .pel-week-step::before,
   .pel-week-step::after,
