@@ -7,7 +7,7 @@ const DEFAULT_TO = 'contact@poreldeporte.com';
 const DEFAULT_FROM = 'Por El Deporte Website <website@poreldeporte.com>';
 // One constant, so the honeypot's fake success and a real send cannot drift apart.
 const SUCCESS_MESSAGE =
-  'Thanks — we’ll write back from contact@poreldeporte.com within a day.';
+  'Thanks. We’ll write back from contact@poreldeporte.com within a day.';
 
 export function loader() {
   return Response.json(

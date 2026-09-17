@@ -264,7 +264,7 @@
   max-width: none;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(38px, 5vw, 70px);
+  font-size: clamp(33px, 4.9vw, 70px);
   font-weight: 650;
   line-height: 0.82;
   letter-spacing: -0.025em;
@@ -275,12 +275,6 @@
   /* #ce643e on #171717 is 4.81:1 — the ink band is the one place in this brand
      where the orange is safe for type. */
   color: var(--pel-orange);
-}
-
-/* Desktop takes the balanced two-line break; the phone takes three. See the
-   43.5em block, and the derivation in the JSX comment. */
-.pel-app-hero__brk--sm {
-  display: none;
 }
 
 /* --prose (470px) measures 3 lines at 1440: 459.4 / 430.2 / 452, last line 98%
@@ -762,14 +756,6 @@ a.pel-app-hero__aside:hover {
   .pel-app-hero__title {
     font-size: clamp(36px, 11vw, 74px);
     line-height: 0.88;
-  }
-
-  .pel-app-hero__brk--sm {
-    display: inline;
-  }
-
-  .pel-app-hero__brk--lg {
-    display: none;
   }
 }
 

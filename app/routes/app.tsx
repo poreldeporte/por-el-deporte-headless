@@ -84,13 +84,13 @@ const WEEK_STEPS: WeekStep[] = [
   {
     id: 'drop',
     when: 'Midweek',
-    what: 'Someone drops. The next player is in and notified. You read about it; you don’t fix it.',
+    what: 'Someone drops. The next player is in and notified. You read about it. You don’t fix it.',
     screen: 1,
   },
   {
     id: 'confirm',
     when: 'Two hours out',
-    what: 'Everyone confirms. Anyone who hasn’t is visible — to you, and to them.',
+    what: 'Everyone confirms. Anyone who hasn’t is visible, to you and to them.',
     screen: 1,
   },
   {
@@ -158,7 +158,7 @@ const STOPS_ITEMS: LeadItem[] = [
   },
   {
     lead: 'Chasing $12.',
-    rest: 'Put in what the pitch cost and everyone sees their share. Afterwards you get a paid and unpaid list. You still collect it however you do now — the app never touches the money.',
+    rest: 'Put in what the pitch cost and everyone sees their share. Afterwards you get a paid and unpaid list. You still collect it however you do now. The app never touches the money.',
   },
   {
     lead: 'Keeping score of people.',
@@ -177,7 +177,7 @@ export const meta: Route.MetaFunction = ({location, matches}) => {
       // A searcher seeing that snippet was being offered more work.
       title: 'Por El Deporte App | Stop Running Your Game by Group Chat',
       description:
-        'You didn’t volunteer to be a switchboard. Move one recurring game over and the roster, waitlist and teams run themselves. Free on iPhone and the web.',
+        'You didn’t volunteer to be everyone’s secretary. Move one game over and the roster, waitlist and teams run themselves. Free on iPhone and the web.',
       url,
       image: origin ? `${origin}/icon-512.png` : undefined,
     }),
@@ -243,31 +243,26 @@ function AppHero() {
         <div className="pel-app-hero__copy">
           {/* HARD BREAKS, MEASURED. Do not remove them.
               Flapjack 650 at -0.025em, width per 100px of font-size:
-                "You didn't volunteer"  8.698x  ┐ 0.76% apart — the only
-                "to be a switchboard."  8.632x  ┘ balanced pair in the sentence
-                "volunteer to be a"     7.494x  <- the phone's binding line
-                "switchboard."          5.329x  <- widest unbreakable token
-              Left to wrap, this H1 takes FIVE shapes across the range, and not
-              monotonically: 2 lines at 375/390/768/1100/1280, 3 lines at
-              900/992/1024/1440/1600/1920. The 1440 rag is 302.5 / 539.6 /
-              383.7 — line 1 at 56% of line 2 — and it flips back to 2 lines at
-              1100 and 1280 before flipping again. That is the LCP element
-              reflowing as the window widens.
-              --lg is the balanced pair, live from 43.5em up. --sm is the
-              three-line poster stack below it: the shorter binding line is
-              what lets a 375px phone set 41.25px instead of 38.5px.
-              The {' '} are load-bearing. JSX strips per-line leading
-              whitespace, so they are the space that rejoins the halves when
-              the <br> next to them is display:none. */}
+                "You didn't volunteer"      8.723x  <- the binding line
+                "to be everyone's"          6.921x
+                "secretary."                4.235x
+              A descending staircase, not a balanced pair: the balanced split
+              ("You didn't volunteer to be" / "everyone's secretary.") measures
+              11.226x at its widest, which caps the H1 at 57px in a 644px copy
+              column. The staircase holds 70px and gives the orange punchline
+              its own line. Left to wrap, the sentence reflows between three
+              and four lines as the window widens.
+              The {' '} are load-bearing: JSX strips per-line leading
+              whitespace, so they are the space that rejoins the lines when a
+              <br> is display:none. */}
           <h1 id="app-hero-title" className="pel-app-hero__title">
-            You didn’t
-            <br className="pel-app-hero__brk--sm" /> volunteer
-            <br className="pel-app-hero__brk--lg" /> to be a
-            <br className="pel-app-hero__brk--sm" /> <span>switchboard.</span>
+            You didn’t volunteer
+            <br /> to be everyone’s
+            <br /> <span>secretary.</span>
           </h1>
           <p className="pel-app-hero__body">
             Por El Deporte takes the roster, the teams, the waitlist and the tab
-            off your plate — and leaves your group chat exactly where it is.
+            off your plate, and leaves your group chat exactly where it is.
             Free, on iPhone and the web.
           </p>
           <div className="pel-app-actions">
@@ -443,7 +438,7 @@ function TheTrade() {
         </h2>
         <p className="pel-app-lead" data-reveal>
           We’re not asking you to move your community. We’re asking you to move
-          the admin out of it. Leave the chat where it is — the slagging, the
+          the admin out of it. Leave the chat where it is: the slagging, the
           photos, the argument about whether that was offside. Take the twelve
           spots, the waitlist, the teams and the tab somewhere they look after
           themselves.
@@ -566,7 +561,7 @@ function WhatStopsBeingYours() {
 /* ── S5 · The reversal ──────────────────────────────────────────────────────*/
 function TheReversal() {
   const bullets = [
-    'A rating that moves every week — and stays blank until they’ve played enough for it to be fair',
+    'A rating that moves every week, and stays blank until they’ve played enough for it to be fair',
     'The draft. Being picked. Being picked first',
     'A written match report that names them, and a read on the matchup before kickoff',
     'Calling the winner, and a record of how often they’re right',
@@ -872,7 +867,7 @@ function OneGame() {
           <p className="pel-app-lead" data-reveal>
             Don’t migrate anybody. Don’t announce anything. Run one game on the
             app and post the link in the chat you already have. People claim
-            their own spot — you’re not adding anyone, and you’re not chasing
+            their own spot. You’re not adding anyone, and you’re not chasing
             anyone to sign up.
           </p>
           <p className="pel-app-onegame__close" data-reveal>
