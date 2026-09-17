@@ -95,10 +95,9 @@
   text-wrap: balance;
 }
 
-/* The two list-label headings are doing the least rhetorical work on the
-   page and were set at the same 66px as its thesis. */
-.pel-app-stops .pel-app-h2,
-.pel-app-wont .pel-app-h2 {
+/* The list-label heading does the least rhetorical work on the page and was
+   set at the same 66px as its thesis. */
+.pel-app-stops .pel-app-h2 {
   font-size: clamp(30px, 3.4vw, 46px);
 }
 
@@ -109,15 +108,46 @@
   color: var(--text-muted);
 }
 
+/* ── The editorial split ─────────────────────────────────────────────────────
+   Heading left, content right. Used by the text-only sections, which
+   otherwise set a 640px measure inside a 1180px column and left half the page
+   empty. The heading column is deliberately narrow: display type wants a
+   short measure, and it gives the eye a fixed left edge to return to. */
+.pel-app-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+  align-items: start;
+  column-gap: clamp(40px, 5vw, 100px);
+}
+
+.pel-app-split > .pel-app-h2 {
+  max-width: 13em;
+  position: sticky;
+  top: 132px;
+}
+
+@media (max-width: 54em) {
+  .pel-app-split {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(26px, 4vw, 40px);
+  }
+
+  .pel-app-split > .pel-app-h2 {
+    position: static;
+    max-width: none;
+  }
+}
+
 /* ── S4 / S8 · the shared list primitive ─────────────────────────────────────
    A list, not cards. The bold lead-in does the work a card heading would, and
    the hairline between items is the only structure — cards would flatten four
    arguments into four features. S8 reuses this verbatim so the two sections
    read as the matched pair they are. */
 .pel-app-leadlist {
-  /* ~72 characters. 78ch measured 104. */
-  width: min(100%, 640px);
-  margin: clamp(38px, 4.4vw, 62px) 0 0;
+  /* The split column already sets the measure. */
+  width: 100%;
+  max-width: 680px;
+  margin: 0;
   padding: 0;
   list-style: none;
   border-top: var(--border-width) solid var(--border-soft);
@@ -204,7 +234,9 @@
   padding: clamp(56px, 4.8vw, 80px) 0 clamp(64px, 5.4vw, 88px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(330px, 0.72fr);
-  align-items: start;
+  /* The ROW is content-sized (that is what removed the dead ink); the copy
+     still centres against the taller sheet beside it. */
+  align-items: center;
   column-gap: clamp(40px, 4.4vw, 72px);
   row-gap: 0;
 }
@@ -803,12 +835,17 @@ a.pel-app-hero__aside:hover {
   margin-inline: auto;
 }
 
+.pel-app-thursday__body {
+  min-width: 0;
+}
+
 /* The font-size lives on the WEEK, not on dd, so this 46ch and dd's 46ch
    resolve against the same character. Setting it on dd is how the old code
    ended up with a "60ch" wrapper that actually measured 53.3ch. */
 .pel-app-thursday__week {
-  width: min(100%, calc(var(--th-day) + var(--th-gap) + 46ch));
-  margin: clamp(34px, 3.4vw, 48px) 0 0;
+  width: 100%;
+  max-width: calc(var(--th-day) + var(--th-gap) + 46ch);
+  margin: 0;
   font: 500 clamp(15.5px, 1.22vw, 17.5px)/1.56 var(--font-body);
   border-top: var(--border-width) solid var(--pel-ink);
 }
@@ -964,7 +1001,8 @@ a.pel-app-hero__aside:hover {
 }
 
 .pel-app-trade .pel-app-lead {
-  max-width: 56ch;
+  max-width: 54ch;
+  margin-top: 0;
 }
 
 /* ── The sheet ─────────────────────────────────────────────────────────────
@@ -1809,6 +1847,14 @@ a.pel-app-hero__aside:hover {
   margin: 0 auto;
 }
 
+.pel-app-onegame__body {
+  min-width: 0;
+}
+
+.pel-app-onegame__body .pel-app-lead {
+  margin-top: 0;
+}
+
 .pel-app-onegame__close {
   max-width: 46ch;
   margin: clamp(28px, 3.2vw, 40px) 0 0;
@@ -1841,14 +1887,7 @@ a.pel-app-hero__aside:hover {
   color: var(--pel-ink);
 }
 
-/* ── S8 · What it doesn't do ─────────────────────────────────────────────────
-   Same list treatment as S4, deliberately. */
-.pel-app-wont {
-  border-top: var(--border-width) solid var(--pel-ink);
-  background: var(--pel-sand);
-}
-
-.pel-app-wont__platform {
+.pel-app-onegame__platform {
   margin: clamp(30px, 3.4vw, 42px) 0 0;
   font: 700 11px/1.5 var(--font-body);
   letter-spacing: 0.16em;
@@ -1860,7 +1899,7 @@ a.pel-app-hero__aside:hover {
    availability row is gone, so it has to be a real tap target. The padding
    grows the hit area to 48x44 and the matching negative margin cancels its
    effect on layout, so "and web today." sets exactly as it would unlinked. */
-.pel-app-wont__platform a {
+.pel-app-onegame__platform a {
   display: inline-block;
   padding: 15px 7px;
   margin: -15px -7px;
@@ -1870,7 +1909,7 @@ a.pel-app-hero__aside:hover {
   text-underline-offset: 4px;
 }
 
-.pel-app-wont__platform a:hover {
+.pel-app-onegame__platform a:hover {
   color: var(--pel-ink);
 }
 

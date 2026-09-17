@@ -166,22 +166,6 @@ const STOPS_ITEMS: LeadItem[] = [
   },
 ];
 
-const WONT_ITEMS: LeadItem[] = [
-  {
-    lead: 'It won’t take payments.',
-    rest: 'It tells you who has paid. You collect it the way you always have.',
-  },
-  {lead: 'It won’t replace your chat.', rest: 'That’s the point.'},
-  {
-    lead: 'It won’t invent a rating.',
-    rest: 'A new player has no number until there’s enough evidence for one to be fair.',
-  },
-  {
-    lead: 'It won’t run your club’s finances, kit or pitch bookings.',
-    rest: 'It runs the game.',
-  },
-];
-
 export const meta: Route.MetaFunction = ({location, matches}) => {
   const origin = siteOrigin(matches);
   const url = `${origin}${location.pathname}`;
@@ -240,7 +224,6 @@ export default function AppLandingPage() {
       <TheReversal />
       <TheWeek />
       <OneGame />
-      <WhatItWontDo />
       <TheClose />
     </div>
   );
@@ -408,7 +391,7 @@ function TheThursday() {
       className="pel-app-sec pel-app-thursday"
       aria-labelledby="app-thursday-title"
     >
-      <div className="pel-app-thursday__inner">
+      <div className="pel-app-thursday__inner pel-app-split">
         {/* One sentence per line. Set as one run it hyphen-broke "Forty-one"
             across two lines and stranded "you." on a third; the {' '} keeps a
             real space between the blocks so selecting and copying the heading
@@ -418,19 +401,21 @@ function TheThursday() {
           <span>One of you.</span>
         </h2>
 
-        <dl className="pel-app-thursday__week" data-reveal>
-          {week.map(([day, rest]) => (
-            <div className="pel-app-thursday__row" key={day}>
-              <dt>{day}</dt>
-              <dd>{rest}</dd>
-            </div>
-          ))}
-        </dl>
+        <div className="pel-app-thursday__body">
+          <dl className="pel-app-thursday__week" data-reveal>
+            {week.map(([day, rest]) => (
+              <div className="pel-app-thursday__row" key={day}>
+                <dt>{day}</dt>
+                <dd>{rest}</dd>
+              </div>
+            ))}
+          </dl>
 
-        <p className="pel-app-thursday__close" data-reveal>
-          <span>And nobody thanks you,</span>
-          <span>because nobody saw any of it.</span>
-        </p>
+          <p className="pel-app-thursday__close" data-reveal>
+            <span>And nobody thanks you,</span>
+            <span>because nobody saw any of it.</span>
+          </p>
+        </div>
       </div>
     </section>
   );
@@ -448,7 +433,7 @@ function TheTrade() {
       className="pel-app-sec pel-app-trade"
       aria-labelledby="app-trade-title"
     >
-      <div className="pel-app-trade__head">
+      <div className="pel-app-trade__head pel-app-split">
         <h2 id="app-trade-title" className="pel-app-h2" data-reveal>
           {/* One sentence per line, whatever the display face's metrics do. It
               also teaches the sheet's two-part division before the reader
@@ -568,7 +553,7 @@ function WhatStopsBeingYours() {
       className="pel-app-sec pel-app-stops"
       aria-labelledby="app-stops-title"
     >
-      <div className="pel-app-sec__inner">
+      <div className="pel-app-sec__inner pel-app-split">
         <h2 id="app-stops-title" className="pel-app-h2" data-reveal>
           Four things you stop doing on Thursday
         </h2>
@@ -879,61 +864,44 @@ function OneGame() {
       className="pel-app-sec pel-app-onegame"
       aria-labelledby="app-onegame-title"
     >
-      <div className="pel-app-onegame__inner">
+      <div className="pel-app-onegame__inner pel-app-split">
         <h2 id="app-onegame-title" className="pel-app-h2" data-reveal>
           One game. That’s the whole commitment.
         </h2>
-        <p className="pel-app-lead" data-reveal>
-          Don’t migrate anybody. Don’t announce anything. Run one game on the
-          app and post the link in the chat you already have. People claim their
-          own spot — you’re not adding anyone, and you’re not chasing anyone to
-          sign up.
-        </p>
-        <p className="pel-app-onegame__close" data-reveal>
-          If Thursday still comes with DMs, you’ve lost one week and nothing
-          else.
-        </p>
-        {/* Set apart and quieter, and arriving a beat after the line above it. */}
-        <p className="pel-app-onegame__pricing" data-reveal>
-          <b>And it’s free.</b> Free for your community, free for your players,
-          not a trial. The kit and the merch pay for pitch time, balls and the
-          next match. The games have always been free to turn up to, and we’d
-          like to keep it that way.
-        </p>
+        <div className="pel-app-onegame__body">
+          <p className="pel-app-lead" data-reveal>
+            Don’t migrate anybody. Don’t announce anything. Run one game on the
+            app and post the link in the chat you already have. People claim
+            their own spot — you’re not adding anyone, and you’re not chasing
+            anyone to sign up.
+          </p>
+          <p className="pel-app-onegame__close" data-reveal>
+            If Thursday still comes with DMs, you’ve lost one week and nothing
+            else.
+          </p>
+          {/* Set apart and quieter, and arriving a beat after the line above it. */}
+          <p className="pel-app-onegame__pricing" data-reveal>
+            <b>And it’s free.</b> Free for your community, free for your
+            players, not a trial. The kit and the merch pay for pitch time,
+            balls and the next match. The games have always been free to turn up
+            to, and we’d like to keep it that way.
+          </p>
+          {/* Relocated from the deleted "Four things it won't do". It is the
+              page's only statement of platform, and the web app's only link. */}
+          <p className="pel-app-onegame__platform" data-reveal>
+            iPhone and{' '}
+            <a href={WEB_APP_URL} target="_blank" rel="noreferrer">
+              web
+            </a>{' '}
+            today.
+          </p>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ── S8 · What it doesn't do ─────────────────────────────────────────────────
-   Deliberately identical to S4 in layout and motion: the two sections are a
-   matched pair, and the same treatment makes them read as one. This is also the
-   section carrying the hard accuracy statement about payments, and a section
-   that behaves oddly gets read as spin. */
-function WhatItWontDo() {
-  return (
-    <section
-      className="pel-app-sec pel-app-wont"
-      aria-labelledby="app-wont-title"
-    >
-      <div className="pel-app-sec__inner">
-        <h2 id="app-wont-title" className="pel-app-h2" data-reveal>
-          Four things it won’t do
-        </h2>
-        <LeadList items={WONT_ITEMS} />
-        <p className="pel-app-wont__platform" data-reveal>
-          iPhone and{' '}
-          <a href={WEB_APP_URL} target="_blank" rel="noreferrer">
-            web
-          </a>{' '}
-          today.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/** The shared S4 / S8 list primitive. */
+/** The shared lead-in list primitive. */
 function LeadList({items}: {items: LeadItem[]}) {
   return (
     <ul className="pel-app-leadlist" role="list">
