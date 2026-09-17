@@ -3,6 +3,7 @@ import {useFetcher} from 'react-router';
 import type {Route} from './+types/app';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 import appLandingStyles from '~/styles/app-landing.css?url';
+import {APP_HERO_SRC, APP_HERO_SRCSET} from '~/lib/app-hero';
 
 const APP_STORE_URL =
   'https://apps.apple.com/us/app/por-el-deporte/id6756241207';
@@ -212,6 +213,17 @@ export const meta: Route.MetaFunction = ({location, matches}) => {
 
 export const links: Route.LinksFunction = () => [
   {rel: 'stylesheet', href: appLandingStyles},
+  // The hero photo is this page's LCP element, and the browser would otherwise
+  // only discover it after parsing the document. imageSrcSet/imageSizes mirror
+  // the <img> exactly, or the preload fetches a second file.
+  {
+    rel: 'preload',
+    as: 'image',
+    href: `${APP_HERO_SRC}&width=1600`,
+    imageSrcSet: APP_HERO_SRCSET,
+    imageSizes: '100vw',
+    fetchPriority: 'high',
+  },
 ];
 
 export default function AppLandingPage() {
@@ -239,6 +251,27 @@ export default function AppLandingPage() {
 function AppHero() {
   return (
     <section className="pel-app-hero" aria-labelledby="app-hero-title">
+      {/* Background, not subject. data-bg-parallax is the repo's own idiom:
+          useScrollMotion drifts the image inside its <section> while the band
+          stays put, and the scale it applies is what stops the drift exposing
+          an edge. Decorative, so alt="" — the hero already says everything
+          this photograph says. */}
+      <div className="pel-app-hero__bg" aria-hidden="true">
+        <img
+          data-bg-parallax
+          src={`${APP_HERO_SRC}&width=1600`}
+          srcSet={APP_HERO_SRCSET}
+          sizes="100vw"
+          width={2400}
+          height={1600}
+          alt=""
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </div>
+      <div className="pel-app-hero__scrim" aria-hidden="true" />
+
       <div className="pel-app-hero__inner">
         <div className="pel-app-hero__copy">
           {/* HARD BREAKS, MEASURED. Do not remove them.

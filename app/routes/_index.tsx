@@ -13,6 +13,19 @@ import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
 
+export const links: Route.LinksFunction = () => [
+  // Moved here from root.tsx, where it preloaded this image at high priority on
+  // EVERY route — including /app, which has its own hero and never uses it.
+  {
+    rel: 'preload',
+    as: 'image',
+    href: `${HERO_SRC}&width=1600`,
+    imageSrcSet: HERO_SRCSET,
+    imageSizes: '100vw',
+    fetchPriority: 'high',
+  },
+];
+
 export const meta: Route.MetaFunction = ({matches}) => {
   const origin = siteOrigin(matches);
   return [
@@ -165,7 +178,10 @@ function MarqueeRow({
   const Group = ({hidden}: {hidden?: boolean}) => (
     <div className="pel-marquee__group" aria-hidden={hidden || undefined}>
       {items.map((item) => (
-        <span key={item.id} style={{display: 'inline-flex', alignItems: 'center', gap: 'inherit'}}>
+        <span
+          key={item.id}
+          style={{display: 'inline-flex', alignItems: 'center', gap: 'inherit'}}
+        >
           <span>{item.text}</span>
           <Spark size={sparkSize} />
         </span>
@@ -255,7 +271,15 @@ function Hero() {
         <div className="pel-nav__actions">
           <Link to="/account" className="pel-pill pel-hide-mobile">
             Account
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
               <circle cx="12" cy="8" r="3.4" />
               <path d="M5.5 20c.5-3.5 3.5-5 6.5-5s6 1.5 6.5 5" />
             </svg>
@@ -286,7 +310,15 @@ function Hero() {
               className="pel-btn pel-btn--icon"
               aria-label="Shop now"
             >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
                 <path d="M7 17L17 7M8.5 7H17v8.5" />
               </svg>
             </Link>
@@ -295,7 +327,14 @@ function Hero() {
       </div>
 
       <div className="pel-scroll-cue" aria-hidden="true">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M6 9l6 6 6-6" />
         </svg>
       </div>

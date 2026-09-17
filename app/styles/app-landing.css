@@ -210,8 +210,72 @@
   overflow: clip;
   /* reset.css:85 sets `section { padding: 1rem 0 }` (2rem from 768px). */
   padding: 0 var(--gutter);
+  /* Still the fallback ground, and what the scrim is made of. */
   background: var(--pel-ink);
   color: var(--pel-cream);
+}
+
+/* ── The hero photograph ─────────────────────────────────────────────────────
+   Atmosphere, not subject: the band still reads as ink, and the picture gives
+   it depth and a place. It is weighted so the two things that must stay
+   legible get the most cover — the copy on the left and, to a lesser degree,
+   the sheet on the right. */
+.pel-app-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.pel-app-hero__bg img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  /* The squad stands in the upper-middle of the frame; a centred crop cuts
+     them at the knees on a band this wide. */
+  object-position: 50% 38%;
+  will-change: transform;
+}
+
+.pel-app-hero__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    /* Left-heavy, because the copy lives there. Cream on the composite
+       measures well past AA the whole width of the copy column. */
+    linear-gradient(
+      90deg,
+      rgba(23, 23, 23, 0.95) 0%,
+      rgba(23, 23, 23, 0.92) 34%,
+      rgba(23, 23, 23, 0.7) 62%,
+      rgba(23, 23, 23, 0.5) 100%
+    ),
+    /* Top and bottom, so the band meets the header and S2 as flat ink rather
+       than as a cut-off photograph. */
+    linear-gradient(
+        180deg,
+        rgba(23, 23, 23, 0.92) 0%,
+        rgba(23, 23, 23, 0.42) 38%,
+        rgba(23, 23, 23, 0.55) 72%,
+        rgba(23, 23, 23, 0.94) 100%
+      );
+}
+
+@media (max-width: 43.5em) {
+  /* Stacked, the copy sits over the top of the band and the sheet over the
+     bottom, so the picture has nowhere safe to show. Hold it back further and
+     let it read as texture. */
+  .pel-app-hero__scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(23, 23, 23, 0.95) 0%,
+      rgba(23, 23, 23, 0.9) 45%,
+      rgba(23, 23, 23, 0.96) 100%
+    );
+  }
 }
 
 /* `align-items: start` is load-bearing and quiet: it is what removes the
@@ -2169,37 +2233,39 @@ a.pel-app-hero__aside:hover {
 
   .pel-app-tour__stage {
     top: 98px;
-    /* z-index 2, not 1: the shelf is IN FRONT now. */
-    z-index: 2;
-    top: 113px;
-    height: 21svh;
+    /* Behind the cards. The whole phone is visible; a card slides up over it,
+       you read it, it carries on, and the screen is clear again until the next
+       one arrives. The runway below each card is what buys that clear moment,
+       so it is sized against the phone rather than against the copy. */
+    z-index: 1;
+    top: 96px;
+    height: 56svh;
     justify-content: flex-start;
     padding-top: 0;
-    /* The crop. A band showing the top of the screen — which on every one of
-       these five screens is the part that names it. */
-    overflow: hidden;
-    background: var(--pel-sand);
-    border-bottom: var(--border-width) solid var(--wk-hair);
     pointer-events: none;
   }
 
   .pel-week .pel-app-phone,
   .pel-app-tour__stage .pel-app-phone {
-    height: min(62svh, 560px);
+    height: min(53svh, 470px);
   }
 
   .pel-app-tour__steps {
     position: relative;
-    /* Behind the shelf, so cards slide under it instead of over the screen. */
-    z-index: 1;
-    margin-top: clamp(20px, 3vh, 34px);
+    /* Over the phone. */
+    z-index: 2;
+    /* Start the first card below the phone so the screen is seen whole before
+       anything covers it. */
+    margin-top: clamp(24px, 5vh, 52px);
   }
 
   /* The step column switches idiom here, because a 1.5px spine cannot read
      behind a sticky phone: the schedule becomes six cards and the time labels
      carry the sequence alone. */
   .pel-week {
-    --wk-runway: clamp(118px, 15vh, 168px);
+    /* The gap between one card and the next, and therefore how long the phone
+       screen is left clear. Sized against the phone (53svh), not the copy. */
+    --wk-runway: clamp(250px, 34vh, 340px);
     padding-bottom: 60px;
   }
 
@@ -2250,7 +2316,9 @@ a.pel-app-hero__aside:hover {
     padding: 46px 24px 24px;
     border: var(--border-width) solid var(--border-soft);
     border-radius: var(--radius-lg);
-    background: rgba(247, 240, 222, 0.96);
+    /* Opaque. At 0.96 the phone ghosted through the card and the screen it was
+       describing showed faintly behind its own sentence. */
+    background: var(--pel-cream);
     box-shadow: 8px 9px 0 rgba(23, 23, 23, 0.1);
   }
 
@@ -2330,11 +2398,13 @@ a.pel-app-hero__aside:hover {
     margin-bottom: 50px;
   }
 
-  /* Keeps the shelf crop set at 54em — these used to restore a full-height
-     phone here, which is what put 515px of sticky phone over the cards. */
   .pel-app-tour__stage {
-    top: 105px;
-    height: 20svh;
+    top: 92px;
+    height: 54svh;
+  }
+
+  .pel-app-tour__stage .pel-app-phone {
+    height: min(51svh, 450px);
   }
 
   .pel-app-tour__steps {
@@ -2346,7 +2416,7 @@ a.pel-app-hero__aside:hover {
   }
 
   .pel-week {
-    --wk-runway: clamp(108px, 14vh, 150px);
+    --wk-runway: clamp(230px, 32vh, 310px);
     padding-bottom: 52px;
   }
 
@@ -2521,11 +2591,15 @@ a.pel-app-hero__aside:hover {
 
 @media (max-width: 25em) {
   .pel-app-tour__stage {
-    height: 19svh;
+    height: 52svh;
+  }
+
+  .pel-app-tour__stage .pel-app-phone {
+    height: min(48svh, 410px);
   }
 
   .pel-week {
-    --wk-runway: 104px;
+    --wk-runway: clamp(210px, 30vh, 280px);
   }
 
   .pel-week-step__body {

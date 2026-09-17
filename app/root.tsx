@@ -22,7 +22,6 @@ import homeStyles from '~/styles/home.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
 import {MetaPixel} from '~/components/MetaPixel';
-import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
 
 export type RootLoader = typeof loader;
 
@@ -111,18 +110,6 @@ export function links() {
     // iOS ignores SVG and multi-size .ico — it wants one opaque 180x180 PNG.
     {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
     {rel: 'manifest', href: '/manifest.json'},
-    // Preload the homepage hero. It's the LCP element and the browser otherwise
-    // only discovers it after parsing the document; `imageSrcSet`/`imageSizes`
-    // must mirror the <img> exactly or the preload fetches a second file.
-    // `fetchPriority` is on the tag too — this just moves the discovery earlier.
-    {
-      rel: 'preload',
-      as: 'image',
-      href: `${HERO_SRC}&width=1600`,
-      imageSrcSet: HERO_SRCSET,
-      imageSizes: '100vw',
-      fetchPriority: 'high',
-    },
   ];
 }
 
@@ -217,7 +204,9 @@ export function Layout({children}: {children?: React.ReactNode}) {
   // applying once we are on the client.
   useEffect(() => {
     document
-      .querySelectorAll<HTMLLinkElement>('link[media="print"][rel="stylesheet"]')
+      .querySelectorAll<HTMLLinkElement>(
+        'link[media="print"][rel="stylesheet"]',
+      )
       .forEach((link) => {
         if (link.href.startsWith('https://fonts.googleapis.com/')) {
           link.media = 'all';
@@ -228,8 +217,8 @@ export function Layout({children}: {children?: React.ReactNode}) {
   // the deepest matched route's meta() replaces its parents', so a root-level
   // meta tag would vanish on every page that defines its own. Optional-chained
   // because Layout also renders the error boundary, where there is no data.
-  const googleSiteVerification = useRouteLoaderData<RootLoader>('root')
-    ?.googleSiteVerification;
+  const googleSiteVerification =
+    useRouteLoaderData<RootLoader>('root')?.googleSiteVerification;
 
   return (
     <html lang="en">
@@ -342,7 +331,10 @@ export function ErrorBoundary() {
         <a href="/" className="pel-error__btn">
           Back home
         </a>
-        <a href="/collections/all-products" className="pel-error__btn pel-error__btn--ghost">
+        <a
+          href="/collections/all-products"
+          className="pel-error__btn pel-error__btn--ghost"
+        >
           Shop all gear
         </a>
       </div>
