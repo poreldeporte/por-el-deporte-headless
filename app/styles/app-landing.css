@@ -27,7 +27,12 @@
   /* One shared column, so every section begins on the same x. Nine sections
      previously centred their own wrapper at their own width and started at
      seven different left edges, which is most of why the page read as
-     assembled rather than designed. */
+     assembled rather than designed.
+
+     It scales past 1180 on a large screen (see the min-width blocks at the
+     foot of this file): held at 1180, a 1860px window left ~680px of dead
+     cream and squeezed the split's heading column to 389px, which wrapped a
+     two-sentence display heading onto five lines. */
   --pel-app-col: 1180px;
   overflow-x: clip;
   background: var(--pel-cream);
@@ -115,9 +120,24 @@
    short measure, and it gives the eye a fixed left edge to return to. */
 .pel-app-split {
   display: grid;
-  grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+  /* The RIGHT column is sized to a readable measure and the heading takes
+     whatever is left, rather than both being fractions. Fractions meant the
+     heading column shrank with the viewport while the display type did not,
+     and the body column grew past a comfortable measure and then left its
+     surplus empty because the paragraph was capped anyway. This way the body
+     always sets at ~75 characters and every spare pixel goes to the heading,
+     which is the element that actually wants them. */
+  grid-template-columns: minmax(340px, 1fr) minmax(0, 600px);
   align-items: start;
-  column-gap: clamp(40px, 5vw, 100px);
+  column-gap: clamp(40px, 4vw, 88px);
+}
+
+/* Sized to the column it sits in rather than to the viewport. A split heading
+   has roughly 40% of the page to work with, so it sets smaller than a
+   full-width one — which is also the right hierarchy, since the hero's H1 is
+   the only heading that should feel like a masthead. */
+.pel-app-split > .pel-app-h2 {
+  font-size: clamp(30px, 3vw, 54px);
 }
 
 .pel-app-split > .pel-app-h2 {
@@ -126,7 +146,7 @@
   top: 132px;
 }
 
-@media (max-width: 54em) {
+@media (max-width: 70em) {
   .pel-app-split {
     grid-template-columns: minmax(0, 1fr);
     row-gap: clamp(26px, 4vw, 40px);
@@ -135,6 +155,7 @@
   .pel-app-split > .pel-app-h2 {
     position: static;
     max-width: none;
+    font-size: clamp(28px, 5.2vw, 52px);
   }
 }
 
@@ -144,9 +165,9 @@
    arguments into four features. S8 reuses this verbatim so the two sections
    read as the matched pair they are. */
 .pel-app-leadlist {
-  /* The split column already sets the measure. */
+  /* Matches the split's body track, so the measure holds when it stacks too. */
   width: 100%;
-  max-width: 680px;
+  max-width: 600px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1022,7 +1043,11 @@ a.pel-app-hero__aside:hover {
    at 1180 it letterboxed to 3.34:1 and each column carried more air than
    type ("The teams" in a 590px cell). 980 keeps it a sheet. */
 .pel-app-trade__sheet {
-  width: min(100%, 980px);
+  /* Scales with the column rather than stopping at 980: on a 1520px column
+     that left 540px of bare cream beside the page's key visual. The rule
+     pitch grows with it at the wide breakpoints so the sheet does not simply
+     get more letterboxed. */
+  width: min(100%, 1180px);
   /* Left-aligned ON THE PAGE'S AXIS, not on the section's gutter. The sheet is
      a direct child of the section, so plain `margin-inline: 0` would start it
      at x=48 while its own heading — which sits inside the centred column —
@@ -1053,7 +1078,7 @@ a.pel-app-hero__aside:hover {
 }
 
 .pel-app-trade .pel-app-lead {
-  max-width: 54ch;
+  max-width: 600px;
   margin-top: 0;
 }
 
@@ -2669,5 +2694,33 @@ a.pel-app-hero__aside:hover {
   .pel-week__meter-cell::before,
   .pel-app-form__submit button {
     transition: none !important;
+  }
+}
+
+/* ── Large screens ──────────────────────────────────────────────────────────
+   The page was built against 1440 and capped its column at 1180, which is
+   right there and increasingly wrong above it. These two steps are the only
+   thing that changes: every section shares the column, so widening it widens
+   all of them together and the single left axis is preserved. */
+@media (min-width: 1500px) {
+  .pel-app-page {
+    --pel-app-col: 1360px;
+  }
+
+  /* A wider sheet needs deeper rules, or the entries swim in their cells. */
+  .pel-app-trade {
+    --tr-rule-h: 42px;
+    --tr-item: 20px;
+  }
+}
+
+@media (min-width: 1760px) {
+  .pel-app-page {
+    --pel-app-col: 1520px;
+  }
+
+  .pel-app-trade {
+    --tr-rule-h: 46px;
+    --tr-item: 21px;
   }
 }
