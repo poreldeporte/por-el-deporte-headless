@@ -84,7 +84,14 @@ export function MetaPixel({pixelId}: {pixelId?: string}) {
       const f = window;
       if (!f.fbq) {
         const n: any = function (...args: unknown[]) {
-          n.callMethod ? n.callMethod.apply(n, args) : n.queue!.push(args);
+          // Meta ships this line as a ternary-as-statement using .apply().
+          // Same behaviour, written so it passes the repo's lint:
+          // n.callMethod(...args) binds `this` to n exactly as .apply(n, …) did.
+          if (n.callMethod) {
+            n.callMethod(...args);
+          } else {
+            n.queue!.push(args);
+          }
         };
         n.push = n;
         n.loaded = true;
@@ -114,7 +121,9 @@ export function MetaPixel({pixelId}: {pixelId?: string}) {
       if (!product) return;
       track('ViewContent', {
         content_type: 'product',
-        content_ids: [numericId(product.variantId) ?? numericId(product.id)].filter(Boolean),
+        content_ids: [
+          numericId(product.variantId) ?? numericId(product.id),
+        ].filter(Boolean),
         content_name: product.title,
         value: Number(product.price) || undefined,
         currency: product.currency ?? payload?.shop?.currency,
@@ -127,7 +136,8 @@ export function MetaPixel({pixelId}: {pixelId?: string}) {
       // not the whole cart, which would inflate AddToCart value on every add.
       const line: CartLineish | undefined = payload?.currentLine;
       const id =
-        numericId(line?.merchandise?.id) ?? numericId(line?.merchandise?.product?.id);
+        numericId(line?.merchandise?.id) ??
+        numericId(line?.merchandise?.product?.id);
       if (!id) return;
       track('AddToCart', {
         content_type: 'product',
