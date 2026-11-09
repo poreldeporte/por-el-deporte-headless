@@ -19,7 +19,7 @@ export const meta: Route.MetaFunction = () => [
   {
     name: 'description',
     content:
-      'Home in orange. Away in black. Preorder your Por El Deporte club jersey, with optional shorts and your own name and number during launch week.',
+      'Our official jersey, released every two years. Made with love for the community. Personalize yours only during the first 7 days of the preorder.',
   },
   // Keep the launch out of search until the merchant approves publication.
   {name: 'robots', content: 'noindex, nofollow'},

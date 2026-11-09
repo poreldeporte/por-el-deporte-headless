@@ -195,7 +195,7 @@ export function JerseyPage({
 
         <div className="jersey-buy">
           <p className="jersey-eyebrow">
-            <span className="jersey-dot" /> THE NEW CLUB KIT · PREORDER
+            <span className="jersey-dot" /> THE OFFICIAL CLUB JERSEY · PREORDER
           </p>
           <h1>
             For the{' '}
@@ -203,8 +203,8 @@ export function JerseyPage({
             club.
           </h1>
           <p className="jersey-intro">
-            From the first whistle to whatever comes after. The new Por El
-            Deporte jersey, made yours.
+            Our official jersey. A new release every two years, made with love
+            for the community that keeps us playing.
           </p>
           <div className="jersey-price" aria-live="polite">
             {price ? <Money data={price} /> : <span>Select your kit</span>}
@@ -306,7 +306,7 @@ export function JerseyPage({
             <div className="jersey-personalization">
               <p className="jersey-personalization-tag">
                 {canPersonalize
-                  ? 'LAUNCH WEEK EXCLUSIVE'
+                  ? 'YOUR ONLY CHANCE TO CUSTOMIZE'
                   : window.status === 'closed'
                     ? 'PERSONALIZATION CLOSED'
                     : 'COMING AT LAUNCH'}
@@ -314,12 +314,12 @@ export function JerseyPage({
               <h2>Your name. Your number.</h2>
               <p>
                 {preview
-                  ? 'Make it yours during the first 7 days of the preorder. The window starts when we launch.'
+                  ? 'Your only chance to add your own name and number to this release. Personalization opens at launch and closes 7 days later.'
                   : canPersonalize
-                    ? `Personalization closes ${closes}.`
+                    ? `This is the only personalization window for this release. Add your name and number before ${closes}.`
                     : window.status === 'closed'
-                      ? 'The 7-day window has ended. You can still preorder a jersey without personalization.'
-                      : 'Name + number personalization will be available for the first 7 days of the preorder.'}
+                      ? 'Personalization for this release has ended. You can still preorder a jersey without personalization.'
+                      : 'This release can only be personalized during the first 7 days of the preorder.'}
               </p>
               {canPersonalize && (
                 <>
@@ -436,7 +436,7 @@ export function JerseyPage({
               'Shipping date to be confirmed.'}
           </p>
           <p className="jersey-community-note">
-            Every order helps pay for the next match.
+            Every order goes back into the community.
           </p>
         </div>
       </section>
@@ -458,15 +458,23 @@ export function JerseyPage({
         <div>
           <p className="jersey-eyebrow">EST. 2014 · KEY BISCAYNE</p>
           <h2>
-            Same club.
+            Made with{' '}
             <br />
-            New colors.
+            love.
           </h2>
-          <p>Home in orange. Away in black. Always Por El Deporte.</p>
           <p>
-            Built around the people who show up, week after week. Pick your
-            side, add the shorts, and put your name on it. We&rsquo;ll see you
-            on the pitch.
+            Every two years, we release a new official Por El Deporte jersey.
+            Made with love for the people who show up, share the field, and
+            keep this community playing.
+          </p>
+          <p>
+            Home in orange. Away in black. Add your own name and number and
+            stand out on the field. The first seven days of the preorder are
+            your only chance to personalize this release.
+          </p>
+          <p>
+            Every order goes back into the community, helping pay for pitch
+            time, equipment, and the next match.
           </p>
         </div>
       </section>
@@ -484,9 +492,10 @@ export function JerseyPage({
           <details>
             <summary>Can I add my own name and number?</summary>
             <p>
-              Yes, during the first 7 days after launch. Personalization is
-              optional. Enter a name of up to {NAME_LIMIT} characters and a
-              number from 0 to 99. Your name prints in uppercase.
+              Yes. The first 7 days of the preorder are the only chance to
+              personalize this release. Personalization is optional. Enter a
+              name of up to {NAME_LIMIT} characters and a number from 0 to 99.
+              Your name prints in uppercase.
             </p>
           </details>
           <details>
