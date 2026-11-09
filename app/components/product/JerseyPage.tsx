@@ -435,9 +435,6 @@ export function JerseyPage({
             {product?.shippingEstimate?.value ||
               'Shipping date to be confirmed.'}
           </p>
-          <p className="jersey-community-note">
-            Every order goes back into the community.
-          </p>
         </div>
       </section>
 
@@ -471,10 +468,6 @@ export function JerseyPage({
             Home in orange. Away in black. Add your own name and number and
             stand out on the field. The first seven days of the preorder are
             your only chance to personalize this release.
-          </p>
-          <p>
-            Every order goes back into the community, helping pay for pitch
-            time, equipment, and the next match.
           </p>
         </div>
       </section>
