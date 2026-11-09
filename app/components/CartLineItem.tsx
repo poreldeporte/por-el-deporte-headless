@@ -85,6 +85,9 @@ export function CartLineItem({
                   {option.name}: {option.value}
                 </li>
               ))}
+            {line.attributes
+              ?.filter(({key}) => ['Order type', 'Name on back', 'Number on back'].includes(key))
+              .map(({key, value}) => <li key={key}>{key}: {value}</li>)}
           </ul>
           <CartLineQuantity line={line} />
         </div>
