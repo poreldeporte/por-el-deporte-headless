@@ -21,7 +21,7 @@ export const meta: Route.MetaFunction = () => [
   {
     name: 'description',
     content:
-      'Our official jersey, released every two years. Made with love for the community. Personalize yours only during the first 7 days of the preorder.',
+      'The official Por El Deporte jersey. Released once every two years, with just seven days to make it yours. Home in orange. Away in black.',
   },
   // Keep the launch out of search until the merchant approves publication.
   {name: 'robots', content: 'noindex, nofollow'},

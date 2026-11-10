@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
 import type {JerseyPreorderQuery} from 'storefrontapi.generated';
@@ -12,6 +12,7 @@ import {
   NAME_LIMIT,
   matchesJerseyVariant,
   personalizationWindow,
+  validateJerseySelection,
 } from '~/lib/jersey';
 import {JerseyArtwork} from './JerseyArtwork';
 
@@ -36,7 +37,8 @@ export function JerseyPage({
   );
   const [now, setNow] = useState(serverNow);
   const fetcher = useFetcher<typeof action>();
-  const {open} = useAside();
+  const feedbackRef = useRef<HTMLDivElement>(null);
+  const {open, type: asideType} = useAside();
   const window = personalizationWindow(product?.startsAt?.value, now);
   const canPersonalize = preview || window.status === 'open';
   const canOrder = preview || ['open', 'closed'].includes(window.status);
@@ -95,6 +97,24 @@ export function JerseyPage({
   const away = color === JERSEY_COLORS[1];
   const busy = fetcher.state !== 'idle';
   const available = preview || Boolean(variant?.availableForSale);
+  const submitDisabled = busy || !canOrder || (hasSizes && !available);
+  const submitLabel = busy
+    ? 'One moment…'
+    : !canOrder
+      ? 'Preorders open soon'
+      : hasSizes && !available
+        ? 'Combination unavailable'
+        : preview
+          ? 'Review your preorder'
+          : 'Preorder your jersey';
+  const readyToSubmit = !validateJerseySelection(
+    {
+      ...selection,
+      name: name.trim().normalize('NFC').toUpperCase(),
+      number: number.trim(),
+    },
+    canPersonalize,
+  );
   const image =
     priceVariant?.image ??
     product?.images.nodes.find((item) => item.altText?.includes(color));
@@ -124,7 +144,11 @@ export function JerseyPage({
   }, [serverNow, preview, product?.startsAt?.value]);
 
   useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data?.added) open('cart');
+    if (fetcher.state !== 'idle') return;
+    if (fetcher.data?.added) open('cart');
+    else if (fetcher.data?.error || fetcher.data?.preview) {
+      feedbackRef.current?.scrollIntoView({block: 'center'});
+    }
   }, [fetcher.state, fetcher.data, open]);
 
   function changeColor(value: string) {
@@ -150,7 +174,7 @@ export function JerseyPage({
         ]}
       />
       <section className="pel-pdp__main" aria-label="The Club Jersey preorder">
-        <div className="pel-pdp__gallery">
+        <div className="pel-pdp__gallery jersey-gallery">
           <div
             className={`pel-pdp__stage jersey-stage${showingPhoto ? ' jersey-stage--photo' : ''}`}
           >
@@ -270,10 +294,10 @@ export function JerseyPage({
 
         <div className="pel-pdp__stats" aria-label="Release details">
           {[
-            {value: '2 YRS', label: 'Between releases'},
-            {value: '7 DAYS', label: 'Custom at launch'},
-            {value: 'M–XXL', label: 'Size range'},
+            {value: 'Official', label: 'Club jersey'},
             {value: '2014', label: 'Est. Key Biscayne'},
+            {value: 'Preorder', label: 'Reserve your kit'},
+            {value: 'Yours', label: 'Name + number at launch'},
           ].map(({value, label}) => (
             <div key={label} className="pel-pdp__stat">
               <div
@@ -296,8 +320,8 @@ export function JerseyPage({
             {product?.title || 'The Club Jersey'}
           </h1>
           <p className="pel-pdp__lead">
-            Our official jersey. A new release every two years, made with love
-            for the community that keeps us playing.
+            The official Por El Deporte jersey. Released once every two years,
+            with just seven days to make it yours.
           </p>
           <div className="pel-pdp__price" aria-live="polite">
             {price ? <Money data={price} /> : <span>Select your kit</span>}
@@ -307,6 +331,7 @@ export function JerseyPage({
           </div>
 
           <fetcher.Form
+            id="jersey-preorder-form"
             method="post"
             action="/products/club-jersey"
             className="jersey-form"
@@ -358,6 +383,110 @@ export function JerseyPage({
                 ))}
               </div>
             </fieldset>
+
+            <div className="pel-pdp__card jersey-personalization">
+              <p className="jersey-personalization-tag">
+                {canPersonalize
+                  ? 'YOUR ONLY CHANCE TO CUSTOMIZE'
+                  : window.status === 'closed'
+                    ? 'PERSONALIZATION CLOSED'
+                    : 'COMING AT LAUNCH'}
+              </p>
+              <h2 className="pel-pdp__card-title">Your name. Your number.</h2>
+              <p className="jersey-personalization-copy">
+                {preview
+                  ? 'Your only chance to add your own name and number to this release. Personalization opens at launch and closes 7 days later.'
+                  : canPersonalize
+                    ? `This is the only personalization window for this release. Add your name and number before ${closes}.`
+                    : window.status === 'closed'
+                      ? 'Personalization for this release has ended. You can still preorder a jersey without personalization.'
+                      : 'This release can only be personalized during the first 7 days of the preorder.'}
+              </p>
+              {canPersonalize && (
+                <>
+                  <label className="jersey-personalize-toggle">
+                    <input
+                      type="checkbox"
+                      name="personalize"
+                      checked={personalize}
+                      onChange={(event) => setPersonalize(event.target.checked)}
+                    />
+                    Add my name & number
+                  </label>
+                  {personalize && (
+                    <div
+                      className="jersey-print-layout"
+                      onFocusCapture={(event) => {
+                        if (
+                          globalThis.matchMedia('(max-width: 60em)').matches
+                        ) {
+                          event.currentTarget.scrollIntoView({block: 'center'});
+                        }
+                      }}
+                    >
+                      <div className="jersey-mobile-preview">
+                        <JerseyArtwork
+                          away={away}
+                          back
+                          shorts={false}
+                          personalize
+                          name={name.toUpperCase()}
+                          number={number}
+                        />
+                        <p>Back preview · illustration</p>
+                      </div>
+                      <div className="jersey-print-fields">
+                        <label htmlFor="jersey-name">
+                          Name on back{' '}
+                          <span>Up to {NAME_LIMIT} characters</span>
+                          <input
+                            id="jersey-name"
+                            name="name"
+                            autoComplete="off"
+                            maxLength={NAME_LIMIT}
+                            value={name}
+                            onChange={(event) => {
+                              setName(event.target.value);
+                              setView('back');
+                            }}
+                            placeholder="YOUR NAME"
+                            required
+                            pattern="[\p{L}\p{M} .’'\-]+"
+                            aria-describedby="jersey-print-note"
+                          />
+                        </label>
+                        <label htmlFor="jersey-number">
+                          Number <span>0–99</span>
+                          <input
+                            id="jersey-number"
+                            name="number"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="off"
+                            maxLength={2}
+                            pattern="[0-9]{1,2}"
+                            value={number}
+                            onChange={(event) => {
+                              setNumber(event.target.value);
+                              setView('back');
+                            }}
+                            placeholder="10"
+                            required
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                  {personalize && (
+                    <p id="jersey-print-note" className="jersey-print-note">
+                      Names print in uppercase. Double-check spelling and number
+                      before ordering.
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+
             <section
               className="pel-pdp__card jersey-shorts"
               aria-labelledby="jersey-shorts-heading"
@@ -411,86 +540,6 @@ export function JerseyPage({
               )}
             </section>
 
-            <div className="pel-pdp__card jersey-personalization">
-              <p className="jersey-personalization-tag">
-                {canPersonalize
-                  ? 'YOUR ONLY CHANCE TO CUSTOMIZE'
-                  : window.status === 'closed'
-                    ? 'PERSONALIZATION CLOSED'
-                    : 'COMING AT LAUNCH'}
-              </p>
-              <h2 className="pel-pdp__card-title">Your name. Your number.</h2>
-              <p className="jersey-personalization-copy">
-                {preview
-                  ? 'Your only chance to add your own name and number to this release. Personalization opens at launch and closes 7 days later.'
-                  : canPersonalize
-                    ? `This is the only personalization window for this release. Add your name and number before ${closes}.`
-                    : window.status === 'closed'
-                      ? 'Personalization for this release has ended. You can still preorder a jersey without personalization.'
-                      : 'This release can only be personalized during the first 7 days of the preorder.'}
-              </p>
-              {canPersonalize && (
-                <>
-                  <label className="jersey-personalize-toggle">
-                    <input
-                      type="checkbox"
-                      name="personalize"
-                      checked={personalize}
-                      onChange={(event) => setPersonalize(event.target.checked)}
-                    />
-                    Add my name & number
-                  </label>
-                  {personalize && (
-                    <div className="jersey-print-fields">
-                      <label htmlFor="jersey-name">
-                        Name on back <span>Up to {NAME_LIMIT} characters</span>
-                        <input
-                          id="jersey-name"
-                          name="name"
-                          autoComplete="off"
-                          maxLength={NAME_LIMIT}
-                          value={name}
-                          onChange={(event) => {
-                            setName(event.target.value);
-                            setView('back');
-                          }}
-                          placeholder="YOUR NAME"
-                          required
-                          pattern="[\p{L}\p{M} .’'\-]+"
-                          aria-describedby="jersey-print-note"
-                        />
-                      </label>
-                      <label htmlFor="jersey-number">
-                        Number <span>0–99</span>
-                        <input
-                          id="jersey-number"
-                          name="number"
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="off"
-                          maxLength={2}
-                          pattern="[0-9]{1,2}"
-                          value={number}
-                          onChange={(event) => {
-                            setNumber(event.target.value);
-                            setView('back');
-                          }}
-                          placeholder="10"
-                          required
-                        />
-                      </label>
-                    </div>
-                  )}
-                  {personalize && (
-                    <p id="jersey-print-note" className="jersey-print-note">
-                      Names print in uppercase. Double-check spelling and number
-                      before ordering.
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
-
             <p className="jersey-order-summary">
               {away ? 'Away · Black' : 'Home · Orange'} / Jersey{' '}
               {size || '— choose a size'} /{' '}
@@ -500,48 +549,41 @@ export function JerseyPage({
             </p>
             <button
               type="submit"
-              className="pel-pdp__cta jersey-submit"
-              disabled={busy || !canOrder || (hasSizes && !available)}
+              className="pel-pdp__cta jersey-submit jersey-submit--main"
+              disabled={submitDisabled}
             >
-              <span>
-                {busy
-                  ? 'One moment…'
-                  : !canOrder
-                    ? 'Preorders open soon'
-                    : hasSizes && !available
-                      ? 'Combination unavailable'
-                      : preview
-                        ? 'Review your preorder'
-                        : 'Preorder your jersey'}
-              </span>
+              <span>{submitLabel}</span>
               {price && <Money data={price} as="span" />}
               <span aria-hidden="true">↗</span>
             </button>
-            {fetcher.data?.error && (
-              <p className="jersey-error" role="alert">
-                {fetcher.data.error}
-              </p>
-            )}
-            {fetcher.data?.preview && (
-              <div className="jersey-review-summary" role="status">
-                <strong>Your preorder preview</strong>
-                <p>
-                  {fetcher.data.preview.color} · Jersey{' '}
-                  {fetcher.data.preview.size} ·{' '}
-                  {fetcher.data.preview.shortsSize === 'None'
-                    ? 'No shorts'
-                    : `Shorts ${fetcher.data.preview.shortsSize}`}
+            <div ref={feedbackRef}>
+              {fetcher.data?.error && (
+                <p className="jersey-error" role="alert">
+                  {fetcher.data.error}
                 </p>
-                <p>
-                  {fetcher.data.preview.personalize
-                    ? `Back: ${fetcher.data.preview.name} / ${fetcher.data.preview.number}`
-                    : 'Without personalization'}
-                </p>
-                <small>
-                  Preview only. No item added to your cart and no order placed.
-                </small>
-              </div>
-            )}
+              )}
+              {fetcher.data?.preview && (
+                <div className="jersey-review-summary" role="status">
+                  <strong>Your preorder preview</strong>
+                  <p>
+                    {fetcher.data.preview.color} · Jersey{' '}
+                    {fetcher.data.preview.size} ·{' '}
+                    {fetcher.data.preview.shortsSize === 'None'
+                      ? 'No shorts'
+                      : `Shorts ${fetcher.data.preview.shortsSize}`}
+                  </p>
+                  <p>
+                    {fetcher.data.preview.personalize
+                      ? `Back: ${fetcher.data.preview.name} / ${fetcher.data.preview.number}`
+                      : 'Without personalization'}
+                  </p>
+                  <small>
+                    Preview only. No item added to your cart and no order
+                    placed.
+                  </small>
+                </div>
+              )}
+            </div>
           </fetcher.Form>
           <p className="jersey-shipping">
             <span aria-hidden="true">◷</span> Preorder ·{' '}
@@ -556,14 +598,16 @@ export function JerseyPage({
           <h2 className="pel-pdp__card-title">The Story</h2>
           <div className="pel-pdp__card-body">
             <p>
-              Every two years, we release a new official Por El Deporte jersey.
-              Made with love for the people who show up, share the field, and
-              keep this community playing.
+              The games brought us together. The people made it a club. Since
+              2014, Por El Deporte has grown around a shared love of playing.
+              This is our official jersey, made with love for that community in
+              Key Biscayne and beyond.
             </p>
             <p>
-              Home in orange. Away in black. Add your own name and number and
-              stand out on the field. The first seven days of the preorder are
-              your only chance to personalize this release.
+              We release a new design every two years: home in orange, away in
+              black. For the first seven days of this preorder, you can put your
+              own name and number on the back. It&rsquo;s the only chance to
+              personalize this release. Step onto the field in yours.
             </p>
           </div>
           <div className="pel-pdp__card-foot">Est. 2014 · Key Biscayne</div>
@@ -604,6 +648,38 @@ export function JerseyPage({
           </p>
         </div>
       </section>
+      {asideType === 'closed' && (
+        <section className="jersey-mobile-bar" aria-label="Jersey preorder">
+          <div className="jersey-mobile-total" aria-live="polite">
+            {price && <Money data={price} as="span" />}
+            <span>
+              {size ? `Jersey ${size}` : 'Choose jersey size'}
+              {withShorts
+                ? shortsSize
+                  ? ` · Shorts ${shortsSize}`
+                  : ' · Choose shorts size'
+                : ''}
+            </span>
+          </div>
+          <button
+            type="submit"
+            form="jersey-preorder-form"
+            className="pel-pdp__cta jersey-submit"
+            disabled={submitDisabled}
+            onClick={(event) => {
+              const form = event.currentTarget.form;
+              if (form && !readyToSubmit && !form.reportValidity()) {
+                event.preventDefault();
+                form
+                  .querySelector<HTMLInputElement>('input:invalid')
+                  ?.scrollIntoView({block: 'center'});
+              }
+            }}
+          >
+            {!submitDisabled && !readyToSubmit ? 'Choose options' : submitLabel}
+          </button>
+        </section>
+      )}
     </div>
   );
 }

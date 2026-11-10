@@ -7,6 +7,16 @@ The jersey uses the existing PDP layout and stylesheet: product title and price,
 gallery thumbnails, release facts, swatches, size pills, and detail cards.
 Jersey-specific styles cover the preorder and personalization additions.
 
+The buying flow is color → jersey size → personalization → optional shorts.
+The desktop gallery stays visible during customization; mobile shows a back
+illustration in the personalization section and a fixed total/purchase bar.
+Both purchase buttons submit the same form with native required-field checks
+and the same server validation. The mobile bar hides while the cart is open.
+Size guides are intentionally excluded. Official photography and confirmed
+print font/placement remain pending; illustrations are labeled as previews.
+The four facts highlight the official club jersey, establishment in Key Biscayne
+in 2014, preorder availability, and launch-week name/number personalization.
+
 With no Shopify product, local development renders a clearly labeled preview
 using the supplied reference photos and illustrative front/back artwork. The
 review button validates the selection and displays a summary without mutating a
