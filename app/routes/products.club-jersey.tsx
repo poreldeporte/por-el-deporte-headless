@@ -4,8 +4,8 @@ import {JerseyPage} from '~/components/product/JerseyPage';
 import {
   JERSEY_HANDLE,
   JERSEY_TITLE,
-  jerseyAttributes,
-  matchesJerseyVariant,
+  PED_SOCKS_HANDLE,
+  jerseyCartLines,
   personalizationWindow,
   readJerseySelection,
   validateJerseySelection,
@@ -37,22 +37,22 @@ export const headers: HeadersFunction = ({actionHeaders, loaderHeaders}) => {
 };
 
 export async function loader({context}: Route.LoaderArgs) {
-  const {product} = await context.storefront.query(JERSEY_QUERY, {
-    variables: {handle: JERSEY_HANDLE},
+  const {product, socks} = await context.storefront.query(JERSEY_QUERY, {
+    variables: {handle: JERSEY_HANDLE, socksHandle: PED_SOCKS_HANDLE},
     cache: context.storefront.CacheNone(),
   });
   const preview = import.meta.env.DEV && !product;
   if (!product && !preview) throw new Response(null, {status: 404});
   return data(
-    {product, preview, now: Date.now()},
+    {product, socks, preview, now: Date.now()},
     {headers: {'Cache-Control': 'no-store'}},
   );
 }
 
 export async function action({request, context}: Route.ActionArgs) {
   const selection = readJerseySelection(await request.formData());
-  const {product} = await context.storefront.query(JERSEY_QUERY, {
-    variables: {handle: JERSEY_HANDLE},
+  const {product, socks} = await context.storefront.query(JERSEY_QUERY, {
+    variables: {handle: JERSEY_HANDLE, socksHandle: PED_SOCKS_HANDLE},
     cache: context.storefront.CacheNone(),
   });
   const preview = import.meta.env.DEV && !product;
@@ -69,26 +69,17 @@ export async function action({request, context}: Route.ActionArgs) {
       {status: 400},
     );
   }
-  const variant = product.variants.nodes.find((item) =>
-    matchesJerseyVariant(item.selectedOptions, selection),
+  const order = jerseyCartLines(
+    selection,
+    product.variants.nodes,
+    socks?.variants.nodes ?? [],
   );
-  if (!variant?.availableForSale) {
+  if (order.error)
     return data(
-      {
-        error: 'This combination is unavailable. Please choose another.',
-        preview: null,
-        added: false,
-      },
+      {error: order.error, preview: null, added: false},
       {status: 400},
     );
-  }
-  const result = await context.cart.addLines([
-    {
-      merchandiseId: variant.id,
-      quantity: 1,
-      attributes: jerseyAttributes(selection),
-    },
-  ]);
+  const result = await context.cart.addLines(order.lines);
   const headers = result.cart
     ? context.cart.setCartId(result.cart.id)
     : new Headers();
@@ -114,7 +105,7 @@ export default function Jersey() {
 }
 
 const JERSEY_QUERY = `#graphql
-  query JerseyPreorder($handle: String!, $country: CountryCode, $language: LanguageCode)
+  query JerseyPreorder($handle: String!, $socksHandle: String!, $country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       id
@@ -123,7 +114,7 @@ const JERSEY_QUERY = `#graphql
       startsAt: metafield(namespace: "preorder", key: "starts_at") { value }
       shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }
       images(first: 10) { nodes { id url altText width height } }
-      variants(first: 100) {
+      variants(first: 250) {
         nodes {
           id
           title
@@ -131,6 +122,19 @@ const JERSEY_QUERY = `#graphql
           selectedOptions { name value }
           price { amount currencyCode }
           image { id url altText width height }
+        }
+      }
+    }
+    socks: product(handle: $socksHandle) {
+      id
+      title
+      options { name values }
+      variants(first: 250) {
+        nodes {
+          id
+          availableForSale
+          selectedOptions { name value }
+          price { amount currencyCode }
         }
       }
     }

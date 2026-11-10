@@ -1,175 +1,173 @@
 # Club jersey preorder
 
-Review route: `/products/club-jersey`. This branch is for review; it has not been
-deployed. The existing product pages are unchanged.
+Review route: `/products/club-jersey`. This task branch is local review work.
+No Shopify catalog import, publication, deployment, or production cart write
+has been performed. Keep the release unpublished until merchant approval.
 
-The jersey uses the existing PDP layout and stylesheet: product title and price,
-gallery thumbnails, release facts, swatches, size pills, and detail cards.
-Jersey-specific styles cover the preorder and personalization additions.
+## Buying experience
 
-The buying flow is color → jersey size → personalization → optional shorts.
-Personalization starts enabled with a “Personalize my jersey” switch and
-full-width name/number fields. Turning it off hides the fields and orders a
-plain back; turning it back on preserves the entered text. Shorts use an
-Add/Remove button beside a labeled illustration, the $15 difference, and the
-full kit price, with a separate size selector after adding. These controls keep
-the existing server form values (`personalize=on` and `addShorts=on`).
+The page keeps the existing gallery, four release facts, brand fonts/colors,
+header/footer, size pills, and product detail cards. The buying column follows:
 
-Both option sections explicitly own their padding, overriding the generic
-section padding in `reset.css`. The gap from the print note to the shorts
-divider is 24px on desktop and mobile, without extra bottom padding.
-The desktop gallery stays visible during customization; mobile offers a
-collapsible back preview and a fixed total/purchase bar.
-On mobile, the title, price, and included-personalization offer come before the
-gallery, followed by buying options and then release facts. Both purchase
-buttons name the next required choice until the selection is complete. The
-summary shows both sizes and the exact name/number before submission, beside
-the preorder shipping notice.
-Both purchase buttons submit the same form with native required-field checks
-and the same server validation. The mobile bar hides while the cart is open.
-The mobile purchase bar is 80px plus the device safe area, with scroll padding
-that keeps fields and shipping details clear of the header and purchase bar.
-These refinements preserve the existing layout, fact cards, swatches, brand
-fonts, colors, and shared product stylesheet.
-Size guides are intentionally excluded. Official photography and confirmed
-print font/placement remain pending; illustrations are labeled as previews.
-The four facts highlight the official club jersey, establishment in Key Biscayne
-in 2014, preorder availability, and launch-week name/number personalization.
+1. One jersey or two jerseys, with the bundle price and saving visible first.
+2. Home/orange or away/black, then short or long sleeves for each jersey.
+3. Optional matching shorts, then jersey size and independent shorts size.
+4. Optional included name/number during launch week.
+5. Optional black/white PED socks, then the purchase button and shipping note.
 
-With no Shopify product, local development renders a clearly labeled preview
-using the supplied reference photos and illustrative front/back artwork. The
-review button validates the selection and displays a summary without mutating a
-cart. Production returns 404 until the real product exists. Reference photos
-are only shown in development; replace them with approved official photography
-before launch.
+The two-jersey offer mixes any two **different** styles, including short and
+long sleeves of the same color. It is one player's bundle: the jersey size and
+personalization apply to both jerseys. With shorts, it includes two matching
+pairs in one separately selected shorts size. Duplicate styles are excluded;
+changing color selects the other sleeve when necessary to keep the styles
+different. In the single-jersey flow, changing color/sleeves recommends the
+opposite color in the same sleeves for the bundle. Switching between one and
+two jerseys otherwise preserves the chosen second style.
 
-For local review, run `npm run dev -- --port 3017` in the task worktree and open
-`http://localhost:3017/products/club-jersey`. Focused tests run on Node 24 with
-`node --test tests/jersey.mjs`; the normal lint, typecheck, and build commands
-also apply. Preview submissions leave the Shopify cart empty.
+Short sleeves are $70 USD; long sleeves are $80 USD. The merchant authorized
+choosing long-sleeve and bundle pricing for review. Two jerseys save $20:
 
-## Shopify product setup
+| Jerseys              | Without shorts | With matching shorts |
+| -------------------- | -------------: | -------------------: |
+| One short sleeve     |            $70 |                  $85 |
+| One long sleeve      |            $80 |                  $95 |
+| Two short sleeves    |           $120 |                 $150 |
+| One short + one long |           $130 |                 $160 |
+| Two long sleeves     |           $140 |                 $170 |
 
-The prepared [draft catalog CSV](./club-jersey-draft.csv) contains one product
-and all 40 variants. It has not been imported into Shopify. It uses the current
-[Shopify product CSV columns](https://help.shopify.com/en/manual/products/import-export/using-csv),
-with `Status: draft` and `Published on online store: false` on every row. It
-omits images and the launch metafield, so importing it does not start the
-personalization window. The catalog description and PDP story share the same
-copy in `app/lib/jersey.ts`.
+Shorts are a $35-per-pair value, offered for $15 per jersey. The two-jersey
+upgrade adds two pairs for $30, saving $40 on shorts. The jersey bundle saving
+and shorts saving refer to separate comparisons. The price at the title and
+purchase button always includes the selected extras. There is no receipt-style
+summary above the button; the cart owns order review. Required sizes start
+unselected, and changing jersey size never changes shorts size. Removing and
+readding an extra preserves its size.
 
-Regenerate it from the reviewed choices and prices on Node 24:
+The personalization switch starts on. Turning it off hides print fields while
+preserving entered text. A mobile back preview shows the selected color/sleeves,
+and the fixed mobile purchase bar uses the same total/form as desktop. Both
+buttons use native required-field checks and server validation. The bar hides
+while the cart is open. Option sections explicitly own their padding to avoid
+the generic section padding in `reset.css`; the print-to-next-divider gap is
+24px. No size guide has been added.
+
+Shorts and socks use photo placeholders until official images arrive. Jersey
+front/back drawings distinguish long and short sleeves and remain labeled as
+illustrations. Supplied reference photos are development-only.
+
+PED socks use direct **No socks / Black / White** choices, with no extra Add
+step. Socks price and sizes are still unconfirmed, and no published `ped-socks`
+product was found. Unconfigured colors are disabled in the preview, keeping
+the jersey total usable. No free or guessed sock price is charged. Once the
+product exists, the UI uses its actual color/size variants and prices; socks
+resolve to a separate line in the same cart mutation. Unknown/out-of-stock
+combinations fail before the cart write. Size choices are shown only if needed.
+
+## Local review and verification
+
+Run `npm run dev -- --port 3017` in the task worktree and open
+`http://localhost:3017/products/club-jersey`. With no Shopify jersey product,
+development shows a marked design preview. Submitting validates the selection
+and shows a preview without changing a cart. Production returns 404 until the
+real jersey product exists. The route remains `noindex, nofollow`.
+
+Focused domain checks: `node --test tests/jersey.mjs` on Node 24. They cover the
+exact seven-day deadline, print normalization/validation, all 200 SKU choices,
+mixed-sleeve bundle prices, independent sizing, actual-price quotes, currency
+mismatches, sock resolution, and rejection before cart mutation. Normal lint,
+typecheck, and build commands also apply. Browser review covers desktop/mobile
+choice changes, form validation, illustrated sleeves, and preview submission.
+
+## Shopify catalog setup
+
+The prepared [draft CSV](./club-jersey-draft.csv) contains one product and all
+200 variants: four single styles plus six two-style combinations, four jersey
+sizes, and five shorts choices. It has not been imported. Regenerate it on
+Node 24 with:
 
 ```sh
 node scripts/jersey-catalog.mjs > docs/club-jersey-draft.csv
 ```
 
-The generator writes only to stdout; it has no Shopify connection. The CSV
-sets fulfillment to manual, tracked inventory to zero, and continue-selling
-enabled for preorders. Confirm the actual fulfillment location, shipping
-weights, and inventory policy before activation. No reference photos or
-illustrative mockups are included in the catalog.
+The generator writes only to stdout and never connects to Shopify. Description
+copy and price seeds live in `app/lib/jersey.ts`. It uses the current
+[Shopify CSV columns](https://help.shopify.com/en/manual/products/import-export/using-csv).
+Every row is draft and unpublished. Images and launch time are omitted, so the
+file does not start the personalization window. Inventory is tracked at zero
+with continue-selling enabled and manual fulfillment. Confirm location,
+shipping weights, and preorder inventory policy before activation.
 
-For the approved import, keep automatic publishing and overwriting matching
-products disabled. If `club-jersey` already exists, inspect it before importing;
-this file is for creating the new draft, not replacing an existing product.
-Verify Draft status and channel availability in Shopify after import. The
-CSV's online-store column does not manage Hydrogen channel publishing.
+Handle: `club-jersey`. Exact native option names:
 
-The product has handle `club-jersey` and these exact option names/values:
+| Option      | Values                                                                                                                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Style       | `Home (Orange) / Short sleeve`, `Home (Orange) / Long sleeve`, `Away (Black) / Short sleeve`, `Away (Black) / Long sleeve`, or two of these joined by a plus sign with one space on either side, in that canonical order |
+| Size        | `M`, `L`, `XL`, `XXL`                                                                                                                                                                                                    |
+| Shorts size | `None`, `M`, `L`, `XL`, `XXL`                                                                                                                                                                                            |
 
-| Option      | Values                              |
-| ----------- | ----------------------------------- |
-| Color       | `Home (Orange)`, `Away (Black)`     |
-| Size        | `M`, `L`, `XL`, `XXL` (jersey size) |
-| Shorts size | `None`, `M`, `L`, `XL`, `XXL`       |
+Each offer is a real priced Shopify variant, so checkout needs no client-only
+discount or discount app. Style combines color/sleeves/contents while staying
+within Shopify's [three-option limit](https://help.shopify.com/en/manual/products/variants/add-variants).
+The route requests up to 250 variants to include all 200. Bundle inventory and
+fulfillment are owned by the bundle SKU; this does not install Shopify Bundles
+or synchronize component inventory. This release uses manual preorder
+fulfillment. Confirm that the supplier understands each Style and the two
+matching shorts pairs, including same-color bundles.
 
-The 40 variants cost **$70 USD** when `Shorts size` is `None`, or **$85 USD**
-when shorts are included. The Add shorts section shows the $15 difference and
-frames the shorts as an optional kit upgrade: a $35 USD value, added for $15,
-saving $20. The $35 reference value comes from the merchant and is defined in
-`JERSEY_SHORTS_VALUE`; it does not create a standalone shorts product or change
-the price charged at checkout. Savings are derived from the actual kit/jersey
-price difference and shown only for a positive saving in the reference
-currency. The UI still shows the full $85 kit total and
-requires an independent shorts size when enabled. Shoppers can pair any jersey
-size with any shorts size. Adding shorts initially selects the chosen jersey
-size if no shorts size has been chosen. Subsequent jersey changes never
-overwrite the shorts size, and removing/readding shorts preserves its selection.
-Both sizes belong to the actual Shopify variant and
-appear as selected options in cart, checkout, and the order; shorts size is not
-just a fulfillment note. The UI reads real prices from Shopify once configured.
+After approval, import without automatic publishing or overwriting matching
+products. Inspect any existing `club-jersey` product before import. Verify draft
+status and channel availability afterward; the CSV online-store column does
+not control Hydrogen channel publication. Shopify owns actual prices,
+availability, image assignments, and IDs. Preview prices never reach checkout.
+The UI derives savings from those actual prices and suppresses unsupported
+currency comparisons.
 
-Configure inventory/continue-selling intentionally
-for a preorder and publish to the Hydrogen sales channel only after approval.
-Assign the right official photo to each variant. Shopify owns actual prices,
-availability, images, and variant IDs; preview prices never reach checkout.
+Create the socks product with handle `ped-socks`, exact native `Color` values
+`Black`/`White`, and optional `Size` values matching the confirmed range. No sock
+catalog file is prepared until price/sizing are supplied. A one-value size is
+selected automatically; multiple sizes require a customer choice.
 
-Create product metafield `preorder.starts_at` (date and time, Storefront access
-enabled). Set it to the agreed launch instant with an explicit timezone, e.g.
-`2026-11-20T12:00:00-05:00`. The example is not a scheduled launch. A missing or
-invalid launch timestamp keeps ordering disabled. Personalization is available
-from this instant until exactly 7 × 24 hours later; afterward plain jerseys
-remain orderable. Deadline text uses America/New_York. Both browser UI and
-server action check the deadline, with the server authoritative on submission.
+Create `preorder.starts_at` on the jersey product (date/time with Storefront
+access). Set it only to the approved launch instant with an explicit timezone,
+e.g. `2026-11-20T12:00:00-05:00`; this example does not schedule a launch. A
+missing/invalid timestamp disables ordering. Personalization lasts exactly
+7 × 24 hours from launch, after which plain preorders continue. Deadline copy
+uses America/New_York; the server checks the deadline again on submission.
+Optional `preorder.shipping_estimate` replaces “Shipping date to be confirmed.”
 
-Optional `preorder.shipping_estimate` (single line text, Storefront access
-enabled) replaces “Shipping date to be confirmed.” No shipping date is invented.
+## Personalization and cart
 
-## Personalization
+Name/number are optional and included in the variant price. If enabled, require
+both a name up to 14 characters and a 1–2 digit number (0–99, leading zeros
+preserved). Names are normalized and uppercased on the server. Confirm print
+limits, font, and placement with the supplier; artwork is not a print proof.
 
-Personalization is optional and included in the selected variant's price. A
-personalized jersey requires both a name (up to 14 characters) and a 1–2 digit
-number (0–99, leading zero preserved). These are proposed print limits; confirm
-them with the supplier before launch. Names are normalized and uppercased on
-the server. The front/back artwork is illustrative, not a print proof.
+The server resolves exact native options before adding quantity 1. Line
+attributes carry `Order type: Preorder`, bundle `Includes`, and, when selected,
+`Name on back` and `Number on back`. The cart shows these properties; Shopify
+carries them into checkout and the order. Different personalizations remain
+separate lines. Confirm fulfillment reads these properties and does not inherit
+automatic Printful fulfillment from the older catalog. Selected socks are a
+second real SKU, and all line IDs are validated before one `cart.addLines`.
 
-The server resolves the selected variant from Shopify and adds quantity 1 with
-line attributes `Order type: Preorder`, `Name on back`, and `Number on back`.
-Different personalizations remain separate Shopify lines. The cart drawer/page
-shows these attributes; Shopify carries them into checkout and the order.
-Confirm that the fulfillment workflow reads order line properties; these new
-jerseys must not inherit automatic fulfillment for the older Printful catalog.
+## Launch review
 
-## Conversion and measurement
+Before publishing, approve the page/prices, provide official photos of all four
+jerseys/shorts/socks, confirm sock price/sizes and print limits, set up all
+variants, agree the launch time, and confirm shipping language. Verify a real
+personalized mixed-sleeve kit plus socks through cart and Shopify checkout
+without placing a paid order. Verify bundle contents, both sizes, print fields,
+stock errors, and checkout price. This integration journey is pending catalog
+setup; preview submission does not prove real checkout.
 
-The UI changes are hypotheses about reducing friction, not measured conversion
-gains. The mobile audit at 390px found the product title 1,155px down the page,
-after the gallery and fact cards. It is now near the top, and the facts follow
-the buying options. The offer explicitly distinguishes the seven-day
-personalization window from the continuing plain-jersey preorder.
+The real product emits Hydrogen's consent-gated `Analytics.ProductView` via the
+existing Shopify/Meta integration. Previews emit no jersey product view, and
+print names/numbers are not analytics fields. Existing cart analytics owns
+add-to-cart events. Verify consent and cart/checkout/purchase events at launch.
+No conversion lift is claimed without live evidence. Review product → cart →
+checkout → purchase by device/source after launch. Keep delivery/shipping claims
+accurate; verify the footer's existing free-shipping claim before repeating it
+beside the CTA.
 
-The remaining launch priorities are approved home/away product photography
-(including front, back, and shorts) and a credible delivery estimate. Keep
-shipping language accurate until the date is confirmed. The footer's free U.S.
-shipping claim has not been independently verified for this preorder; verify
-eligibility and actual rates before adding that promise beside the purchase
-action. Baymard's research on
-[product page usability](https://baymard.com/research-articles/current-state-ecommerce-product-page-ux)
-and [shipping information](https://baymard.com/research-articles/show-shipping-costs-on-product-pages)
-informed these priorities; neither source establishes a conversion lift for
-this store.
-
-The real jersey product now publishes Hydrogen's `Analytics.ProductView`, which
-feeds the existing consent-gated Shopify/Meta integration. Development previews
-do not publish jersey product views. No print names or numbers are added to
-this event. Hydrogen already derives add-to-cart events from cart changes, so
-this page does not send a second manual add-to-cart event.
-
-At launch, verify one product view, one successful add-to-cart, and the existing
-checkout/purchase events with consent enabled; confirm declined consent is
-respected. Review the funnel from product view → cart → checkout → purchase by
-device and traffic source in the existing analytics. Use real launch traffic
-to identify drop-off before making further conversion claims or running an
-experiment. Real product/cart/checkout event validation remains pending the
-Shopify catalog setup.
-
-## Approval and final validation
-
-Before go-live: obtain official home/away photos, confirm supplier print limits,
-prepare the 40 real variants, agree the launch timestamp,
-and confirm shipping language. Verify one real personalized selection through
-cart and Shopify checkout without placing a paid order. Remove `noindex` when
-the launch is approved, add approved navigation/promotion, then deploy the exact
-approved revision. No Shopify catalog writes or production deployment have been
-performed for this preview.
+Only after merchant approval: remove `noindex`, add approved promotion/navigation,
+publish the catalog to Hydrogen, and deploy the exact approved revision.

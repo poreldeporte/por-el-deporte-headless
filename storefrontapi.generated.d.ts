@@ -1021,6 +1021,7 @@ export type ProductQuery = {
 
 export type JerseyPreorderQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
+  socksHandle: StorefrontAPI.Scalars['String']['input'];
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
@@ -1056,6 +1057,21 @@ export type JerseyPreorderQuery = {
                 'id' | 'url' | 'altText' | 'width' | 'height'
               >
             >;
+          }
+        >;
+      };
+    }
+  >;
+  socks?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Product, 'id' | 'title'> & {
+      options: Array<Pick<StorefrontAPI.ProductOption, 'name' | 'values'>>;
+      variants: {
+        nodes: Array<
+          Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+            selectedOptions: Array<
+              Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
+            >;
+            price: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
           }
         >;
       };
@@ -1388,7 +1404,7 @@ interface GeneratedQueryTypes {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };
-  '#graphql\n  query JerseyPreorder($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      vendor\n      startsAt: metafield(namespace: "preorder", key: "starts_at") { value }\n      shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }\n      images(first: 10) { nodes { id url altText width height } }\n      variants(first: 100) {\n        nodes {\n          id\n          title\n          availableForSale\n          selectedOptions { name value }\n          price { amount currencyCode }\n          image { id url altText width height }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query JerseyPreorder($handle: String!, $socksHandle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      vendor\n      startsAt: metafield(namespace: "preorder", key: "starts_at") { value }\n      shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }\n      images(first: 10) { nodes { id url altText width height } }\n      variants(first: 250) {\n        nodes {\n          id\n          title\n          availableForSale\n          selectedOptions { name value }\n          price { amount currencyCode }\n          image { id url altText width height }\n        }\n      }\n    }\n    socks: product(handle: $socksHandle) {\n      id\n      title\n      options { name values }\n      variants(first: 250) {\n        nodes {\n          id\n          availableForSale\n          selectedOptions { name value }\n          price { amount currencyCode }\n        }\n      }\n    }\n  }\n': {
     return: JerseyPreorderQuery;
     variables: JerseyPreorderQueryVariables;
   };

@@ -1,7 +1,7 @@
 import {
-  JERSEY_COLORS,
+  JERSEY_STYLE_OPTIONS,
+  jerseyPreviewPrice,
   JERSEY_HANDLE,
-  JERSEY_PREVIEW_PRICES,
   JERSEY_SHORTS_OPTIONS,
   JERSEY_SIZES,
   JERSEY_STORY,
@@ -9,7 +9,7 @@ import {
 } from '../app/lib/jersey.ts';
 
 // This command only writes CSV to stdout. It never connects to Shopify.
-const variants = JERSEY_COLORS.flatMap((color) =>
+const variants = JERSEY_STYLE_OPTIONS.flatMap((style) =>
   JERSEY_SIZES.flatMap((size) =>
     JERSEY_SHORTS_OPTIONS.map((shortsSize) => ({
       'URL handle': JERSEY_HANDLE,
@@ -18,13 +18,13 @@ const variants = JERSEY_COLORS.flatMap((color) =>
       Vendor: '',
       'Published on online store': 'false',
       Status: 'draft',
-      'Option1 name': 'Color',
-      'Option1 value': color,
+      'Option1 name': 'Style',
+      'Option1 value': style,
       'Option2 name': 'Size',
       'Option2 value': size,
       'Option3 name': 'Shorts size',
       'Option3 value': shortsSize,
-      Price: JERSEY_PREVIEW_PRICES[shortsSize === 'None' ? 0 : 1],
+      Price: jerseyPreviewPrice(style, shortsSize !== 'None').amount,
       'Inventory tracker': 'shopify',
       'Inventory quantity': '0',
       'Continue selling when out of stock': 'continue',

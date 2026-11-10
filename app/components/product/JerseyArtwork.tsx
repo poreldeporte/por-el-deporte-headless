@@ -2,6 +2,7 @@ import {useId} from 'react';
 
 export function JerseyArtwork({
   away,
+  longSleeve,
   back,
   shorts,
   personalize,
@@ -9,6 +10,7 @@ export function JerseyArtwork({
   number,
 }: {
   away: boolean;
+  longSleeve: boolean;
   back: boolean;
   shorts: boolean;
   personalize: boolean;
@@ -17,23 +19,21 @@ export function JerseyArtwork({
 }) {
   const shirt = away ? '#242522' : '#e96026';
   const id = useId();
+  const outline = longSleeve
+    ? 'm167 48-61 22-72 231 56 19 42-158-9 205q97 19 194 0l-9-205 42 158 56-19-72-231-61-22Z'
+    : 'm167 48-61 22-67 86 61 43 32-37-9 205q97 19 194 0l-9-205 32 37 61-43-67-86-61-22Z';
   return (
     <svg
       viewBox="0 0 440 510"
       role="img"
-      aria-label={`${away ? 'Black away' : 'Orange home'} jersey illustration${back ? (personalize ? `, back: ${name || 'your name'} ${number || '10'}` : ', plain back') : ', front'}${shorts ? ' with shorts' : ''}`}
+      aria-label={`${away ? 'Black away' : 'Orange home'} ${longSleeve ? 'long sleeve' : 'short sleeve'} jersey illustration${back ? (personalize ? `, back: ${name || 'your name'} ${number || '10'}` : ', plain back') : ', front'}${shorts ? ' with shorts' : ''}`}
     >
       <ArtworkDefs id={id} />
       <g
         transform={shorts ? 'translate(45 0) scale(.8)' : 'translate(0 38)'}
         filter={`url(#${id}-shadow)`}
       >
-        <path
-          d="m167 48-61 22-67 86 61 43 32-37-9 205q97 19 194 0l-9-205 32 37 61-43-67-86-61-22Z"
-          fill={shirt}
-          stroke="#171717"
-          strokeOpacity=".2"
-        />
+        <path d={outline} fill={shirt} stroke="#171717" strokeOpacity=".2" />
         {!back && (
           <path d="M151 54h37v321l-37-3Z" fill={`url(#${id}-diamonds)`} />
         )}
@@ -51,7 +51,11 @@ export function JerseyArtwork({
           strokeWidth="2"
         />
         <path
-          d="m39 156 61 43 6-10-59-43Zm301 43 61-43-8-10-59 43Z"
+          d={
+            longSleeve
+              ? 'm34 301 56 19 3-12-56-19Zm316 19 56-19-3-12-56 19Z'
+              : 'm39 156 61 43 6-10-59-43Zm301 43 61-43-8-10-59 43Z'
+          }
           fill="#1a1c1a"
         />
         {back && personalize ? (
@@ -95,26 +99,9 @@ export function JerseyArtwork({
             </text>
           </g>
         ) : null}
-        <path
-          d="m167 48-61 22-67 86 61 43 32-37-9 205q97 19 194 0l-9-205 32 37 61-43-67-86-61-22Z"
-          fill={`url(#${id}-shade)`}
-        />
+        <path d={outline} fill={`url(#${id}-shade)`} />
       </g>
       {shorts && <Shorts away={away} id={id} />}
-    </svg>
-  );
-}
-
-export function ShortsArtwork({away}: {away: boolean}) {
-  const id = useId();
-  return (
-    <svg
-      viewBox="100 312 240 180"
-      role="img"
-      aria-label={`${away ? 'Away' : 'Home'} shorts illustration`}
-    >
-      <ArtworkDefs id={id} />
-      <Shorts away={away} id={id} />
     </svg>
   );
 }
