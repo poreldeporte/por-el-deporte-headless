@@ -8,8 +8,11 @@ gallery thumbnails, release facts, swatches, size pills, and detail cards.
 Jersey-specific styles cover the preorder and personalization additions.
 
 The buying flow is color → jersey size → personalization → optional shorts.
-Personalization uses a plain/name-and-number choice with full-width name/number
-fields. Shorts use a single optional add-on row and a separate size selector.
+Personalization uses one checked-by-default “Personalize my jersey” checkbox
+with full-width name/number fields. Unchecking it hides the fields and orders a
+plain back; turning it back on preserves the entered text. Shorts use a single
+optional add-on row with a labeled illustration, the $15 difference, the full
+kit price, and a separate size selector.
 The desktop gallery stays visible during customization; mobile offers a
 collapsible back preview and a fixed total/purchase bar.
 On mobile, the title, price, and included-personalization offer come before the
@@ -19,6 +22,10 @@ summary shows both sizes and the exact name/number before submission, beside
 the preorder shipping notice.
 Both purchase buttons submit the same form with native required-field checks
 and the same server validation. The mobile bar hides while the cart is open.
+The mobile purchase bar is 80px plus the device safe area, with scroll padding
+that keeps fields and shipping details clear of the header and purchase bar.
+These refinements preserve the existing layout, fact cards, swatches, brand
+fonts, colors, and shared product stylesheet.
 Size guides are intentionally excluded. Official photography and confirmed
 print font/placement remain pending; illustrations are labeled as previews.
 The four facts highlight the official club jersey, establishment in Key Biscayne
@@ -123,7 +130,10 @@ personalization window from the continuing plain-jersey preorder.
 
 The remaining launch priorities are approved home/away product photography
 (including front, back, and shorts) and a credible delivery estimate. Keep
-shipping language accurate until the date is confirmed. Baymard's research on
+shipping language accurate until the date is confirmed. The footer's free U.S.
+shipping claim has not been independently verified for this preorder; verify
+eligibility and actual rates before adding that promise beside the purchase
+action. Baymard's research on
 [product page usability](https://baymard.com/research-articles/current-state-ecommerce-product-page-ux)
 and [shipping information](https://baymard.com/research-articles/show-shipping-costs-on-product-pages)
 informed these priorities; neither source establishes a conversion lift for

@@ -23,24 +23,7 @@ export function JerseyArtwork({
       role="img"
       aria-label={`${away ? 'Black away' : 'Orange home'} jersey illustration${back ? (personalize ? `, back: ${name || 'your name'} ${number || '10'}` : ', plain back') : ', front'}${shorts ? ' with shorts' : ''}`}
     >
-      <defs>
-        <pattern
-          id={`${id}-diamonds`}
-          width="28"
-          height="16"
-          patternUnits="userSpaceOnUse"
-        >
-          <path d="M0 8 14 0 28 8 14 16Z" fill="#f7f0de" />
-        </pattern>
-        <linearGradient id={`${id}-shade`} x1="0" x2="1">
-          <stop stopColor="#000" stopOpacity=".12" />
-          <stop offset=".5" stopColor="#fff" stopOpacity=".04" />
-          <stop offset="1" stopColor="#000" stopOpacity=".15" />
-        </linearGradient>
-        <filter id={`${id}-shadow`} x="-40%" width="180%" height="150%">
-          <feDropShadow dx="0" dy="14" stdDeviation="12" floodOpacity=".14" />
-        </filter>
-      </defs>
+      <ArtworkDefs id={id} />
       <g
         transform={shorts ? 'translate(45 0) scale(.8)' : 'translate(0 38)'}
         filter={`url(#${id}-shadow)`}
@@ -117,23 +100,64 @@ export function JerseyArtwork({
           fill={`url(#${id}-shade)`}
         />
       </g>
-      {shorts && (
-        <g filter={`url(#${id}-shadow)`}>
-          <path
-            d="M141 325h158l23 138-87 9-15-83-15 83-87-9Z"
-            fill={away ? '#242522' : '#f4eee0'}
-            stroke="#171717"
-            strokeOpacity=".25"
-          />
-          <path d="M141 325h158v12H141Z" fill={away ? '#171717' : '#ded8cc'} />
-          <path d="m279 337 20-2 22 127-25 3Z" fill={`url(#${id}-diamonds)`} />
-          <path
-            d="M216 335v17m8-17v17"
-            stroke={away ? '#f7f0de' : '#171717'}
-            strokeWidth="2"
-          />
-        </g>
-      )}
+      {shorts && <Shorts away={away} id={id} />}
     </svg>
+  );
+}
+
+export function ShortsArtwork({away}: {away: boolean}) {
+  const id = useId();
+  return (
+    <svg
+      viewBox="100 312 240 180"
+      role="img"
+      aria-label={`${away ? 'Away' : 'Home'} shorts illustration`}
+    >
+      <ArtworkDefs id={id} />
+      <Shorts away={away} id={id} />
+    </svg>
+  );
+}
+
+function ArtworkDefs({id}: {id: string}) {
+  return (
+    <defs>
+      <pattern
+        id={`${id}-diamonds`}
+        width="28"
+        height="16"
+        patternUnits="userSpaceOnUse"
+      >
+        <path d="M0 8 14 0 28 8 14 16Z" fill="#f7f0de" />
+      </pattern>
+      <linearGradient id={`${id}-shade`} x1="0" x2="1">
+        <stop stopColor="#000" stopOpacity=".12" />
+        <stop offset=".5" stopColor="#fff" stopOpacity=".04" />
+        <stop offset="1" stopColor="#000" stopOpacity=".15" />
+      </linearGradient>
+      <filter id={`${id}-shadow`} x="-40%" width="180%" height="150%">
+        <feDropShadow dx="0" dy="14" stdDeviation="12" floodOpacity=".14" />
+      </filter>
+    </defs>
+  );
+}
+
+function Shorts({away, id}: {away: boolean; id: string}) {
+  return (
+    <g filter={`url(#${id}-shadow)`}>
+      <path
+        d="M141 325h158l23 138-87 9-15-83-15 83-87-9Z"
+        fill={away ? '#242522' : '#f4eee0'}
+        stroke="#171717"
+        strokeOpacity=".25"
+      />
+      <path d="M141 325h158v12H141Z" fill={away ? '#171717' : '#ded8cc'} />
+      <path d="m279 337 20-2 22 127-25 3Z" fill={`url(#${id}-diamonds)`} />
+      <path
+        d="M216 335v17m8-17v17"
+        stroke={away ? '#f7f0de' : '#171717'}
+        strokeWidth="2"
+      />
+    </g>
   );
 }
