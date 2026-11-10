@@ -7,7 +7,6 @@ import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {useAside} from '~/components/Aside';
 import {
   JERSEY_COLORS,
-  JERSEY_KITS,
   JERSEY_PREVIEW_PRICES,
   JERSEY_SIZES,
   NAME_LIMIT,
@@ -27,7 +26,8 @@ export function JerseyPage({
 }) {
   const [color, setColor] = useState<string>(JERSEY_COLORS[0]);
   const [size, setSize] = useState('');
-  const [kit, setKit] = useState<string>(JERSEY_KITS[0]);
+  const [withShorts, setWithShorts] = useState(false);
+  const [shortsSize, setShortsSize] = useState('');
   const [personalize, setPersonalize] = useState(true);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
@@ -43,7 +43,7 @@ export function JerseyPage({
   const selection = {
     color,
     size,
-    kit,
+    shortsSize: withShorts ? shortsSize : 'None',
     personalize: personalize && canPersonalize,
     name,
     number,
@@ -51,24 +51,48 @@ export function JerseyPage({
   const variant = product?.variants.nodes.find((item) =>
     matchesJerseyVariant(item.selectedOptions, selection),
   );
-  const priceVariant = size
-    ? variant
-    : product?.variants.nodes.find((item) =>
-        matchesJerseyVariant(item.selectedOptions, {
-          ...selection,
-          size: JERSEY_SIZES[0],
-        }),
-      );
+  const hasSizes = Boolean(size && (!withShorts || shortsSize));
+  const priceSelection = {...selection, size: size || JERSEY_SIZES[0]};
+  const jerseyOnlyVariant = product?.variants.nodes.find((item) =>
+    matchesJerseyVariant(item.selectedOptions, {
+      ...priceSelection,
+      shortsSize: 'None',
+    }),
+  );
+  const kitVariant = product?.variants.nodes.find((item) =>
+    matchesJerseyVariant(item.selectedOptions, {
+      ...priceSelection,
+      shortsSize: shortsSize || JERSEY_SIZES[0],
+    }),
+  );
+  const priceVariant = withShorts ? kitVariant : jerseyOnlyVariant;
   const price =
     priceVariant?.price ??
     (preview
       ? {
-          amount: JERSEY_PREVIEW_PRICES[kit === JERSEY_KITS[1] ? 1 : 0],
+          amount: JERSEY_PREVIEW_PRICES[withShorts ? 1 : 0],
           currencyCode: 'USD' as const,
         }
       : null);
+  const shortsPrice = preview
+    ? {
+        amount: (
+          Number(JERSEY_PREVIEW_PRICES[1]) - Number(JERSEY_PREVIEW_PRICES[0])
+        ).toFixed(2),
+        currencyCode: 'USD' as const,
+      }
+    : jerseyOnlyVariant &&
+        kitVariant &&
+        jerseyOnlyVariant.price.currencyCode === kitVariant.price.currencyCode
+      ? {
+          amount: (
+            Number(kitVariant.price.amount) -
+            Number(jerseyOnlyVariant.price.amount)
+          ).toFixed(2),
+          currencyCode: kitVariant.price.currencyCode,
+        }
+      : null;
   const away = color === JERSEY_COLORS[1];
-  const withShorts = kit === JERSEY_KITS[1];
   const busy = fetcher.state !== 'idle';
   const available = preview || Boolean(variant?.availableForSale);
   const image =
@@ -314,7 +338,7 @@ export function JerseyPage({
               </div>
             </fieldset>
             <fieldset className="pel-pdp__opt">
-              <legend className="pel-pdp__opt-label">Size</legend>
+              <legend className="pel-pdp__opt-label">Jersey size</legend>
               <div className="pel-pdp__sizes jersey-sizes">
                 {JERSEY_SIZES.map((value) => (
                   <label
@@ -334,34 +358,58 @@ export function JerseyPage({
                 ))}
               </div>
             </fieldset>
-            <fieldset className="pel-pdp__opt">
-              <legend className="pel-pdp__opt-label">Kit</legend>
-              <div className="pel-pdp__sizes jersey-kit-options">
-                {JERSEY_KITS.map((value, index) => (
-                  <label
-                    key={value}
-                    className={`pel-pdp__size${kit === value ? ' is-active' : ''}`}
-                  >
-                    <input
-                      type="radio"
-                      name="kit"
-                      value={value}
-                      checked={kit === value}
-                      onChange={() => setKit(value)}
-                    />
-                    <span>{value}</span>
-                    {preview && (
-                      <span>${Number(JERSEY_PREVIEW_PRICES[index])}</span>
-                    )}
-                  </label>
-                ))}
+            <section
+              className="pel-pdp__card jersey-shorts"
+              aria-labelledby="jersey-shorts-heading"
+            >
+              <div className="jersey-shorts-heading">
+                <h2 id="jersey-shorts-heading" className="pel-pdp__card-title">
+                  Add shorts
+                </h2>
+                {shortsPrice && (
+                  <span className="jersey-shorts-price">
+                    +<Money data={shortsPrice} as="span" />
+                  </span>
+                )}
               </div>
+              <p className="jersey-hint">
+                Complete your kit. Choose a shorts size independently of your
+                jersey.
+              </p>
+              <label className="jersey-personalize-toggle">
+                <input
+                  type="checkbox"
+                  name="addShorts"
+                  checked={withShorts}
+                  onChange={(event) => setWithShorts(event.target.checked)}
+                  aria-controls="jersey-shorts-sizes"
+                />
+                Add matching shorts
+              </label>
               {withShorts && (
-                <p className="jersey-hint">
-                  Shorts are the same size as your jersey.
-                </p>
+                <fieldset id="jersey-shorts-sizes" className="pel-pdp__opt">
+                  <legend className="pel-pdp__opt-label">Shorts size</legend>
+                  <div className="pel-pdp__sizes jersey-sizes">
+                    {JERSEY_SIZES.map((value) => (
+                      <label
+                        key={value}
+                        className={`pel-pdp__size${shortsSize === value ? ' is-active' : ''}`}
+                      >
+                        <input
+                          type="radio"
+                          name="shortsSize"
+                          value={value}
+                          checked={shortsSize === value}
+                          onChange={() => setShortsSize(value)}
+                          required
+                        />
+                        {value}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
               )}
-            </fieldset>
+            </section>
 
             <div className="pel-pdp__card jersey-personalization">
               <p className="jersey-personalization-tag">
@@ -444,21 +492,23 @@ export function JerseyPage({
             </div>
 
             <p className="jersey-order-summary">
-              {away ? 'Away · Black' : 'Home · Orange'} /{' '}
-              {size || 'Choose a size'} /{' '}
-              {withShorts ? 'With shorts' : 'Jersey only'}
+              {away ? 'Away · Black' : 'Home · Orange'} / Jersey{' '}
+              {size || '— choose a size'} /{' '}
+              {withShorts
+                ? `Shorts ${shortsSize || '— choose a size'}`
+                : 'No shorts'}
             </p>
             <button
               type="submit"
               className="pel-pdp__cta jersey-submit"
-              disabled={busy || !canOrder || (!!size && !available)}
+              disabled={busy || !canOrder || (hasSizes && !available)}
             >
               <span>
                 {busy
                   ? 'One moment…'
                   : !canOrder
                     ? 'Preorders open soon'
-                    : size && !available
+                    : hasSizes && !available
                       ? 'Combination unavailable'
                       : preview
                         ? 'Review your preorder'
@@ -476,8 +526,11 @@ export function JerseyPage({
               <div className="jersey-review-summary" role="status">
                 <strong>Your preorder preview</strong>
                 <p>
-                  {fetcher.data.preview.color} · {fetcher.data.preview.size} ·{' '}
-                  {fetcher.data.preview.kit}
+                  {fetcher.data.preview.color} · Jersey{' '}
+                  {fetcher.data.preview.size} ·{' '}
+                  {fetcher.data.preview.shortsSize === 'None'
+                    ? 'No shorts'
+                    : `Shorts ${fetcher.data.preview.shortsSize}`}
                 </p>
                 <p>
                   {fetcher.data.preview.personalize
@@ -534,7 +587,7 @@ export function JerseyPage({
               ['Colors', 'Home (Orange) / Away (Black)'],
               ['Sizes', 'M / L / XL / XXL'],
               ['Options', 'Jersey only or with shorts'],
-              ['Shorts', 'Same size as your jersey'],
+              ['Shorts', 'Choose a separate size'],
               [
                 'Shipping',
                 product?.shippingEstimate?.value || 'Date to be confirmed',

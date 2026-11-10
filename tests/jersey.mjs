@@ -14,7 +14,7 @@ const end = start + 7 * 24 * 60 * 60 * 1000;
 const selection = {
   color: 'Home (Orange)',
   size: 'XL',
-  kit: 'Jersey + shorts',
+  shortsSize: 'M',
   personalize: true,
   name: 'VIOLA',
   number: '07',
@@ -50,6 +50,7 @@ test('server normalizes printed names and preserves leading-zero numbers as line
   const form = new FormData();
   for (const [key, value] of Object.entries({
     ...selection,
+    addShorts: 'on',
     personalize: 'on',
     name: '  Jose\u0301  ',
   }))
@@ -69,7 +70,8 @@ test('invalid options and print data are rejected before a cart write', () => {
     {size: ''},
     {size: 'S'},
     {color: 'Blue'},
-    {kit: 'Free shorts'},
+    {shortsSize: ''},
+    {shortsSize: 'S'},
     {name: ''},
     {name: '---'},
     {name: '<script>'},
@@ -87,13 +89,13 @@ test('invalid options and print data are rejected before a cart write', () => {
 
 test('variant matching resolves all three options regardless of Shopify option order', () => {
   const options = [
-    {name: 'Kit', value: 'Jersey + shorts'},
+    {name: 'Shorts size', value: 'M'},
     {name: 'Color', value: 'Home (Orange)'},
     {name: 'Size', value: 'XL'},
   ];
   assert.equal(matchesJerseyVariant(options, selection), true);
   assert.equal(
-    matchesJerseyVariant(options, {...selection, kit: 'Jersey only'}),
+    matchesJerseyVariant(options, {...selection, shortsSize: 'None'}),
     false,
   );
   assert.equal(
@@ -101,4 +103,53 @@ test('variant matching resolves all three options regardless of Shopify option o
     false,
   );
   assert.equal(matchesJerseyVariant(options.slice(1), selection), false);
+});
+
+test('shorts size is independent of jersey size and required only when adding shorts', () => {
+  assert.equal(validateJerseySelection(selection, true), null);
+  assert.equal(
+    validateJerseySelection({...selection, shortsSize: 'None'}, true),
+    null,
+  );
+  assert.match(
+    validateJerseySelection({...selection, shortsSize: ''}, true),
+    /shorts size/i,
+  );
+  assert.match(
+    validateJerseySelection({...selection, shortsSize: 'S'}, true),
+    /shorts size/i,
+  );
+  const form = new FormData();
+  for (const [key, value] of Object.entries({...selection, personalize: 'on'}))
+    form.set(key, value);
+  assert.equal(readJerseySelection(form).shortsSize, 'None');
+  form.set('addShorts', 'on');
+  assert.equal(readJerseySelection(form).shortsSize, 'M');
+  form.delete('shortsSize');
+  assert.equal(readJerseySelection(form).shortsSize, '');
+});
+
+test('every jersey and shorts size combination resolves its own Shopify variant', () => {
+  const sizes = ['M', 'L', 'XL', 'XXL'];
+  for (const color of ['Home (Orange)', 'Away (Black)']) {
+    for (const size of sizes) {
+      for (const shortsSize of ['None', ...sizes]) {
+        const chosen = {...selection, color, size, shortsSize};
+        assert.equal(validateJerseySelection(chosen, true), null);
+        const options = [
+          {name: 'Color', value: color},
+          {name: 'Size', value: size},
+          {name: 'Shorts size', value: shortsSize},
+        ];
+        assert.equal(matchesJerseyVariant(options, chosen), true);
+        assert.equal(
+          matchesJerseyVariant(options, {
+            ...chosen,
+            shortsSize: shortsSize === 'None' ? 'M' : 'None',
+          }),
+          false,
+        );
+      }
+    }
+  }
 });

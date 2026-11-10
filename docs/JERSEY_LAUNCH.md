@@ -4,7 +4,7 @@ Review route: `/products/club-jersey`. This branch is for review; it has not bee
 deployed. The existing product pages are unchanged.
 
 The jersey uses the existing PDP layout and stylesheet: product title and price,
-gallery thumbnails, release facts, swatches, size/kit pills, and detail cards.
+gallery thumbnails, release facts, swatches, size pills, and detail cards.
 Jersey-specific styles cover the preorder and personalization additions.
 
 With no Shopify product, local development renders a clearly labeled preview
@@ -23,14 +23,20 @@ also apply. Preview submissions leave the Shopify cart empty.
 
 Create a product with handle `club-jersey` and these exact option names/values:
 
-| Option | Values                           |
-| ------ | -------------------------------- |
-| Color  | `Home (Orange)`, `Away (Black)`  |
-| Size   | `M`, `L`, `XL`, `XXL`            |
-| Kit    | `Jersey only`, `Jersey + shorts` |
+| Option      | Values                              |
+| ----------- | ----------------------------------- |
+| Color       | `Home (Orange)`, `Away (Black)`     |
+| Size        | `M`, `L`, `XL`, `XXL` (jersey size) |
+| Shorts size | `None`, `M`, `L`, `XL`, `XXL`       |
 
-The 16 variants cost **$70 USD** for a jersey and **$85 USD** with shorts.
-Shorts use the jersey size. Configure inventory/continue-selling intentionally
+The 40 variants cost **$70 USD** when `Shorts size` is `None`, or **$85 USD**
+when shorts are included. The Add shorts section shows the $15 difference and
+requires an independent shorts size when enabled. Shoppers can pair any jersey
+size with any shorts size. Both sizes belong to the actual Shopify variant and
+appear as selected options in cart, checkout, and the order; shorts size is not
+just a fulfillment note. The UI reads real prices from Shopify once configured.
+
+Configure inventory/continue-selling intentionally
 for a preorder and publish to the Hydrogen sales channel only after approval.
 Assign the right official photo to each variant. Shopify owns actual prices,
 availability, images, and variant IDs; preview prices never reach checkout.
@@ -63,8 +69,8 @@ jerseys must not inherit automatic fulfillment for the older Printful catalog.
 
 ## Approval and final validation
 
-Before go-live: obtain official home/away photos, confirm supplier print limits
-and same-size shorts, prepare the 16 real variants, agree the launch timestamp,
+Before go-live: obtain official home/away photos, confirm supplier print limits,
+prepare the 40 real variants, agree the launch timestamp,
 and confirm shipping language. Verify one real personalized selection through
 cart and Shopify checkout without placing a paid order. Remove `noindex` when
 the launch is approved, add approved navigation/promotion, then deploy the exact

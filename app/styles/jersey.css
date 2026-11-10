@@ -94,13 +94,11 @@
   margin-bottom: 0;
 }
 .jersey-colors label,
-.jersey-sizes label,
-.jersey-kit-options label {
+.jersey-sizes label {
   position: relative;
 }
 .jersey-colors input,
-.jersey-sizes input,
-.jersey-kit-options input {
+.jersey-sizes input {
   position: absolute;
   opacity: 0;
   width: 1px;
@@ -108,7 +106,6 @@
 }
 .jersey-colors label:focus-within,
 .jersey-sizes label:focus-within,
-.jersey-kit-options label:focus-within,
 .jersey-page button:focus-visible,
 .jersey-print-fields input:focus-visible {
   outline: 2px solid var(--pel-blue);
@@ -129,22 +126,13 @@
   margin-top: 6px;
   font: 600 12px/1.4 var(--font-body);
 }
-.jersey-kit-options .pel-pdp__size {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.jersey-kit-options .pel-pdp__size > span:last-child:not(:first-of-type) {
-  font-size: 12px;
-  letter-spacing: 0;
-}
 .jersey-hint {
   font: 500 12px/1.6 var(--font-body);
   color: var(--text-muted);
   margin: 10px 0 0;
 }
-.jersey-personalization {
+.jersey-personalization,
+.jersey-shorts {
   padding: 24px;
   margin-top: 32px;
 }
@@ -157,6 +145,27 @@
 .jersey-personalization .pel-pdp__card-title {
   font-size: 28px;
   margin-bottom: 14px;
+}
+.jersey-shorts-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.jersey-shorts-heading .pel-pdp__card-title {
+  margin-bottom: 0;
+}
+.jersey-shorts-price {
+  font: 700 16px/1.5 var(--font-body);
+}
+.jersey-shorts .jersey-sizes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.jersey-shorts .pel-pdp__size {
+  min-width: 0;
+  padding: 14px 8px;
 }
 .jersey-personalization-copy {
   font: 500 14px/1.6 var(--font-body);
@@ -263,7 +272,8 @@
   .jersey-review-banner span {
     display: block;
   }
-  .jersey-personalization {
+  .jersey-personalization,
+  .jersey-shorts {
     padding: 20px;
   }
   .jersey-stage-label {

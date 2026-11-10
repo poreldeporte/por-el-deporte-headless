@@ -1,7 +1,7 @@
 export const JERSEY_HANDLE = 'club-jersey';
 export const JERSEY_SIZES = ['M', 'L', 'XL', 'XXL'] as const;
 export const JERSEY_COLORS = ['Home (Orange)', 'Away (Black)'] as const;
-export const JERSEY_KITS = ['Jersey only', 'Jersey + shorts'] as const;
+export const JERSEY_SHORTS_OPTIONS = ['None', ...JERSEY_SIZES] as const;
 export const JERSEY_PREVIEW_PRICES = ['70.00', '85.00'] as const;
 export const NAME_LIMIT = 14;
 const PERSONALIZATION_DURATION = 7 * 24 * 60 * 60 * 1000;
@@ -9,7 +9,7 @@ const PERSONALIZATION_DURATION = 7 * 24 * 60 * 60 * 1000;
 export type JerseySelection = {
   color: string;
   size: string;
-  kit: string;
+  shortsSize: string;
   personalize: boolean;
   name: string;
   number: string;
@@ -43,7 +43,7 @@ export function readJerseySelection(form: FormData): JerseySelection {
   return {
     color: text('color'),
     size: text('size'),
-    kit: text('kit'),
+    shortsSize: form.get('addShorts') === 'on' ? text('shortsSize') : 'None',
     personalize: form.get('personalize') === 'on',
     name: text('name').normalize('NFC').toUpperCase(),
     number: text('number'),
@@ -54,13 +54,15 @@ export function validateJerseySelection(
   selection: JerseySelection,
   canPersonalize: boolean,
 ) {
-  const {color, size, kit, personalize, name, number} = selection;
+  const {color, size, shortsSize, personalize, name, number} = selection;
   if (
     !JERSEY_COLORS.some((value) => value === color) ||
-    !JERSEY_SIZES.some((value) => value === size) ||
-    !JERSEY_KITS.some((value) => value === kit)
+    !JERSEY_SIZES.some((value) => value === size)
   ) {
-    return 'Choose a color, size, and kit option.';
+    return 'Choose a color and jersey size.';
+  }
+  if (!JERSEY_SHORTS_OPTIONS.some((value) => value === shortsSize)) {
+    return 'Choose a shorts size, or remove the shorts.';
   }
   if (!personalize) return null;
   if (!canPersonalize)
@@ -92,14 +94,16 @@ export function matchesJerseyVariant(
   options: {name: string; value: string}[],
   selection: JerseySelection,
 ) {
+  const selectedOptions = {
+    Color: selection.color,
+    Size: selection.size,
+    'Shorts size': selection.shortsSize,
+  };
   return (
     options.length === 3 &&
     options.every(
       ({name, value}) =>
-        value ===
-        {Color: selection.color, Size: selection.size, Kit: selection.kit}[
-          name as 'Color' | 'Size' | 'Kit'
-        ],
+        value === selectedOptions[name as keyof typeof selectedOptions],
     )
   );
 }
