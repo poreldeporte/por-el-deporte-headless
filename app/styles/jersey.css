@@ -131,8 +131,7 @@
 }
 .jersey-colors label:focus-within,
 .jersey-sizes label:focus-within,
-.jersey-print-toggle input:focus-visible,
-.jersey-addon-row input:focus-visible,
+.jersey-print-toggle input:focus-visible + .jersey-switch,
 .jersey-page button:focus-visible,
 .jersey-print-fields input:focus-visible {
   outline: 2px solid var(--pel-blue);
@@ -160,7 +159,7 @@
 }
 .jersey-personalization,
 .jersey-shorts {
-  padding-top: 20px;
+  padding: 20px 0 0;
   margin-top: 24px;
   border-top: 1px solid var(--border-soft);
 }
@@ -178,27 +177,58 @@
   color: var(--pel-orange-ink);
 }
 .jersey-print-toggle {
+  position: relative;
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 12px;
   min-height: 44px;
   cursor: pointer;
   font: 600 14px/1.5 var(--font-body);
 }
+.jersey-print-toggle > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.jersey-print-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.jersey-switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  border: 1px solid var(--pel-ink);
+  border-radius: var(--radius-pill);
+  transition: background var(--dur-fast);
+}
+.jersey-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--pel-ink);
+  border-radius: 50%;
+  transition: transform var(--dur-fast);
+}
+.jersey-print-toggle input:checked + .jersey-switch {
+  background: var(--pel-ink);
+}
+.jersey-print-toggle input:checked + .jersey-switch::after {
+  background: var(--pel-cream);
+  transform: translateX(20px);
+}
 .jersey-addon-row {
   display: grid;
-  grid-template-columns: 20px 64px minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   padding: 12px 0;
-  cursor: pointer;
-}
-.jersey-addon-row input,
-.jersey-print-toggle input {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--pel-ink);
-  flex: none;
 }
 .jersey-addon-copy {
   min-width: 0;
@@ -224,9 +254,10 @@
   font: 500 12px/1.5 var(--font-body);
   color: var(--text-muted);
 }
-.jersey-shorts-price {
-  font: 700 16px/1.5 var(--font-body);
-  white-space: nowrap;
+.jersey-shorts .jersey-shorts-toggle {
+  min-width: 76px;
+  min-height: 44px;
+  padding: 12px;
 }
 .jersey-shorts .pel-pdp__opt {
   margin-top: 16px;
@@ -236,7 +267,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
-.jersey-shorts .pel-pdp__size {
+.jersey-shorts .jersey-sizes .pel-pdp__size {
   min-width: 0;
   padding: 14px 8px;
 }

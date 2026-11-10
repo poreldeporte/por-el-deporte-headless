@@ -8,11 +8,16 @@ gallery thumbnails, release facts, swatches, size pills, and detail cards.
 Jersey-specific styles cover the preorder and personalization additions.
 
 The buying flow is color → jersey size → personalization → optional shorts.
-Personalization uses one checked-by-default “Personalize my jersey” checkbox
-with full-width name/number fields. Unchecking it hides the fields and orders a
-plain back; turning it back on preserves the entered text. Shorts use a single
-optional add-on row with a labeled illustration, the $15 difference, the full
-kit price, and a separate size selector.
+Personalization starts enabled with a “Personalize my jersey” switch and
+full-width name/number fields. Turning it off hides the fields and orders a
+plain back; turning it back on preserves the entered text. Shorts use an
+Add/Remove button beside a labeled illustration, the $15 difference, and the
+full kit price, with a separate size selector after adding. These controls keep
+the existing server form values (`personalize=on` and `addShorts=on`).
+
+Both option sections explicitly own their padding, overriding the generic
+section padding in `reset.css`. The gap from the print note to the shorts
+divider is 24px on desktop and mobile, without extra bottom padding.
 The desktop gallery stays visible during customization; mobile offers a
 collapsible back preview and a fixed total/purchase bar.
 On mobile, the title, price, and included-personalization offer come before the

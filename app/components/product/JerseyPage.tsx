@@ -393,32 +393,35 @@ export function JerseyPage({
               <div className="jersey-option-heading">
                 {canPersonalize ? (
                   <label className="jersey-print-toggle">
+                    <span id="jersey-personalization-heading">
+                      Personalize my jersey
+                    </span>
+                    <span className="jersey-option-note">Included</span>
                     <input
                       type="checkbox"
+                      role="switch"
                       name="personalize"
                       checked={personalize}
                       onChange={(event) => setPersonalize(event.target.checked)}
                       aria-describedby="jersey-personalization-deadline"
                     />
-                    <span id="jersey-personalization-heading">
-                      Personalize my jersey
-                    </span>
+                    <span className="jersey-switch" aria-hidden="true" />
                   </label>
                 ) : (
-                  <h2
-                    id="jersey-personalization-heading"
-                    className="pel-pdp__opt-label"
-                  >
-                    Name & number
-                  </h2>
+                  <>
+                    <h2
+                      id="jersey-personalization-heading"
+                      className="pel-pdp__opt-label"
+                    >
+                      Name & number
+                    </h2>
+                    <span className="jersey-option-note">
+                      {window.status === 'closed'
+                        ? 'Window closed'
+                        : 'Coming at launch'}
+                    </span>
+                  </>
                 )}
-                <span className="jersey-option-note">
-                  {canPersonalize
-                    ? 'Included'
-                    : window.status === 'closed'
-                      ? 'Window closed'
-                      : 'Coming at launch'}
-                </span>
               </div>
               <p
                 id="jersey-personalization-deadline"
@@ -518,38 +521,49 @@ export function JerseyPage({
               <h2 id="jersey-shorts-heading" className="pel-pdp__opt-label">
                 Complete your kit
               </h2>
-              <label className="jersey-addon-row">
-                <input
-                  type="checkbox"
-                  name="addShorts"
-                  checked={withShorts}
-                  onChange={(event) => {
-                    const checked = event.target.checked;
-                    setWithShorts(checked);
-                    if (checked && !shortsSize) setShortsSize(size);
-                  }}
-                />
+              <div className="jersey-addon-row">
                 <span className="jersey-shorts-thumbnail" aria-hidden="true">
                   <ShortsArtwork away={away} />
                   <small>Illustration</small>
                 </span>
                 <span className="jersey-addon-copy">
-                  <strong>Add matching shorts</strong>
-                  {kitPrice && (
+                  <strong>Matching shorts</strong>
+                  {(shortsPrice || kitPrice) && (
                     <small>
-                      Complete kit: <Money data={kitPrice} as="span" />
+                      {shortsPrice && (
+                        <>
+                          +<Money data={shortsPrice} as="span" />
+                        </>
+                      )}
+                      {shortsPrice && kitPrice && ' · '}
+                      {kitPrice && (
+                        <>
+                          Kit <Money data={kitPrice} as="span" />
+                        </>
+                      )}
                     </small>
                   )}
                 </span>
-                {shortsPrice && (
-                  <span className="jersey-shorts-price">
-                    +<Money data={shortsPrice} as="span" />
-                  </span>
-                )}
-              </label>
+                <button
+                  type="button"
+                  className="pel-pdp__size jersey-shorts-toggle"
+                  aria-label={
+                    withShorts
+                      ? 'Remove matching shorts'
+                      : 'Add matching shorts'
+                  }
+                  onClick={() => {
+                    setWithShorts(!withShorts);
+                    if (!withShorts && !shortsSize) setShortsSize(size);
+                  }}
+                >
+                  {withShorts ? 'Remove' : 'Add'}
+                </button>
+              </div>
               {withShorts && (
                 <fieldset id="jersey-shorts-sizes" className="pel-pdp__opt">
                   <legend className="pel-pdp__opt-label">Shorts size</legend>
+                  <input type="hidden" name="addShorts" value="on" />
                   <div className="pel-pdp__sizes jersey-sizes">
                     {JERSEY_SIZES.map((value) => (
                       <label
