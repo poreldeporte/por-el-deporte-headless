@@ -3,6 +3,7 @@ import type {Route} from './+types/products.club-jersey';
 import {JerseyPage} from '~/components/product/JerseyPage';
 import {
   JERSEY_HANDLE,
+  JERSEY_TITLE,
   jerseyAttributes,
   matchesJerseyVariant,
   personalizationWindow,
@@ -17,7 +18,7 @@ export const links: Route.LinksFunction = () => [
   {rel: 'stylesheet', href: jerseyStyles},
 ];
 export const meta: Route.MetaFunction = () => [
-  {title: 'The Club Jersey | Por El Deporte'},
+  {title: `${JERSEY_TITLE} | Por El Deporte`},
   {
     name: 'description',
     content:

@@ -1,4 +1,9 @@
 export const JERSEY_HANDLE = 'club-jersey';
+export const JERSEY_TITLE = 'The Club Jersey';
+export const JERSEY_STORY = [
+  'The games brought us together. The people made it a club. Since 2014, Por El Deporte has grown around a shared love of playing. This is our official jersey, made with love for that community in Key Biscayne and beyond.',
+  'We release a new design every two years: home in orange, away in black. For the first seven days of this preorder, you can put your own name and number on the back. It’s the only chance to personalize this release. Step onto the field in yours.',
+] as const;
 export const JERSEY_SIZES = ['M', 'L', 'XL', 'XXL'] as const;
 export const JERSEY_COLORS = ['Home (Orange)', 'Away (Black)'] as const;
 export const JERSEY_SHORTS_OPTIONS = ['None', ...JERSEY_SIZES] as const;

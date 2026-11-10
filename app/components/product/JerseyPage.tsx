@@ -9,6 +9,8 @@ import {
   JERSEY_COLORS,
   JERSEY_PREVIEW_PRICES,
   JERSEY_SIZES,
+  JERSEY_STORY,
+  JERSEY_TITLE,
   NAME_LIMIT,
   matchesJerseyVariant,
   personalizationWindow,
@@ -182,17 +184,18 @@ export function JerseyPage({
         items={[
           {name: 'Home', href: '/'},
           {name: 'Shop', href: '/collections/all-products'},
-          {name: 'The Club Jersey'},
+          {name: JERSEY_TITLE},
         ]}
       />
-      <section className="pel-pdp__main" aria-label="The Club Jersey preorder">
+      <section
+        className="pel-pdp__main"
+        aria-label={`${JERSEY_TITLE} preorder`}
+      >
         <div className="jersey-intro">
           <p className="jersey-eyebrow">
             <span className="jersey-dot" /> THE OFFICIAL CLUB JERSEY · PREORDER
           </p>
-          <h1 className="pel-pdp__title">
-            {product?.title || 'The Club Jersey'}
-          </h1>
+          <h1 className="pel-pdp__title">{product?.title || JERSEY_TITLE}</h1>
           <p className="pel-pdp__lead">
             Our official jersey, released once every two years. Made with love
             for the people who make this club.
@@ -651,18 +654,9 @@ export function JerseyPage({
         <div className="pel-pdp__card">
           <h2 className="pel-pdp__card-title">The Story</h2>
           <div className="pel-pdp__card-body">
-            <p>
-              The games brought us together. The people made it a club. Since
-              2014, Por El Deporte has grown around a shared love of playing.
-              This is our official jersey, made with love for that community in
-              Key Biscayne and beyond.
-            </p>
-            <p>
-              We release a new design every two years: home in orange, away in
-              black. For the first seven days of this preorder, you can put your
-              own name and number on the back. It&rsquo;s the only chance to
-              personalize this release. Step onto the field in yours.
-            </p>
+            {JERSEY_STORY.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
           <div className="pel-pdp__card-foot">Est. 2014 · Key Biscayne</div>
         </div>

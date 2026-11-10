@@ -38,7 +38,33 @@ also apply. Preview submissions leave the Shopify cart empty.
 
 ## Shopify product setup
 
-Create a product with handle `club-jersey` and these exact option names/values:
+The prepared [draft catalog CSV](./club-jersey-draft.csv) contains one product
+and all 40 variants. It has not been imported into Shopify. It uses the current
+[Shopify product CSV columns](https://help.shopify.com/en/manual/products/import-export/using-csv),
+with `Status: draft` and `Published on online store: false` on every row. It
+omits images and the launch metafield, so importing it does not start the
+personalization window. The catalog description and PDP story share the same
+copy in `app/lib/jersey.ts`.
+
+Regenerate it from the reviewed choices and prices on Node 24:
+
+```sh
+node scripts/jersey-catalog.mjs > docs/club-jersey-draft.csv
+```
+
+The generator writes only to stdout; it has no Shopify connection. The CSV
+sets fulfillment to manual, tracked inventory to zero, and continue-selling
+enabled for preorders. Confirm the actual fulfillment location, shipping
+weights, and inventory policy before activation. No reference photos or
+illustrative mockups are included in the catalog.
+
+For the approved import, keep automatic publishing and overwriting matching
+products disabled. If `club-jersey` already exists, inspect it before importing;
+this file is for creating the new draft, not replacing an existing product.
+Verify Draft status and channel availability in Shopify after import. The
+CSV's online-store column does not manage Hydrogen channel publishing.
+
+The product has handle `club-jersey` and these exact option names/values:
 
 | Option      | Values                              |
 | ----------- | ----------------------------------- |
