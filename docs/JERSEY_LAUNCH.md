@@ -3,6 +3,10 @@
 Review route: `/products/club-jersey`. This branch is for review; it has not been
 deployed. The existing product pages are unchanged.
 
+The jersey uses the existing PDP layout and stylesheet: product title and price,
+gallery thumbnails, release facts, swatches, size/kit pills, and detail cards.
+Jersey-specific styles cover the preorder and personalization additions.
+
 With no Shopify product, local development renders a clearly labeled preview
 using the supplied reference photos and illustrative front/back artwork. The
 review button validates the selection and displays a summary without mutating a

@@ -10,8 +10,10 @@ import {
   validateJerseySelection,
 } from '~/lib/jersey';
 import jerseyStyles from '~/styles/jersey.css?url';
+import productStyles from '~/styles/product.css?url';
 
 export const links: Route.LinksFunction = () => [
+  {rel: 'stylesheet', href: productStyles},
   {rel: 'stylesheet', href: jerseyStyles},
 ];
 export const meta: Route.MetaFunction = () => [

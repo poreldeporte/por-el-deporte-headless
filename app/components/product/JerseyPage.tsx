@@ -31,7 +31,7 @@ export function JerseyPage({
   const [personalize, setPersonalize] = useState(true);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [view, setView] = useState<'photo' | 'front' | 'back'>(
+  const [view, setView] = useState<'photo' | 'club' | 'front' | 'back'>(
     preview ? 'photo' : 'front',
   );
   const [now, setNow] = useState(serverNow);
@@ -75,7 +75,8 @@ export function JerseyPage({
     priceVariant?.image ??
     product?.images.nodes.find((item) => item.altText?.includes(color));
   const showingPhoto =
-    (preview && view === 'photo') || Boolean(image && view !== 'back');
+    (preview && (view === 'photo' || view === 'club')) ||
+    Boolean(image && view !== 'back');
   const closes = window.endsAt
     ? new Intl.DateTimeFormat('en-US', {
         month: 'short',
@@ -104,11 +105,11 @@ export function JerseyPage({
 
   function changeColor(value: string) {
     setColor(value);
-    if (view === 'photo') setView('front');
+    if (view === 'photo' || view === 'club') setView('front');
   }
 
   return (
-    <div className={`jersey-page${away ? ' jersey-page--away' : ''}`}>
+    <div className="pel-pdp jersey-page">
       {preview && (
         <div className="jersey-review-banner">
           DESIGN PREVIEW{' '}
@@ -124,25 +125,33 @@ export function JerseyPage({
           {name: 'The Club Jersey'},
         ]}
       />
-      <section className="jersey-layout" aria-label="The Club Jersey preorder">
-        <div className="jersey-gallery">
+      <section className="pel-pdp__main" aria-label="The Club Jersey preorder">
+        <div className="pel-pdp__gallery">
           <div
-            className={`jersey-stage${view === 'photo' ? ' jersey-stage--photo' : ''}`}
+            className={`pel-pdp__stage jersey-stage${showingPhoto ? ' jersey-stage--photo' : ''}`}
           >
             <div className="jersey-stage-label">
               <span>{away ? 'AWAY / BLACK' : 'HOME / ORANGE'}</span>
               <span>POR EL DEPORTE</span>
             </div>
-            {preview && view === 'photo' ? (
+            {preview && (view === 'photo' || view === 'club') ? (
               <img
-                src="/jersey/home-reference.png"
-                alt="The orange home jersey on the pitch in Key Biscayne — reference photograph"
+                src={
+                  view === 'club'
+                    ? '/jersey/club-reference.png'
+                    : '/jersey/home-reference.png'
+                }
+                alt={
+                  view === 'club'
+                    ? 'Por El Deporte players wearing the orange home kit — reference photograph'
+                    : 'The orange home jersey on the pitch in Key Biscayne — reference photograph'
+                }
                 loading="eager"
               />
             ) : image && view !== 'back' ? (
               <Image
                 data={image}
-                sizes="(min-width: 900px) 55vw, 100vw"
+                sizes="(min-width: 60em) 640px, 100vw"
                 loading="eager"
               />
             ) : (
@@ -161,29 +170,71 @@ export function JerseyPage({
               </span>
             )}
           </div>
-          <div className="jersey-gallery-nav" aria-label="Jersey views">
+          <div
+            className="pel-pdp__thumbs jersey-thumbs"
+            aria-label="Jersey views"
+          >
             {preview && !away && (
               <button
                 type="button"
+                className={`pel-pdp__thumb${view === 'photo' ? ' is-active' : ''}`}
+                aria-label="On the pitch"
                 aria-pressed={view === 'photo'}
                 onClick={() => setView('photo')}
               >
-                On the pitch
+                <img src="/jersey/home-reference.png" alt="" loading="lazy" />
+                <span className="jersey-thumb-label">On the pitch</span>
+              </button>
+            )}
+            {preview && !away && (
+              <button
+                type="button"
+                className={`pel-pdp__thumb${view === 'club' ? ' is-active' : ''}`}
+                aria-label="The club"
+                aria-pressed={view === 'club'}
+                onClick={() => setView('club')}
+              >
+                <img src="/jersey/club-reference.png" alt="" loading="lazy" />
+                <span className="jersey-thumb-label">The club</span>
               </button>
             )}
             <button
               type="button"
+              className={`pel-pdp__thumb${view === 'front' ? ' is-active' : ''}`}
+              aria-label="Front"
               aria-pressed={view === 'front'}
               onClick={() => setView('front')}
             >
-              Front
+              <span aria-hidden="true">
+                <JerseyArtwork
+                  away={away}
+                  back={false}
+                  shorts={withShorts}
+                  personalize={false}
+                  name=""
+                  number=""
+                />
+              </span>
+              <span className="jersey-thumb-label">Front</span>
             </button>
             <button
               type="button"
+              className={`pel-pdp__thumb${view === 'back' ? ' is-active' : ''}`}
+              aria-label="Your name & number"
               aria-pressed={view === 'back'}
               onClick={() => setView('back')}
             >
-              Your name & number <span aria-hidden="true">↗</span>
+              <span aria-hidden="true">
+                <JerseyArtwork
+                  away={away}
+                  back
+                  shorts={withShorts}
+                  personalize={selection.personalize}
+                  name={name.toUpperCase()}
+                  number={number}
+                />
+              </span>
+              <span className="jersey-thumb-label">Back</span>
             </button>
           </div>
           <p className="jersey-gallery-caption">
@@ -193,22 +244,42 @@ export function JerseyPage({
           </p>
         </div>
 
-        <div className="jersey-buy">
+        <div className="pel-pdp__stats" aria-label="Release details">
+          {[
+            {value: '2 YRS', label: 'Between releases'},
+            {value: '7 DAYS', label: 'Custom at launch'},
+            {value: 'M–XXL', label: 'Size range'},
+            {value: '2014', label: 'Est. Key Biscayne'},
+          ].map(({value, label}) => (
+            <div key={label} className="pel-pdp__stat">
+              <div
+                className="pel-pdp__stat-value"
+                data-len={value.length > 4 ? 'long' : undefined}
+              >
+                {value}
+              </div>
+              <div className="pel-pdp__stat-rule" />
+              <div className="pel-pdp__stat-label">{label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="pel-pdp__buy">
           <p className="jersey-eyebrow">
             <span className="jersey-dot" /> THE OFFICIAL CLUB JERSEY · PREORDER
           </p>
-          <h1>
-            For the{' '}
-            <br />
-            club.
+          <h1 className="pel-pdp__title">
+            {product?.title || 'The Club Jersey'}
           </h1>
-          <p className="jersey-intro">
+          <p className="pel-pdp__lead">
             Our official jersey. A new release every two years, made with love
             for the community that keeps us playing.
           </p>
-          <div className="jersey-price" aria-live="polite">
+          <div className="pel-pdp__price" aria-live="polite">
             {price ? <Money data={price} /> : <span>Select your kit</span>}
-            <span>{withShorts ? 'Jersey + shorts' : 'Jersey only'}</span>
+            <span className="jersey-price-label">
+              {withShorts ? 'Jersey + shorts' : 'Jersey only'}
+            </span>
           </div>
 
           <fetcher.Form
@@ -216,15 +287,13 @@ export function JerseyPage({
             action="/products/club-jersey"
             className="jersey-form"
           >
-            <fieldset>
-              <legend>
-                <span>01</span> Pick your side
-              </legend>
-              <div className="jersey-colors">
+            <fieldset className="pel-pdp__opt">
+              <legend className="pel-pdp__opt-label">Color</legend>
+              <div className="pel-pdp__swatches jersey-colors">
                 {JERSEY_COLORS.map((value, index) => (
                   <label
                     key={value}
-                    className={color === value ? 'is-selected' : ''}
+                    className={`pel-pdp__swatch${color === value ? ' is-active' : ''}`}
                   >
                     <input
                       type="radio"
@@ -234,28 +303,23 @@ export function JerseyPage({
                       onChange={() => changeColor(value)}
                     />
                     <span
-                      className={`jersey-swatch${index ? ' jersey-swatch--black' : ''}`}
+                      className={`pel-pdp__swatch-dot jersey-swatch${index ? ' jersey-swatch--black' : ''}`}
                     />
-                    <span>
+                    <span className="pel-pdp__swatch-name">
                       {index ? 'Away' : 'Home'}
                       <small>{index ? 'Black' : 'Orange'}</small>
-                    </span>
-                    <span className="jersey-choice-mark" aria-hidden="true">
-                      {color === value ? '●' : '○'}
                     </span>
                   </label>
                 ))}
               </div>
             </fieldset>
-            <fieldset>
-              <legend>
-                <span>02</span> Choose your size
-              </legend>
-              <div className="jersey-sizes">
+            <fieldset className="pel-pdp__opt">
+              <legend className="pel-pdp__opt-label">Size</legend>
+              <div className="pel-pdp__sizes jersey-sizes">
                 {JERSEY_SIZES.map((value) => (
                   <label
                     key={value}
-                    className={size === value ? 'is-selected' : ''}
+                    className={`pel-pdp__size${size === value ? ' is-active' : ''}`}
                   >
                     <input
                       type="radio"
@@ -270,15 +334,13 @@ export function JerseyPage({
                 ))}
               </div>
             </fieldset>
-            <fieldset>
-              <legend>
-                <span>03</span> Make it a kit
-              </legend>
-              <div className="jersey-kit-options">
+            <fieldset className="pel-pdp__opt">
+              <legend className="pel-pdp__opt-label">Kit</legend>
+              <div className="pel-pdp__sizes jersey-kit-options">
                 {JERSEY_KITS.map((value, index) => (
                   <label
                     key={value}
-                    className={kit === value ? 'is-selected' : ''}
+                    className={`pel-pdp__size${kit === value ? ' is-active' : ''}`}
                   >
                     <input
                       type="radio"
@@ -287,23 +349,21 @@ export function JerseyPage({
                       checked={kit === value}
                       onChange={() => setKit(value)}
                     />
-                    <span>
-                      {value}
-                      <small>
-                        {index
-                          ? 'The full match-day look. Shorts in the same size.'
-                          : 'Your new starting shirt.'}
-                      </small>
-                    </span>
+                    <span>{value}</span>
                     {preview && (
                       <span>${Number(JERSEY_PREVIEW_PRICES[index])}</span>
                     )}
                   </label>
                 ))}
               </div>
+              {withShorts && (
+                <p className="jersey-hint">
+                  Shorts are the same size as your jersey.
+                </p>
+              )}
             </fieldset>
 
-            <div className="jersey-personalization">
+            <div className="pel-pdp__card jersey-personalization">
               <p className="jersey-personalization-tag">
                 {canPersonalize
                   ? 'YOUR ONLY CHANCE TO CUSTOMIZE'
@@ -311,8 +371,8 @@ export function JerseyPage({
                     ? 'PERSONALIZATION CLOSED'
                     : 'COMING AT LAUNCH'}
               </p>
-              <h2>Your name. Your number.</h2>
-              <p>
+              <h2 className="pel-pdp__card-title">Your name. Your number.</h2>
+              <p className="jersey-personalization-copy">
                 {preview
                   ? 'Your only chance to add your own name and number to this release. Personalization opens at launch and closes 7 days later.'
                   : canPersonalize
@@ -390,7 +450,7 @@ export function JerseyPage({
             </p>
             <button
               type="submit"
-              className="jersey-submit"
+              className="pel-pdp__cta jersey-submit"
               disabled={busy || !canOrder || (!!size && !available)}
             >
               <span>
@@ -438,73 +498,57 @@ export function JerseyPage({
         </div>
       </section>
 
-      <div className="jersey-strip" aria-label="Kit details">
-        <span>TWO COLORS. ONE CLUB.</span>
-        <span>JERSEY OR FULL KIT</span>
-        <span>YOUR NAME + NUMBER</span>
-        <span>BEYOND THE GAME.</span>
-      </div>
-      <section className="jersey-story">
-        {preview && (
-          <img
-            src="/jersey/club-reference.png"
-            alt="Por El Deporte players together wearing the orange home kit — reference photograph"
-            loading="lazy"
-          />
-        )}
-        <div>
-          <p className="jersey-eyebrow">EST. 2014 · KEY BISCAYNE</p>
-          <h2>
-            Made with{' '}
-            <br />
-            love.
-          </h2>
-          <p>
-            Every two years, we release a new official Por El Deporte jersey.
-            Made with love for the people who show up, share the field, and
-            keep this community playing.
-          </p>
-          <p>
-            Home in orange. Away in black. Add your own name and number and
-            stand out on the field. The first seven days of the preorder are
-            your only chance to personalize this release.
-          </p>
+      <section className="pel-pdp__info" aria-label="About the jersey">
+        <div className="pel-pdp__card">
+          <h2 className="pel-pdp__card-title">The Story</h2>
+          <div className="pel-pdp__card-body">
+            <p>
+              Every two years, we release a new official Por El Deporte jersey.
+              Made with love for the people who show up, share the field, and
+              keep this community playing.
+            </p>
+            <p>
+              Home in orange. Away in black. Add your own name and number and
+              stand out on the field. The first seven days of the preorder are
+              your only chance to personalize this release.
+            </p>
+          </div>
+          <div className="pel-pdp__card-foot">Est. 2014 · Key Biscayne</div>
         </div>
-      </section>
-      <section className="jersey-faq" aria-label="Preorder questions">
-        <h2>Before the whistle.</h2>
-        <div>
-          <details>
-            <summary>How does the preorder work?</summary>
-            <p>
-              Choose your color, size, and either a jersey on its own or a
-              jersey with shorts. This is a preorder, so it will ship after
-              production. The shipping date is to be confirmed.
-            </p>
-          </details>
-          <details>
-            <summary>Can I add my own name and number?</summary>
-            <p>
-              Yes. The first 7 days of the preorder are the only chance to
-              personalize this release. Personalization is optional. Enter a
-              name of up to {NAME_LIMIT} characters and a number from 0 to 99.
-              Your name prints in uppercase.
-            </p>
-          </details>
-          <details>
-            <summary>What sizes are available?</summary>
-            <p>
-              M, L, XL, and XXL. If you add shorts, they will be the same size
-              as your jersey.
-            </p>
-          </details>
-          <details>
-            <summary>When will my kit ship?</summary>
-            <p>
-              {product?.shippingEstimate?.value ||
-                'The shipping date is to be confirmed. This is a preorder, not an item ready to ship.'}
-            </p>
-          </details>
+        <div className="pel-pdp__card">
+          <h2 className="pel-pdp__card-title">Make It Yours</h2>
+          <p className="pel-pdp__card-body">
+            The first 7 days of the preorder are the only chance to personalize
+            this release. Add your own name and number, or keep the back plain.
+          </p>
+          <ul className="pel-pdp__speclist" role="list">
+            <li>Up to {NAME_LIMIT} characters for your name</li>
+            <li>Names print in uppercase</li>
+            <li>Jersey numbers from 0 to 99</li>
+          </ul>
+        </div>
+        <div className="pel-pdp__card">
+          <h2 className="pel-pdp__card-title">The Details</h2>
+          <div className="pel-pdp__specs">
+            {[
+              ['Colors', 'Home (Orange) / Away (Black)'],
+              ['Sizes', 'M / L / XL / XXL'],
+              ['Options', 'Jersey only or with shorts'],
+              ['Shorts', 'Same size as your jersey'],
+              [
+                'Shipping',
+                product?.shippingEstimate?.value || 'Date to be confirmed',
+              ],
+            ].map(([label, value]) => (
+              <div key={label} className="pel-pdp__spec">
+                <span className="pel-pdp__spec-k">{label}</span>
+                <span className="pel-pdp__spec-v">{value}</span>
+              </div>
+            ))}
+          </div>
+          <p className="jersey-hint">
+            This is a preorder. Your kit will ship after production.
+          </p>
         </div>
       </section>
     </div>

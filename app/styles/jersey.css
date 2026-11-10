@@ -1,11 +1,4 @@
-.jersey-page {
-  --kit-color: #d95224;
-  background: var(--pel-cream);
-  color: var(--pel-ink);
-}
-.jersey-page--away {
-  --kit-color: #242522;
-}
+/* Product layout and controls come from product.css. These styles own preorder additions. */
 .jersey-review-banner {
   display: flex;
   justify-content: center;
@@ -13,57 +6,19 @@
   padding: 10px 24px;
   background: var(--pel-ink);
   color: var(--pel-cream);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font: 700 12px/1.5 var(--font-body);
 }
 .jersey-review-banner span {
   font-weight: 500;
-  letter-spacing: 0;
-}
-.jersey-layout {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 12px 48px 64px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(0, 1fr);
-  gap: clamp(32px, 5vw, 80px);
-  align-items: start;
-}
-.jersey-gallery {
-  position: sticky;
-  top: 100px;
-  min-width: 0;
 }
 .jersey-stage {
-  position: relative;
   display: grid;
   place-items: center;
-  aspect-ratio: 4 / 5;
-  background: #e9e3d5;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.jersey-stage::before {
-  content: '';
-  position: absolute;
-  width: 75%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(23, 23, 23, 0.1);
-  border-radius: 50%;
 }
 .jersey-stage > svg {
-  width: 95%;
-  position: relative;
-}
-.jersey-stage > img {
+  position: absolute;
   width: 100%;
   height: 100%;
-  position: absolute;
-  object-fit: cover;
-}
-.jersey-stage--photo > img {
-  object-position: 45% 50%;
 }
 .jersey-stage-label {
   position: absolute;
@@ -74,9 +29,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font: 700 12px/1.4 var(--font-body);
 }
 .jersey-stage--photo .jersey-stage-label {
   color: var(--pel-cream);
@@ -84,122 +37,66 @@
 }
 .jersey-artwork-note {
   position: absolute;
-  bottom: 20px;
-  font-size: 10px;
+  bottom: 16px;
+  font: 500 12px/1.5 var(--font-body);
   color: var(--text-muted);
 }
-.jersey-gallery-nav {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
+.jersey-thumbs svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 86%;
 }
-.jersey-gallery-nav button {
-  flex: 1;
-  padding: 13px 8px;
-  border: 1px solid var(--border-soft);
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
+.jersey-thumb-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 2px;
+  background: var(--pel-cream);
   color: var(--pel-ink);
-  background: transparent;
-  cursor: pointer;
+  font: 600 12px/1.2 var(--font-body);
 }
-.jersey-gallery-nav button[aria-pressed='true'] {
+.jersey-thumbs .is-active .jersey-thumb-label {
   background: var(--pel-ink);
   color: var(--pel-cream);
-  border-color: var(--pel-ink);
 }
 .jersey-gallery-caption {
-  font-size: 10px;
+  margin: 0;
+  font: 500 12px/1.6 var(--font-body);
   color: var(--text-muted);
-  margin: 12px 0 0;
-  line-height: 1.6;
 }
 .jersey-eyebrow {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  margin: 0 0 16px;
+  font: 700 12px/1.5 var(--font-body);
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
 }
 .jersey-dot {
   width: 7px;
   height: 7px;
-  background: var(--kit-color);
+  background: var(--pel-orange);
   border-radius: 50%;
+  flex: none;
 }
-.jersey-buy h1 {
-  font-family: var(--font-display);
-  font-size: clamp(70px, 7.4vw, 106px);
-  line-height: 0.88;
-  font-weight: 650;
-  letter-spacing: -0.025em;
-  text-transform: uppercase;
-  margin: 0 0 24px;
-}
-.jersey-intro {
-  font-size: 13px;
-  line-height: 1.75;
-  max-width: 360px;
-  margin: 0;
+.jersey-price-label {
+  font: 600 14px/1.4 var(--font-body);
+  letter-spacing: 0;
   color: var(--text-muted);
-}
-.jersey-price {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 22px 0 28px;
-  font-size: 24px;
-  font-weight: 700;
-}
-.jersey-price > span:last-child {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-.jersey-form {
-  display: grid;
-  gap: 22px;
 }
 .jersey-form fieldset {
-  padding: 0;
-  margin: 0;
   border: 0;
+  padding: 0;
   min-width: 0;
-}
-.jersey-form legend {
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-.jersey-form legend > span {
-  color: var(--text-muted);
-  font-size: 10px;
-  font-weight: 500;
-  margin-right: 9px;
-}
-.jersey-colors {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  margin-inline: 0;
+  margin-bottom: 0;
 }
 .jersey-colors label,
 .jersey-sizes label,
 .jersey-kit-options label {
   position: relative;
-  border: 1px solid var(--border-soft);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-}
-.jersey-colors label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 12px;
 }
 .jersey-colors input,
 .jersey-sizes input,
@@ -211,408 +108,168 @@
 }
 .jersey-colors label:focus-within,
 .jersey-sizes label:focus-within,
-.jersey-kit-options label:focus-within {
+.jersey-kit-options label:focus-within,
+.jersey-page button:focus-visible,
+.jersey-print-fields input:focus-visible {
   outline: 2px solid var(--pel-blue);
   outline-offset: 3px;
 }
-.jersey-page .is-selected {
-  border-color: var(--pel-ink);
-  background: rgba(23, 23, 23, 0.035);
+.jersey-colors .is-active {
+  background: var(--pel-orange-ink);
+  border-color: var(--pel-orange-ink);
 }
 .jersey-swatch {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
   background: #e96026;
-  border: 1px solid rgba(23, 23, 23, 0.2);
-  flex-shrink: 0;
 }
 .jersey-swatch--black {
   background: #242522;
 }
-.jersey-colors small,
-.jersey-kit-options small {
+.jersey-colors small {
   display: block;
-  margin-top: 4px;
-  font-size: 10px;
+  margin-top: 6px;
+  font: 600 12px/1.4 var(--font-body);
+}
+.jersey-kit-options .pel-pdp__size {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.jersey-kit-options .pel-pdp__size > span:last-child:not(:first-of-type) {
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.jersey-hint {
+  font: 500 12px/1.6 var(--font-body);
   color: var(--text-muted);
-  font-weight: 500;
-  line-height: 1.5;
-}
-.jersey-choice-mark {
-  margin-left: auto;
-  font-size: 16px;
-}
-.jersey-sizes {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-.jersey-sizes label {
-  padding: 14px 8px;
-  text-align: center;
-}
-.jersey-sizes .is-selected {
-  background: var(--pel-ink);
-  color: var(--pel-cream);
-}
-.jersey-kit-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.jersey-kit-options label {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 14px 12px;
-}
-.jersey-kit-options label > span:last-child:not(:first-of-type) {
-  font-size: 13px;
+  margin: 10px 0 0;
 }
 .jersey-personalization {
-  padding: 20px;
-  background: #eae4d5;
-  border: 1px solid #d4cbb8;
-  border-radius: 4px;
+  padding: 24px;
+  margin-top: 32px;
 }
 .jersey-personalization-tag {
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  font-weight: 800;
-  margin: 0 0 10px;
+  font: 700 12px/1.5 var(--font-body);
+  letter-spacing: 0.04em;
+  margin: 0 0 12px;
   color: var(--pel-orange-ink);
 }
-.jersey-personalization h2 {
-  font-family: var(--font-display);
-  font-size: clamp(24px, 2.5vw, 32px);
-  line-height: 1.05;
-  font-weight: 650;
-  margin: 0 0 9px;
+.jersey-personalization .pel-pdp__card-title {
+  font-size: 28px;
+  margin-bottom: 14px;
 }
-.jersey-personalization > p:not(.jersey-personalization-tag) {
-  font-size: 11px;
-  line-height: 1.7;
+.jersey-personalization-copy {
+  font: 500 14px/1.6 var(--font-body);
   color: var(--text-muted);
   margin: 0;
 }
 .jersey-personalize-toggle {
   display: flex;
   align-items: center;
-  gap: 9px;
-  font-size: 11px;
-  font-weight: 700;
-  margin-top: 16px;
+  gap: 10px;
+  font: 600 14px/1.5 var(--font-body);
+  margin-top: 20px;
   cursor: pointer;
 }
 .jersey-personalize-toggle input {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   accent-color: var(--pel-ink);
+  flex: none;
 }
 .jersey-print-fields {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 82px;
+  grid-template-columns: minmax(0, 1fr) 86px;
   gap: 12px;
-  margin: 16px 0 10px;
+  margin: 20px 0 12px;
 }
 .jersey-print-fields label {
-  font-size: 10px;
-  font-weight: 700;
+  font: 700 12px/1.5 var(--font-body);
 }
 .jersey-print-fields label > span {
   display: block;
   color: var(--text-muted);
-  font-size: 9px;
   font-weight: 500;
   margin: 4px 0 8px;
 }
 .jersey-print-fields input {
   width: 100%;
   min-width: 0;
-  padding: 12px 10px;
-  font-family: var(--font-body);
-  font-size: 16px;
+  padding: 12px;
+  font: 600 16px/1.5 var(--font-body);
   color: var(--pel-ink);
-  border: 1px solid #b6ac98;
-  border-radius: 3px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-sm);
   background: var(--pel-cream);
 }
 #jersey-name {
   text-transform: uppercase;
 }
 .jersey-print-note {
-  font-size: 9px !important;
+  font: 500 12px/1.6 var(--font-body);
+  color: var(--text-muted);
+  margin: 0;
 }
 .jersey-order-summary {
-  font-size: 10px;
-  line-height: 1.5;
-  margin: 0 0 -12px;
+  font: 600 12px/1.6 var(--font-body);
   color: var(--text-muted);
+  margin: 24px 0 12px;
 }
 .jersey-submit {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 19px 18px;
-  background: var(--pel-ink);
-  color: var(--pel-cream);
-  border: 1px solid var(--pel-ink);
-  border-radius: 4px;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
 }
 .jersey-submit > span:first-child {
   margin-right: auto;
 }
 .jersey-submit:hover:not(:disabled) {
   background: var(--pel-orange-ink);
-  border-color: var(--pel-orange-ink);
-}
-.jersey-submit:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 .jersey-shipping {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  font-size: 10px;
-  margin: 14px 0 0;
-  line-height: 1.6;
+  font: 600 12px/1.6 var(--font-body);
   text-align: center;
+  margin: 14px 0 0;
 }
 .jersey-error {
   color: var(--error);
-  font-size: 12px;
-  margin: 0;
+  font: 600 14px/1.6 var(--font-body);
+  margin: 12px 0 0;
 }
 .jersey-review-summary {
-  border: 1px solid var(--pel-green);
+  border: var(--border-width) solid var(--pel-green);
+  border-radius: var(--radius-md);
   background: #e8eadb;
-  padding: 16px;
-  font-size: 12px;
-  line-height: 1.6;
+  padding: 20px;
+  font: 500 14px/1.6 var(--font-body);
+  margin-top: 16px;
 }
 .jersey-review-summary p {
   margin: 6px 0;
 }
 .jersey-review-summary small {
-  font-size: 10px;
-}
-.jersey-strip {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 24px;
-  padding: 23px 32px;
-  background: var(--kit-color);
-  color: var(--pel-cream);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-}
-.jersey-page:not(.jersey-page--away) .jersey-strip {
-  background: var(--pel-orange-ink);
-}
-.jersey-story {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 72px;
-  align-items: center;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 80px 80px;
-}
-.jersey-story > img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  object-position: center 40%;
-  border-radius: 4px;
-}
-.jersey-story > div {
-  max-width: 400px;
-}
-.jersey-story h2 {
-  font-family: var(--font-display);
-  font-size: clamp(40px, 5vw, 72px);
-  font-weight: 650;
-  line-height: 0.95;
-  text-transform: uppercase;
-  margin: 0 0 24px;
-}
-.jersey-story p:not(.jersey-eyebrow) {
-  font-size: 13px;
-  line-height: 1.9;
-  margin: 0 0 12px;
-  color: var(--text-muted);
-}
-.jersey-faq {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 48px 96px;
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 48px;
-}
-.jersey-faq h2 {
-  font-family: var(--font-display);
-  font-size: 36px;
-  font-weight: 650;
-  line-height: 1.1;
-  margin: 16px 0;
-}
-.jersey-faq details {
-  border-top: 1px solid var(--border-soft);
-}
-.jersey-faq details:last-child {
-  border-bottom: 1px solid var(--border-soft);
-}
-.jersey-faq summary {
-  padding: 20px 28px 20px 0;
-  position: relative;
-  cursor: pointer;
   font-size: 12px;
-  font-weight: 700;
-  list-style: none;
 }
-.jersey-faq summary::-webkit-details-marker {
-  display: none;
+.jersey-page .pel-pdp__spec-v {
+  text-align: right;
 }
-.jersey-faq summary::after {
-  content: '+';
-  position: absolute;
-  right: 4px;
-  top: 17px;
-  font-size: 20px;
-  font-weight: 500;
-}
-.jersey-faq details[open] summary::after {
-  content: '−';
-}
-.jersey-faq details p {
-  font-size: 12px;
-  line-height: 1.8;
-  margin: 0 0 20px;
-  color: var(--text-muted);
-}
-.jersey-page button:focus-visible,
-.jersey-page summary:focus-visible,
-.jersey-print-fields input:focus-visible {
-  outline: 2px solid var(--pel-blue);
-  outline-offset: 3px;
-}
-@media (min-width: 1440px) {
-  .jersey-gallery {
-    top: 110px;
-  }
-}
-@media (max-width: 899px) {
-  .jersey-layout {
-    padding: 8px 24px 48px;
-    gap: 32px;
-    grid-template-columns: 1fr 1fr;
-  }
-  .jersey-buy h1 {
-    font-size: 70px;
-  }
-  .jersey-colors,
-  .jersey-kit-options {
-    grid-template-columns: 1fr;
-  }
-  .jersey-story {
-    padding: 56px 32px;
-    gap: 32px;
-  }
-}
-@media (max-width: 639px) {
+@media (max-width: 60em) {
   .jersey-review-banner {
     display: block;
     text-align: center;
-    font-size: 9px;
-    line-height: 1.6;
     padding: 8px 16px;
   }
   .jersey-review-banner span {
     display: block;
   }
-  .jersey-layout {
-    grid-template-columns: 1fr;
-    padding: 4px 20px 40px;
-    gap: 30px;
-  }
-  .jersey-gallery {
-    position: static;
-  }
-  .jersey-stage {
-    aspect-ratio: 1;
-  }
-  .jersey-stage > svg {
-    width: 82%;
-  }
-  .jersey-stage--photo > img {
-    object-position: 50% 40%;
+  .jersey-personalization {
+    padding: 20px;
   }
   .jersey-stage-label {
-    top: 14px;
-    left: 14px;
-    right: 14px;
-    font-size: 8px;
-  }
-  .jersey-artwork-note {
-    bottom: 12px;
-    font-size: 9px;
-  }
-  .jersey-gallery-nav button {
-    font-size: 10px;
-    min-height: 44px;
-  }
-  .jersey-buy h1 {
-    font-size: 76px;
-  }
-  .jersey-colors,
-  .jersey-kit-options {
-    grid-template-columns: 1fr 1fr;
-  }
-  .jersey-personalization {
-    padding: 16px;
-  }
-  .jersey-strip {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px 12px;
-    padding: 24px 20px;
-    font-size: 9px;
-    text-align: center;
-  }
-  .jersey-story {
-    grid-template-columns: 1fr;
-    padding: 40px 20px;
-    gap: 28px;
-  }
-  .jersey-story > img {
-    aspect-ratio: 5 / 4;
-    object-position: 50% 35%;
-  }
-  .jersey-faq {
-    grid-template-columns: 1fr;
-    padding: 0 20px 56px;
-    gap: 8px;
-  }
-  .jersey-faq h2 {
-    font-size: 32px;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .jersey-page button,
-  .jersey-form label {
-    transition:
-      background-color 0.15s,
-      border-color 0.15s;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    font-size: 12px;
   }
 }

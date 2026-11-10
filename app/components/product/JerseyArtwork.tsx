@@ -1,3 +1,5 @@
+import {useId} from 'react';
+
 export function JerseyArtwork({
   away,
   back,
@@ -14,6 +16,7 @@ export function JerseyArtwork({
   number: string;
 }) {
   const shirt = away ? '#242522' : '#e96026';
+  const id = useId();
   return (
     <svg
       viewBox="0 0 440 510"
@@ -22,25 +25,25 @@ export function JerseyArtwork({
     >
       <defs>
         <pattern
-          id="jersey-diamonds"
+          id={`${id}-diamonds`}
           width="28"
           height="16"
           patternUnits="userSpaceOnUse"
         >
           <path d="M0 8 14 0 28 8 14 16Z" fill="#f7f0de" />
         </pattern>
-        <linearGradient id="jersey-shade" x1="0" x2="1">
+        <linearGradient id={`${id}-shade`} x1="0" x2="1">
           <stop stopColor="#000" stopOpacity=".12" />
           <stop offset=".5" stopColor="#fff" stopOpacity=".04" />
           <stop offset="1" stopColor="#000" stopOpacity=".15" />
         </linearGradient>
-        <filter id="jersey-shadow" x="-40%" width="180%" height="150%">
+        <filter id={`${id}-shadow`} x="-40%" width="180%" height="150%">
           <feDropShadow dx="0" dy="14" stdDeviation="12" floodOpacity=".14" />
         </filter>
       </defs>
       <g
         transform={shorts ? 'translate(45 0) scale(.8)' : 'translate(0 38)'}
-        filter="url(#jersey-shadow)"
+        filter={`url(#${id}-shadow)`}
       >
         <path
           d="m167 48-61 22-67 86 61 43 32-37-9 205q97 19 194 0l-9-205 32 37 61-43-67-86-61-22Z"
@@ -49,7 +52,7 @@ export function JerseyArtwork({
           strokeOpacity=".2"
         />
         {!back && (
-          <path d="M151 54h37v321l-37-3Z" fill="url(#jersey-diamonds)" />
+          <path d="M151 54h37v321l-37-3Z" fill={`url(#${id}-diamonds)`} />
         )}
         <path
           d="m167 48-13 9 42 42 24-23 24 23 42-42-13-9q-53 31-106 0Z"
@@ -111,11 +114,11 @@ export function JerseyArtwork({
         ) : null}
         <path
           d="m167 48-61 22-67 86 61 43 32-37-9 205q97 19 194 0l-9-205 32 37 61-43-67-86-61-22Z"
-          fill="url(#jersey-shade)"
+          fill={`url(#${id}-shade)`}
         />
       </g>
       {shorts && (
-        <g filter="url(#jersey-shadow)">
+        <g filter={`url(#${id}-shadow)`}>
           <path
             d="M141 325h158l23 138-87 9-15-83-15 83-87-9Z"
             fill={away ? '#242522' : '#f4eee0'}
@@ -123,7 +126,7 @@ export function JerseyArtwork({
             strokeOpacity=".25"
           />
           <path d="M141 325h158v12H141Z" fill={away ? '#171717' : '#ded8cc'} />
-          <path d="m279 337 20-2 22 127-25 3Z" fill="url(#jersey-diamonds)" />
+          <path d="m279 337 20-2 22 127-25 3Z" fill={`url(#${id}-diamonds)`} />
           <path
             d="M216 335v17m8-17v17"
             stroke={away ? '#f7f0de' : '#171717'}
