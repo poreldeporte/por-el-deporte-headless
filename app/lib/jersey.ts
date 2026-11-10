@@ -8,6 +8,10 @@ export const JERSEY_SIZES = ['M', 'L', 'XL', 'XXL'] as const;
 export const JERSEY_COLORS = ['Home (Orange)', 'Away (Black)'] as const;
 export const JERSEY_SHORTS_OPTIONS = ['None', ...JERSEY_SIZES] as const;
 export const JERSEY_PREVIEW_PRICES = ['70.00', '85.00'] as const;
+export const JERSEY_SHORTS_VALUE = {
+  amount: '35.00',
+  currencyCode: 'USD',
+} as const;
 export const NAME_LIMIT = 14;
 const PERSONALIZATION_DURATION = 7 * 24 * 60 * 60 * 1000;
 

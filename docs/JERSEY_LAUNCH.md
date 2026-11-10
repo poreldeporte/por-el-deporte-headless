@@ -86,6 +86,12 @@ The product has handle `club-jersey` and these exact option names/values:
 
 The 40 variants cost **$70 USD** when `Shorts size` is `None`, or **$85 USD**
 when shorts are included. The Add shorts section shows the $15 difference and
+frames the shorts as an optional kit upgrade: a $35 USD value, added for $15,
+saving $20. The $35 reference value comes from the merchant and is defined in
+`JERSEY_SHORTS_VALUE`; it does not create a standalone shorts product or change
+the price charged at checkout. Savings are derived from the actual kit/jersey
+price difference and shown only for a positive saving in the reference
+currency. The UI still shows the full $85 kit total and
 requires an independent shorts size when enabled. Shoppers can pair any jersey
 size with any shorts size. Adding shorts initially selects the chosen jersey
 size if no shorts size has been chosen. Subsequent jersey changes never

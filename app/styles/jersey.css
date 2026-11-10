@@ -254,6 +254,10 @@
   font: 500 12px/1.5 var(--font-body);
   color: var(--text-muted);
 }
+.jersey-shorts-saving {
+  color: var(--pel-orange-ink);
+  font-weight: 700;
+}
 .jersey-shorts .jersey-shorts-toggle {
   min-width: 76px;
   min-height: 44px;

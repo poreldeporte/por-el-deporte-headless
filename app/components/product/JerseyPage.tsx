@@ -8,6 +8,7 @@ import {useAside} from '~/components/Aside';
 import {
   JERSEY_COLORS,
   JERSEY_PREVIEW_PRICES,
+  JERSEY_SHORTS_VALUE,
   JERSEY_SIZES,
   JERSEY_STORY,
   JERSEY_TITLE,
@@ -93,6 +94,17 @@ export function JerseyPage({
             Number(kitPrice.amount) - Number(jerseyPrice.amount)
           ).toFixed(2),
           currencyCode: kitPrice.currencyCode,
+        }
+      : null;
+  const shortsSavings =
+    shortsPrice &&
+    shortsPrice.currencyCode === JERSEY_SHORTS_VALUE.currencyCode &&
+    Number(shortsPrice.amount) < Number(JERSEY_SHORTS_VALUE.amount)
+      ? {
+          amount: (
+            Number(JERSEY_SHORTS_VALUE.amount) - Number(shortsPrice.amount)
+          ).toFixed(2),
+          currencyCode: shortsPrice.currencyCode,
         }
       : null;
   const away = color === JERSEY_COLORS[1];
@@ -528,14 +540,25 @@ export function JerseyPage({
                 </span>
                 <span className="jersey-addon-copy">
                   <strong>Matching shorts</strong>
-                  {(shortsPrice || kitPrice) && (
+                  {shortsPrice && (
                     <small>
-                      {shortsPrice && (
+                      {shortsSavings && (
                         <>
-                          +<Money data={shortsPrice} as="span" />
+                          <Money data={JERSEY_SHORTS_VALUE} as="span" /> value
+                          ·{' '}
                         </>
                       )}
-                      {shortsPrice && kitPrice && ' · '}
+                      Add for <Money data={shortsPrice} as="span" />
+                    </small>
+                  )}
+                  {(shortsSavings || kitPrice) && (
+                    <small>
+                      {shortsSavings && (
+                        <span className="jersey-shorts-saving">
+                          Save <Money data={shortsSavings} as="span" />
+                        </span>
+                      )}
+                      {shortsSavings && kitPrice && ' · '}
                       {kitPrice && (
                         <>
                           Kit <Money data={kitPrice} as="span" />
