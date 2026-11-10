@@ -8,8 +8,10 @@ gallery thumbnails, release facts, swatches, size pills, and detail cards.
 Jersey-specific styles cover the preorder and personalization additions.
 
 The buying flow is color → jersey size → personalization → optional shorts.
-The desktop gallery stays visible during customization; mobile shows a back
-illustration in the personalization section and a fixed total/purchase bar.
+Personalization uses a plain/name-and-number choice with full-width name/number
+fields. Shorts use a single optional add-on row and a separate size selector.
+The desktop gallery stays visible during customization; mobile offers a
+collapsible back preview and a fixed total/purchase bar.
 Both purchase buttons submit the same form with native required-field checks
 and the same server validation. The mobile bar hides while the cart is open.
 Size guides are intentionally excluded. Official photography and confirmed

@@ -384,35 +384,59 @@ export function JerseyPage({
               </div>
             </fieldset>
 
-            <div className="pel-pdp__card jersey-personalization">
-              <p className="jersey-personalization-tag">
-                {canPersonalize
-                  ? 'YOUR ONLY CHANCE TO CUSTOMIZE'
-                  : window.status === 'closed'
-                    ? 'PERSONALIZATION CLOSED'
-                    : 'COMING AT LAUNCH'}
-              </p>
-              <h2 className="pel-pdp__card-title">Your name. Your number.</h2>
+            <section
+              className="jersey-personalization"
+              aria-labelledby="jersey-personalization-heading"
+            >
+              <div className="jersey-option-heading">
+                <h2
+                  id="jersey-personalization-heading"
+                  className="pel-pdp__opt-label"
+                >
+                  Name & number
+                </h2>
+                <span className="jersey-option-note">
+                  {canPersonalize
+                    ? 'Launch week only'
+                    : window.status === 'closed'
+                      ? 'Window closed'
+                      : 'Coming at launch'}
+                </span>
+              </div>
               <p className="jersey-personalization-copy">
                 {preview
-                  ? 'Your only chance to add your own name and number to this release. Personalization opens at launch and closes 7 days later.'
+                  ? 'Personalize this release during the first 7 days of preorder.'
                   : canPersonalize
-                    ? `This is the only personalization window for this release. Add your name and number before ${closes}.`
+                    ? `Add your name and number before ${closes}.`
                     : window.status === 'closed'
-                      ? 'Personalization for this release has ended. You can still preorder a jersey without personalization.'
-                      : 'This release can only be personalized during the first 7 days of the preorder.'}
+                      ? 'Personalization has ended. You can still preorder a plain jersey.'
+                      : 'Personalization opens for 7 days when the preorder launches.'}
               </p>
               {canPersonalize && (
                 <>
-                  <label className="jersey-personalize-toggle">
-                    <input
-                      type="checkbox"
-                      name="personalize"
-                      checked={personalize}
-                      onChange={(event) => setPersonalize(event.target.checked)}
-                    />
-                    Add my name & number
-                  </label>
+                  <fieldset className="jersey-print-choice">
+                    <legend className="sr-only">Personalization</legend>
+                    <div className="pel-pdp__sizes jersey-personalization-choice">
+                      {[
+                        {value: 'off', label: 'Keep it plain'},
+                        {value: 'on', label: 'Name + number'},
+                      ].map(({value, label}) => (
+                        <label
+                          key={value}
+                          className={`pel-pdp__size${personalize === (value === 'on') ? ' is-active' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name="personalize"
+                            value={value}
+                            checked={personalize === (value === 'on')}
+                            onChange={() => setPersonalize(value === 'on')}
+                          />
+                          {label}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
                   {personalize && (
                     <div
                       className="jersey-print-layout"
@@ -424,17 +448,6 @@ export function JerseyPage({
                         }
                       }}
                     >
-                      <div className="jersey-mobile-preview">
-                        <JerseyArtwork
-                          away={away}
-                          back
-                          shorts={false}
-                          personalize
-                          name={name.toUpperCase()}
-                          number={number}
-                        />
-                        <p>Back preview · illustration</p>
-                      </div>
                       <div className="jersey-print-fields">
                         <label htmlFor="jersey-name">
                           Name on back{' '}
@@ -475,45 +488,54 @@ export function JerseyPage({
                           />
                         </label>
                       </div>
+                      <details className="jersey-print-preview">
+                        <summary>View back preview</summary>
+                        <div className="jersey-mobile-preview">
+                          <JerseyArtwork
+                            away={away}
+                            back
+                            shorts={false}
+                            personalize
+                            name={name.toUpperCase()}
+                            number={number}
+                          />
+                          <p>Illustration · final details may vary</p>
+                        </div>
+                      </details>
                     </div>
                   )}
                   {personalize && (
                     <p id="jersey-print-note" className="jersey-print-note">
-                      Names print in uppercase. Double-check spelling and number
-                      before ordering.
+                      Printed in uppercase. Check your spelling and number.
                     </p>
                   )}
                 </>
               )}
-            </div>
+            </section>
 
             <section
-              className="pel-pdp__card jersey-shorts"
+              className="jersey-shorts"
               aria-labelledby="jersey-shorts-heading"
             >
-              <div className="jersey-shorts-heading">
-                <h2 id="jersey-shorts-heading" className="pel-pdp__card-title">
-                  Add shorts
-                </h2>
-                {shortsPrice && (
-                  <span className="jersey-shorts-price">
-                    +<Money data={shortsPrice} as="span" />
-                  </span>
-                )}
-              </div>
-              <p className="jersey-hint">
-                Complete your kit. Choose a shorts size independently of your
-                jersey.
-              </p>
-              <label className="jersey-personalize-toggle">
+              <h2 id="jersey-shorts-heading" className="pel-pdp__opt-label">
+                Complete your kit
+              </h2>
+              <label className="jersey-addon-row">
                 <input
                   type="checkbox"
                   name="addShorts"
                   checked={withShorts}
                   onChange={(event) => setWithShorts(event.target.checked)}
-                  aria-controls="jersey-shorts-sizes"
                 />
-                Add matching shorts
+                <span className="jersey-addon-copy">
+                  <strong>Add matching shorts</strong>
+                  <small>Choose a separate size.</small>
+                </span>
+                {shortsPrice && (
+                  <span className="jersey-shorts-price">
+                    +<Money data={shortsPrice} as="span" />
+                  </span>
+                )}
               </label>
               {withShorts && (
                 <fieldset id="jersey-shorts-sizes" className="pel-pdp__opt">
