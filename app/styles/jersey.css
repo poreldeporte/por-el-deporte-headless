@@ -1,4 +1,29 @@
 /* Product layout and controls come from product.css. These styles own preorder additions. */
+.jersey-page .pel-pdp__main {
+  grid-template-areas:
+    'gallery facts intro'
+    'gallery facts buy';
+  grid-template-rows: auto 1fr;
+  row-gap: 0;
+}
+.jersey-intro {
+  grid-area: intro;
+  min-width: 0;
+}
+.jersey-gallery {
+  grid-area: gallery;
+}
+.jersey-page .pel-pdp__stats {
+  grid-area: facts;
+}
+.jersey-page .pel-pdp__buy {
+  grid-area: buy;
+}
+.jersey-launch-offer {
+  margin: 14px 0 0;
+  font: 600 12px/1.6 var(--font-body);
+  color: var(--pel-orange-ink);
+}
 .jersey-review-banner {
   display: flex;
   justify-content: center;
@@ -258,6 +283,11 @@
   color: var(--text-muted);
   margin: 24px 0 12px;
 }
+.jersey-order-summary > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--pel-ink);
+}
 .jersey-submit {
   display: flex;
   align-items: center;
@@ -272,8 +302,7 @@
 }
 .jersey-shipping {
   font: 600 12px/1.6 var(--font-body);
-  text-align: center;
-  margin: 14px 0 0;
+  margin: 0 0 14px;
 }
 .jersey-error {
   color: var(--error);
@@ -311,6 +340,14 @@
   }
 }
 @media (max-width: 60em) {
+  .jersey-page .pel-pdp__main {
+    grid-template-areas: 'intro' 'gallery' 'buy' 'facts';
+    grid-template-rows: auto;
+    row-gap: 28px;
+  }
+  .jersey-page .pel-pdp__buy .pel-pdp__opt:first-child {
+    margin-top: 0;
+  }
   .jersey-print-preview {
     display: block;
   }

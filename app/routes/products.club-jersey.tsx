@@ -21,7 +21,7 @@ export const meta: Route.MetaFunction = () => [
   {
     name: 'description',
     content:
-      'The official Por El Deporte jersey. Released once every two years, with just seven days to make it yours. Home in orange. Away in black.',
+      'The official Por El Deporte jersey. Released every two years. Home in orange, away in black. Name and number included during the first 7 days of preorder.',
   },
   // Keep the launch out of search until the merchant approves publication.
   {name: 'robots', content: 'noindex, nofollow'},
@@ -118,12 +118,14 @@ const JERSEY_QUERY = `#graphql
     product(handle: $handle) {
       id
       title
+      vendor
       startsAt: metafield(namespace: "preorder", key: "starts_at") { value }
       shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }
       images(first: 10) { nodes { id url altText width height } }
       variants(first: 100) {
         nodes {
           id
+          title
           availableForSale
           selectedOptions { name value }
           price { amount currencyCode }

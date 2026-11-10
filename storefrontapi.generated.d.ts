@@ -1027,7 +1027,7 @@ export type JerseyPreorderQueryVariables = StorefrontAPI.Exact<{
 
 export type JerseyPreorderQuery = {
   product?: StorefrontAPI.Maybe<
-    Pick<StorefrontAPI.Product, 'id' | 'title'> & {
+    Pick<StorefrontAPI.Product, 'id' | 'title' | 'vendor'> & {
       startsAt?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
       shippingEstimate?: StorefrontAPI.Maybe<
         Pick<StorefrontAPI.Metafield, 'value'>
@@ -1042,7 +1042,10 @@ export type JerseyPreorderQuery = {
       };
       variants: {
         nodes: Array<
-          Pick<StorefrontAPI.ProductVariant, 'id' | 'availableForSale'> & {
+          Pick<
+            StorefrontAPI.ProductVariant,
+            'id' | 'title' | 'availableForSale'
+          > & {
             selectedOptions: Array<
               Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
             >;
@@ -1385,7 +1388,7 @@ interface GeneratedQueryTypes {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };
-  '#graphql\n  query JerseyPreorder($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      startsAt: metafield(namespace: "preorder", key: "starts_at") { value }\n      shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }\n      images(first: 10) { nodes { id url altText width height } }\n      variants(first: 100) {\n        nodes {\n          id\n          availableForSale\n          selectedOptions { name value }\n          price { amount currencyCode }\n          image { id url altText width height }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query JerseyPreorder($handle: String!, $country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      id\n      title\n      vendor\n      startsAt: metafield(namespace: "preorder", key: "starts_at") { value }\n      shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }\n      images(first: 10) { nodes { id url altText width height } }\n      variants(first: 100) {\n        nodes {\n          id\n          title\n          availableForSale\n          selectedOptions { name value }\n          price { amount currencyCode }\n          image { id url altText width height }\n        }\n      }\n    }\n  }\n': {
     return: JerseyPreorderQuery;
     variables: JerseyPreorderQueryVariables;
   };

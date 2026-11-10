@@ -12,6 +12,11 @@ Personalization uses a plain/name-and-number choice with full-width name/number
 fields. Shorts use a single optional add-on row and a separate size selector.
 The desktop gallery stays visible during customization; mobile offers a
 collapsible back preview and a fixed total/purchase bar.
+On mobile, the title, price, and included-personalization offer come before the
+gallery, followed by buying options and then release facts. Both purchase
+buttons name the next required choice until the selection is complete. The
+summary shows both sizes and the exact name/number before submission, beside
+the preorder shipping notice.
 Both purchase buttons submit the same form with native required-field checks
 and the same server validation. The mobile bar hides while the cart is open.
 Size guides are intentionally excluded. Official photography and confirmed
@@ -44,7 +49,10 @@ Create a product with handle `club-jersey` and these exact option names/values:
 The 40 variants cost **$70 USD** when `Shorts size` is `None`, or **$85 USD**
 when shorts are included. The Add shorts section shows the $15 difference and
 requires an independent shorts size when enabled. Shoppers can pair any jersey
-size with any shorts size. Both sizes belong to the actual Shopify variant and
+size with any shorts size. Adding shorts initially selects the chosen jersey
+size if no shorts size has been chosen. Subsequent jersey changes never
+overwrite the shorts size, and removing/readding shorts preserves its selection.
+Both sizes belong to the actual Shopify variant and
 appear as selected options in cart, checkout, and the order; shorts size is not
 just a fulfillment note. The UI reads real prices from Shopify once configured.
 
@@ -78,6 +86,36 @@ Different personalizations remain separate Shopify lines. The cart drawer/page
 shows these attributes; Shopify carries them into checkout and the order.
 Confirm that the fulfillment workflow reads order line properties; these new
 jerseys must not inherit automatic fulfillment for the older Printful catalog.
+
+## Conversion and measurement
+
+The UI changes are hypotheses about reducing friction, not measured conversion
+gains. The mobile audit at 390px found the product title 1,155px down the page,
+after the gallery and fact cards. It is now near the top, and the facts follow
+the buying options. The offer explicitly distinguishes the seven-day
+personalization window from the continuing plain-jersey preorder.
+
+The remaining launch priorities are approved home/away product photography
+(including front, back, and shorts) and a credible delivery estimate. Keep
+shipping language accurate until the date is confirmed. Baymard's research on
+[product page usability](https://baymard.com/research-articles/current-state-ecommerce-product-page-ux)
+and [shipping information](https://baymard.com/research-articles/show-shipping-costs-on-product-pages)
+informed these priorities; neither source establishes a conversion lift for
+this store.
+
+The real jersey product now publishes Hydrogen's `Analytics.ProductView`, which
+feeds the existing consent-gated Shopify/Meta integration. Development previews
+do not publish jersey product views. No print names or numbers are added to
+this event. Hydrogen already derives add-to-cart events from cart changes, so
+this page does not send a second manual add-to-cart event.
+
+At launch, verify one product view, one successful add-to-cart, and the existing
+checkout/purchase events with consent enabled; confirm declined consent is
+respected. Review the funnel from product view → cart → checkout → purchase by
+device and traffic source in the existing analytics. Use real launch traffic
+to identify drop-off before making further conversion claims or running an
+experiment. Real product/cart/checkout event validation remains pending the
+Shopify catalog setup.
 
 ## Approval and final validation
 

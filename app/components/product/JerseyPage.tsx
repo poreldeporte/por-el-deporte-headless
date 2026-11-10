@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
+import {Analytics, Image, Money} from '@shopify/hydrogen';
 import type {JerseyPreorderQuery} from 'storefrontapi.generated';
 import type {action} from '~/routes/products.club-jersey';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
@@ -98,15 +98,6 @@ export function JerseyPage({
   const busy = fetcher.state !== 'idle';
   const available = preview || Boolean(variant?.availableForSale);
   const submitDisabled = busy || !canOrder || (hasSizes && !available);
-  const submitLabel = busy
-    ? 'One moment…'
-    : !canOrder
-      ? 'Preorders open soon'
-      : hasSizes && !available
-        ? 'Combination unavailable'
-        : preview
-          ? 'Review your preorder'
-          : 'Preorder your jersey';
   const readyToSubmit = !validateJerseySelection(
     {
       ...selection,
@@ -115,6 +106,27 @@ export function JerseyPage({
     },
     canPersonalize,
   );
+  const nextChoice = !size
+    ? 'Choose jersey size'
+    : selection.personalize && !name.trim()
+      ? 'Add your name'
+      : selection.personalize && !number.trim()
+        ? 'Add your number'
+        : withShorts && !shortsSize
+          ? 'Choose shorts size'
+          : !readyToSubmit
+            ? 'Check print details'
+            : null;
+  const submitLabel = busy
+    ? preview
+      ? 'Reviewing…'
+      : 'Adding to bag…'
+    : !canOrder
+      ? 'Preorders open soon'
+      : hasSizes && !available
+        ? 'Combination unavailable'
+        : nextChoice ||
+          (preview ? 'Review your preorder' : 'Preorder your jersey');
   const image =
     priceVariant?.image ??
     product?.images.nodes.find((item) => item.altText?.includes(color));
@@ -174,6 +186,31 @@ export function JerseyPage({
         ]}
       />
       <section className="pel-pdp__main" aria-label="The Club Jersey preorder">
+        <div className="jersey-intro">
+          <p className="jersey-eyebrow">
+            <span className="jersey-dot" /> THE OFFICIAL CLUB JERSEY · PREORDER
+          </p>
+          <h1 className="pel-pdp__title">
+            {product?.title || 'The Club Jersey'}
+          </h1>
+          <p className="pel-pdp__lead">
+            Our official jersey, released once every two years. Made with love
+            for the people who make this club.
+          </p>
+          <div className="pel-pdp__price" aria-live="polite">
+            {price ? <Money data={price} /> : <span>Select your kit</span>}
+            <span className="jersey-price-label">
+              {withShorts ? 'Jersey + shorts' : 'Jersey only'}
+            </span>
+          </div>
+          <p className="jersey-launch-offer">
+            {canPersonalize
+              ? 'Name + number included · first 7 days only'
+              : window.status === 'closed'
+                ? 'Plain jersey preorder · personalization has ended'
+                : 'Name + number included during launch week'}
+          </p>
+        </div>
         <div className="pel-pdp__gallery jersey-gallery">
           <div
             className={`pel-pdp__stage jersey-stage${showingPhoto ? ' jersey-stage--photo' : ''}`}
@@ -292,44 +329,7 @@ export function JerseyPage({
           </p>
         </div>
 
-        <div className="pel-pdp__stats" aria-label="Release details">
-          {[
-            {value: 'Official', label: 'Club jersey'},
-            {value: '2014', label: 'Est. Key Biscayne'},
-            {value: 'Preorder', label: 'Reserve your kit'},
-            {value: 'Yours', label: 'Name + number at launch'},
-          ].map(({value, label}) => (
-            <div key={label} className="pel-pdp__stat">
-              <div
-                className="pel-pdp__stat-value"
-                data-len={value.length > 4 ? 'long' : undefined}
-              >
-                {value}
-              </div>
-              <div className="pel-pdp__stat-rule" />
-              <div className="pel-pdp__stat-label">{label}</div>
-            </div>
-          ))}
-        </div>
-
         <div className="pel-pdp__buy">
-          <p className="jersey-eyebrow">
-            <span className="jersey-dot" /> THE OFFICIAL CLUB JERSEY · PREORDER
-          </p>
-          <h1 className="pel-pdp__title">
-            {product?.title || 'The Club Jersey'}
-          </h1>
-          <p className="pel-pdp__lead">
-            The official Por El Deporte jersey. Released once every two years,
-            with just seven days to make it yours.
-          </p>
-          <div className="pel-pdp__price" aria-live="polite">
-            {price ? <Money data={price} /> : <span>Select your kit</span>}
-            <span className="jersey-price-label">
-              {withShorts ? 'Jersey + shorts' : 'Jersey only'}
-            </span>
-          </div>
-
           <fetcher.Form
             id="jersey-preorder-form"
             method="post"
@@ -397,7 +397,7 @@ export function JerseyPage({
                 </h2>
                 <span className="jersey-option-note">
                   {canPersonalize
-                    ? 'Launch week only'
+                    ? 'Included'
                     : window.status === 'closed'
                       ? 'Window closed'
                       : 'Coming at launch'}
@@ -525,11 +525,19 @@ export function JerseyPage({
                   type="checkbox"
                   name="addShorts"
                   checked={withShorts}
-                  onChange={(event) => setWithShorts(event.target.checked)}
+                  onChange={(event) => {
+                    const checked = event.target.checked;
+                    setWithShorts(checked);
+                    if (checked && !shortsSize) setShortsSize(size);
+                  }}
                 />
                 <span className="jersey-addon-copy">
                   <strong>Add matching shorts</strong>
-                  <small>Choose a separate size.</small>
+                  <small>
+                    {withShorts && shortsSize
+                      ? `Shorts size ${shortsSize} · change below`
+                      : 'Choose a separate size.'}
+                  </small>
                 </span>
                 {shortsPrice && (
                   <span className="jersey-shorts-price">
@@ -568,6 +576,16 @@ export function JerseyPage({
               {withShorts
                 ? `Shorts ${shortsSize || '— choose a size'}`
                 : 'No shorts'}
+              <span>
+                {selection.personalize
+                  ? `Back: ${name.trim().toUpperCase() || 'Your name'} / ${number.trim() || 'Your number'}`
+                  : 'Plain back'}
+              </span>
+            </p>
+            <p className="jersey-shipping">
+              Preorder ·{' '}
+              {product?.shippingEstimate?.value ||
+                'Shipping date to be confirmed.'}
             </p>
             <button
               type="submit"
@@ -607,11 +625,25 @@ export function JerseyPage({
               )}
             </div>
           </fetcher.Form>
-          <p className="jersey-shipping">
-            <span aria-hidden="true">◷</span> Preorder ·{' '}
-            {product?.shippingEstimate?.value ||
-              'Shipping date to be confirmed.'}
-          </p>
+        </div>
+        <div className="pel-pdp__stats" aria-label="Release details">
+          {[
+            {value: 'Official', label: 'Club jersey'},
+            {value: '2014', label: 'Est. Key Biscayne'},
+            {value: 'Preorder', label: 'Reserve your kit'},
+            {value: 'Yours', label: 'Name + number at launch'},
+          ].map(({value, label}) => (
+            <div key={label} className="pel-pdp__stat">
+              <div
+                className="pel-pdp__stat-value"
+                data-len={value.length > 4 ? 'long' : undefined}
+              >
+                {value}
+              </div>
+              <div className="pel-pdp__stat-rule" />
+              <div className="pel-pdp__stat-label">{label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -698,9 +730,26 @@ export function JerseyPage({
               }
             }}
           >
-            {!submitDisabled && !readyToSubmit ? 'Choose options' : submitLabel}
+            {submitLabel}
           </button>
         </section>
+      )}
+      {!preview && product && priceVariant && (
+        <Analytics.ProductView
+          data={{
+            products: [
+              {
+                id: product.id,
+                title: product.title,
+                vendor: product.vendor,
+                price: priceVariant.price.amount,
+                variantId: priceVariant.id,
+                variantTitle: priceVariant.title,
+                quantity: 1,
+              },
+            ],
+          }}
+        />
       )}
     </div>
   );
