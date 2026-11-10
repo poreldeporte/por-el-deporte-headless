@@ -7,11 +7,12 @@ import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {useAside} from '~/components/Aside';
 import {
   JERSEY_COLORS,
-  JERSEY_SLEEVES,
   JERSEY_STYLES,
   jerseyStyleValue,
   jerseyStyles,
   jerseyQuote,
+  subtractPrices,
+  type Price,
   JERSEY_SIZES,
   JERSEY_STORY,
   JERSEY_TITLE,
@@ -23,6 +24,8 @@ import {
   validateJerseySelection,
 } from '~/lib/jersey';
 import {JerseyArtwork} from './JerseyArtwork';
+
+type JerseyStyle = (typeof JERSEY_STYLES)[number];
 
 export function JerseyPage({
   product,
@@ -36,9 +39,10 @@ export function JerseyPage({
   now: number;
 }) {
   const [firstStyle, setFirstStyle] = useState(JERSEY_STYLES[0]);
-  const [secondStyle, setSecondStyle] = useState(JERSEY_STYLES[2]);
-  const [bundle, setBundle] = useState(false);
-  const styles = bundle ? [firstStyle, secondStyle] : [firstStyle];
+  const [secondStyle, setSecondStyle] = useState<JerseyStyle | null>(null);
+  const [editingSecond, setEditingSecond] = useState(false);
+  const bundle = Boolean(secondStyle);
+  const styles = secondStyle ? [firstStyle, secondStyle] : [firstStyle];
   const style = jerseyStyleValue(styles.map(({value}) => value));
   const away = firstStyle.color === JERSEY_COLORS[1];
   const [size, setSize] = useState('');
@@ -47,7 +51,6 @@ export function JerseyPage({
   const withSocks = socksColor !== 'None';
   const [socksSize, setSocksSize] = useState('');
   const [shortsSize, setShortsSize] = useState('');
-  const [personalize, setPersonalize] = useState(true);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
   const [view, setView] = useState<'photo' | 'club' | 'front' | 'back'>(
@@ -56,6 +59,8 @@ export function JerseyPage({
   const [now, setNow] = useState(serverNow);
   const fetcher = useFetcher<typeof action>();
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const addSecondRef = useRef<HTMLButtonElement>(null);
+  const editSecondRef = useRef<HTMLButtonElement>(null);
   const {open, type: asideType} = useAside();
   const window = personalizationWindow(product?.startsAt?.value, now);
   const canPersonalize = preview || window.status === 'open';
@@ -68,7 +73,7 @@ export function JerseyPage({
     style,
     size,
     shortsSize: withShorts ? shortsSize : 'None',
-    personalize: personalize && canPersonalize,
+    personalize: Boolean(name.trim() || number.trim()) && canPersonalize,
     name,
     number,
     socksColor: withSocks ? socksColor : 'None',
@@ -104,12 +109,49 @@ export function JerseyPage({
     preview,
   );
   const price = quote.total;
-  const singleChoice = quote.choices.find(
+  const firstChoice = quote.choices.find(
     (item) => item.style === firstStyle.value,
-  );
-  const bundleChoice = quote.choices.find(
-    (item) =>
-      item.style === jerseyStyleValue([firstStyle.value, secondStyle.value]),
+  )!;
+  const styleChoices = JERSEY_STYLES.map((item) => ({
+    style: item,
+    price:
+      quote.choices.find((choice) => choice.style === item.value)?.price ??
+      null,
+    image:
+      product?.variants.nodes.find(
+        (variant) =>
+          variant.image &&
+          variant.selectedOptions.some(
+            (option) => option.name === 'Style' && option.value === item.value,
+          ),
+      )?.image ?? undefined,
+  }));
+  const secondChoices = styleChoices.map((item) => {
+    const choice = quote.choices.find(
+      (choice) =>
+        choice.style === jerseyStyleValue([firstStyle.value, item.style.value]),
+    );
+    return {
+      ...item,
+      price: subtractPrices(
+        (withShorts ? choice?.kitPrice : choice?.price) ?? null,
+        withShorts ? firstChoice.kitPrice : firstChoice.price,
+      ),
+      savings: choice?.savings ?? null,
+    };
+  });
+  const savings = secondChoices
+    .filter((item) => item.style.value !== firstStyle.value)
+    .map((item) => item.savings);
+  const bundleSaving = savings.every(
+    (price) =>
+      price?.amount === savings[0]?.amount &&
+      price?.currencyCode === savings[0]?.currencyCode,
+  )
+    ? savings[0]
+    : null;
+  const secondChoice = secondChoices.find(
+    (item) => item.style.value === secondStyle?.value,
   );
   const socksComplete =
     !withSocks || !sockSizes.length || Boolean(selectedSocksSize);
@@ -175,32 +217,6 @@ export function JerseyPage({
       feedbackRef.current?.scrollIntoView({block: 'center'});
     }
   }, [fetcher.state, fetcher.data, open]);
-
-  function changeStyle(
-    index: number,
-    patch: {color?: string; sleeve?: string},
-  ) {
-    const current = index === 0 ? firstStyle : secondStyle;
-    const other = index === 0 ? secondStyle : firstStyle;
-    const next = {...current, ...patch};
-    const matches = JERSEY_STYLES.filter((item) => item.color === next.color);
-    const chosen =
-      matches.find(
-        (item) =>
-          item.sleeve === next.sleeve &&
-          (!bundle || item.value !== other.value),
-      ) ?? matches.find((item) => item.value !== other.value)!;
-    if (!bundle)
-      setSecondStyle(
-        JERSEY_STYLES.find(
-          (item) =>
-            item.color !== chosen.color && item.sleeve === chosen.sleeve,
-        )!,
-      );
-    if (index === 0) setFirstStyle(chosen);
-    else setSecondStyle(chosen);
-    if (view === 'photo' || view === 'club') setView('front');
-  }
 
   return (
     <div className="pel-pdp jersey-page">
@@ -380,157 +396,270 @@ export function JerseyPage({
             className="jersey-form"
           >
             <input type="hidden" name="style" value={style} />
-            <fieldset className="pel-pdp__opt">
-              <legend className="pel-pdp__opt-label">
-                Choose your jerseys
-              </legend>
-              <div className="jersey-packages jersey-sizes">
-                {[false, true].map((pair) => {
-                  const choice = pair ? bundleChoice : singleChoice;
-                  return (
-                    <label
-                      key={String(pair)}
-                      className={`jersey-package${bundle === pair ? ' is-active' : ''}`}
+            <StyleChoice
+              label="Choose your jersey"
+              name="firstStyle"
+              value={firstStyle.value}
+              choices={styleChoices}
+              unavailable={secondStyle?.value}
+              unavailableLabel="Second jersey"
+              onChange={(item) => {
+                setFirstStyle(item);
+                setView('front');
+              }}
+            />
+            <SizeChoice
+              name="size"
+              label={bundle ? 'Size · both jerseys' : 'Size'}
+              value={size}
+              onChange={setSize}
+            />
+
+            <section
+              className="jersey-bundle"
+              aria-labelledby="jersey-bundle-heading"
+            >
+              {secondStyle ? (
+                <div className="jersey-addon-row jersey-bundle-item">
+                  <StylePicture
+                    style={secondStyle}
+                    image={secondChoice?.image}
+                  />
+                  <div className="jersey-addon-copy">
+                    <h2 id="jersey-bundle-heading">
+                      {secondStyle.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}{' '}
+                      · {secondStyle.sleeve}
+                    </h2>
+                    <small className="jersey-addon-saving">
+                      {secondChoice?.savings ? (
+                        <>
+                          Bundle ·{' '}
+                          <Money data={secondChoice.savings} as="span" /> saved
+                        </>
+                      ) : (
+                        'Two-jersey bundle'
+                      )}
+                    </small>
+                    <small>Same size and name + number</small>
+                  </div>
+                  <div className="jersey-item-actions">
+                    <button
+                      type="button"
+                      className="jersey-text-button"
+                      ref={editSecondRef}
+                      aria-label="Edit second jersey"
+                      aria-expanded={editingSecond}
+                      aria-controls="jersey-second-options"
+                      onClick={() => setEditingSecond(!editingSecond)}
                     >
-                      <input
-                        type="radio"
-                        name="package"
-                        value={pair ? 'two' : 'one'}
-                        checked={bundle === pair}
-                        onChange={() => {
-                          setBundle(pair);
-                          setView('front');
-                        }}
-                      />
-                      <strong>{pair ? '2 jerseys' : '1 jersey'}</strong>
-                      {choice?.price && <Money data={choice.price} as="span" />}
-                      <small>
-                        {pair && choice?.savings ? (
-                          <>
-                            Save <Money data={choice.savings} as="span" /> · mix
-                            & match
-                          </>
-                        ) : (
-                          'Your color. Your sleeves.'
-                        )}
-                      </small>
-                    </label>
-                  );
-                })}
-              </div>
-            </fieldset>
-            <div className="jersey-style-list">
-              {styles.map((chosen, index) => (
-                <div
-                  className="jersey-style"
-                  key={index === 0 ? 'first' : 'second'}
-                >
-                  {bundle && (
-                    <p className="jersey-style-title">Jersey {index + 1}</p>
-                  )}
-                  <fieldset className="pel-pdp__opt">
-                    <legend className="pel-pdp__opt-label">
-                      {bundle ? `Jersey ${index + 1} color` : 'Color'}
-                    </legend>
-                    <div className="pel-pdp__swatches jersey-colors">
-                      {JERSEY_COLORS.map((value, colorIndex) => (
-                        <label
-                          key={value}
-                          className={`pel-pdp__swatch${chosen.color === value ? ' is-active' : ''}`}
-                        >
-                          <input
-                            type="radio"
-                            name={`color-${index}`}
-                            value={value}
-                            checked={chosen.color === value}
-                            onChange={() => changeStyle(index, {color: value})}
-                          />
-                          <span
-                            className={`pel-pdp__swatch-dot jersey-swatch${colorIndex ? ' jersey-swatch--black' : ''}`}
-                          />
-                          <span className="pel-pdp__swatch-name">
-                            {colorIndex ? 'Away' : 'Home'}
-                            <small>{colorIndex ? 'Black' : 'Orange'}</small>
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-                  <fieldset className="pel-pdp__opt jersey-sleeves">
-                    <legend className="pel-pdp__opt-label">
-                      {bundle ? `Jersey ${index + 1} sleeves` : 'Sleeves'}
-                    </legend>
-                    <div className="jersey-sizes jersey-choice-row">
-                      {JERSEY_SLEEVES.map((sleeve) => {
-                        const option = JERSEY_STYLES.find(
-                          (item) =>
-                            item.color === chosen.color &&
-                            item.sleeve === sleeve,
-                        )!;
-                        const other = index === 0 ? secondStyle : firstStyle;
-                        const disabled = bundle && option.value === other.value;
-                        const optionPrice = quote.choices.find(
-                          (item) => item.style === option.value,
-                        )?.price;
-                        return (
-                          <label
-                            key={sleeve}
-                            className={`pel-pdp__size${chosen.sleeve === sleeve ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
-                          >
-                            <input
-                              type="radio"
-                              name={`sleeve-${index}`}
-                              value={sleeve}
-                              checked={chosen.sleeve === sleeve}
-                              disabled={disabled}
-                              onChange={() => changeStyle(index, {sleeve})}
-                            />
-                            {sleeve}
-                            {optionPrice && (
-                              <small>
-                                <Money data={optionPrice} as="span" />
-                              </small>
-                            )}
-                          </label>
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="jersey-text-button"
+                      aria-label="Remove second jersey"
+                      onClick={() => {
+                        setSecondStyle(null);
+                        setEditingSecond(false);
+                        requestAnimationFrame(() =>
+                          addSecondRef.current?.focus({preventScroll: true}),
                         );
-                      })}
-                    </div>
-                  </fieldset>
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
-            {bundle && (
-              <p className="jersey-hint">
-                Two different styles, one player. Same jersey size and name +
-                number on both.
-              </p>
-            )}
+              ) : (
+                <div className="jersey-bundle-offer">
+                  <div className="jersey-addon-copy">
+                    <h2 id="jersey-bundle-heading">Add another jersey</h2>
+                    <small className="jersey-addon-saving">
+                      {bundleSaving ? (
+                        <>
+                          Save <Money data={bundleSaving} as="span" /> · mix any
+                          two styles
+                        </>
+                      ) : (
+                        'Mix any two styles'
+                      )}
+                    </small>
+                    <small>Same size and name + number on both.</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="pel-pdp__size jersey-extra-toggle"
+                    ref={addSecondRef}
+                    aria-label={
+                      editingSecond
+                        ? 'Cancel adding second jersey'
+                        : 'Add another jersey'
+                    }
+                    aria-expanded={editingSecond}
+                    aria-controls="jersey-second-options"
+                    onClick={() => setEditingSecond(!editingSecond)}
+                  >
+                    {editingSecond ? 'Cancel' : 'Add'}
+                  </button>
+                </div>
+              )}
+              {editingSecond && (
+                <div id="jersey-second-options">
+                  {withShorts && (
+                    <p className="jersey-hint">
+                      Prices below include a second pair of matching shorts in
+                      your selected shorts size.
+                    </p>
+                  )}
+                  <StyleChoice
+                    label="Choose your second jersey"
+                    name="secondStyle"
+                    value={secondStyle?.value ?? ''}
+                    choices={secondChoices}
+                    unavailable={firstStyle.value}
+                    unavailableLabel="Your first jersey"
+                    additional
+                    onChange={(item) => {
+                      setSecondStyle(item);
+                      setEditingSecond(false);
+                      setView('front');
+                      requestAnimationFrame(() =>
+                        editSecondRef.current?.focus({preventScroll: true}),
+                      );
+                    }}
+                  />
+                </div>
+              )}
+            </section>
+
+            <section
+              className="jersey-personalization"
+              aria-labelledby="jersey-personalization-heading"
+            >
+              <div className="jersey-option-heading">
+                <h2 id="jersey-personalization-heading">Name + number</h2>
+                <span className="jersey-option-note">
+                  {canPersonalize
+                    ? 'Optional · Included'
+                    : window.status === 'closed'
+                      ? 'Window closed'
+                      : 'Coming at launch'}
+                </span>
+              </div>
+              {canPersonalize ? (
+                <>
+                  {!preview && (
+                    <p className="jersey-hint">Available until {closes}.</p>
+                  )}
+                  <div
+                    className="jersey-print-fields"
+                    onFocusCapture={(event) => {
+                      if (
+                        event.target instanceof HTMLInputElement &&
+                        globalThis.matchMedia('(max-width: 60em)').matches
+                      ) {
+                        const bounds = event.target.getBoundingClientRect();
+                        if (
+                          bounds.top < 120 ||
+                          bounds.bottom >
+                            (globalThis.visualViewport?.height ??
+                              globalThis.innerHeight) -
+                              96
+                        )
+                          event.target.scrollIntoView({block: 'center'});
+                      }
+                    }}
+                  >
+                    <label htmlFor="jersey-name">
+                      Name <span>Max {NAME_LIMIT}</span>
+                      <input
+                        id="jersey-name"
+                        name="name"
+                        autoComplete="off"
+                        maxLength={NAME_LIMIT}
+                        value={name}
+                        onChange={(event) => {
+                          setName(event.target.value);
+                          setView('back');
+                        }}
+                        placeholder="YOUR NAME"
+                        required={Boolean(number.trim())}
+                        pattern="[\p{L}\p{M} .’'\-]+"
+                        aria-describedby="jersey-print-note"
+                      />
+                    </label>
+                    <label htmlFor="jersey-number">
+                      Number <span>0–99</span>
+                      <input
+                        id="jersey-number"
+                        name="number"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="off"
+                        maxLength={2}
+                        pattern="[0-9]{1,2}"
+                        value={number}
+                        onChange={(event) => {
+                          setNumber(event.target.value);
+                          setView('back');
+                        }}
+                        placeholder="10"
+                        required={Boolean(name.trim())}
+                        aria-describedby="jersey-print-note"
+                      />
+                    </label>
+                  </div>
+                  <p id="jersey-print-note" className="jersey-print-note">
+                    Leave both blank for a plain back. Names print in uppercase.
+                  </p>
+                  <details className="jersey-print-preview">
+                    <summary>View back preview</summary>
+                    <div className="jersey-mobile-preview">
+                      <KitArtwork
+                        styles={styles}
+                        back
+                        shorts={false}
+                        personalize={selection.personalize}
+                        name={name.toUpperCase()}
+                        number={number}
+                      />
+                      <p>Illustration · final details may vary</p>
+                    </div>
+                  </details>
+                </>
+              ) : (
+                <p className="jersey-hint">
+                  {window.status === 'closed'
+                    ? 'Personalization has ended. Plain jerseys are still available to preorder.'
+                    : 'Personalization opens for the first 7 days of preorder.'}
+                </p>
+              )}
+            </section>
+
             <section
               className="jersey-shorts"
               aria-labelledby="jersey-shorts-heading"
             >
-              <h2 id="jersey-shorts-heading" className="pel-pdp__opt-label">
-                Add matching shorts
-              </h2>
               <div className="jersey-addon-row">
                 <PhotoPlaceholder label="Shorts" />
-                <span className="jersey-addon-copy">
-                  <strong>
-                    {bundle ? '2 matching pairs' : 'Matching shorts'}
-                  </strong>
-                  {quote.shorts && (
-                    <small>
-                      <Money data={quote.shortsValue} as="s" /> · add for{' '}
-                      <Money data={quote.shorts} as="span" />
-                    </small>
-                  )}
-                  {quote.shortsSavings && (
-                    <small className="jersey-addon-saving">
-                      Save <Money data={quote.shortsSavings} as="span" />
-                      {bundle ? ' on 2 pairs' : ' with your jersey'}
-                    </small>
-                  )}
-                </span>
+                <div className="jersey-addon-copy">
+                  <h2 id="jersey-shorts-heading">
+                    Matching shorts{bundle ? ' · 2 pairs' : ''}
+                  </h2>
+                  <small>
+                    {quote.shorts && (
+                      <>
+                        +<Money data={quote.shorts} as="span" />
+                        {quote.shortsSavings && (
+                          <>
+                            {' '}
+                            · <Money data={quote.shortsValue} as="s" /> value
+                          </>
+                        )}
+                      </>
+                    )}
+                  </small>
+                </div>
                 <button
                   type="button"
                   className="pel-pdp__size jersey-extra-toggle"
@@ -539,25 +668,16 @@ export function JerseyPage({
                       ? 'Remove matching shorts'
                       : 'Add matching shorts'
                   }
-                  aria-pressed={withShorts}
+                  aria-expanded={withShorts}
+                  aria-controls="jersey-shorts-size"
                   onClick={() => setWithShorts(!withShorts)}
                 >
                   {withShorts ? 'Remove' : 'Add'}
                 </button>
               </div>
               {withShorts && (
-                <input type="hidden" name="addShorts" value="on" />
-              )}
-            </section>
-            <div className="jersey-fit">
-              <SizeChoice
-                name="size"
-                label={bundle ? 'Jersey size · both jerseys' : 'Jersey size'}
-                value={size}
-                onChange={setSize}
-              />
-              {withShorts && (
-                <>
+                <div id="jersey-shorts-size">
+                  <input type="hidden" name="addShorts" value="on" />
                   <SizeChoice
                     name="shortsSize"
                     label={bundle ? 'Shorts size · both pairs' : 'Shorts size'}
@@ -565,137 +685,9 @@ export function JerseyPage({
                     onChange={setShortsSize}
                   />
                   <p className="jersey-hint">
-                    Shorts can be a different size from your jersey.
+                    Choose independently from your jersey size.
                   </p>
-                </>
-              )}
-            </div>
-
-            <section
-              className="jersey-personalization"
-              aria-labelledby="jersey-personalization-heading"
-            >
-              <div className="jersey-option-heading">
-                {canPersonalize ? (
-                  <label className="jersey-print-toggle">
-                    <span id="jersey-personalization-heading">
-                      Personalize my {bundle ? 'jerseys' : 'jersey'}
-                    </span>
-                    <span className="jersey-option-note">Included</span>
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      name="personalize"
-                      checked={personalize}
-                      onChange={(event) => setPersonalize(event.target.checked)}
-                      aria-describedby="jersey-personalization-deadline"
-                    />
-                    <span className="jersey-switch" aria-hidden="true" />
-                  </label>
-                ) : (
-                  <>
-                    <h2
-                      id="jersey-personalization-heading"
-                      className="pel-pdp__opt-label"
-                    >
-                      Name & number
-                    </h2>
-                    <span className="jersey-option-note">
-                      {window.status === 'closed'
-                        ? 'Window closed'
-                        : 'Coming at launch'}
-                    </span>
-                  </>
-                )}
-              </div>
-              <p
-                id="jersey-personalization-deadline"
-                className="jersey-personalization-copy"
-              >
-                {preview
-                  ? 'Available for the first 7 days of preorder.'
-                  : canPersonalize
-                    ? `Add your name and number before ${closes}.`
-                    : window.status === 'closed'
-                      ? 'Personalization has ended. You can still preorder a plain jersey.'
-                      : 'Personalization opens for 7 days when the preorder launches.'}
-              </p>
-              {canPersonalize && (
-                <>
-                  {personalize && (
-                    <div
-                      className="jersey-print-layout"
-                      onFocusCapture={(event) => {
-                        if (
-                          event.target instanceof HTMLInputElement &&
-                          globalThis.matchMedia('(max-width: 60em)').matches
-                        ) {
-                          event.target.scrollIntoView({block: 'center'});
-                        }
-                      }}
-                    >
-                      <div className="jersey-print-fields">
-                        <label htmlFor="jersey-name">
-                          Name on back{' '}
-                          <span>Up to {NAME_LIMIT} characters</span>
-                          <input
-                            id="jersey-name"
-                            name="name"
-                            autoComplete="off"
-                            maxLength={NAME_LIMIT}
-                            value={name}
-                            onChange={(event) => {
-                              setName(event.target.value);
-                              setView('back');
-                            }}
-                            placeholder="YOUR NAME"
-                            required
-                            pattern="[\p{L}\p{M} .’'\-]+"
-                            aria-describedby="jersey-print-note"
-                          />
-                        </label>
-                        <label htmlFor="jersey-number">
-                          Number <span>0–99</span>
-                          <input
-                            id="jersey-number"
-                            name="number"
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="off"
-                            maxLength={2}
-                            pattern="[0-9]{1,2}"
-                            value={number}
-                            onChange={(event) => {
-                              setNumber(event.target.value);
-                              setView('back');
-                            }}
-                            placeholder="10"
-                            required
-                          />
-                        </label>
-                      </div>
-                      <details className="jersey-print-preview">
-                        <summary>View back preview</summary>
-                        <div className="jersey-mobile-preview">
-                          <KitArtwork
-                            styles={styles}
-                            back
-                            shorts={false}
-                            personalize
-                            name={name.toUpperCase()}
-                            number={number}
-                          />
-                          <p>Illustration · final details may vary</p>
-                        </div>
-                      </details>
-                    </div>
-                  )}
-                  {personalize && (
-                    <p id="jersey-print-note" className="jersey-print-note">
-                      Printed in uppercase. Check your spelling and number.
-                    </p>
-                  )}
-                </>
+                </div>
               )}
             </section>
 
@@ -704,61 +696,77 @@ export function JerseyPage({
                 className="jersey-socks"
                 aria-labelledby="jersey-socks-heading"
               >
-                <h2 id="jersey-socks-heading" className="pel-pdp__opt-label">
-                  Finish with PED socks
-                </h2>
-                <div className="jersey-addon-row jersey-addon-row--info">
+                <div className="jersey-addon-row">
                   <PhotoPlaceholder label="Socks" />
-                  <span className="jersey-addon-copy">
-                    <strong>PED socks · 1 pair</strong>
+                  <div className="jersey-addon-copy">
+                    <h2 id="jersey-socks-heading">PED socks · 1 pair</h2>
                     <small>
                       {socks
-                        ? 'Choose black or white.'
-                        : 'Price and sizing coming soon.'}
+                        ? 'Add black or white.'
+                        : 'Black / White · price and sizes coming soon'}
                     </small>
-                  </span>
-                </div>
-                <fieldset className="pel-pdp__opt jersey-sock-options">
-                  <legend className="sr-only">Socks color</legend>
-                  <div className="jersey-sizes jersey-choice-row">
-                    {['None', ...PED_SOCKS_COLORS].map((value) => {
-                      const options = socks?.variants.nodes.filter((item) =>
-                        matchesSocksVariant(item.selectedOptions, {
-                          socksColor: value,
-                          socksSize:
-                            item.selectedOptions.find(
-                              (option) => option.name === 'Size',
-                            )?.value || '',
-                        }),
-                      );
-                      const optionPrice = options?.[0]?.price;
-                      const disabled =
-                        value !== 'None' &&
-                        !options?.some((item) => item.availableForSale);
-                      return (
-                        <label
-                          key={value}
-                          className={`pel-pdp__size${socksColor === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
-                        >
-                          <input
-                            type="radio"
-                            name="socksColor"
-                            value={value}
-                            checked={socksColor === value}
-                            disabled={disabled}
-                            onChange={() => setSocksColor(value)}
-                          />
-                          {value === 'None' ? 'No socks' : value}
-                          {value !== 'None' && optionPrice && (
-                            <small>
-                              +<Money data={optionPrice} as="span" />
-                            </small>
-                          )}
-                        </label>
-                      );
-                    })}
                   </div>
-                </fieldset>
+                  {withSocks && (
+                    <button
+                      type="button"
+                      className="jersey-text-button"
+                      aria-label="Remove PED socks"
+                      onClick={() => setSocksColor('None')}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                {socks && (
+                  <fieldset className="jersey-sock-options">
+                    <legend className="sr-only">Socks color</legend>
+                    <div className="jersey-sizes jersey-choice-row">
+                      {PED_SOCKS_COLORS.map((value) => {
+                        const options = socks.variants.nodes.filter((item) =>
+                          matchesSocksVariant(item.selectedOptions, {
+                            socksColor: value,
+                            socksSize:
+                              item.selectedOptions.find(
+                                (option) => option.name === 'Size',
+                              )?.value || '',
+                          }),
+                        );
+                        const selected = options.find((item) =>
+                          matchesSocksVariant(item.selectedOptions, {
+                            socksColor: value,
+                            socksSize: selectedSocksSize,
+                          }),
+                        );
+                        const optionPrice =
+                          selected?.price ?? options[0]?.price;
+                        const disabled = !options.some(
+                          (item) => item.availableForSale,
+                        );
+                        return (
+                          <label
+                            key={value}
+                            className={`pel-pdp__size${socksColor === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
+                          >
+                            <input
+                              type="radio"
+                              name="socksColor"
+                              value={value}
+                              checked={socksColor === value}
+                              disabled={disabled}
+                              onChange={() => setSocksColor(value)}
+                            />
+                            {value}
+                            {optionPrice && (
+                              <small>
+                                +<Money data={optionPrice} as="span" />
+                              </small>
+                            )}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
                 {withSocks &&
                   (sockSizes.length > 1 ? (
                     <fieldset className="pel-pdp__opt">
@@ -980,6 +988,118 @@ function KitArtwork({
     <div className="jersey-pair">{artworks}</div>
   ) : (
     artworks[0]
+  );
+}
+
+function StyleChoice({
+  label,
+  name,
+  value,
+  choices,
+  unavailable,
+  unavailableLabel,
+  additional,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  choices: {
+    style: JerseyStyle;
+    price: Price | null;
+    image?: ComponentProps<typeof Image>['data'];
+  }[];
+  unavailable?: string;
+  unavailableLabel: string;
+  additional?: boolean;
+  onChange: (style: JerseyStyle) => void;
+}) {
+  return (
+    <fieldset className="pel-pdp__opt jersey-style-choice">
+      <legend className="pel-pdp__opt-label">{label}</legend>
+      <div className="jersey-style-grid">
+        {choices.map(({style, price, image}) => {
+          const disabled = style.value === unavailable || !price;
+          const className = `jersey-style-option${style.value === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`;
+          const content = (
+            <>
+              <StylePicture style={style} image={image} />
+              <span className="jersey-style-copy">
+                <strong>
+                  {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}
+                </strong>
+                <span>{style.sleeve}</span>
+                <small>
+                  {style.value === unavailable ? (
+                    unavailableLabel
+                  ) : price ? (
+                    <>
+                      {additional ? '+' : ''}
+                      <Money data={price} as="span" />
+                    </>
+                  ) : (
+                    'Unavailable'
+                  )}
+                </small>
+              </span>
+            </>
+          );
+          return additional ? (
+            <button
+              key={style.value}
+              type="button"
+              className={className}
+              disabled={disabled}
+              aria-pressed={style.value === value}
+              onClick={() => onChange(style)}
+            >
+              {content}
+            </button>
+          ) : (
+            <label key={style.value} className={className}>
+              <input
+                type="radio"
+                name={name}
+                value={style.value}
+                checked={style.value === value}
+                disabled={disabled}
+                onChange={() => onChange(style)}
+              />
+              {content}
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
+function StylePicture({
+  style,
+  image,
+}: {
+  style: JerseyStyle;
+  image?: ComponentProps<typeof Image>['data'];
+}) {
+  return (
+    <span className="jersey-style-picture" aria-hidden="true">
+      {image ? (
+        <Image data={image} sizes="72px" alt="" />
+      ) : (
+        <>
+          <JerseyArtwork
+            away={style.color === JERSEY_COLORS[1]}
+            longSleeve={style.sleeve === 'Long sleeve'}
+            back={false}
+            shorts={false}
+            personalize={false}
+            name=""
+            number=""
+          />
+          <small>Preview</small>
+        </>
+      )}
+    </span>
   );
 }
 

@@ -74,13 +74,15 @@ export function personalizationWindow(
 export function readJerseySelection(form: FormData): JerseySelection {
   const text = (key: string) => String(form.get(key) ?? '').trim();
   const socksColor = form.has('socksColor') ? text('socksColor') : 'None';
+  const name = text('name').normalize('NFC').toUpperCase();
+  const number = text('number');
   return {
     style: text('style'),
     size: text('size'),
     shortsSize: form.get('addShorts') === 'on' ? text('shortsSize') : 'None',
-    personalize: form.get('personalize') === 'on',
-    name: text('name').normalize('NFC').toUpperCase(),
-    number: text('number'),
+    personalize: Boolean(name || number),
+    name,
+    number,
     socksColor,
     socksSize: socksColor === 'None' ? '' : text('socksSize'),
   };
@@ -109,6 +111,8 @@ export function validateJerseySelection(
   if (!personalize) return null;
   if (!canPersonalize)
     return 'The personalization window has closed. Choose a jersey without personalization.';
+  if (!name || !number)
+    return 'Add both a name and number, or leave both blank for a plain back.';
   if (
     !/\p{L}/u.test(name) ||
     [...name].length > NAME_LIMIT ||
@@ -244,7 +248,7 @@ export function jerseyPreviewPrice(style: string, shorts: boolean) {
   return {amount: amount.toFixed(2), currencyCode: 'USD' as const};
 }
 
-type Price = {amount: string; currencyCode: CurrencyCode};
+export type Price = {amount: string; currencyCode: CurrencyCode};
 type PricedVariant = {
   selectedOptions: {name: string; value: string}[];
   price: Price;
@@ -287,6 +291,7 @@ export function jerseyQuote(
     return {
       style,
       price,
+      kitPrice: priceFor(style, shortsSize),
       savings: positivePrice(subtractPrices(separate, price)),
     };
   });
@@ -329,7 +334,7 @@ function sumPrices(prices: (Price | null)[]): Price | null {
   };
 }
 
-function subtractPrices(a: Price | null, b: Price | null): Price | null {
+export function subtractPrices(a: Price | null, b: Price | null): Price | null {
   return a && b
     ? sumPrices([a, {...b, amount: String(-Number(b.amount))}])
     : null;

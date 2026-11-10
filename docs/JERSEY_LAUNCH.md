@@ -9,20 +9,25 @@ has been performed. Keep the release unpublished until merchant approval.
 The page keeps the existing gallery, four release facts, brand fonts/colors,
 header/footer, size pills, and product detail cards. The buying column follows:
 
-1. One jersey or two jerseys, with the bundle price and saving visible first.
-2. Home/orange or away/black, then short or long sleeves for each jersey.
-3. Optional matching shorts, then jersey size and independent shorts size.
-4. Optional included name/number during launch week.
-5. Optional black/white PED socks, then the purchase button and shipping note.
+1. Four visual choices: home short/long and away short/long, then jersey size.
+2. An inline “Add another jersey” offer with the bundle saving. Add reveals
+   the second style choices; selecting one collapses to an editable item row.
+3. Optional included name/number during launch week, with both fields visible.
+4. Compact matching shorts and PED socks rows. Adding shorts opens its own
+   size choice directly beneath the row.
+5. The purchase button and shipping note, without an order summary above them.
 
 The two-jersey offer mixes any two **different** styles, including short and
 long sleeves of the same color. It is one player's bundle: the jersey size and
 personalization apply to both jerseys. With shorts, it includes two matching
-pairs in one separately selected shorts size. Duplicate styles are excluded;
-changing color selects the other sleeve when necessary to keep the styles
-different. In the single-jersey flow, changing color/sleeves recommends the
-opposite color in the same sleeves for the bundle. Switching between one and
-two jerseys otherwise preserves the chosen second style.
+pairs in one separately selected shorts size. These shared choices are stated
+in the offer before adding. The first style is disabled in the second picker,
+and vice versa, so changing one jersey never silently changes the other.
+Opening or canceling the picker does not change the order or price. Selecting
+a second style adds it; Edit replaces it and Remove returns to one jersey.
+Size and print choices survive these changes. The second picker shows the
+incremental price, including the second shorts pair when selected. The collapsed
+row confirms the jersey bundle saving; the shorts row owns the shorts charge.
 
 Short sleeves are $70 USD; long sleeves are $80 USD. The merchant authorized
 choosing long-sleeve and bundle pricing for review. Two jerseys save $20:
@@ -43,25 +48,27 @@ summary above the button; the cart owns order review. Required sizes start
 unselected, and changing jersey size never changes shorts size. Removing and
 readding an extra preserves its size.
 
-The personalization switch starts on. Turning it off hides print fields while
-preserving entered text. A mobile back preview shows the selected color/sleeves,
+Personalization has no switch. Both fields blank means a plain back; entering
+either field requires both. A mobile back preview shows the selected styles,
 and the fixed mobile purchase bar uses the same total/form as desktop. Both
 buttons use native required-field checks and server validation. The bar hides
 while the cart is open. Option sections explicitly own their padding to avoid
 the generic section padding in `reset.css`; the print-to-next-divider gap is
-24px. No size guide has been added.
+24px. The community floating button is hidden only on this PDP so it cannot
+cover buying controls. No size guide has been added.
 
 Shorts and socks use photo placeholders until official images arrive. Jersey
 front/back drawings distinguish long and short sleeves and remain labeled as
 illustrations. Supplied reference photos are development-only.
 
-PED socks use direct **No socks / Black / White** choices, with no extra Add
-step. Socks price and sizes are still unconfirmed, and no published `ped-socks`
-product was found. Unconfigured colors are disabled in the preview, keeping
-the jersey total usable. No free or guessed sock price is charged. Once the
-product exists, the UI uses its actual color/size variants and prices; socks
-resolve to a separate line in the same cart mutation. Unknown/out-of-stock
-combinations fail before the cart write. Size choices are shown only if needed.
+PED socks use direct **Black / White** choices with real prices, followed by
+Remove once selected. Socks price and sizes are still unconfirmed, and no
+published `ped-socks` product was found. Until configured, the preview shows
+one quiet placeholder row without unavailable buying controls. No free or
+guessed sock price is charged. Once the product exists, the UI uses its actual
+color/size variants and prices; socks resolve to a separate line in the same
+cart mutation. Unknown/out-of-stock combinations fail before the cart write.
+Size choices are shown only if needed.
 
 ## Local review and verification
 
@@ -73,8 +80,9 @@ real jersey product exists. The route remains `noindex, nofollow`.
 
 Focused domain checks: `node --test tests/jersey.mjs` on Node 24. They cover the
 exact seven-day deadline, print normalization/validation, all 200 SKU choices,
-mixed-sleeve bundle prices, independent sizing, actual-price quotes, currency
-mismatches, sock resolution, and rejection before cart mutation. Normal lint,
+mixed-sleeve bundle prices and increments with shorts, independent sizing,
+actual-price quotes, currency mismatches, sock resolution, and rejection before
+cart mutation. Blank and partial print fields also cover the switch-free flow. Normal lint,
 typecheck, and build commands also apply. Browser review covers desktop/mobile
 choice changes, form validation, illustrated sleeves, and preview submission.
 
@@ -137,8 +145,8 @@ Optional `preorder.shipping_estimate` replaces “Shipping date to be confirmed.
 
 ## Personalization and cart
 
-Name/number are optional and included in the variant price. If enabled, require
-both a name up to 14 characters and a 1–2 digit number (0–99, leading zeros
+Name/number are optional and included in the variant price. If either is filled,
+require both a name up to 14 characters and a 1–2 digit number (0–99, leading zeros
 preserved). Names are normalized and uppercased on the server. Confirm print
 limits, font, and placement with the supplier; artwork is not a print proof.
 

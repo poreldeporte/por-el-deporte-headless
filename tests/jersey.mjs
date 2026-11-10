@@ -9,6 +9,7 @@ import {
   jerseyStyleValue,
   jerseyPreviewPrice,
   jerseyQuote,
+  subtractPrices,
   matchesSocksVariant,
   matchesJerseyVariant,
   personalizationWindow,
@@ -151,6 +152,42 @@ test('server normalizes printed names and preserves leading-zero numbers as line
     {key: 'Name on back', value: 'JOSÉ'},
     {key: 'Number on back', value: '07'},
   ]);
+});
+
+test('blank print fields order a plain jersey; partial fields and expired personalization are rejected', () => {
+  const form = new FormData();
+  for (const [key, value] of Object.entries({
+    ...selection,
+    addShorts: 'on',
+    name: ' ',
+    number: '',
+  }))
+    form.set(key, value);
+  const plain = readJerseySelection(form);
+  assert.equal(plain.personalize, false);
+  assert.equal(validateJerseySelection(plain, false), null);
+  assert.deepEqual(jerseyAttributes(plain), [
+    {key: 'Order type', value: 'Preorder'},
+  ]);
+  form.set('name', 'VIOLA');
+  form.set('personalize', 'off');
+  assert.equal(readJerseySelection(form).personalize, true);
+  assert.match(
+    validateJerseySelection(readJerseySelection(form), true),
+    /both a name and number/,
+  );
+  form.set('name', '');
+  form.set('number', '07');
+  assert.match(
+    validateJerseySelection(readJerseySelection(form), true),
+    /both a name and number/,
+  );
+  form.set('name', 'VIOLA');
+  assert.equal(validateJerseySelection(readJerseySelection(form), true), null);
+  assert.match(
+    validateJerseySelection(readJerseySelection(form), false),
+    /closed/,
+  );
 });
 
 test('invalid options and print data are rejected before a cart write', () => {
@@ -328,4 +365,17 @@ test('quotes use real SKU prices, include priced socks, and never invent a missi
     price: {...item.price, currencyCode: 'EUR'},
   }));
   assert.equal(jerseyQuote(chosen, euro, null, false).shortsSavings, null);
+});
+
+test('the second jersey quote includes its matching shorts when shorts are selected', () => {
+  const quote = jerseyQuote({...selection, style: homeShort}, [], null, true);
+  const first = quote.choices.find((item) => item.style === homeShort);
+  const mixed = quote.choices.find((item) => item.style === bundleStyle);
+  assert.equal(subtractPrices(mixed.price, first.price).amount, '60.00');
+  assert.equal(subtractPrices(mixed.kitPrice, first.kitPrice).amount, '75.00');
+  assert.equal(
+    Number(first.kitPrice.amount) +
+      Number(subtractPrices(mixed.kitPrice, first.kitPrice).amount),
+    160,
+  );
 });
