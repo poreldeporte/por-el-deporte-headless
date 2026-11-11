@@ -647,6 +647,9 @@ body:has(.jersey-kit-preview[open]) {
   padding: 16px 20px;
   min-height: 0;
 }
+.jersey-kit-content .jersey-gallery-addon + .jersey-gallery-addon {
+  margin-top: 12px;
+}
 .jersey-kit-jerseys {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
