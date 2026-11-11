@@ -55,24 +55,27 @@ export function JerseyPhotos({
   );
 }
 
-export function SocksPhoto({color}: {color: string}) {
+export function SocksPhoto({
+  color,
+  view = 'pair',
+  sizes = '72px',
+  priority = false,
+}: {
+  color: string;
+  view?: 'pair' | 'detail';
+  sizes?: string;
+  priority?: boolean;
+}) {
+  const src = `/jersey/socks/${color.toLowerCase()}-${view}`;
   return (
-    <span
-      className="jersey-photo-placeholder"
-      aria-label={`${color} socks photo coming soon`}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        aria-hidden="true"
-      >
-        <rect x="3" y="4" width="18" height="16" rx="2" />
-        <circle cx="8" cy="9" r="1.5" />
-        <path d="m3 17 6-5 4 4 3-3 5 5" />
-      </svg>
-      <small>Photo soon</small>
-    </span>
+    <img
+      className="jersey-socks-photo"
+      src={`${src}-640.webp`}
+      srcSet={`${src}-160.webp 160w, ${src}-640.webp 640w, ${src}-1024.webp 1024w`}
+      sizes={sizes}
+      alt={`${color} PED socks with orange island logos${view === 'detail' ? ', knit and logo detail' : ', one pair'}`}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+    />
   );
 }

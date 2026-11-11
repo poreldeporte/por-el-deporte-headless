@@ -27,6 +27,7 @@ import {
 } from '~/lib/jersey';
 import {JerseyPhotos, SocksPhoto, type JerseyPhotoView} from './JerseyPhotos';
 import {JerseyKitPreview} from './JerseyKitPreview';
+import {SocksGallery} from './SocksGallery';
 
 type JerseyStyle = (typeof JERSEY_STYLES)[number];
 
@@ -718,22 +719,24 @@ export function JerseyPage({
                 >
                   <div className="jersey-option-heading">
                     <h4 id="jersey-socks-heading">PED socks</h4>
-                    {withSocks && (
-                      <button
-                        type="button"
-                        className="jersey-text-button"
-                        aria-label="Remove PED socks"
-                        onClick={() => {
-                          setSocksColor('None');
-                          setSocksPack(PED_SOCKS_PACKS[0].value);
-                        }}
-                      >
-                        Remove
-                      </button>
-                    )}
-                    {!withSocks && (
-                      <span className="jersey-option-note">Optional</span>
-                    )}
+                    <div className="jersey-socks-actions">
+                      <SocksGallery selectedColor={socksColor} />
+                      {withSocks ? (
+                        <button
+                          type="button"
+                          className="jersey-text-button"
+                          aria-label="Remove PED socks"
+                          onClick={() => {
+                            setSocksColor('None');
+                            setSocksPack(PED_SOCKS_PACKS[0].value);
+                          }}
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        <span className="jersey-option-note">Optional</span>
+                      )}
+                    </div>
                   </div>
                   <fieldset className="jersey-sock-options">
                     <legend className="sr-only">Socks color</legend>

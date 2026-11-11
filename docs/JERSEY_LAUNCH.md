@@ -21,7 +21,7 @@ The “Build your kit” column follows:
    own card, Edit control, and required size choice. Sizes start unselected.
 2. **Complete your kit:** optional matching shorts with a separately chosen
    shorts size, then black/white socks and one-pair/three-pair packs. Selected
-   extras appear in the gallery and kit preview; socks photos remain placeholders.
+   extras appear in the gallery and kit preview using the supplied product photos.
 3. **Your name + number:** optional included personalization during launch week.
    Both fields remain visible, and the section states that the same print applies
    to both jerseys in a bundle.
@@ -88,8 +88,7 @@ chosen color, shows both photos for a Home + Away set, and remains selected when
 changing jerseys. Both photos show short sleeves, stated in the caption even
 when a long-sleeve jersey is selected. Shorts shown in the photos remain optional.
 Personalization stays in the name/number fields; there is no illustrated Print
-view or mobile print preview. Socks still use a placeholder because the supplied
-folder contained no socks photos.
+view or mobile print preview.
 
 The 16 supplied photos had their external white backgrounds removed using the
 imagegen edit tool with transparent output. White/cream fabric and printed details
@@ -106,6 +105,31 @@ same three widths and quality 88. Their scenes and backgrounds are preserved,
 with no AI edits. Home uses `orange/andy-orange.jpg`; Away uses
 `black/Black Kit Soccer Action Shot.png`, both from the supplied pictures folder.
 Originals remain unchanged. The gallery contains the full photo without cropping.
+
+The four supplied socks photos are in `public/jersey/socks`, with responsive
+160/640/1024px WebP exports. The black and white pair photos replace placeholders
+in the color choices, selected gallery add-on, and kit preview. “View photos”
+opens a native dialog with the pair and logo detail for either color. Browsing
+photos does not add socks or change the kit; the dialog starts on the selected
+sock color, or black before selection. Close and Escape restore focus to the
+trigger. The dialog keeps the existing brand styles and supports desktop/mobile.
+
+Source files supplied from Downloads:
+
+| Asset        | Source file                                     |
+| ------------ | ----------------------------------------------- |
+| Black pair   | `Black Socks with Orange Island Logos.png`      |
+| Black detail | `Black Ribbed Socks Product Detail.png`         |
+| White pair   | `ChatGPT Image Nov 11, 2026, 12_25_02 AM-2.png` |
+| White detail | `ChatGPT Image Nov 11, 2026, 12_25_02 AM-1.png` |
+
+The built-in imagegen tool removed the exterior background from the two pair
+shots, preserving the sock fabric, orange logos, and markings. Prompt for each
+color: “Remove only the pale tabletop/background outside the two socks; preserve
+both entire socks, their silhouette, orientation, knit texture, fabric color,
+orange island logos, and small markings. Keep both socks fully in frame and
+return a transparent cutout.” Pair exports preserve alpha; detail photos retain
+their original backgrounds and framing. All supplied originals remain unchanged.
 
 PED socks use visual **Black / White** choices, followed by a pack choice and
 Remove once selected. Merchant-confirmed prices are **$10 for one pair** and
@@ -235,8 +259,8 @@ second real SKU, and all line IDs are validated before one `cart.addLines`.
 
 ## Launch review
 
-Before publishing, approve the page/prices and supplied jersey/shorts photos,
-provide socks photos, confirm sock sizes and print limits, set up all
+Before publishing, approve the page/prices and supplied jersey/shorts/socks photos,
+confirm sock sizes and print limits, set up all
 variants, agree the launch time, and confirm shipping language. Verify a real
 personalized mixed-sleeve kit plus socks through cart and Shopify checkout
 without placing a paid order. Verify bundle contents, different jersey sizes
