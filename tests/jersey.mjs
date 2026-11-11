@@ -29,12 +29,11 @@ const homeLong = 'Home (Orange) / Long sleeve';
 const awayShort = 'Away (Black) / Short sleeve';
 const awayLong = 'Away (Black) / Long sleeve';
 const bundleStyle = jerseyStyleValue([homeShort, awayLong]);
+const print = {name: 'VIOLA', number: '07'};
+const plainPrint = {name: '', number: ''};
 const selection = {
-  jerseys: [{style: homeShort, size: 'XL'}],
+  jerseys: [{style: homeShort, size: 'XL', print}],
   shortsSize: 'M',
-  personalize: true,
-  name: 'VIOLA',
-  number: '07',
   socksColor: 'None',
   socksPack: '1 pair',
   socksSize: '',
@@ -69,8 +68,8 @@ test('a mixed sleeve bundle adds each jersey and matching shorts as separate lin
   const chosen = {
     ...selection,
     jerseys: [
-      {style: homeShort, size: 'XL'},
-      {style: awayLong, size: 'M'},
+      {style: homeShort, size: 'XL', print},
+      {style: awayLong, size: 'M', print},
     ],
   };
   const variants = chosen.jerseys.map((jersey, index) => ({
@@ -214,21 +213,25 @@ test('expired submissions reject custom printing while plain preorders remain va
   assert.equal(validateJerseySelection(selection, true), null);
   assert.match(validateJerseySelection(selection, false), /closed/);
   assert.equal(
-    validateJerseySelection({...selection, personalize: false}, false),
+    validateJerseySelection(
+      {...selection, jerseys: [{...selection.jerseys[0], print: plainPrint}]},
+      false,
+    ),
     null,
   );
-  assert.deepEqual(jerseyAttributes({...selection, personalize: false}), [
+  assert.deepEqual(jerseyAttributes(plainPrint), [
     {key: 'Order type', value: 'Preorder'},
   ]);
 });
 
 test('server normalizes printed names and preserves leading-zero numbers as line properties', () => {
-  const form = formFor({...selection, name: '  Jose\u0301  '});
+  const form = formFor(selection);
+  form.set('name', '  Jose\u0301  ');
   form.set('addShorts', 'on');
   const parsed = readJerseySelection(form);
-  assert.equal(parsed.name, 'JOSÉ');
+  assert.equal(parsed.jerseys[0].print.name, 'JOSÉ');
   assert.equal(validateJerseySelection(parsed, true), null);
-  assert.deepEqual(jerseyAttributes(parsed), [
+  assert.deepEqual(jerseyAttributes(parsed.jerseys[0].print), [
     {key: 'Order type', value: 'Preorder'},
     {key: 'Name on back', value: 'JOSÉ'},
     {key: 'Number on back', value: '07'},
@@ -236,17 +239,19 @@ test('server normalizes printed names and preserves leading-zero numbers as line
 });
 
 test('blank print fields order a plain jersey; partial fields and expired personalization are rejected', () => {
-  const form = formFor({...selection, name: ' ', number: ''});
+  const form = formFor(selection);
+  form.set('name', ' ');
+  form.set('number', '');
   form.set('addShorts', 'on');
   const plain = readJerseySelection(form);
-  assert.equal(plain.personalize, false);
+  assert.deepEqual(plain.jerseys[0].print, plainPrint);
   assert.equal(validateJerseySelection(plain, false), null);
-  assert.deepEqual(jerseyAttributes(plain), [
+  assert.deepEqual(jerseyAttributes(plain.jerseys[0].print), [
     {key: 'Order type', value: 'Preorder'},
   ]);
   form.set('name', 'VIOLA');
   form.set('personalize', 'off');
-  assert.equal(readJerseySelection(form).personalize, true);
+  assert.equal(readJerseySelection(form).jerseys[0].print.name, 'VIOLA');
   assert.match(
     validateJerseySelection(readJerseySelection(form), true),
     /both a name and number/,
@@ -268,31 +273,31 @@ test('blank print fields order a plain jersey; partial fields and expired person
 test('invalid options and print data are rejected before a cart write', () => {
   for (const patch of [
     {jerseys: []},
-    {jerseys: [{style: homeShort, size: ''}]},
-    {jerseys: [{style: homeShort, size: 'S'}]},
-    {jerseys: [{style: 'Blue', size: 'M'}]},
+    {jerseys: [{style: homeShort, size: '', print}]},
+    {jerseys: [{style: homeShort, size: 'S', print}]},
+    {jerseys: [{style: 'Blue', size: 'M', print}]},
     {
       jerseys: [
-        {style: homeShort, size: 'M'},
-        {style: homeShort, size: 'XL'},
+        {style: homeShort, size: 'M', print},
+        {style: homeShort, size: 'XL', print},
       ],
     },
     {
       jerseys: [
-        {style: homeShort, size: 'M'},
-        {style: homeLong, size: 'XL'},
+        {style: homeShort, size: 'M', print},
+        {style: homeLong, size: 'XL', print},
       ],
     },
     {
       jerseys: [
-        {style: awayShort, size: 'M'},
-        {style: awayLong, size: 'XL'},
+        {style: awayShort, size: 'M', print},
+        {style: awayLong, size: 'XL', print},
       ],
     },
     {
       jerseys: [
-        {style: homeShort, size: 'M'},
-        {style: awayLong, size: ''},
+        {style: homeShort, size: 'M', print},
+        {style: awayLong, size: '', print},
       ],
     },
     {
@@ -303,6 +308,12 @@ test('invalid options and print data are rejected before a cart write', () => {
     },
     {shortsSize: ''},
     {shortsSize: 'S'},
+  ])
+    assert.equal(
+      typeof validateJerseySelection({...selection, ...patch}, true),
+      'string',
+    );
+  for (const patch of [
     {name: ''},
     {name: '---'},
     {name: '<script>'},
@@ -313,7 +324,13 @@ test('invalid options and print data are rejected before a cart write', () => {
     {number: '1.5'},
   ])
     assert.equal(
-      typeof validateJerseySelection({...selection, ...patch}, true),
+      typeof validateJerseySelection(
+        {
+          ...selection,
+          jerseys: [{...selection.jerseys[0], print: {...print, ...patch}}],
+        },
+        true,
+      ),
       'string',
     );
 });
@@ -325,7 +342,7 @@ test('variant matching resolves style and size regardless of option order', () =
   ];
   assert.equal(matchesJerseyVariant(options, selection.jerseys[0]), true);
   assert.equal(
-    matchesJerseyVariant(options, {style: awayShort, size: 'XL'}),
+    matchesJerseyVariant(options, {style: awayShort, size: 'XL', print}),
     false,
   );
   assert.equal(
@@ -377,6 +394,7 @@ test('16 jerseys and 8 shorts fulfill all 400 builder combinations with independ
           const jerseys = styles.map((item, index) => ({
             style: item.value,
             size: index === 0 ? firstSize : secondSize,
+            print,
           }));
           for (const ordered of [jerseys, [...jerseys].reverse()]) {
             const chosen = {...selection, jerseys: ordered, shortsSize};
@@ -454,7 +472,10 @@ test('quotes sum actual separate prices and reject missing or mixed-currency ext
     ...item,
     price: {amount: '17.00', currencyCode: 'USD'},
   }));
-  const chosen = {...selection, jerseys: [{style: homeLong, size: 'XL'}]};
+  const chosen = {
+    ...selection,
+    jerseys: [{style: homeLong, size: 'XL', print}],
+  };
   const quote = jerseyQuote(chosen, variants, null, false, pricedShorts);
   assert.equal(quote.total.amount, '100.00');
   assert.equal(quote.shorts.amount, '17.00');
@@ -498,8 +519,8 @@ test('bundle quotes sum real single prices and require both USD components', () 
     ...selection,
     shortsSize: 'None',
     jerseys: [
-      {style: homeShort, size: 'XL'},
-      {style: awayLong, size: 'M'},
+      {style: homeShort, size: 'XL', print},
+      {style: awayLong, size: 'M', print},
     ],
   };
   const variants = chosen.jerseys.map((jersey, index) => ({
@@ -583,8 +604,8 @@ test('quotes keep each size attached to its style, including an unchosen first s
   const chosen = {
     ...selection,
     jerseys: [
-      {style: homeShort, size: ''},
-      {style: awayLong, size: 'XL'},
+      {style: homeShort, size: '', print},
+      {style: awayLong, size: 'XL', print},
     ],
     shortsSize: 'None',
   };
@@ -689,8 +710,8 @@ test('different sizes stay attached to their jersey through parsing, canonical o
   const chosen = {
     ...selection,
     jerseys: [
-      {style: awayLong, size: 'M'},
-      {style: homeShort, size: 'XXL'},
+      {style: awayLong, size: 'M', print},
+      {style: homeShort, size: 'XXL', print},
     ],
   };
   const form = formFor(chosen);
@@ -717,6 +738,102 @@ test('different sizes stay attached to their jersey through parsing, canonical o
   );
 });
 
+test('each jersey keeps its own normalized print through cart fulfillment', () => {
+  const chosen = {
+    ...selection,
+    jerseys: [
+      {style: awayLong, size: 'M', print},
+      {
+        style: homeShort,
+        size: 'XXL',
+        print: {name: '  Jose\u0301  ', number: '09'},
+      },
+    ],
+  };
+  const form = formFor(chosen);
+  form.set('addShorts', 'on');
+  const parsed = readJerseySelection(form);
+  assert.equal(validateJerseySelection(parsed, true), null);
+  assert.deepEqual(
+    parsed.jerseys.map(({print}) => print),
+    [print, {name: 'JOSÉ', number: '09'}],
+  );
+  const variants = parsed.jerseys.map((jersey) => ({
+    id: jersey.style,
+    availableForSale: true,
+    selectedOptions: Object.entries(jerseyOptionValues(jersey)).map(
+      ([name, value]) => ({name, value}),
+    ),
+  }));
+  const order = jerseyCartLines(parsed, variants, [], shorts);
+  assert.equal(order.error, null);
+  assert.deepEqual(
+    order.lines.map(({attributes}) => attributes),
+    [
+      [
+        {key: 'Order type', value: 'Preorder'},
+        {key: 'Name on back', value: 'VIOLA'},
+        {key: 'Number on back', value: '07'},
+      ],
+      [{key: 'Order type', value: 'Preorder'}],
+      [
+        {key: 'Order type', value: 'Preorder'},
+        {key: 'Name on back', value: 'JOSÉ'},
+        {key: 'Number on back', value: '09'},
+      ],
+      [{key: 'Order type', value: 'Preorder'}],
+    ],
+  );
+  form.set('name', '');
+  form.set('number', '');
+  assert.equal(validateJerseySelection(readJerseySelection(form), true), null);
+  assert.match(
+    validateJerseySelection(readJerseySelection(form), false),
+    /closed/,
+  );
+  for (const [name, number] of [
+    ['JOSÉ', ''],
+    ['', '09'],
+    ['<script>', '09'],
+    ['JOSE', '100'],
+  ]) {
+    form.set('secondName', name);
+    form.set('secondNumber', number);
+    assert.match(
+      validateJerseySelection(readJerseySelection(form), true),
+      /Home jersey/,
+    );
+  }
+  form.set('secondName', '');
+  form.set('secondNumber', '');
+  const plain = readJerseySelection(form);
+  assert.equal(validateJerseySelection(plain, false), null);
+  assert.ok(
+    jerseyCartLines(plain, variants, [], shorts).lines.every(
+      ({attributes}) => attributes.length === 1,
+    ),
+  );
+});
+
+test('open legacy forms keep the shared print, while explicit blank second fields mean a plain back', () => {
+  const form = formFor({
+    ...selection,
+    jerseys: [selection.jerseys[0], {style: awayLong, size: 'M', print}],
+  });
+  form.delete('secondName');
+  form.delete('secondNumber');
+  assert.deepEqual(
+    readJerseySelection(form).jerseys.map(({print}) => print),
+    [print, print],
+  );
+  form.set('secondName', '');
+  form.set('secondNumber', '');
+  assert.deepEqual(
+    readJerseySelection(form).jerseys.map(({print}) => print),
+    [print, plainPrint],
+  );
+});
+
 function formFor(value) {
   const form = new FormData();
   const {jerseys, ...extras} = value;
@@ -725,6 +842,8 @@ function formFor(value) {
     const prefix = index === 0 ? 'first' : 'second';
     form.set(`${prefix}Style`, jersey.style);
     form.set(`${prefix}Size`, jersey.size);
+    form.set(index === 0 ? 'name' : 'secondName', jersey.print.name);
+    form.set(index === 0 ? 'number' : 'secondNumber', jersey.print.number);
   });
   return form;
 }

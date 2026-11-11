@@ -10,6 +10,7 @@ import {
   JERSEY_STYLES,
   jerseyStyleValue,
   jerseyQuote,
+  jerseyPrint,
   subtractPrices,
   socksPackSavings,
   type Price,
@@ -64,6 +65,9 @@ export function JerseyPage({
   const [shortsSize, setShortsSize] = useState('');
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const [samePrint, setSamePrint] = useState(true);
+  const [secondName, setSecondName] = useState('');
+  const [secondNumber, setSecondNumber] = useState('');
   const [view, setView] = useState<Exclude<JerseyPhotoView, 'kit'>>('front');
   const [now, setNow] = useState(serverNow);
   const fetcher = useFetcher<typeof action>();
@@ -82,15 +86,23 @@ export function JerseyPage({
     socks?.options.find((option) => option.name === 'Size')?.values ?? [];
   const selectedSocksSize =
     socksSize || (sockSizes.length === 1 ? sockSizes[0] : '');
+  const firstPrint = jerseyPrint(
+    canPersonalize ? name : '',
+    canPersonalize ? number : '',
+  );
+  const secondPrint = samePrint
+    ? firstPrint
+    : jerseyPrint(
+        canPersonalize ? secondName : '',
+        canPersonalize ? secondNumber : '',
+      );
   const selection: JerseySelection = {
     jerseys: styles.map((item, index) => ({
       style: item.value,
       size: index === 0 ? size : secondSize,
+      print: index === 0 ? firstPrint : secondPrint,
     })),
     shortsSize: withShorts ? shortsSize : 'None',
-    personalize: Boolean(name.trim() || number.trim()) && canPersonalize,
-    name: name.trim().normalize('NFC').toUpperCase(),
-    number: number.trim(),
     socksColor: withSocks ? socksColor : 'None',
     socksPack,
     socksSize: withSocks ? selectedSocksSize : '',
@@ -306,11 +318,15 @@ export function JerseyPage({
           </p>
           <h1 className="pel-pdp__title">{product?.title || JERSEY_TITLE}</h1>
           <p className="pel-pdp__lead">
-            <strong>We came for the game. We stayed for the people.</strong>{' '}
-            Our official jersey celebrates the friendships, the post-game
-            stories, and the community we’ve built in Key Biscayne and beyond.
-            Made with love and released just once every two years. Wear it with
-            pride, wherever you play.
+            <strong>
+              This one’s for everyone who plays with us, cheers us on, or
+              supports the club in their own way.
+            </strong>{' '}
+            We put a lot of love into this jersey, and we hope you wear it as
+            proudly as we do.
+          </p>
+          <p className="jersey-release-note">
+            Our official jersey. A new design every two years.
           </p>
           <p className="jersey-designer">
             Jersey design by <strong>Sergio Gomez</strong>
@@ -454,7 +470,11 @@ export function JerseyPage({
             <BuilderStep
               number={1}
               title="Choose your jersey"
-              note="Pick your sleeve length and size."
+              note={
+                canPersonalize
+                  ? 'Choose your style, size, and what goes on the back.'
+                  : 'Choose your style and size.'
+              }
             >
               <div className={bundle ? 'jersey-item' : undefined}>
                 {secondStyle && (
@@ -511,6 +531,26 @@ export function JerseyPage({
                   value={size}
                   onChange={setSize}
                 />
+                {canPersonalize && (
+                  <div
+                    className="jersey-personalization"
+                    role="group"
+                    aria-label={`${firstSide} jersey personalization`}
+                  >
+                    <div className="jersey-option-heading">
+                      <h4>{firstSide} name + number</h4>
+                      <span className="jersey-option-note">
+                        Included · optional
+                      </span>
+                    </div>
+                    <PrintFields
+                      name={name}
+                      number={number}
+                      onNameChange={setName}
+                      onNumberChange={setNumber}
+                    />
+                  </div>
+                )}
               </div>
 
               <section
@@ -620,12 +660,79 @@ export function JerseyPage({
                     </div>
                   )}
                   {secondStyle && (
-                    <SizeChoice
-                      name="secondSize"
-                      label={`${secondSide} size`}
-                      value={secondSize}
-                      onChange={setSecondSize}
-                    />
+                    <>
+                      <SizeChoice
+                        name="secondSize"
+                        label={`${secondSide} size`}
+                        value={secondSize}
+                        onChange={setSecondSize}
+                      />
+                      {canPersonalize && (
+                        <div
+                          className="jersey-personalization"
+                          role="group"
+                          aria-label={`${secondSide} jersey personalization`}
+                        >
+                          <div className="jersey-option-heading">
+                            <h4>{secondSide} name + number</h4>
+                            <span className="jersey-option-note">
+                              Included · optional
+                            </span>
+                          </div>
+                          <div className="jersey-print-sharing">
+                            <p className="jersey-hint">
+                              {samePrint
+                                ? `Same as ${firstSide}`
+                                : 'Personalize this jersey separately.'}
+                              {samePrint && (
+                                <strong>
+                                  {firstPrint.name && firstPrint.number
+                                    ? `${firstPrint.name} / ${firstPrint.number}`
+                                    : firstPrint.name || firstPrint.number
+                                      ? `Finish your ${firstSide.toLowerCase()} name + number above.`
+                                      : 'Plain back'}
+                                </strong>
+                              )}
+                            </p>
+                            <button
+                              type="button"
+                              className="jersey-text-button"
+                              aria-expanded={!samePrint}
+                              aria-controls="jersey-second-print"
+                              onClick={() => setSamePrint(!samePrint)}
+                            >
+                              {samePrint
+                                ? 'Personalize separately'
+                                : `Use same as ${firstSide}`}
+                            </button>
+                          </div>
+                          {samePrint ? (
+                            <>
+                              <input
+                                type="hidden"
+                                name="secondName"
+                                value={secondPrint.name}
+                              />
+                              <input
+                                type="hidden"
+                                name="secondNumber"
+                                value={secondPrint.number}
+                              />
+                            </>
+                          ) : (
+                            <div id="jersey-second-print">
+                              <PrintFields
+                                second
+                                name={secondName}
+                                number={secondNumber}
+                                onNameChange={setSecondName}
+                                onNumberChange={setSecondNumber}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
                 {secondStyle && (
@@ -641,18 +748,27 @@ export function JerseyPage({
                   </p>
                 )}
               </section>
+              <p className="jersey-hint">
+                {canPersonalize
+                  ? preview
+                    ? 'Name + number included for the first 7 days of preorder.'
+                    : `Name + number included until ${closes}.`
+                  : window.status === 'closed'
+                    ? 'Personalization has ended. Plain jerseys are still available to preorder.'
+                    : 'Personalization opens for the first 7 days of preorder.'}
+              </p>
             </BuilderStep>
             <BuilderStep
               number={2}
               title="Complete your kit"
-              note="Matching shorts and PED socks. Both optional."
+              note="Add what you like. Both extras are optional."
             >
               <section
                 className="jersey-shorts"
                 aria-labelledby="jersey-shorts-heading"
               >
                 <div className="jersey-option-heading">
-                  <h4 id="jersey-shorts-heading">Matching shorts</h4>
+                  <h4 id="jersey-shorts-heading">Add shorts</h4>
                   <span className="jersey-option-note">
                     {withShorts ? 'Added' : 'Optional'}
                   </span>
@@ -741,7 +857,7 @@ export function JerseyPage({
                   aria-labelledby="jersey-socks-heading"
                 >
                   <div className="jersey-option-heading">
-                    <h4 id="jersey-socks-heading">PED socks</h4>
+                    <h4 id="jersey-socks-heading">Add socks</h4>
                     <div className="jersey-socks-actions">
                       <SocksGallery selectedColor={socksColor} />
                       {withSocks ? (
@@ -886,88 +1002,6 @@ export function JerseyPage({
                 </section>
               )}
             </BuilderStep>
-            <BuilderStep
-              number={3}
-              title="Your name + number"
-              note={
-                canPersonalize
-                  ? bundle
-                    ? 'Included for the first 7 days. Same name + number on both.'
-                    : 'Included for the first 7 days of preorder.'
-                  : window.status === 'closed'
-                    ? 'Personalization window closed.'
-                    : 'Available at launch.'
-              }
-            >
-              {canPersonalize ? (
-                <>
-                  {!preview && (
-                    <p className="jersey-hint">Available until {closes}.</p>
-                  )}
-                  <div
-                    className="jersey-print-fields"
-                    onFocusCapture={(event) => {
-                      if (
-                        event.target instanceof HTMLInputElement &&
-                        globalThis.matchMedia('(max-width: 60em)').matches
-                      ) {
-                        const bounds = event.target.getBoundingClientRect();
-                        if (
-                          bounds.top < 120 ||
-                          bounds.bottom >
-                            (globalThis.visualViewport?.height ??
-                              globalThis.innerHeight) -
-                              96
-                        )
-                          event.target.scrollIntoView({block: 'center'});
-                      }
-                    }}
-                  >
-                    <label htmlFor="jersey-name">
-                      Name on back <span>Max {NAME_LIMIT}</span>
-                      <input
-                        id="jersey-name"
-                        name="name"
-                        autoComplete="off"
-                        maxLength={NAME_LIMIT}
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        placeholder="YOUR NAME"
-                        required={Boolean(number.trim())}
-                        pattern="[\p{L}\p{M} .’'\-]+"
-                        aria-describedby="jersey-print-note"
-                      />
-                    </label>
-                    <label htmlFor="jersey-number">
-                      Number <span>0–99</span>
-                      <input
-                        id="jersey-number"
-                        name="number"
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="off"
-                        maxLength={2}
-                        pattern="[0-9]{1,2}"
-                        value={number}
-                        onChange={(event) => setNumber(event.target.value)}
-                        placeholder="10"
-                        required={Boolean(name.trim())}
-                        aria-describedby="jersey-print-note"
-                      />
-                    </label>
-                  </div>
-                  <p id="jersey-print-note" className="jersey-print-note">
-                    Leave both blank for a plain back. Names print in uppercase.
-                  </p>
-                </>
-              ) : (
-                <p className="jersey-hint">
-                  {window.status === 'closed'
-                    ? 'Personalization has ended. Plain jerseys are still available to preorder.'
-                    : 'Personalization opens for the first 7 days of preorder.'}
-                </p>
-              )}
-            </BuilderStep>
 
             <button
               type="submit"
@@ -995,6 +1029,9 @@ export function JerseyPage({
                   {fetcher.data.preview.jerseys.map((jersey, index) => (
                     <p key={jersey.style}>
                       Jersey {index + 1}: {jersey.style} · Size {jersey.size}
+                      {jersey.print.name
+                        ? ` · Back: ${jersey.print.name} / ${jersey.print.number}`
+                        : ' · Plain back'}
                     </p>
                   ))}
                   <p>
@@ -1012,11 +1049,6 @@ export function JerseyPage({
                       {socksPreview ? ' · size TBC' : ''}
                     </p>
                   )}
-                  <p>
-                    {fetcher.data.preview.personalize
-                      ? `Back: ${fetcher.data.preview.name} / ${fetcher.data.preview.number}`
-                      : 'Without personalization'}
-                  </p>
                   <small>
                     Preview only. No item added to your cart and no order
                     placed.
@@ -1169,6 +1201,82 @@ function BuilderStep({
       </div>
       {children}
     </section>
+  );
+}
+
+function PrintFields({
+  second = false,
+  name,
+  number,
+  onNameChange,
+  onNumberChange,
+}: {
+  second?: boolean;
+  name: string;
+  number: string;
+  onNameChange: (name: string) => void;
+  onNumberChange: (number: string) => void;
+}) {
+  const prefix = second ? 'jersey-second' : 'jersey';
+  return (
+    <>
+      <div
+        className="jersey-print-fields"
+        onFocusCapture={(event) => {
+          if (
+            event.target instanceof HTMLInputElement &&
+            globalThis.matchMedia('(max-width: 60em)').matches
+          ) {
+            const bounds = event.target.getBoundingClientRect();
+            if (
+              bounds.top < 120 ||
+              bounds.bottom >
+                (globalThis.visualViewport?.height ?? globalThis.innerHeight) -
+                  96
+            )
+              event.target.scrollIntoView({block: 'center'});
+          }
+        }}
+      >
+        <label htmlFor={`${prefix}-name`}>
+          Name on back <span>Max {NAME_LIMIT}</span>
+          <input
+            id={`${prefix}-name`}
+            className="jersey-print-name"
+            name={second ? 'secondName' : 'name'}
+            autoComplete="off"
+            maxLength={NAME_LIMIT}
+            value={name}
+            onChange={(event) => onNameChange(event.target.value)}
+            placeholder="YOUR NAME"
+            required={Boolean(number.trim())}
+            pattern="[\p{L}\p{M} .’'\-]+"
+            aria-describedby={`${prefix}-print-note`}
+          />
+        </label>
+        <label htmlFor={`${prefix}-number`}>
+          Number <span>0–99</span>
+          <input
+            id={`${prefix}-number`}
+            className="jersey-print-number"
+            name={second ? 'secondNumber' : 'number'}
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            maxLength={2}
+            pattern="[0-9]{1,2}"
+            value={number}
+            onChange={(event) => onNumberChange(event.target.value)}
+            placeholder="10"
+            required={Boolean(name.trim())}
+            aria-describedby={`${prefix}-print-note`}
+          />
+        </label>
+      </div>
+      <p id={`${prefix}-print-note`} className="jersey-print-note">
+        Leave both blank for a plain back. Names print in uppercase.
+      </p>
+    </>
   );
 }
 
