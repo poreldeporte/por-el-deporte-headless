@@ -16,7 +16,7 @@ export function ProductPrice({
     price.currencyCode === compareAtPrice.currencyCode &&
     Number(compareAtPrice.amount) > Number(price.amount);
   return (
-    <span aria-label="Price" className="product-price" role="group">
+    <span className="product-price">
       {onSale ? (
         <span className="product-price-on-sale">
           <span className="sr-only">Originally </span>
