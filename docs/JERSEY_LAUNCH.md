@@ -4,6 +4,21 @@ Product route: `/products/club-jersey`. Publication was approved on November 11,
 2026. The existing brand and buying layout are preserved. The release uses
 Shopify Oxygen storefront `1000157315` at `https://poreldeporte.com`.
 
+## Storefront discovery
+
+The homepage keeps its existing brand hero and adds a release announcement and
+“Build your kit” link. Directly below the hero marquee, a jersey feature shows
+Home and Away, the Shopify starting price, the preorder shipping note, and the
+included printing offer while the existing personalization window is open.
+The hero streams independently of the catalog query. The homepage marquee no
+longer promises one-week delivery, which does not apply to these preorders.
+
+The jersey is first in Shopify's manually curated All Products collection
+(`268004393007`, handle `all-products`). That collection controls both Shop order
+and the homepage product rail. Shorts and socks remain builder add-ons rather
+than separate Shop cards. The jersey cards and homepage feature reuse the
+compressed, transparent product photos and link to the kit builder.
+
 ## Buying experience
 
 The page keeps the existing gallery, four release facts, brand fonts/colors,

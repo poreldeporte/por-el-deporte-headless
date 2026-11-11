@@ -2,6 +2,7 @@ import {Suspense} from 'react';
 import {Await, Link, useLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
 import {ProductRail, ProductRailSkeleton} from '~/components/home/ProductRail';
+import {JerseyFeature} from '~/components/home/JerseyFeature';
 import {CartButton} from '~/components/home/CartButton';
 import {About} from '~/components/home/About';
 import {Moods} from '~/components/home/Moods';
@@ -12,6 +13,7 @@ import {AsSeenOn} from '~/components/home/AsSeenOn';
 import {PelLogoMark} from '~/components/PelLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
+import {JERSEY_HANDLE} from '~/lib/jersey';
 
 export const links: Route.LinksFunction = () => [
   // Moved here from root.tsx, where it preloaded this image at high priority on
@@ -38,7 +40,7 @@ export const meta: Route.MetaFunction = ({matches}) => {
       // the products, the place and the year.
       title: 'Por El Deporte | Football, Friends, Key Biscayne',
       description:
-        'Original kit, tees, caps and totes from a club that has been playing on Key Biscayne since 2014. Free shipping in the U.S.',
+        'Preorder the official Por El Deporte jersey. Build your Home or Away kit, then browse original tees, caps and totes from our Key Biscayne club.',
       url: origin || undefined,
       image:
         'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20241117_PorElDeporte_acajiga-26.jpg?v=1755707174&width=1200',
@@ -107,28 +109,36 @@ export async function loader({context}: Route.LoaderArgs) {
   // The hero renders from static content, so we DON'T await the product rail.
   // Returning the un-awaited promise lets Hydrogen stream it in after first
   // paint (deferred data). See docs/BUILD_GUIDE.md §2.4.
-  const railProducts = context.storefront
+  const catalog = context.storefront
     .query(HOME_RAIL_QUERY, {
-      variables: {handle: RAIL_COLLECTION_HANDLE, first: 12},
-      cache: context.storefront.CacheLong(),
+      variables: {
+        handle: RAIL_COLLECTION_HANDLE,
+        jerseyHandle: JERSEY_HANDLE,
+        first: 12,
+      },
+      cache: context.storefront.CacheShort(),
     })
-    .then((data) => data.collection?.products.nodes ?? [])
     .catch((error: Error) => {
       // Never throw from deferred data — the page should still render.
       console.error(error);
-      return [];
+      return null;
     });
 
-  return {railProducts};
+  return {
+    railProducts: catalog.then((data) => data?.collection?.products.nodes ?? []),
+    jersey: catalog.then((data) => data?.jersey ?? null),
+    now: Date.now(),
+  };
 }
 
 export default function Homepage() {
-  const {railProducts} = useLoaderData<typeof loader>();
+  const {railProducts, jersey, now} = useLoaderData<typeof loader>();
   return (
     <div className="pel-home">
       <TopMarquee />
       <Hero />
       <OrangeMarquee />
+      <JerseyFeature product={jersey} now={now} />
       <Suspense fallback={<ProductRailSkeleton />}>
         <Await resolve={railProducts} errorElement={null}>
           {(products) => <ProductRail products={products} />}
@@ -208,10 +218,10 @@ function TopMarquee() {
     // with things the club actually does. "Beyond the Game" stays: it is the
     // real tagline, and it also titles the About page.
     {id: 'btg-1', text: 'Beyond the Game'},
-    {id: 'bc-1', text: 'Free to Turn Up'},
+    {id: 'bc-1', text: 'The New Club Jersey'},
     {id: 'cm-1', text: 'Est. 2014 Key Biscayne'},
     {id: 'btg-2', text: 'Beyond the Game'},
-    {id: 'bc-2', text: 'Free to Turn Up'},
+    {id: 'bc-2', text: 'The New Club Jersey'},
     {id: 'cm-2', text: 'Est. 2014 Key Biscayne'},
   ];
   return <MarqueeRow items={phrases} variant="blue" sparkSize={14} />;
@@ -221,8 +231,8 @@ function OrangeMarquee() {
   const phrases = [
     {id: 'ship', text: 'Free Shipping on U.S. Orders'},
     {id: 'est', text: 'Est. 2014 Key Biscayne'},
-    {id: 'week', text: 'On Your Doorstep in 1 Week'},
-    {id: 'community', text: 'Every Order Funds Our Games'},
+    {id: 'jersey', text: 'The Club Jersey · Preorder'},
+    {id: 'shipping', text: 'Jersey shipping date to be confirmed'},
   ];
   return <MarqueeRow items={phrases} variant="orange" sparkSize={16} />;
 }
@@ -289,26 +299,25 @@ function Hero() {
       </nav>
 
       <div className="pel-hero__content">
+        <p className="pel-hero__release">The new club jersey · Preorder</p>
         <h1 className="pel-hero__title">
           Football, Friends,
           <br />
           Key Biscayne
         </h1>
         <div className="pel-hero__lede">
-          {/* The headline is the club's line; this one has to say what we
-              actually sell, since the headline no longer does. */}
           <p className="pel-hero__sub">
-            Original kit, tees and caps from the club that plays on the island.
-            Since 2014.
+            Our official jersey is here. Home or Away, short or long sleeve.
+            Made for everyone who makes this club.
           </p>
           <div className="pel-cta-row">
-            <Link to="/collections/all-products" className="pel-btn">
-              Shop Now
+            <Link to={`/products/${JERSEY_HANDLE}`} className="pel-btn">
+              Build your kit
             </Link>
             <Link
-              to="/collections/all-products"
+              to={`/products/${JERSEY_HANDLE}`}
               className="pel-btn pel-btn--icon"
-              aria-label="Shop now"
+              aria-label="Build your jersey kit"
             >
               <svg
                 width="22"
@@ -349,10 +358,30 @@ function Hero() {
  * ---------------------------------------------------------------- */
 
 const HOME_RAIL_QUERY = `#graphql
+  fragment HomeJersey on Product {
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    startsAt: metafield(namespace: "preorder", key: "starts_at") {
+      value
+    }
+    shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") {
+      value
+    }
+  }
   fragment HomeRailProduct on Product {
     id
     title
     handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
     featuredImage {
       id
       url
@@ -377,10 +406,14 @@ const HOME_RAIL_QUERY = `#graphql
   }
   query HomeRailProducts(
     $handle: String!
+    $jerseyHandle: String!
     $first: Int!
     $country: CountryCode
     $language: LanguageCode
   ) @inContext(country: $country, language: $language) {
+    jersey: product(handle: $jerseyHandle) {
+      ...HomeJersey
+    }
     collection(handle: $handle) {
       id
       title

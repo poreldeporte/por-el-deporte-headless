@@ -490,10 +490,23 @@ export type FooterQuery = {
   >;
 };
 
+export type HomeJerseyFragment = {
+  priceRange: {
+    minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+  };
+  startsAt?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  shippingEstimate?: StorefrontAPI.Maybe<
+    Pick<StorefrontAPI.Metafield, 'value'>
+  >;
+};
+
 export type HomeRailProductFragment = Pick<
   StorefrontAPI.Product,
   'id' | 'title' | 'handle'
 > & {
+  priceRange: {
+    minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+  };
   featuredImage?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
   >;
@@ -511,17 +524,33 @@ export type HomeRailProductFragment = Pick<
 
 export type HomeRailProductsQueryVariables = StorefrontAPI.Exact<{
   handle: StorefrontAPI.Scalars['String']['input'];
+  jerseyHandle: StorefrontAPI.Scalars['String']['input'];
   first: StorefrontAPI.Scalars['Int']['input'];
   country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
   language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
 }>;
 
 export type HomeRailProductsQuery = {
+  jersey?: StorefrontAPI.Maybe<{
+    priceRange: {
+      minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
+    };
+    startsAt?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+    shippingEstimate?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metafield, 'value'>
+    >;
+  }>;
   collection?: StorefrontAPI.Maybe<
     Pick<StorefrontAPI.Collection, 'id' | 'title'> & {
       products: {
         nodes: Array<
           Pick<StorefrontAPI.Product, 'id' | 'title' | 'handle'> & {
+            priceRange: {
+              minVariantPrice: Pick<
+                StorefrontAPI.MoneyV2,
+                'amount' | 'currencyCode'
+              >;
+            };
             featuredImage?: StorefrontAPI.Maybe<
               Pick<
                 StorefrontAPI.Image,
@@ -1492,7 +1521,7 @@ interface GeneratedQueryTypes {
     return: FooterQuery;
     variables: FooterQueryVariables;
   };
-  '#graphql\n  fragment HomeRailProduct on Product {\n    id\n    title\n    handle\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n    }\n    options {\n      name\n      optionValues {\n        name\n      }\n    }\n  }\n  query HomeRailProducts(\n    $handle: String!\n    $first: Int!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      title\n      products(first: $first) {\n        nodes {\n          ...HomeRailProduct\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  fragment HomeJersey on Product {\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    startsAt: metafield(namespace: "preorder", key: "starts_at") {\n      value\n    }\n    shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") {\n      value\n    }\n  }\n  fragment HomeRailProduct on Product {\n    id\n    title\n    handle\n    priceRange {\n      minVariantPrice {\n        amount\n        currencyCode\n      }\n    }\n    featuredImage {\n      id\n      url\n      altText\n      width\n      height\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: [], ignoreUnknownOptions: true) {\n      id\n      availableForSale\n      price {\n        amount\n        currencyCode\n      }\n    }\n    options {\n      name\n      optionValues {\n        name\n      }\n    }\n  }\n  query HomeRailProducts(\n    $handle: String!\n    $jerseyHandle: String!\n    $first: Int!\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    jersey: product(handle: $jerseyHandle) {\n      ...HomeJersey\n    }\n    collection(handle: $handle) {\n      id\n      title\n      products(first: $first) {\n        nodes {\n          ...HomeRailProduct\n        }\n      }\n    }\n  }\n': {
     return: HomeRailProductsQuery;
     variables: HomeRailProductsQueryVariables;
   };

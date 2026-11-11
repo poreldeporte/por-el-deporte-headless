@@ -259,6 +259,16 @@ body:has(.pel-home) {
   text-transform: uppercase;
   text-shadow: 0 3px 26px rgba(0, 0, 0, 0.28);
 }
+.pel-hero__release {
+  margin: 0 0 24px;
+  padding: 10px 18px;
+  border: var(--border-width) solid var(--pel-cream);
+  border-radius: var(--radius-pill);
+  color: var(--pel-cream);
+  font: 700 12px/1.5 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .pel-hero__lede {
   max-width: 470px;
   margin: 44px auto 0;
@@ -269,6 +279,10 @@ body:has(.pel-home) {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--pel-cream);
+}
+.pel-hero__lede .pel-btn:not(.pel-btn--icon) {
+  padding-inline: 28px;
+  white-space: nowrap;
 }
 .pel-cta-row {
   display: inline-flex;
@@ -335,6 +349,107 @@ body:has(.pel-home) {
   .pel-marquee__track,
   .pel-scroll-cue {
     animation: none !important;
+  }
+}
+
+/* ===== Club jersey release ===== */
+.pel-jersey-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+  padding: 80px 48px;
+  border-bottom: var(--border-width) solid var(--pel-ink);
+  background: var(--pel-cream);
+}
+.pel-jersey-feature__media {
+  padding: 24px;
+  border: var(--border-width) solid var(--pel-ink);
+  border-radius: var(--radius-lg);
+  background: var(--pel-sand);
+}
+.pel-jersey-feature__media .jersey-photos,
+.pel-jersey-feature__colors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.pel-jersey-feature__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.pel-jersey-feature__colors {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+  text-align: center;
+  font: 700 12px/1.5 var(--font-body);
+  text-transform: uppercase;
+}
+.pel-jersey-feature__eyebrow {
+  margin: 0 0 16px;
+  font: 700 12px/1.5 var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pel-orange-ink);
+}
+.pel-jersey-feature h2 {
+  max-width: 9ch;
+  margin: 0 0 20px;
+  font: 650 var(--t-display-lg)/0.98 var(--font-display);
+  text-transform: uppercase;
+}
+.pel-jersey-feature__body {
+  max-width: 38ch;
+  margin: 0 0 16px;
+  font: 500 16px/1.65 var(--font-body);
+}
+.pel-jersey-feature__styles {
+  margin: 0;
+  font: 600 13px/1.6 var(--font-body);
+}
+.pel-jersey-feature__details {
+  margin: 24px 0;
+}
+.pel-jersey-feature__price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 32px;
+  margin: 0 0 8px;
+}
+.pel-jersey-feature__price > span {
+  font: 500 14px/1.5 var(--font-body);
+}
+.pel-jersey-feature__price > strong {
+  font: 650 32px/1 var(--font-display);
+}
+.pel-jersey-feature__offer,
+.pel-jersey-feature__shipping {
+  margin: 4px 0 0;
+  font: 500 12px/1.6 var(--font-body);
+}
+.pel-jersey-feature__offer {
+  color: var(--pel-orange-ink);
+  font-weight: 600;
+}
+.pel-jersey-feature__shipping {
+  color: var(--text-muted);
+}
+.pel-jersey-feature .pel-btn-outline {
+  gap: 20px;
+}
+@media (max-width: 60em) {
+  .pel-jersey-feature {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 48px 20px;
+  }
+  .pel-jersey-feature__media {
+    padding: 16px;
   }
 }
 
@@ -480,6 +595,12 @@ body:has(.pel-home) {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+.pel-card__imgwell .jersey-photos,
+.pel-card__imgwell .jersey-photos img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .pel-card__title {
   margin: 26px 0 12px;

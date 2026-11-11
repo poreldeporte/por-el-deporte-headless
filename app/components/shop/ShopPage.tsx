@@ -5,6 +5,8 @@ import type {ShopProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
+import {JerseyPhotos} from '~/components/product/JerseyPhotos';
+import {JERSEY_HANDLE, JERSEY_STYLES} from '~/lib/jersey';
 
 const BANNER_IMG =
   'https://cdn.shopify.com/s/files/1/0548/8492/5487/files/20240609_PorElDeporteFinal_ACajiga-1216.jpg?v=1755705211&width=2000';
@@ -86,7 +88,7 @@ export function ShopPage({
                 favorites" above an empty shelf reads as a broken page rather
                 than one that hasn't been filled yet. */}
             {products.length
-              ? 'Every tee, hat, and tote supports our Key Biscayne community. Have a look through.'
+              ? 'Official jerseys and everyday gear from our Key Biscayne community. Find something to make your own.'
               : "This one isn't stocked yet. Everything we do make is in the shop."}
           </p>
         </div>
@@ -172,6 +174,7 @@ export function ShopPage({
 
 function ShopCard({product}: {product: ShopProductFragment}) {
   const {open} = useAside();
+  const isJersey = product.handle === JERSEY_HANDLE;
   const to = `/products/${product.handle}`;
   const variant = product.selectedOrFirstAvailableVariant;
   const min = product.priceRange.minVariantPrice;
@@ -190,7 +193,16 @@ function ShopCard({product}: {product: ShopProductFragment}) {
     <div className="pel-shopcard">
       <Link className="pel-shopcard__link" to={to}>
         <div className="pel-shopcard__well">
-          {product.featuredImage ? (
+          {isJersey ? (
+            <>
+              <span className="pel-shopcard__badge">Preorder</span>
+              <JerseyPhotos
+                styles={[JERSEY_STYLES[0]]}
+                view="front"
+                sizes="(min-width: 48em) 258px, 45vw"
+              />
+            </>
+          ) : product.featuredImage ? (
             <Image
               data={product.featuredImage}
               className="pel-shopcard__img"
@@ -212,7 +224,11 @@ function ShopCard({product}: {product: ShopProductFragment}) {
         <Link
           className="pel-shopcard__add"
           to={to}
-          aria-label={`Choose options for ${product.title}`}
+          aria-label={
+            isJersey
+              ? 'Build your jersey kit'
+              : `Choose options for ${product.title}`
+          }
         >
           {plusIcon}
         </Link>
