@@ -47,7 +47,6 @@ export function JerseyKitPreview({
                   styles={[style]}
                   view={withShorts ? 'kit' : 'front'}
                   sizes={styles.length === 2 ? '45vw' : '90vw'}
-                  priority
                 />
               </div>
               <h3>

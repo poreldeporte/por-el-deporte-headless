@@ -40,10 +40,13 @@ jobs:
       # Codegen + production Oxygen build. Uses the bundled Storefront/Customer
       # Account API schemas, so no store credentials are needed at build time.
       - name: Build
+        if: github.event_name == 'pull_request'
         run: npm run build
 
-      - name: Deploy production to Oxygen
+      # Oxygen supplies the CDN asset base before building. Reusing a build
+      # made without it sends images through the storefront's asset proxy.
+      - name: Build and deploy production to Oxygen
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: npx shopify hydrogen deploy --env-branch main --build-command "true"
+        run: npx shopify hydrogen deploy --env-branch main --build-command "npm run build"
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000157315 }}

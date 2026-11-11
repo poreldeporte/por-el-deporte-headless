@@ -1,5 +1,12 @@
 import {JERSEY_COLORS, type JERSEY_STYLES} from '~/lib/jersey';
 
+// Imported assets receive content hashes and Oxygen's direct CDN URLs.
+const photos = import.meta.glob<string>('/app/assets/jersey/*/*.webp', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+
 export type JerseyPhotoView =
   'front' | 'back' | 'kit' | 'shorts' | 'detail' | 'action';
 
@@ -31,7 +38,7 @@ export function JerseyPhotos({
           : shorts
             ? `${color}-shorts${view === 'detail' ? '-detail' : ''}`
             : `${color}-${sleeve}-${view}`;
-        const src = `/jersey/${action ? 'action' : 'cutouts'}/${file}`;
+        const src = `${action ? 'action' : 'cutouts'}/${file}`;
         const alt = action
           ? `Player wearing the ${home ? 'orange home' : 'black away'} short-sleeve jersey and matching shorts on the field`
           : shorts
@@ -40,13 +47,13 @@ export function JerseyPhotos({
         return (
           <img
             key={style.value}
-            src={`${src}-640.webp`}
-            srcSet={`${src}-160.webp 160w, ${src}-640.webp 640w, ${src}-1024.webp 1024w`}
+            {...photoSources(src)}
             sizes={sizes}
             width={1024}
             height={action ? 1536 : 1024}
             alt={decorative ? '' : alt}
             loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
             decoding="async"
           />
         );
@@ -59,23 +66,31 @@ export function SocksPhoto({
   color,
   view = 'pair',
   sizes = '72px',
-  priority = false,
 }: {
   color: string;
   view?: 'pair' | 'detail';
   sizes?: string;
-  priority?: boolean;
 }) {
-  const src = `/jersey/socks/${color.toLowerCase()}-${view}`;
+  const src = `socks/${color.toLowerCase()}-${view}`;
   return (
     <img
       className="jersey-socks-photo"
-      src={`${src}-640.webp`}
-      srcSet={`${src}-160.webp 160w, ${src}-640.webp 640w, ${src}-1024.webp 1024w`}
+      {...photoSources(src)}
       sizes={sizes}
       alt={`${color} PED socks with orange island logos${view === 'detail' ? ', knit and logo detail' : ', one pair'}`}
-      loading={priority ? 'eager' : 'lazy'}
+      loading="lazy"
       decoding="async"
     />
   );
+}
+
+function photoSources(path: string) {
+  const url = (width: number) =>
+    photos[`/app/assets/jersey/${path}-${width}.webp`];
+  return {
+    src: url(640),
+    srcSet: [160, 320, 640, 1024]
+      .map((width) => `${url(width)} ${width}w`)
+      .join(', '),
+  };
 }
