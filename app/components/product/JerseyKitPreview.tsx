@@ -19,7 +19,9 @@ export function JerseyKitPreview({
   selection: JerseySelection;
   price: Price | null;
 }) {
-  const withShorts = selection.shortsSize !== 'None';
+  const withShorts = selection.jerseys.some(
+    ({shortsSize}) => shortsSize !== 'None',
+  );
   return (
     <dialog
       ref={dialogRef}
@@ -41,7 +43,7 @@ export function JerseyKitPreview({
       <div className="jersey-kit-content">
         <div className="jersey-kit-jerseys">
           {styles.map((style, index) => {
-            const {size, print} = selection.jerseys[index];
+            const {size, print, shortsSize} = selection.jerseys[index];
             return (
               <div key={style.value} className="jersey-kit-item">
                 <div className="jersey-kit-photo">
@@ -67,27 +69,24 @@ export function JerseyKitPreview({
                 {withShorts && (
                   <p>
                     Matching shorts ·{' '}
-                    {selection.shortsSize
-                      ? `Size ${selection.shortsSize}`
-                      : 'Choose a size'}
+                    {shortsSize ? `Size ${shortsSize}` : 'Choose a size'}
                   </p>
                 )}
               </div>
             );
           })}
         </div>
-        {selection.socksColor !== 'None' && (
-          <div className="jersey-gallery-addon">
-            <SocksPhoto color={selection.socksColor} />
+        {selection.socks.map(({color, quantity}) => (
+          <div className="jersey-gallery-addon" key={color}>
+            <SocksPhoto color={color} />
             <div className="jersey-addon-copy">
-              <strong>{selection.socksColor} PED socks</strong>
+              <strong>{color} PED socks</strong>
               <small>
-                {selection.socksPack}
-                {selection.socksSize ? ` · ${selection.socksSize}` : ''}
+                {quantity} {quantity === 1 ? 'pair' : 'pairs'} · One size
               </small>
             </div>
           </div>
-        )}
+        ))}
         <p className="jersey-hint">Photos show an example name and number.</p>
       </div>
       <div className="jersey-kit-footer">
