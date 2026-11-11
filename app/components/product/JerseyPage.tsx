@@ -371,7 +371,11 @@ export function JerseyPage({
                     <JerseyPhotos
                       styles={styles}
                       view={option === 'front' && withShorts ? 'kit' : option}
-                      sizes={bundle ? '60px' : '120px'}
+                      sizes={
+                        bundle
+                          ? '(min-width: 60.01em) 60px, calc((100vw - 72px) / 10)'
+                          : '(min-width: 60.01em) 120px, calc((100vw - 72px) / 5)'
+                      }
                       decorative
                     />
                   </span>
@@ -685,6 +689,7 @@ export function JerseyPage({
                         : away
                           ? 'Black'
                           : 'Cream'}
+                      {' · With pockets'}
                     </span>
                     <small id="jersey-shorts-price">
                       {quote.shorts && (
@@ -1025,6 +1030,7 @@ export function JerseyPage({
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
+          <p className="jersey-hint">Jersey design by Sergio Gomez</p>
           <div className="pel-pdp__card-foot">Est. 2014 · Key Biscayne</div>
         </div>
         <div className="pel-pdp__card">
@@ -1047,7 +1053,7 @@ export function JerseyPage({
               ['Sizes', 'M / L / XL / XXL'],
               ['Sleeves', 'Short / Long'],
               ['Options', 'Home, Away, or both'],
-              ['Shorts', 'Optional · choose a separate size'],
+              ['Shorts', 'With pockets · optional · choose a separate size'],
               ['Socks', 'Black / White · 1 pair or 3 pairs'],
               [
                 'Shipping',

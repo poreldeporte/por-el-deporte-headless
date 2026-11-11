@@ -63,7 +63,6 @@ export function SocksGallery({selectedColor}: {selectedColor: string}) {
                   color={color}
                   view={view}
                   sizes="(min-width: 601px) 350px, 90vw"
-                  priority
                 />
                 <figcaption>
                   {color} · {view === 'pair' ? 'One pair' : 'Logo detail'}

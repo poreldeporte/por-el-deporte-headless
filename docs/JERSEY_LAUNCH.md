@@ -8,6 +8,8 @@ Shopify Oxygen storefront `1000157315` at `https://poreldeporte.com`.
 
 The page keeps the existing gallery, four release facts, brand fonts/colors,
 header/footer, size pills, and product detail cards.
+The Story includes a small “Jersey design by Sergio Gomez” credit below its
+paragraphs. The shorts option and The Details both mention the pockets.
 
 On desktop, the product gallery and four release facts share one sticky container.
 They stay aligned while the buying column scrolls and leave the viewport together
@@ -77,7 +79,7 @@ the generic section padding in `reset.css`; the print-to-next-divider gap is
 24px. The community floating button is hidden only on this PDP so it cannot
 cover buying controls. No size guide has been added.
 
-The official jersey and shorts cutouts are in `public/jersey/cutouts`. The
+The official jersey and shorts cutouts are in `app/assets/jersey/cutouts`. The
 gallery, four style choices, second-jersey row, and shorts upsell use these
 photos. Front/back images follow each selected color and sleeve, including
 mixed bundles. Adding shorts switches Front to the matching full-kit photo.
@@ -92,22 +94,26 @@ view or mobile print preview.
 
 The 16 supplied photos had their external white backgrounds removed using the
 imagegen edit tool with transparent output. White/cream fabric and printed details
-remain opaque. Cutouts were exported with
-`cwebp -q 88 -alpha_q 100 -m 6 -resize WIDTH 0` at widths 160, 640, and 1024 for
-responsive loading. All exports retain alpha transparency. Image containers
+remain opaque. The current compressed exports use
+`cwebp -q 78 -alpha_q 100 -m 6 -resize WIDTH 0` at widths 160, 320, 640, and 1024.
+The extra 320px size keeps small cards and thumbnails from requesting 640px
+images on high-density phones. All exports retain alpha transparency. Image containers
 use the store's existing background. Originals remain unchanged in the supplied
 `ped-kits/web-product-pictures` folder. File names use
 `{home|away}-{short|long}-{front|back|kit}` and `{home|away}-shorts[-detail]`, followed by
 the width and `.webp`. `JerseyPhotos.tsx` owns the mapping used by every surface.
+It imports the files through Vite so each gets a content hash and a direct
+Oxygen CDN URL in production. Only the main gallery image loads eagerly with
+high priority; closed kit and socks dialogs wait until they are opened.
 
-The action photos are responsive WebP exports in `public/jersey/action`, at the
-same three widths and quality 88. Their scenes and backgrounds are preserved,
+The action photos are responsive WebP exports in `app/assets/jersey/action`, at the
+same four widths and quality 78. Their scenes and backgrounds are preserved,
 with no AI edits. Home uses `orange/andy-orange.jpg`; Away uses
 `black/Black Kit Soccer Action Shot.png`, both from the supplied pictures folder.
 Originals remain unchanged. The gallery contains the full photo without cropping.
 
-The four supplied socks photos are in `public/jersey/socks`, with responsive
-160/640/1024px WebP exports. The black and white pair photos replace placeholders
+The four supplied socks photos are in `app/assets/jersey/socks`, with responsive
+160/320/640/1024px WebP exports. The black and white pair photos replace placeholders
 in the color choices, selected gallery add-on, and kit preview. “View photos”
 opens a native dialog with the pair and logo detail for either color. Browsing
 photos does not add socks or change the kit; the dialog starts on the selected
@@ -275,11 +281,16 @@ are Unlisted on that channel so the builder owns their discovery. The native
 Home + Away discount has no end date. `preorder.starts_at` owns the seven-day
 printing cutoff; it is set to the actual launch instant, not the testing window.
 
-Pushes to `main` run lint, typecheck, the financial/cart contracts and a production
-build, then deploy that same revision to Oxygen using the existing repository
+Pushes to `main` run lint, typecheck and the financial/cart contracts, then
+build and deploy that same revision to Oxygen using the existing repository
 secret `OXYGEN_DEPLOYMENT_TOKEN_1000157315` and environment branch `main`. Pull
 requests run checks without deploying. The standard public-repository runner
 has a 15-minute cap; no paid runner or new hosting plan is introduced.
+The deploy command runs `npm run build` after Oxygen supplies
+`HYDROGEN_ASSET_BASE_URL`. Do not skip that build: an earlier build without the
+CDN base leaves relative image URLs that the storefront asset proxy expands
+into much larger PNG responses. Imported image URLs go directly to the CDN;
+content hashes also prevent old compressed files remaining in browser caches.
 
 ## Earlier checkout evidence · November 11, 2026
 
