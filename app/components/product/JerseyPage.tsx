@@ -48,7 +48,7 @@ export function JerseyPage({
 }) {
   const [firstStyle, setFirstStyle] = useState(JERSEY_STYLES[0]);
   const [secondStyle, setSecondStyle] = useState<JerseyStyle | null>(null);
-  const [editingFirst, setEditingFirst] = useState(false);
+  const [editingFirst, setEditingFirst] = useState(true);
   const [editingSecond, setEditingSecond] = useState(false);
   const bundle = Boolean(secondStyle);
   const styles = secondStyle ? [firstStyle, secondStyle] : [firstStyle];
@@ -65,7 +65,6 @@ export function JerseyPage({
   const [shortsSize, setShortsSize] = useState('');
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [samePrint, setSamePrint] = useState(true);
   const [secondName, setSecondName] = useState('');
   const [secondNumber, setSecondNumber] = useState('');
   const [view, setView] = useState<Exclude<JerseyPhotoView, 'kit'>>('front');
@@ -90,12 +89,10 @@ export function JerseyPage({
     canPersonalize ? name : '',
     canPersonalize ? number : '',
   );
-  const secondPrint = samePrint
-    ? firstPrint
-    : jerseyPrint(
-        canPersonalize ? secondName : '',
-        canPersonalize ? secondNumber : '',
-      );
+  const secondPrint = jerseyPrint(
+    canPersonalize ? secondName : '',
+    canPersonalize ? secondNumber : '',
+  );
   const selection: JerseySelection = {
     jerseys: styles.map((item, index) => ({
       style: item.value,
@@ -200,16 +197,10 @@ export function JerseyPage({
       savings: choice?.savings ?? null,
     };
   });
-  const savings = secondChoices
-    .filter((item) => item.style.color !== firstStyle.color)
-    .map((item) => item.savings);
-  const bundleSaving = savings.every(
-    (price) =>
-      price?.amount === savings[0]?.amount &&
-      price?.currencyCode === savings[0]?.currencyCode,
-  )
-    ? savings[0]
-    : null;
+  const secondOffer = secondChoices.find(
+    ({style}) =>
+      style.color !== firstStyle.color && style.sleeve === firstStyle.sleeve,
+  )!;
   const secondChoice = secondChoices.find(
     (item) => item.style.value === secondStyle?.value,
   );
@@ -476,26 +467,24 @@ export function JerseyPage({
                   : 'Choose your style and size.'
               }
             >
-              <div className={bundle ? 'jersey-item' : undefined}>
-                {secondStyle && (
-                  <SelectedJersey style={firstStyle}>
-                    <button
-                      ref={editFirstRef}
-                      type="button"
-                      className="jersey-text-button"
-                      aria-label={`Edit ${firstSide.toLowerCase()} jersey`}
-                      aria-expanded={editingFirst}
-                      aria-controls="jersey-first-options"
-                      onClick={() => {
-                        setEditingFirst(!editingFirst);
-                        setEditingSecond(false);
-                      }}
-                    >
-                      {editingFirst ? 'Done' : 'Edit'}
-                    </button>
-                  </SelectedJersey>
-                )}
-                {(!secondStyle || editingFirst) && (
+              <div className="jersey-item">
+                <SelectedJersey style={firstStyle}>
+                  <button
+                    ref={editFirstRef}
+                    type="button"
+                    className="jersey-text-button"
+                    aria-label={`Edit ${firstSide.toLowerCase()} jersey`}
+                    aria-expanded={editingFirst}
+                    aria-controls="jersey-first-options"
+                    onClick={() => {
+                      setEditingFirst(!editingFirst);
+                      setEditingSecond(false);
+                    }}
+                  >
+                    {editingFirst ? 'Done' : 'Edit'}
+                  </button>
+                </SelectedJersey>
+                {editingFirst && (
                   <div
                     id="jersey-first-options"
                     className="jersey-first-choice"
@@ -517,10 +506,9 @@ export function JerseyPage({
                         setView((current) =>
                           current === 'action' ? current : 'front',
                         );
-                        if (bundle)
-                          requestAnimationFrame(() =>
-                            editFirstRef.current?.focus({preventScroll: true}),
-                          );
+                        requestAnimationFrame(() =>
+                          editFirstRef.current?.focus({preventScroll: true}),
+                        );
                       }}
                     />
                   </div>
@@ -529,7 +517,10 @@ export function JerseyPage({
                   name="firstSize"
                   label={`${firstSide} size`}
                   value={size}
-                  onChange={setSize}
+                  onChange={(value) => {
+                    setSize(value);
+                    setEditingFirst(false);
+                  }}
                 />
                 {canPersonalize && (
                   <div
@@ -553,201 +544,158 @@ export function JerseyPage({
                 )}
               </div>
 
-              <section
-                className={`jersey-bundle${bundle ? ' jersey-bundle--selected' : ''}`}
-                aria-labelledby="jersey-bundle-heading"
-              >
-                <div className={bundle ? 'jersey-item' : undefined}>
-                  {secondStyle ? (
-                    <>
-                      <h4 id="jersey-bundle-heading" className="sr-only">
-                        Your Home + Away set
-                      </h4>
-                      <SelectedJersey style={secondStyle}>
-                        <button
-                          type="button"
-                          className="jersey-text-button"
-                          ref={editSecondRef}
-                          aria-label={`Edit ${secondSide.toLowerCase()} jersey`}
-                          aria-expanded={editingSecond}
-                          aria-controls="jersey-second-options"
-                          onClick={() => {
-                            setEditingSecond(!editingSecond);
-                            setEditingFirst(false);
-                          }}
-                        >
-                          {editingSecond ? 'Done' : 'Edit'}
-                        </button>
-                        <button
-                          type="button"
-                          className="jersey-text-button"
-                          aria-label={`Remove ${secondSide.toLowerCase()} jersey`}
-                          onClick={() => {
-                            setSecondStyle(null);
-                            setEditingFirst(false);
+              <div className="jersey-bundle">
+                {secondStyle ? (
+                  <div className="jersey-item">
+                    <SelectedJersey style={secondStyle}>
+                      <button
+                        type="button"
+                        className="jersey-text-button"
+                        ref={editSecondRef}
+                        aria-label={`Edit ${secondSide.toLowerCase()} jersey`}
+                        aria-expanded={editingSecond}
+                        aria-controls="jersey-second-options"
+                        onClick={() => {
+                          setEditingSecond(!editingSecond);
+                          setEditingFirst(false);
+                        }}
+                      >
+                        {editingSecond ? 'Done' : 'Edit'}
+                      </button>
+                      <button
+                        type="button"
+                        className="jersey-text-button"
+                        aria-label={`Remove ${secondSide.toLowerCase()} jersey`}
+                        onClick={() => {
+                          setSecondStyle(null);
+                          setEditingFirst(false);
+                          setEditingSecond(false);
+                          requestAnimationFrame(() =>
+                            addSecondRef.current?.focus({preventScroll: true}),
+                          );
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </SelectedJersey>
+                    {editingSecond && (
+                      <div id="jersey-second-options">
+                        {withShorts && (
+                          <p className="jersey-hint">
+                            These prices include matching shorts.
+                          </p>
+                        )}
+                        <StyleChoice
+                          label={`${secondSide} sleeve length`}
+                          name="secondStyle"
+                          value={secondStyle.value}
+                          choices={secondChoices.filter(
+                            (item) => item.style.color !== firstStyle.color,
+                          )}
+                          additional
+                          onChange={(item) => {
+                            setSecondStyle(item);
                             setEditingSecond(false);
+                            setView((current) =>
+                              current === 'action' ? current : 'front',
+                            );
                             requestAnimationFrame(() =>
-                              addSecondRef.current?.focus({
+                              editSecondRef.current?.focus({
                                 preventScroll: true,
                               }),
                             );
                           }}
-                        >
-                          Remove
-                        </button>
-                      </SelectedJersey>
-                    </>
-                  ) : (
-                    <div className="jersey-bundle-offer">
-                      <div className="jersey-addon-copy">
-                        <h4 id="jersey-bundle-heading">Get Home + Away</h4>
-                        <small className="jersey-addon-saving">
-                          {bundleSaving ? (
-                            <>
-                              Save <Money data={bundleSaving} as="span" /> on
-                              both jerseys
-                            </>
-                          ) : (
-                            'One home jersey. One away jersey.'
-                          )}
-                        </small>
-                        <small>Choose sleeves and sizes for each.</small>
+                        />
                       </div>
-                      <button
-                        type="button"
-                        className="pel-pdp__size jersey-extra-toggle"
-                        ref={addSecondRef}
-                        aria-label={
-                          editingSecond
-                            ? `Cancel adding the ${secondSide.toLowerCase()} jersey`
-                            : `Add the ${secondSide.toLowerCase()} jersey`
-                        }
-                        aria-expanded={editingSecond}
-                        aria-controls="jersey-second-options"
-                        onClick={() => setEditingSecond(!editingSecond)}
-                      >
-                        {editingSecond ? 'Cancel' : `Add ${secondSide}`}
-                      </button>
-                    </div>
-                  )}
-                  {editingSecond && (
-                    <div id="jersey-second-options">
-                      {withShorts && (
-                        <p className="jersey-hint">
-                          The added price includes matching shorts in your
-                          chosen shorts size.
-                        </p>
-                      )}
-                      <StyleChoice
-                        label={`${secondSide} sleeve length`}
-                        name="secondStyle"
-                        value={secondStyle?.value ?? ''}
-                        choices={secondChoices.filter(
-                          (item) => item.style.color !== firstStyle.color,
-                        )}
-                        additional
-                        onChange={(item) => {
-                          setSecondStyle(item);
-                          setEditingSecond(false);
-                          setView((current) =>
-                            current === 'action' ? current : 'front',
-                          );
-                          requestAnimationFrame(() =>
-                            editSecondRef.current?.focus({preventScroll: true}),
-                          );
-                        }}
-                      />
-                    </div>
-                  )}
-                  {secondStyle && (
-                    <>
-                      <SizeChoice
-                        name="secondSize"
-                        label={`${secondSide} size`}
-                        value={secondSize}
-                        onChange={setSecondSize}
-                      />
-                      {canPersonalize && (
-                        <div
-                          className="jersey-personalization"
-                          role="group"
-                          aria-label={`${secondSide} jersey personalization`}
-                        >
-                          <div className="jersey-option-heading">
-                            <h4>{secondSide} name + number</h4>
-                            <span className="jersey-option-note">
-                              Included · optional
-                            </span>
-                          </div>
-                          <div className="jersey-print-sharing">
-                            <p className="jersey-hint">
-                              {samePrint
-                                ? `Same as ${firstSide}`
-                                : 'Personalize this jersey separately.'}
-                              {samePrint && (
-                                <strong>
-                                  {firstPrint.name && firstPrint.number
-                                    ? `${firstPrint.name} / ${firstPrint.number}`
-                                    : firstPrint.name || firstPrint.number
-                                      ? `Finish your ${firstSide.toLowerCase()} name + number above.`
-                                      : 'Plain back'}
-                                </strong>
-                              )}
-                            </p>
-                            <button
-                              type="button"
-                              className="jersey-text-button"
-                              aria-expanded={!samePrint}
-                              aria-controls="jersey-second-print"
-                              onClick={() => setSamePrint(!samePrint)}
-                            >
-                              {samePrint
-                                ? 'Personalize separately'
-                                : `Use same as ${firstSide}`}
-                            </button>
-                          </div>
-                          {samePrint ? (
-                            <>
-                              <input
-                                type="hidden"
-                                name="secondName"
-                                value={secondPrint.name}
-                              />
-                              <input
-                                type="hidden"
-                                name="secondNumber"
-                                value={secondPrint.number}
-                              />
-                            </>
-                          ) : (
-                            <div id="jersey-second-print">
-                              <PrintFields
-                                second
-                                name={secondName}
-                                number={secondNumber}
-                                onNameChange={setSecondName}
-                                onNumberChange={setSecondNumber}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-                {secondStyle && (
-                  <p className="jersey-hint jersey-addon-saving">
-                    {secondChoice?.savings ? (
-                      <>
-                        Home + Away ·{' '}
-                        <Money data={secondChoice.savings} as="span" /> saved
-                      </>
-                    ) : (
-                      'Home + Away set'
                     )}
+                    <SizeChoice
+                      name="secondSize"
+                      label={`${secondSide} size`}
+                      value={secondSize}
+                      onChange={(value) => {
+                        setSecondSize(value);
+                        setEditingSecond(false);
+                      }}
+                    />
+                    {canPersonalize && (
+                      <div
+                        className="jersey-personalization"
+                        role="group"
+                        aria-label={`${secondSide} jersey personalization`}
+                      >
+                        <div className="jersey-option-heading">
+                          <h4>{secondSide} name + number</h4>
+                          <span className="jersey-option-note">
+                            Included · optional
+                          </span>
+                        </div>
+                        <PrintFields
+                          second
+                          name={secondName}
+                          number={secondNumber}
+                          onNameChange={setSecondName}
+                          onNumberChange={setSecondNumber}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="jersey-bundle-offer"
+                    ref={addSecondRef}
+                    disabled={!secondOffer.price}
+                    onClick={() => {
+                      setSecondStyle(secondOffer.style);
+                      setSecondSize('');
+                      setSecondName(name);
+                      setSecondNumber(number);
+                      setEditingFirst(false);
+                      setEditingSecond(true);
+                      setView((current) =>
+                        current === 'action' ? current : 'front',
+                      );
+                      requestAnimationFrame(() => {
+                        editSecondRef.current?.focus({preventScroll: true});
+                        editSecondRef.current?.scrollIntoView({
+                          block: 'center',
+                        });
+                      });
+                    }}
+                  >
+                    <StylePicture style={secondOffer.style} />
+                    <span className="jersey-addon-copy">
+                      <strong>Add {secondSide} jersey</strong>
+                      <small className="jersey-addon-saving">
+                        {secondOffer.savings ? (
+                          <>
+                            Save <Money data={secondOffer.savings} as="span" />{' '}
+                            with Home + Away
+                          </>
+                        ) : (
+                          'Complete your Home + Away set'
+                        )}
+                      </small>
+                      {withShorts && <small>Includes matching shorts</small>}
+                    </span>
+                    <span className="jersey-bundle-price">
+                      {secondOffer.price ? (
+                        <>
+                          +<Money data={secondOffer.price} as="span" />
+                        </>
+                      ) : (
+                        'Unavailable'
+                      )}
+                    </span>
+                  </button>
+                )}
+                {secondStyle && secondChoice?.savings && (
+                  <p className="jersey-hint jersey-addon-saving">
+                    Home + Away ·{' '}
+                    <Money data={secondChoice.savings} as="span" /> saved
                   </p>
                 )}
-              </section>
+              </div>
               <p className="jersey-hint">
                 {canPersonalize
                   ? preview

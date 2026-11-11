@@ -254,12 +254,14 @@ preserved). Names are normalized and uppercased on the server. Confirm print
 limits, font, and placement with the supplier; the sample photos are not a
 personalized print proof.
 
-The builder keeps name/number beside each jersey's size. A Home + Away set
-defaults to the same print on both; “Personalize separately” allows a different
-name/number or a plain back on the second jersey. Each jersey owns its print in
-the kit preview and cart. Forms opened before this change still apply their
-single name/number to both jerseys. Shorts and socks are separate optional
-sections under “Complete your kit.”
+Each jersey has a card containing its style, size, and visible name/number
+fields. The compact Home + Away offer opens a second card with the same sleeve
+length and copies the first jersey's current print once. Both prints are then
+independently editable; leave either pair of fields blank for a plain back.
+The second jersey requires its own size selection. The kit preview and cart
+keep each print with its jersey. Legacy forms that submit only one name/number
+still apply it to both jerseys. Shorts and socks are separate optional sections
+under “Complete your kit.”
 
 The server resolves all exact native options before a single `cart.addLines`
 call. If any selected jersey, shorts or socks are unavailable, it adds nothing.
