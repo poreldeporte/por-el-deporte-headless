@@ -314,6 +314,11 @@
   letter-spacing: 0;
   color: var(--text-muted);
 }
+.jersey-total-saving {
+  margin: 8px 0 0;
+  color: var(--pel-orange-ink);
+  font: 600 13px/1.5 var(--font-body);
+}
 .jersey-form fieldset {
   border: 0;
   padding: 0;

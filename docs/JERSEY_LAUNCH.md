@@ -89,6 +89,13 @@ summary above the button; the cart owns order review. Changing either jersey
 size never changes the other jersey or shorts size. Removing and readding an
 extra preserves its size.
 
+Original prices are struck through beside discounted prices in the add offers,
+selected cards, kit preview, title/mobile total, cart and Shopify checkout. The
+cart derives savings from native line subtotals and final totals, including
+quantity, rather than reconstructing promotions. The $20 jersey allocation is
+on Away even when Away was picked first. The socks card shows the shared total
+and its original price at every qualifying group of three.
+
 Personalization has no switch. Both fields blank means a plain back; entering
 either field requires both. The fixed mobile purchase bar uses the same
 total/form as desktop. Both buttons use native required-field checks and server
@@ -240,7 +247,8 @@ Created products:
 
 A Home + Away purchase adds **two individual jersey variants** in one cart
 mutation. Each line has its own sleeve, jersey size, photo, price and print
-properties. Each matching pair of shorts is a separate $15 cart/order line with
+properties. Each matching pair of shorts is a separate $35 cart/order line,
+discounted to $15, with
 its own
 color, size and photo. Shopify’s native parent relationship attaches it to the
 corresponding jersey and removes it if that jersey is removed. The kit-only
@@ -253,6 +261,21 @@ not the entire product. No per-order limit; one saving per qualifying pair.
 Allow product-discount combinations so the separate PED socks saving can apply; order and shipping combinations remain off. Removing either jersey must
 remove the saving. The PDP quotes the same $20 USD offer; Shopify applies and
 recalculates the real cart/checkout discount. The cart shows its allocation.
+
+The native [Kit shorts — Save $20](https://admin.shopify.com/store/por-el-deporte/discounts/1328251764783)
+automatic product discount subtracts $20 from **each** of the eight Club Shorts
+variants (base price $35; no compare-at price). Product-discount combinations
+are enabled, with no per-order limit. Compare-at prices do not produce checkout
+strikethroughs; this actual discount does, including in the order receipt.
+Shorts remain unlisted and offered through the kit builder. The rule applies to
+these shorts directly, preserving their existing $15 selling price; it is not a
+second jersey-qualified Buy X get Y rule, which would compete with Home + Away.
+Do not activate the shorts discount while the variants still have a $15 base.
+Do not expose $35 shorts without the matching active discount.
+
+The jersey-specific [confirmation templates](email/README.md) thank supporters,
+state the preorder shipping status and show every individual item and custom
+print. Shipping emails refer only to the jerseys in that actual shipment.
 
 Socks retain native `Color` values `Black`/`White` and `Pack` values `1 pair`/`3 pairs`,
 priced at $10/$25. The builder now uses the `1 pair` variants exclusively and

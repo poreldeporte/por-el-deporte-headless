@@ -532,7 +532,7 @@ test('quotes sum actual separate prices and reject missing or mixed-currency ext
   ];
   const pricedShorts = shorts.map((item) => ({
     ...item,
-    price: {amount: '17.00', currencyCode: 'USD'},
+    price: {amount: '37.00', currencyCode: 'USD'},
   }));
   const chosen = {
     ...selection,
@@ -541,7 +541,9 @@ test('quotes sum actual separate prices and reject missing or mixed-currency ext
   const quote = jerseyQuote(chosen, variants, [], false, pricedShorts);
   assert.equal(quote.total.amount, '100.00');
   assert.equal(quote.shorts.amount, '17.00');
-  assert.equal(quote.shortsSavings.amount, '18.00');
+  assert.equal(quote.shortsSavings.amount, '20.00');
+  assert.equal(quote.original.amount, '120.00');
+  assert.equal(quote.savings.amount, '20.00');
   const withSocks = {...chosen, socks: [{color: 'Black', quantity: 1}]};
   assert.equal(
     jerseyQuote(withSocks, variants, socks, false, pricedShorts).total.amount,
@@ -703,6 +705,27 @@ test('mixed socks and both kits quote the exact combined discount and independen
   };
   const quote = jerseyQuote(chosen, [], [], true);
   assert.equal(quote.total.amount, '185.00');
+  assert.equal(quote.original.amount, '250.00');
+  assert.equal(quote.savings.amount, '65.00');
+  assert.deepEqual(
+    quote.jerseyPrices.map((price) => price.amount),
+    ['70.00', '60.00'],
+  );
+  assert.deepEqual(
+    quote.jerseyValues.map((price) => price.amount),
+    ['70.00', '80.00'],
+  );
+  const reversed = jerseyQuote(
+    {...chosen, jerseys: [...chosen.jerseys].reverse()},
+    [],
+    [],
+    true,
+  );
+  assert.deepEqual(
+    reversed.jerseyPrices.map((price) => price.amount),
+    ['60.00', '70.00'],
+  );
+  assert.equal(reversed.total.amount, '185.00');
   assert.equal(
     jerseyQuote({...chosen, jerseys: [chosen.jerseys[0]]}, [], [], true).total
       .amount,

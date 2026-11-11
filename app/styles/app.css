@@ -514,12 +514,16 @@ button.reset:hover:not(:has(> *)) {
 }
 
 .product-price-on-sale {
-  display: flex;
-  grid-gap: 0.5rem;
+  display: inline-flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5em;
 }
 
 .product-price-on-sale s {
-  opacity: 0.5;
+  color: var(--text-muted);
+  font-size: 0.8em;
+  font-weight: 500;
 }
 
 .product-options-grid {

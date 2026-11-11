@@ -3,6 +3,7 @@ import type {CartLayout} from '~/components/CartMain';
 import {Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useId} from 'react';
 import {trackInitiateCheckout} from '~/components/MetaPixel';
+import {ProductPrice} from './ProductPrice';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -30,6 +31,41 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
   const summaryId = useId();
   const checkoutUrl = cart?.checkoutUrl;
+  const subtotal = cart?.cost?.subtotalAmount;
+  const total =
+    subtotal?.amount && subtotal.currencyCode
+      ? {amount: subtotal.amount, currencyCode: subtotal.currencyCode}
+      : null;
+  const lines = cart?.lines.nodes ?? [];
+  const originalCents = lines.reduce(
+    (sum, line) =>
+      sum + Math.round(Number(line.cost?.subtotalAmount.amount) * 100),
+    0,
+  );
+  const original =
+    total &&
+    !cart?.isOptimistic &&
+    Number.isFinite(originalCents) &&
+    lines.every(
+      (line) => line.cost?.subtotalAmount.currencyCode === total.currencyCode,
+    )
+      ? {...total, amount: (originalCents / 100).toFixed(2)}
+      : null;
+  const savings =
+    original && total && originalCents > Math.round(Number(total.amount) * 100)
+      ? {
+          ...total,
+          amount: (
+            (originalCents - Math.round(Number(total.amount) * 100)) /
+            100
+          ).toFixed(2),
+        }
+      : null;
+  const preorder = lines.some((line) =>
+    line.attributes?.some(
+      ({key, value}) => key === 'Order type' && value === 'Preorder',
+    ),
+  );
 
   return (
     <div aria-labelledby={summaryId} className={className}>
@@ -45,11 +81,19 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         <dd>Free in the U.S.</dd>
       </dl>
 
+      {savings && (
+        <dl className="cart-row cart-row--saving">
+          <dt>You save</dt>
+          <dd>
+            <Money data={savings} />
+          </dd>
+        </dl>
+      )}
       <dl className="cart-row cart-row--total">
         <dt>Total</dt>
         <dd>
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart.cost.subtotalAmount} />
+          {total ? (
+            <ProductPrice price={total} compareAtPrice={original} />
           ) : (
             'Calculating'
           )}
@@ -76,7 +120,9 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       ) : null}
 
       <p className="cart-fineprint">
-        Taxes and any international shipping are calculated at checkout.
+        {preorder
+          ? 'Preorder · Shipping date to be confirmed. Taxes calculated at checkout.'
+          : 'Taxes and any international shipping are calculated at checkout.'}
       </p>
     </div>
   );

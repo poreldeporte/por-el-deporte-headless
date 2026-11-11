@@ -1,6 +1,11 @@
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
-import {CartForm, Image, Money, type OptimisticCartLine} from '@shopify/hydrogen';
+import {
+  CartForm,
+  Image,
+  Money,
+  type OptimisticCartLine,
+} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
@@ -67,7 +72,12 @@ export function CartLineItem({
               {product.title}
             </Link>
             <div className="cart-line__price">
-              <ProductPrice price={line?.cost?.totalAmount} />
+              <ProductPrice
+                price={line.cost?.totalAmount}
+                compareAtPrice={
+                  line.isOptimistic ? null : line.cost?.subtotalAmount
+                }
+              />
             </div>
           </div>
 
@@ -86,8 +96,19 @@ export function CartLineItem({
                 </li>
               ))}
             {line.attributes
-              ?.filter(({key}) => ['Order type', 'Includes', 'Name on back', 'Number on back'].includes(key))
-              .map(({key, value}) => <li key={key}>{key}: {value}</li>)}
+              ?.filter(({key}) =>
+                [
+                  'Order type',
+                  'Includes',
+                  'Name on back',
+                  'Number on back',
+                ].includes(key),
+              )
+              .map(({key, value}) => (
+                <li key={key}>
+                  {key}: {value}
+                </li>
+              ))}
             {line.discountAllocations
               ?.filter(
                 ({discountedAmount}) => Number(discountedAmount.amount) > 0,
@@ -147,29 +168,29 @@ function CartLineQuantity({line}: {line: CartLine}) {
       {/* One pill holding minus / count / plus, with Remove pushed to the far
           right of the row. */}
       <div className="cart-line-quantity__stepper">
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Decrease quantity"
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
-        >
-          <span>&#8722; </span>
-        </button>
-      </CartLineUpdateButton>
-      <span className="cart-line-quantity__count" aria-live="polite">
-        {quantity}
-      </span>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <button
-          aria-label="Increase quantity"
-          name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
-        >
-          <span>&#43;</span>
-        </button>
-      </CartLineUpdateButton>
+        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+          <button
+            aria-label="Decrease quantity"
+            disabled={quantity <= 1 || !!isOptimistic}
+            name="decrease-quantity"
+            value={prevQuantity}
+          >
+            <span>&#8722; </span>
+          </button>
+        </CartLineUpdateButton>
+        <span className="cart-line-quantity__count" aria-live="polite">
+          {quantity}
+        </span>
+        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+          <button
+            aria-label="Increase quantity"
+            name="increase-quantity"
+            value={nextQuantity}
+            disabled={!!isOptimistic}
+          >
+            <span>&#43;</span>
+          </button>
+        </CartLineUpdateButton>
       </div>
       <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
     </div>

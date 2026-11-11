@@ -4,20 +4,21 @@ import {
   JERSEY_COLORS,
   type JERSEY_STYLES,
   type JerseySelection,
-  type Price,
+  type jerseyQuote,
 } from '~/lib/jersey';
+import {ProductPrice} from '~/components/ProductPrice';
 import {JerseyPhotos, SocksPhoto} from './JerseyPhotos';
 
 export function JerseyKitPreview({
   dialogRef,
   styles,
   selection,
-  price,
+  quote,
 }: {
   dialogRef: RefObject<HTMLDialogElement>;
   styles: typeof JERSEY_STYLES;
   selection: JerseySelection;
-  price: Price | null;
+  quote: ReturnType<typeof jerseyQuote>;
 }) {
   const withShorts = selection.jerseys.some(
     ({shortsSize}) => shortsSize !== 'None',
@@ -60,6 +61,12 @@ export function JerseyKitPreview({
                   {style.sleeve} · {size ? `Size ${size}` : 'Choose a size'}
                 </p>
                 <p>
+                  <ProductPrice
+                    price={quote.jerseyPrices[index]}
+                    compareAtPrice={quote.jerseyValues[index]}
+                  />
+                </p>
+                <p>
                   {print.name || print.number
                     ? print.name && print.number
                       ? `Back: ${print.name} / ${print.number}`
@@ -69,7 +76,11 @@ export function JerseyKitPreview({
                 {withShorts && (
                   <p>
                     Matching shorts ·{' '}
-                    {shortsSize ? `Size ${shortsSize}` : 'Choose a size'}
+                    {shortsSize ? `Size ${shortsSize}` : 'Choose a size'} ·{' '}
+                    <ProductPrice
+                      price={quote.shortsPrices[index]}
+                      compareAtPrice={quote.shortsValues[index]}
+                    />
                   </p>
                 )}
               </div>
@@ -90,9 +101,15 @@ export function JerseyKitPreview({
         <p className="jersey-hint">Photos show an example name and number.</p>
       </div>
       <div className="jersey-kit-footer">
-        {price && (
+        {quote.total && (
           <p>
-            Kit total <Money data={price} as="strong" />
+            Kit total{' '}
+            <ProductPrice price={quote.total} compareAtPrice={quote.original} />
+          </p>
+        )}
+        {quote.savings && (
+          <p className="jersey-total-saving">
+            You save <Money data={quote.savings} as="span" />
           </p>
         )}
         <button
