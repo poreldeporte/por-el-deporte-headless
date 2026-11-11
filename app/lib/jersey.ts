@@ -41,9 +41,13 @@ export const JERSEY_SHORTS_PRICE = 15;
 export const NAME_LIMIT = 14;
 const PERSONALIZATION_DURATION = 7 * 24 * 60 * 60 * 1000;
 
-export type JerseySelection = {
+export type JerseyItem = {
   style: string;
   size: string;
+};
+
+export type JerseySelection = {
+  jerseys: JerseyItem[];
   shortsSize: string;
   personalize: boolean;
   name: string;
@@ -82,8 +86,12 @@ export function readJerseySelection(form: FormData): JerseySelection {
   const name = text('name').normalize('NFC').toUpperCase();
   const number = text('number');
   return {
-    style: text('style'),
-    size: text('size'),
+    jerseys: [
+      {style: text('firstStyle'), size: text('firstSize')},
+      ...(form.has('secondStyle')
+        ? [{style: text('secondStyle'), size: text('secondSize')}]
+        : []),
+    ],
     shortsSize: form.get('addShorts') === 'on' ? text('shortsSize') : 'None',
     personalize: Boolean(name || number),
     name,
@@ -98,13 +106,19 @@ export function validateJerseySelection(
   selection: JerseySelection,
   canPersonalize: boolean,
 ) {
-  const {style, size, shortsSize, personalize, name, number} = selection;
+  const {jerseys, shortsSize, personalize, name, number} = selection;
   if (
-    !JERSEY_STYLE_OPTIONS.includes(style) ||
-    !JERSEY_SIZES.some((value) => value === size)
+    jerseys.length < 1 ||
+    jerseys.length > 2 ||
+    new Set(jerseys.map(({style}) => style)).size !== jerseys.length ||
+    jerseys.some(({style}) => !JERSEY_STYLES.some(({value}) => value === style))
   ) {
-    return 'Choose your jersey styles and size.';
+    return 'Choose one jersey or two different jersey styles.';
   }
+  const missingSize = jerseys.findIndex(
+    ({size}) => !JERSEY_SIZES.some((value) => value === size),
+  );
+  if (missingSize !== -1) return `Choose a size for jersey ${missingSize + 1}.`;
   if (!JERSEY_SHORTS_OPTIONS.some((value) => value === shortsSize)) {
     return 'Choose a shorts size, or remove the shorts.';
   }
@@ -138,11 +152,20 @@ export function validateJerseySelection(
 export function jerseyAttributes(selection: JerseySelection) {
   return [
     {key: 'Order type', value: 'Preorder'},
-    ...(jerseyStyles(selection.style).length === 2
+    ...(selection.jerseys.length === 2
       ? [
           {
             key: 'Includes',
-            value: `${selection.style}${selection.shortsSize === 'None' ? '' : ' + 2 pairs of matching shorts'}`,
+            value: [
+              ...selection.jerseys.map(
+                ({style, size}) => `${style} · Size ${size}`,
+              ),
+              ...(selection.shortsSize === 'None'
+                ? []
+                : [
+                    `2 pairs of matching shorts · Size ${selection.shortsSize}`,
+                  ]),
+            ].join('; '),
           },
         ]
       : []),
@@ -157,13 +180,9 @@ export function jerseyAttributes(selection: JerseySelection) {
 
 export function matchesJerseyVariant(
   options: {name: string; value: string}[],
-  selection: Pick<JerseySelection, 'style' | 'size' | 'shortsSize'>,
+  selection: Pick<JerseySelection, 'jerseys' | 'shortsSize'>,
 ) {
-  const selectedOptions = {
-    Style: selection.style,
-    Size: selection.size,
-    'Shorts size': selection.shortsSize,
-  };
+  const selectedOptions = jerseyOptionValues(selection);
   return (
     options.length === 3 &&
     options.every(
@@ -171,6 +190,19 @@ export function matchesJerseyVariant(
         value === selectedOptions[name as keyof typeof selectedOptions],
     )
   );
+}
+
+export function jerseyOptionValues(
+  selection: Pick<JerseySelection, 'jerseys' | 'shortsSize'>,
+) {
+  const jerseys = [...selection.jerseys].sort((a, b) =>
+    compareJerseyStyles(a.style, b.style),
+  );
+  return {
+    Style: jerseys.map(({style}) => style).join(' + '),
+    Size: jerseys.map(({size}) => size).join(' / '),
+    'Shorts size': selection.shortsSize,
+  };
 }
 
 export function matchesSocksVariant(
@@ -237,13 +269,14 @@ export function jerseyCartLines(
 }
 
 export function jerseyStyleValue(styles: readonly string[]) {
-  return [...styles]
-    .sort(
-      (a, b) =>
-        JERSEY_STYLES.findIndex(({value}) => value === a) -
-        JERSEY_STYLES.findIndex(({value}) => value === b),
-    )
-    .join(' + ');
+  return [...styles].sort(compareJerseyStyles).join(' + ');
+}
+
+function compareJerseyStyles(a: string, b: string) {
+  return (
+    JERSEY_STYLES.findIndex(({value}) => value === a) -
+    JERSEY_STYLES.findIndex(({value}) => value === b)
+  );
 }
 
 export function jerseyStyles(style: string) {
@@ -267,54 +300,65 @@ type PricedVariant = {
 };
 
 export function jerseyQuote(
-  selection: Pick<
-    JerseySelection,
-    'style' | 'size' | 'shortsSize' | 'socksColor'
-  >,
+  selection: Pick<JerseySelection, 'jerseys' | 'shortsSize' | 'socksColor'>,
   variants: PricedVariant[],
   socksPrice: Price | null,
   preview: boolean,
 ) {
-  const size = selection.size || JERSEY_SIZES[0];
   const shortsSize =
     selection.shortsSize === 'None'
       ? JERSEY_SIZES[0]
       : selection.shortsSize || JERSEY_SIZES[0];
-  const priceFor = (style: string, shorts: string): Price | null => {
+  const priceFor = (jerseys: JerseyItem[], shorts: string): Price | null => {
     const variant = variants.find((item) =>
       matchesJerseyVariant(item.selectedOptions, {
-        style,
-        size,
+        jerseys,
         shortsSize: shorts,
       }),
     );
     return (
       variant?.price ??
-      (preview ? jerseyPreviewPrice(style, shorts !== 'None') : null)
+      (preview
+        ? jerseyPreviewPrice(
+            jerseyStyleValue(jerseys.map(({style}) => style)),
+            shorts !== 'None',
+          )
+        : null)
     );
   };
   const choices = JERSEY_STYLE_OPTIONS.map((style) => {
-    const price = priceFor(style, 'None');
     const styles = jerseyStyles(style);
+    const jerseys = styles.map(({value}) => {
+      const current = selection.jerseys.find(
+        (jersey) => jersey.style === value,
+      );
+      const size = current
+        ? current.size
+        : selection.jerseys[styles.length === 1 ? 0 : 1]?.size;
+      return {style: value, size: size || JERSEY_SIZES[0]};
+    });
+    const price = priceFor(jerseys, 'None');
     const separate =
       styles.length === 2
-        ? sumPrices(styles.map(({value}) => priceFor(value, 'None')))
+        ? sumPrices(jerseys.map((jersey) => priceFor([jersey], 'None')))
         : null;
     return {
       style,
       price,
-      kitPrice: priceFor(style, shortsSize),
+      kitPrice: priceFor(jerseys, shortsSize),
       savings: positivePrice(subtractPrices(separate, price)),
     };
   });
-  const base = priceFor(selection.style, 'None');
-  const kit = priceFor(selection.style, shortsSize);
+  const jerseys = selection.jerseys.map((jersey) => ({
+    ...jersey,
+    size: jersey.size || JERSEY_SIZES[0],
+  }));
+  const base = priceFor(jerseys, 'None');
+  const kit = priceFor(jerseys, shortsSize);
   const shorts = subtractPrices(kit, base);
   const shortsValue = {
     ...JERSEY_SHORTS_VALUE,
-    amount: (
-      Number(JERSEY_SHORTS_VALUE.amount) * jerseyStyles(selection.style).length
-    ).toFixed(2),
+    amount: (Number(JERSEY_SHORTS_VALUE.amount) * jerseys.length).toFixed(2),
   };
   const jersey = selection.shortsSize === 'None' ? base : kit;
   return {

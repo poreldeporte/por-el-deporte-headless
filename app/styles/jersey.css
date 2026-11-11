@@ -125,12 +125,48 @@
 .jersey-first-choice .jersey-style-choice {
   margin-top: 0;
 }
-.jersey-selected-jersey {
-  padding: 12px;
-  min-height: 112px;
+.jersey-item {
+  padding: 14px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   background: var(--pel-sand);
+}
+.jersey-selected-jersey {
+  min-height: 76px;
+}
+.jersey-step {
+  padding: 24px 0 0;
+  margin-top: 28px;
+  border-top: 1px solid var(--pel-ink);
+}
+.jersey-step:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+.jersey-step-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.jersey-step-number {
+  color: var(--pel-orange-ink);
+  font: 600 20px/1.2 var(--font-display);
+}
+.jersey-step-heading h3 {
+  margin: 0;
+  font: 600 24px/1.2 var(--font-display);
+}
+.jersey-step-heading p {
+  margin: 5px 0 0;
+  font: 500 12px/1.5 var(--font-body);
+  color: var(--text-muted);
+}
+.jersey-step > .jersey-shorts {
+  padding: 0;
+  margin: 0;
+  border: 0;
 }
 .jersey-selected-jersey + .jersey-first-choice {
   margin-top: 12px;
@@ -259,7 +295,6 @@
   margin: 8px 0 0;
 }
 .jersey-bundle,
-.jersey-personalization,
 .jersey-shorts,
 .jersey-socks {
   padding: 16px 0 0;
@@ -273,9 +308,8 @@
   justify-content: space-between;
   gap: 12px;
 }
-.jersey-option-heading h2,
-.jersey-addon-copy h2,
-.jersey-addon-copy h3 {
+.jersey-option-heading h4,
+.jersey-addon-copy h4 {
   margin: 0;
   font: 600 14px/1.5 var(--font-body);
 }

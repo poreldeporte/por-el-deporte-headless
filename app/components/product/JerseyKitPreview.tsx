@@ -55,7 +55,8 @@ export function JerseyKitPreview({
                 {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}
               </h3>
               <p>
-                {style.sleeve} · {selection.size || 'Size not selected'}
+                {style.sleeve} ·{' '}
+                {selection.jerseys[index]?.size || 'Size not selected'}
               </p>
               {withShorts && (
                 <p>

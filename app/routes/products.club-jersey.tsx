@@ -1,6 +1,7 @@
 import {data, useLoaderData, type HeadersFunction} from 'react-router';
 import type {Route} from './+types/products.club-jersey';
 import {JerseyPage} from '~/components/product/JerseyPage';
+import {loadJerseyVariants} from '~/lib/jersey-catalog';
 import {
   JERSEY_HANDLE,
   JERSEY_TITLE,
@@ -37,10 +38,7 @@ export const headers: HeadersFunction = ({actionHeaders, loaderHeaders}) => {
 };
 
 export async function loader({context}: Route.LoaderArgs) {
-  const {product, socks} = await context.storefront.query(JERSEY_QUERY, {
-    variables: {handle: JERSEY_HANDLE, socksHandle: PED_SOCKS_HANDLE},
-    cache: context.storefront.CacheNone(),
-  });
+  const {product, socks} = await loadCatalog(context);
   const preview = import.meta.env.DEV && !product;
   if (!product && !preview) throw new Response(null, {status: 404});
   return data(
@@ -51,10 +49,7 @@ export async function loader({context}: Route.LoaderArgs) {
 
 export async function action({request, context}: Route.ActionArgs) {
   const selection = readJerseySelection(await request.formData());
-  const {product, socks} = await context.storefront.query(JERSEY_QUERY, {
-    variables: {handle: JERSEY_HANDLE, socksHandle: PED_SOCKS_HANDLE},
-    cache: context.storefront.CacheNone(),
-  });
+  const {product, socks} = await loadCatalog(context);
   const preview = import.meta.env.DEV && !product;
   const window = personalizationWindow(product?.startsAt?.value, Date.now());
   const error = validateJerseySelection(
@@ -104,8 +99,23 @@ export default function Jersey() {
   return <JerseyPage {...useLoaderData<typeof loader>()} />;
 }
 
+async function loadCatalog(context: Route.LoaderArgs['context']) {
+  const readPage = (after: string | null) =>
+    context.storefront.query(JERSEY_QUERY, {
+      variables: {handle: JERSEY_HANDLE, socksHandle: PED_SOCKS_HANDLE, after},
+      cache: context.storefront.CacheNone(),
+    });
+  const catalog = await readPage(null);
+  if (!catalog.product) return catalog;
+  const variants = await loadJerseyVariants(
+    catalog.product.variants,
+    async (cursor) => (await readPage(cursor)).product?.variants ?? null,
+  );
+  return {...catalog, product: {...catalog.product, variants}};
+}
+
 const JERSEY_QUERY = `#graphql
-  query JerseyPreorder($handle: String!, $socksHandle: String!, $country: CountryCode, $language: LanguageCode)
+  query JerseyPreorder($handle: String!, $socksHandle: String!, $after: String, $country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       id
@@ -114,7 +124,8 @@ const JERSEY_QUERY = `#graphql
       startsAt: metafield(namespace: "preorder", key: "starts_at") { value }
       shippingEstimate: metafield(namespace: "preorder", key: "shipping_estimate") { value }
       images(first: 10) { nodes { id url altText width height } }
-      variants(first: 250) {
+      variants(first: 250, after: $after) {
+        pageInfo { hasNextPage endCursor }
         nodes {
           id
           title
