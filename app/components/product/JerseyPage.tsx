@@ -265,6 +265,24 @@ export function JerseyPage({
       }).format(new Date(window.endsAt))
     : null;
 
+  const removeSecondButton = (
+    <button
+      type="button"
+      className="jersey-text-button"
+      aria-label={`Remove ${secondSide.toLowerCase()} jersey`}
+      onClick={() => {
+        setSecondStyle(null);
+        setEditingFirst(false);
+        setEditingSecond(false);
+        requestAnimationFrame(() =>
+          addSecondRef.current?.focus({preventScroll: true}),
+        );
+      }}
+    >
+      Remove
+    </button>
+  );
+
   useEffect(() => {
     if (preview || !product?.startsAt?.value) return;
     const mounted = performance.now();
@@ -468,22 +486,25 @@ export function JerseyPage({
               }
             >
               <div className="jersey-item">
-                <SelectedJersey style={firstStyle}>
-                  <button
-                    ref={editFirstRef}
-                    type="button"
-                    className="jersey-text-button"
-                    aria-label={`Edit ${firstSide.toLowerCase()} jersey`}
-                    aria-expanded={editingFirst}
-                    aria-controls="jersey-first-options"
-                    onClick={() => {
-                      setEditingFirst(!editingFirst);
-                      setEditingSecond(false);
-                    }}
-                  >
-                    {editingFirst ? 'Done' : 'Edit'}
-                  </button>
-                </SelectedJersey>
+                {!editingFirst && (
+                  <SelectedJersey style={firstStyle}>
+                    <button
+                      ref={editFirstRef}
+                      type="button"
+                      className="jersey-text-button"
+                      aria-label={`Edit ${firstSide.toLowerCase()} jersey`}
+                      aria-expanded={editingFirst}
+                      aria-controls="jersey-first-options"
+                      onClick={() => {
+                        setEditingFirst(true);
+                        setEditingSecond(false);
+                        focusStyleChoice('jersey-first-options');
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </SelectedJersey>
+                )}
                 {editingFirst && (
                   <div
                     id="jersey-first-options"
@@ -547,39 +568,31 @@ export function JerseyPage({
               <div className="jersey-bundle">
                 {secondStyle ? (
                   <div className="jersey-item">
-                    <SelectedJersey style={secondStyle}>
-                      <button
-                        type="button"
-                        className="jersey-text-button"
-                        ref={editSecondRef}
-                        aria-label={`Edit ${secondSide.toLowerCase()} jersey`}
-                        aria-expanded={editingSecond}
-                        aria-controls="jersey-second-options"
-                        onClick={() => {
-                          setEditingSecond(!editingSecond);
-                          setEditingFirst(false);
-                        }}
-                      >
-                        {editingSecond ? 'Done' : 'Edit'}
-                      </button>
-                      <button
-                        type="button"
-                        className="jersey-text-button"
-                        aria-label={`Remove ${secondSide.toLowerCase()} jersey`}
-                        onClick={() => {
-                          setSecondStyle(null);
-                          setEditingFirst(false);
-                          setEditingSecond(false);
-                          requestAnimationFrame(() =>
-                            addSecondRef.current?.focus({preventScroll: true}),
-                          );
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </SelectedJersey>
+                    {!editingSecond && (
+                      <SelectedJersey style={secondStyle}>
+                        <button
+                          type="button"
+                          className="jersey-text-button"
+                          ref={editSecondRef}
+                          aria-label={`Edit ${secondSide.toLowerCase()} jersey`}
+                          aria-expanded={editingSecond}
+                          aria-controls="jersey-second-options"
+                          onClick={() => {
+                            setEditingSecond(true);
+                            setEditingFirst(false);
+                            focusStyleChoice('jersey-second-options');
+                          }}
+                        >
+                          Edit
+                        </button>
+                        {removeSecondButton}
+                      </SelectedJersey>
+                    )}
                     {editingSecond && (
-                      <div id="jersey-second-options">
+                      <div
+                        id="jersey-second-options"
+                        className="jersey-first-choice"
+                      >
                         {withShorts && (
                           <p className="jersey-hint">
                             These prices include matching shorts.
@@ -588,6 +601,7 @@ export function JerseyPage({
                         <StyleChoice
                           label={`${secondSide} sleeve length`}
                           name="secondStyle"
+                          action={removeSecondButton}
                           value={secondStyle.value}
                           choices={secondChoices.filter(
                             (item) => item.style.color !== firstStyle.color,
@@ -655,12 +669,7 @@ export function JerseyPage({
                       setView((current) =>
                         current === 'action' ? current : 'front',
                       );
-                      requestAnimationFrame(() => {
-                        editSecondRef.current?.focus({preventScroll: true});
-                        editSecondRef.current?.scrollIntoView({
-                          block: 'center',
-                        });
-                      });
+                      focusStyleChoice('jersey-second-options', true);
                     }}
                   >
                     <StylePicture style={secondOffer.style} />
@@ -1260,6 +1269,7 @@ function StyleChoice({
   value,
   choices,
   additional,
+  action,
   onChange,
 }: {
   label: string;
@@ -1270,11 +1280,22 @@ function StyleChoice({
     price: Price | null;
   }[];
   additional?: boolean;
+  action?: ReactNode;
   onChange: (style: JerseyStyle) => void;
 }) {
   return (
     <fieldset className="pel-pdp__opt jersey-style-choice">
-      <legend className="pel-pdp__opt-label">{label}</legend>
+      <legend className={action ? 'sr-only' : 'pel-pdp__opt-label'}>
+        {label}
+      </legend>
+      {action && (
+        <div className="jersey-choice-heading">
+          <span className="pel-pdp__opt-label" aria-hidden="true">
+            {label}
+          </span>
+          {action}
+        </div>
+      )}
       <div className="jersey-style-grid">
         {choices.map(({style, price}) => {
           const disabled = !price;
@@ -1320,6 +1341,9 @@ function StyleChoice({
                 checked={style.value === value}
                 disabled={disabled}
                 onChange={() => onChange(style)}
+                onClick={() => {
+                  if (style.value === value) onChange(style);
+                }}
               />
               {content}
             </label>
@@ -1328,6 +1352,16 @@ function StyleChoice({
       </div>
     </fieldset>
   );
+}
+
+function focusStyleChoice(id: string, scroll = false) {
+  requestAnimationFrame(() => {
+    const choice = document.querySelector<HTMLElement>(
+      `#${id} input:checked, #${id} button[aria-pressed="true"]`,
+    );
+    choice?.focus({preventScroll: true});
+    if (scroll) choice?.scrollIntoView({block: 'center'});
+  });
 }
 
 function StylePicture({style}: {style: JerseyStyle}) {

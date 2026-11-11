@@ -147,7 +147,7 @@
   border-bottom: 1px solid var(--pel-ink);
   font: 700 clamp(34px, 3vw, 42px)/1.05 var(--font-display);
 }
-.jersey-first-choice .jersey-style-choice {
+.jersey-form .jersey-first-choice .jersey-style-choice {
   margin-top: 0;
 }
 .jersey-item {
@@ -193,8 +193,15 @@
   margin: 0;
   border: 0;
 }
-.jersey-selected-jersey + .jersey-first-choice {
-  margin-top: 12px;
+.jersey-choice-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.jersey-choice-heading .pel-pdp__opt-label {
+  margin: 0;
 }
 .jersey-eyebrow {
   display: flex;
