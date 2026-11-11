@@ -3,7 +3,7 @@ type VariantPage<T> = {
   pageInfo: {hasNextPage: boolean; endCursor?: string | null};
 };
 
-// The 400-variant Home + Away draft fits in two Storefront pages of 250.
+// Bound catalog reads and reject partial results before resolving a cart selection.
 export async function loadJerseyVariants<T extends {id: string}>(
   first: VariantPage<T>,
   readNext: (cursor: string) => Promise<VariantPage<T> | null>,

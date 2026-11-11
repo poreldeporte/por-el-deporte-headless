@@ -54,7 +54,7 @@ test('personalization opens at launch and closes exactly seven days later', () =
   }
 });
 
-test('a mixed sleeve bundle resolves a real SKU with explicit fulfillment contents', () => {
+test('a mixed sleeve bundle adds two real jersey lines with their own fulfillment contents', () => {
   const chosen = {
     ...selection,
     jerseys: [
@@ -62,27 +62,39 @@ test('a mixed sleeve bundle resolves a real SKU with explicit fulfillment conten
       {style: awayLong, size: 'M'},
     ],
   };
-  const variant = {
-    id: 'bundle-xl-m',
+  const variants = chosen.jerseys.map((jersey, index) => ({
+    id: `jersey-${index}`,
     availableForSale: true,
     selectedOptions: [
-      {name: 'Style', value: bundleStyle},
-      {name: 'Size', value: 'XL / M'},
+      {name: 'Style', value: jersey.style},
+      {name: 'Size', value: jersey.size},
       {name: 'Shorts size', value: 'M'},
     ],
-  };
+  }));
   assert.equal(validateJerseySelection(chosen, true), null);
-  const order = jerseyCartLines(chosen, [variant], []);
+  const order = jerseyCartLines(chosen, variants, []);
   assert.equal(order.error, null);
-  assert.equal(order.lines.length, 1);
-  assert.equal(order.lines[0].merchandiseId, 'bundle-xl-m');
-  assert.equal(order.lines[0].quantity, 1);
-  assert.ok(
-    order.lines[0].attributes.some(
-      ({key, value}) => key === 'Includes' && value.includes('2 pairs'),
-    ),
+  assert.deepEqual(
+    order.lines,
+    variants.map(({id}) => ({
+      merchandiseId: id,
+      quantity: 1,
+      attributes: [
+        {key: 'Order type', value: 'Preorder'},
+        {key: 'Includes', value: '1 pair of matching shorts · Size M'},
+        {key: 'Name on back', value: 'VIOLA'},
+        {key: 'Number on back', value: '07'},
+      ],
+    })),
   );
-  assert.match(jerseyCartLines(chosen, [], []).error, /unavailable/);
+  for (const stock of [
+    variants.slice(1),
+    [variants[0], {...variants[1], availableForSale: false}],
+  ]) {
+    const result = jerseyCartLines(chosen, stock, []);
+    assert.match(result.error, /unavailable/);
+    assert.deepEqual(result.lines, []);
+  }
 });
 
 test('socks resolve the exact color, pack and size before adding one priced SKU', () => {
@@ -166,6 +178,7 @@ test('expired submissions reject custom printing while plain preorders remain va
   );
   assert.deepEqual(jerseyAttributes({...selection, personalize: false}), [
     {key: 'Order type', value: 'Preorder'},
+    {key: 'Includes', value: '1 pair of matching shorts · Size M'},
   ]);
 });
 
@@ -177,6 +190,7 @@ test('server normalizes printed names and preserves leading-zero numbers as line
   assert.equal(validateJerseySelection(parsed, true), null);
   assert.deepEqual(jerseyAttributes(parsed), [
     {key: 'Order type', value: 'Preorder'},
+    {key: 'Includes', value: '1 pair of matching shorts · Size M'},
     {key: 'Name on back', value: 'JOSÉ'},
     {key: 'Number on back', value: '07'},
   ]);
@@ -190,6 +204,7 @@ test('blank print fields order a plain jersey; partial fields and expired person
   assert.equal(validateJerseySelection(plain, false), null);
   assert.deepEqual(jerseyAttributes(plain), [
     {key: 'Order type', value: 'Preorder'},
+    {key: 'Includes', value: '1 pair of matching shorts · Size M'},
   ]);
   form.set('name', 'VIOLA');
   form.set('personalize', 'off');
@@ -271,19 +286,26 @@ test('variant matching resolves all three options regardless of Shopify option o
     {name: 'Style', value: homeShort},
     {name: 'Size', value: 'XL'},
   ];
-  assert.equal(matchesJerseyVariant(options, selection), true);
   assert.equal(
-    matchesJerseyVariant(options, {...selection, shortsSize: 'None'}),
+    matchesJerseyVariant(options, selection.jerseys[0], selection.shortsSize),
+    true,
+  );
+  assert.equal(
+    matchesJerseyVariant(options, selection.jerseys[0], 'None'),
     false,
   );
   assert.equal(
-    matchesJerseyVariant(options, {
-      ...selection,
-      jerseys: [{style: awayShort, size: 'XL'}],
-    }),
+    matchesJerseyVariant(options, {style: awayShort, size: 'XL'}, 'M'),
     false,
   );
-  assert.equal(matchesJerseyVariant(options.slice(1), selection), false);
+  assert.equal(
+    matchesJerseyVariant(
+      options.slice(1),
+      selection.jerseys[0],
+      selection.shortsSize,
+    ),
+    false,
+  );
 });
 
 test('shorts size is independent of jersey size and required only when adding shorts', () => {
@@ -308,10 +330,22 @@ test('shorts size is independent of jersey size and required only when adding sh
   assert.equal(readJerseySelection(form).shortsSize, '');
 });
 
-test('all 400 SKUs preserve each jersey size and the independent shorts size', () => {
+test('80 individual SKUs fulfill all 400 builder combinations with independent sizes', () => {
+  const variants = [homeShort, homeLong, awayShort, awayLong].flatMap((style) =>
+    JERSEY_SIZES.flatMap((size) =>
+      JERSEY_SHORTS_OPTIONS.map((shortsSize) => ({
+        id: `${style}-${size}-${shortsSize}`,
+        availableForSale: true,
+        selectedOptions: [
+          {name: 'Style', value: style},
+          {name: 'Size', value: size},
+          {name: 'Shorts size', value: shortsSize},
+        ],
+      })),
+    ),
+  );
+  assert.equal(variants.length, 80);
   let count = 0;
-  assert.equal(JERSEY_STYLE_OPTIONS.length, 8);
-  assert.equal(new Set(JERSEY_STYLE_OPTIONS).size, 8);
   for (const style of JERSEY_STYLE_OPTIONS) {
     const styles = jerseyStyles(style);
     for (const firstSize of JERSEY_SIZES) {
@@ -321,49 +355,17 @@ test('all 400 SKUs preserve each jersey size and the independent shorts size', (
             style: item.value,
             size: index === 0 ? firstSize : secondSize,
           }));
-          const chosen = {...selection, jerseys, shortsSize};
-          assert.equal(validateJerseySelection(chosen, true), null);
-          const variant = {
-            id: String(count++),
-            availableForSale: true,
-            selectedOptions: [
-              {name: 'Style', value: style},
-              {
-                name: 'Size',
-                value: secondSize ? `${firstSize} / ${secondSize}` : firstSize,
-              },
-              {name: 'Shorts size', value: shortsSize},
-            ],
-          };
-          assert.equal(
-            jerseyCartLines(chosen, [variant], []).lines[0].merchandiseId,
-            variant.id,
-          );
-          assert.equal(
-            matchesJerseyVariant(variant.selectedOptions, {
-              ...chosen,
-              jerseys: [...jerseys].reverse(),
-            }),
-            true,
-          );
-          assert.equal(
-            matchesJerseyVariant(variant.selectedOptions, {
-              ...chosen,
-              shortsSize: shortsSize === 'None' ? 'M' : 'None',
-            }),
-            false,
-          );
-          assert.equal(
-            matchesJerseyVariant(variant.selectedOptions, {
-              ...chosen,
-              jerseys: jerseys.map((item, index) =>
-                index === jerseys.length - 1
-                  ? {...item, size: item.size === 'M' ? 'XL' : 'M'}
-                  : item,
-              ),
-            }),
-            false,
-          );
+          for (const ordered of [jerseys, [...jerseys].reverse()]) {
+            const chosen = {...selection, jerseys: ordered, shortsSize};
+            assert.equal(validateJerseySelection(chosen, true), null);
+            const result = jerseyCartLines(chosen, variants, []);
+            assert.equal(result.error, null);
+            assert.deepEqual(
+              result.lines.map(({merchandiseId}) => merchandiseId),
+              ordered.map(({style, size}) => `${style}-${size}-${shortsSize}`),
+            );
+          }
+          count++;
         }
       }
     }
@@ -452,6 +454,49 @@ test('quotes use real SKU prices, include priced socks, and never invent a missi
   assert.equal(jerseyQuote(chosen, euro, null, false).shortsSavings, null);
 });
 
+test('bundle quotes sum real single prices and require both USD components', () => {
+  const chosen = {
+    ...selection,
+    shortsSize: 'None',
+    jerseys: [
+      {style: homeShort, size: 'XL'},
+      {style: awayLong, size: 'M'},
+    ],
+  };
+  const variants = chosen.jerseys.map((jersey, index) => ({
+    selectedOptions: Object.entries(jerseyOptionValues(jersey, 'None')).map(
+      ([name, value]) => ({name, value}),
+    ),
+    price: {amount: index === 0 ? '73.00' : '82.00', currencyCode: 'USD'},
+  }));
+  assert.equal(
+    jerseyQuote(chosen, variants, null, false).total.amount,
+    '135.00',
+  );
+  assert.equal(jerseyQuote(chosen, variants.slice(1), null, false).total, null);
+  assert.equal(
+    jerseyQuote(
+      chosen,
+      variants.map((v) => ({...v, price: {...v.price, currencyCode: 'EUR'}})),
+      null,
+      false,
+    ).total,
+    null,
+  );
+  assert.equal(
+    jerseyQuote(
+      chosen,
+      [
+        variants[0],
+        {...variants[1], price: {...variants[1].price, currencyCode: 'EUR'}},
+      ],
+      null,
+      false,
+    ).total,
+    null,
+  );
+});
+
 test('the second jersey quote includes its matching shorts when shorts are selected', () => {
   const quote = jerseyQuote(selection, [], null, true);
   const first = quote.choices.find((item) => item.style === homeShort);
@@ -489,8 +534,6 @@ test('quotes keep each size attached to its style, including an unchosen first s
     [homeShort, 'M', '70.00'],
     [homeShort, 'XL', '75.00'],
     [awayLong, 'XL', '85.00'],
-    [bundleStyle, 'M / XL', '135.00'],
-    [bundleStyle, 'XL / XL', '140.00'],
   ].map(([style, size, amount]) => ({
     selectedOptions: [
       {name: 'Style', value: style},
@@ -540,7 +583,7 @@ test('quotes keep each size attached to its style, including an unchosen first s
   );
 });
 
-test('the full jersey catalog loads all 400 variants through bounded pagination', async () => {
+test('catalog pagination remains bounded if the single-jersey catalog grows', async () => {
   const page = (start, count, endCursor, hasNextPage) => ({
     nodes: Array.from({length: count}, (_, index) => ({
       id: String(start + index),
@@ -616,16 +659,15 @@ test('different sizes stay attached to their jersey through parsing, canonical o
   form.set('addShorts', 'on');
   const parsed = readJerseySelection(form);
   assert.deepEqual(parsed, chosen);
-  assert.deepEqual(jerseyOptionValues(parsed), {
-    Style: bundleStyle,
-    Size: 'XXL / M',
-    'Shorts size': 'M',
-  });
-  const includes = jerseyAttributes(parsed).find(
-    ({key}) => key === 'Includes',
-  ).value;
-  assert.ok(includes.includes(`${awayLong} · Size M`));
-  assert.ok(includes.includes(`${homeShort} · Size XXL`));
+  assert.deepEqual(
+    parsed.jerseys.map((jersey) =>
+      jerseyOptionValues(jersey, parsed.shortsSize),
+    ),
+    [
+      {Style: awayLong, Size: 'M', 'Shorts size': 'M'},
+      {Style: homeShort, Size: 'XXL', 'Shorts size': 'M'},
+    ],
+  );
   form.delete('secondSize');
   assert.match(
     validateJerseySelection(readJerseySelection(form), true),

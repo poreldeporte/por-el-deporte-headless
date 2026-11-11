@@ -1,7 +1,6 @@
 import {
-  JERSEY_STYLE_OPTIONS,
+  JERSEY_STYLES,
   jerseyPreviewPrice,
-  jerseyStyles,
   JERSEY_HANDLE,
   JERSEY_SHORTS_OPTIONS,
   JERSEY_SIZES,
@@ -10,14 +9,8 @@ import {
 } from '../app/lib/jersey.ts';
 
 // This command only writes CSV to stdout. It never connects to Shopify.
-const variants = JERSEY_STYLE_OPTIONS.flatMap((style) => {
-  const sizes =
-    jerseyStyles(style).length === 1
-      ? JERSEY_SIZES
-      : JERSEY_SIZES.flatMap((first) =>
-          JERSEY_SIZES.map((second) => `${first} / ${second}`),
-        );
-  return sizes.flatMap((size) =>
+const variants = JERSEY_STYLES.flatMap(({value: style}) => {
+  return JERSEY_SIZES.flatMap((size) =>
     JERSEY_SHORTS_OPTIONS.map((shortsSize) => ({
       'URL handle': JERSEY_HANDLE,
       Title: '',

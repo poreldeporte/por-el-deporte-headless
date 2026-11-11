@@ -92,20 +92,19 @@ export function JerseyPage({
     socksPack,
     socksSize: withSocks ? selectedSocksSize : '',
   };
-  const variant = product?.variants.nodes.find((item) =>
-    matchesJerseyVariant(item.selectedOptions, selection),
+  const variants = selection.jerseys.map((jersey) =>
+    product?.variants.nodes.find((item) =>
+      matchesJerseyVariant(item.selectedOptions, jersey, selection.shortsSize),
+    ),
   );
   const hasJerseySizes = Boolean(size && (!bundle || secondSize));
   const hasSizes = hasJerseySizes && (!withShorts || Boolean(shortsSize));
   const priceVariant = product?.variants.nodes.find((item) =>
-    matchesJerseyVariant(item.selectedOptions, {
-      ...selection,
-      jerseys: selection.jerseys.map((jersey) => ({
-        ...jersey,
-        size: jersey.size || JERSEY_SIZES[0],
-      })),
-      shortsSize: withShorts ? shortsSize || JERSEY_SIZES[0] : 'None',
-    }),
+    matchesJerseyVariant(
+      item.selectedOptions,
+      {...selection.jerseys[0], size: size || JERSEY_SIZES[0]},
+      withShorts ? shortsSize || JERSEY_SIZES[0] : 'None',
+    ),
   );
   const sockChoices = PED_SOCKS_COLORS.flatMap((color) =>
     PED_SOCKS_PACKS.map((pack) => {
@@ -204,7 +203,8 @@ export function JerseyPage({
   const socksAvailable =
     !withSocks || !socksComplete || Boolean(selectedSocks?.available);
   const busy = fetcher.state !== 'idle';
-  const available = preview || Boolean(variant?.availableForSale);
+  const available =
+    preview || variants.every((variant) => variant?.availableForSale);
   const submitDisabled =
     busy || !canOrder || (hasSizes && !available) || !socksAvailable;
   const readyToSubmit =

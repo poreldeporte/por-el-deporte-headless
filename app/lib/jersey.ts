@@ -159,20 +159,11 @@ export function validateJerseySelection(
 export function jerseyAttributes(selection: JerseySelection) {
   return [
     {key: 'Order type', value: 'Preorder'},
-    ...(selection.jerseys.length === 2
+    ...(selection.shortsSize !== 'None'
       ? [
           {
             key: 'Includes',
-            value: [
-              ...selection.jerseys.map(
-                ({style, size}) => `${style} · Size ${size}`,
-              ),
-              ...(selection.shortsSize === 'None'
-                ? []
-                : [
-                    `2 pairs of matching shorts · Size ${selection.shortsSize}`,
-                  ]),
-            ].join('; '),
+            value: `1 pair of matching shorts · Size ${selection.shortsSize}`,
           },
         ]
       : []),
@@ -187,9 +178,10 @@ export function jerseyAttributes(selection: JerseySelection) {
 
 export function matchesJerseyVariant(
   options: {name: string; value: string}[],
-  selection: Pick<JerseySelection, 'jerseys' | 'shortsSize'>,
+  jersey: JerseyItem,
+  shortsSize: string,
 ) {
-  const selectedOptions = jerseyOptionValues(selection);
+  const selectedOptions = jerseyOptionValues(jersey, shortsSize);
   return (
     options.length === 3 &&
     options.every(
@@ -199,16 +191,11 @@ export function matchesJerseyVariant(
   );
 }
 
-export function jerseyOptionValues(
-  selection: Pick<JerseySelection, 'jerseys' | 'shortsSize'>,
-) {
-  const jerseys = [...selection.jerseys].sort((a, b) =>
-    compareJerseyStyles(a.style, b.style),
-  );
+export function jerseyOptionValues(jersey: JerseyItem, shortsSize: string) {
   return {
-    Style: jerseys.map(({style}) => style).join(' + '),
-    Size: jerseys.map(({size}) => size).join(' / '),
-    'Shorts size': selection.shortsSize,
+    Style: jersey.style,
+    Size: jersey.size,
+    'Shorts size': shortsSize,
   };
 }
 
@@ -242,10 +229,12 @@ export function jerseyCartLines(
     selectedOptions: {name: string; value: string}[];
   }[],
 ) {
-  const jersey = variants.find((item) =>
-    matchesJerseyVariant(item.selectedOptions, selection),
+  const jerseys = selection.jerseys.map((jersey) =>
+    variants.find((item) =>
+      matchesJerseyVariant(item.selectedOptions, jersey, selection.shortsSize),
+    ),
   );
-  if (!jersey?.availableForSale)
+  if (!jerseys.length || jerseys.some((jersey) => !jersey?.availableForSale))
     return {
       error:
         'This jersey selection is unavailable. Try another size or jersey.',
@@ -266,11 +255,11 @@ export function jerseyCartLines(
   return {
     error: null,
     lines: [
-      {
-        merchandiseId: jersey.id,
+      ...jerseys.map((jersey) => ({
+        merchandiseId: jersey!.id,
         quantity: 1,
         attributes: jerseyAttributes(selection),
-      },
+      })),
       ...(sock ? [{merchandiseId: sock.id, quantity: 1}] : []),
     ],
   };
@@ -318,21 +307,26 @@ export function jerseyQuote(
       ? JERSEY_SIZES[0]
       : selection.shortsSize || JERSEY_SIZES[0];
   const priceFor = (jerseys: JerseyItem[], shorts: string): Price | null => {
-    const variant = variants.find((item) =>
-      matchesJerseyVariant(item.selectedOptions, {
-        jerseys,
-        shortsSize: shorts,
+    const style = jerseyStyleValue(jerseys.map(({style}) => style));
+    if (!JERSEY_STYLE_OPTIONS.includes(style)) return null;
+    const total = sumPrices(
+      jerseys.map((jersey) => {
+        const variant = variants.find((item) =>
+          matchesJerseyVariant(item.selectedOptions, jersey, shorts),
+        );
+        return (
+          variant?.price ??
+          (preview ? jerseyPreviewPrice(jersey.style, shorts !== 'None') : null)
+        );
       }),
     );
-    return (
-      variant?.price ??
-      (preview
-        ? jerseyPreviewPrice(
-            jerseyStyleValue(jerseys.map(({style}) => style)),
-            shorts !== 'None',
-          )
-        : null)
-    );
+    // Shopify's matching automatic discount owns the checkout saving.
+    return jerseys.length === 2
+      ? subtractPrices(total, {
+          amount: String(JERSEY_BUNDLE_SAVING),
+          currencyCode: 'USD',
+        })
+      : total;
   };
   const choices = JERSEY_STYLE_OPTIONS.map((style) => {
     const styles = jerseyStyles(style);
