@@ -57,9 +57,20 @@ the generic section padding in `reset.css`; the print-to-next-divider gap is
 24px. The community floating button is hidden only on this PDP so it cannot
 cover buying controls. No size guide has been added.
 
-Shorts and socks use photo placeholders until official images arrive. Jersey
-front/back drawings distinguish long and short sleeves and remain labeled as
-illustrations. Supplied reference photos are development-only.
+The official jersey and shorts photos are in `public/jersey/official`. The
+gallery, four style choices, second-jersey row, and shorts upsell use these
+photos. Front/back images follow each selected color and sleeve, including
+mixed bundles. Adding shorts switches Front to the matching full-kit photo.
+Shorts and Detail views can be browsed without adding shorts to the order.
+The photos show sample VIOLA/10 printing; Print remains a separately labeled
+illustration of the customer's entered name/number. Socks still use a placeholder
+because the supplied folder contained no socks photos.
+
+The 16 supplied photos were exported with `cwebp -q 88 -m 6 -resize WIDTH 0`
+at widths 160, 640, and 1024 for responsive loading. Originals remain unchanged
+in the supplied `ped-kits/web-product-pictures` folder. File names use
+`{home|away}-{short|long}-{front|back|kit}` and `{home|away}-shorts[-detail]`, followed by
+the width and `.webp`. `JerseyPhotos.tsx` owns the mapping used by every surface.
 
 PED socks use direct **Black / White** choices with real prices, followed by
 Remove once selected. Socks price and sizes are still unconfirmed, and no
@@ -84,7 +95,7 @@ mixed-sleeve bundle prices and increments with shorts, independent sizing,
 actual-price quotes, currency mismatches, sock resolution, and rejection before
 cart mutation. Blank and partial print fields also cover the switch-free flow. Normal lint,
 typecheck, and build commands also apply. Browser review covers desktop/mobile
-choice changes, form validation, illustrated sleeves, and preview submission.
+choice changes, form validation, official photo mapping, and preview submission.
 
 ## Shopify catalog setup
 
@@ -126,7 +137,8 @@ After approval, import without automatic publishing or overwriting matching
 products. Inspect any existing `club-jersey` product before import. Verify draft
 status and channel availability afterward; the CSV online-store column does
 not control Hydrogen channel publication. Shopify owns actual prices,
-availability, image assignments, and IDs. Preview prices never reach checkout.
+availability, cart/checkout image assignments, and IDs. The PDP's official
+gallery assets are served by the storefront. Preview prices never reach checkout.
 The UI derives savings from those actual prices and suppresses unsupported
 currency comparisons.
 
@@ -160,8 +172,8 @@ second real SKU, and all line IDs are validated before one `cart.addLines`.
 
 ## Launch review
 
-Before publishing, approve the page/prices, provide official photos of all four
-jerseys/shorts/socks, confirm sock price/sizes and print limits, set up all
+Before publishing, approve the page/prices and supplied jersey/shorts photos,
+provide socks photos, confirm sock price/sizes and print limits, set up all
 variants, agree the launch time, and confirm shipping language. Verify a real
 personalized mixed-sleeve kit plus socks through cart and Shopify checkout
 without placing a paid order. Verify bundle contents, both sizes, print fields,

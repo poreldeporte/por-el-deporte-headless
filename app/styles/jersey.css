@@ -56,9 +56,37 @@
   gap: 12px;
   font: 700 12px/1.4 var(--font-body);
 }
-.jersey-stage--photo .jersey-stage-label {
-  color: var(--pel-cream);
-  text-shadow: 0 1px 6px #000;
+.jersey-stage--photo {
+  background: #fff;
+}
+.jersey-photos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  gap: 8px;
+}
+.jersey-photos--pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.jersey-page .jersey-photos img {
+  position: static;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+.jersey-stage > .jersey-photos {
+  position: absolute;
+  inset: 48px 16px 20px;
+  width: auto;
+  height: auto;
+}
+.jersey-stage > .jersey-photos--pair {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 .jersey-artwork-note {
   position: absolute;
@@ -66,11 +94,22 @@
   font: 500 12px/1.5 var(--font-body);
   color: var(--text-muted);
 }
+.jersey-thumbs {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.jersey-thumb-image {
+  position: absolute;
+  inset: 0 0 25px;
+  background: #fff;
+}
 .jersey-thumbs svg {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 86%;
+  height: 100%;
 }
 .jersey-pair {
   position: absolute;
@@ -85,7 +124,7 @@
   height: 100%;
 }
 .jersey-thumbs .jersey-pair {
-  bottom: 14%;
+  bottom: 0;
 }
 .jersey-thumb-label {
   position: absolute;
@@ -95,7 +134,7 @@
   padding: 6px 2px;
   background: var(--pel-cream);
   color: var(--pel-ink);
-  font: 600 12px/1.2 var(--font-body);
+  font: 600 11px/1.2 var(--font-body);
 }
 .jersey-thumbs .is-active .jersey-thumb-label {
   background: var(--pel-ink);
@@ -182,28 +221,22 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
-.jersey-style-picture {
+.jersey-style-picture,
+.jersey-extra-picture {
   display: block;
   position: relative;
   width: 64px;
   height: 76px;
   flex: none;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: #fff;
 }
-.jersey-style-picture svg,
-.jersey-style-picture img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.jersey-extra-picture {
+  height: 64px;
 }
-.jersey-style-picture small {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font: 500 9px/1.3 var(--font-body);
-  color: var(--text-muted);
+.jersey-extra-picture .jersey-photos {
+  gap: 2px;
 }
 .jersey-style-copy {
   display: grid;

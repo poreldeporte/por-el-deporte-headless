@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState, type ComponentProps} from 'react';
 import {useFetcher} from 'react-router';
-import {Analytics, Image, Money} from '@shopify/hydrogen';
+import {Analytics, Money} from '@shopify/hydrogen';
 import type {JerseyPreorderQuery} from 'storefrontapi.generated';
 import type {action} from '~/routes/products.club-jersey';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
@@ -24,6 +24,7 @@ import {
   validateJerseySelection,
 } from '~/lib/jersey';
 import {JerseyArtwork} from './JerseyArtwork';
+import {JerseyPhotos, type JerseyPhotoView} from './JerseyPhotos';
 
 type JerseyStyle = (typeof JERSEY_STYLES)[number];
 
@@ -53,8 +54,8 @@ export function JerseyPage({
   const [shortsSize, setShortsSize] = useState('');
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [view, setView] = useState<'photo' | 'club' | 'front' | 'back'>(
-    preview ? 'photo' : 'front',
+  const [view, setView] = useState<Exclude<JerseyPhotoView, 'kit'> | 'print'>(
+    'front',
   );
   const [now, setNow] = useState(serverNow);
   const fetcher = useFetcher<typeof action>();
@@ -117,14 +118,6 @@ export function JerseyPage({
     price:
       quote.choices.find((choice) => choice.style === item.value)?.price ??
       null,
-    image:
-      product?.variants.nodes.find(
-        (variant) =>
-          variant.image &&
-          variant.selectedOptions.some(
-            (option) => option.name === 'Style' && option.value === item.value,
-          ),
-      )?.image ?? undefined,
   }));
   const secondChoices = styleChoices.map((item) => {
     const choice = quote.choices.find(
@@ -182,12 +175,6 @@ export function JerseyPage({
         : preview
           ? 'Review preorder'
           : 'Preorder now';
-  const image =
-    priceVariant?.image ??
-    product?.images.nodes.find((item) => item.altText?.includes(style));
-  const referencePhoto =
-    preview && !bundle && !away && (view === 'photo' || view === 'club');
-  const showingPhoto = referencePhoto || Boolean(image && view !== 'back');
   const closes = window.endsAt
     ? new Intl.DateTimeFormat('en-US', {
         month: 'short',
@@ -223,9 +210,7 @@ export function JerseyPage({
       {preview && (
         <div className="jersey-review-banner">
           DESIGN PREVIEW{' '}
-          <span>
-            Reference photos & illustrative mockups · no orders will be placed
-          </span>
+          <span>Official product photos · no orders will be placed</span>
         </div>
       )}
       <Breadcrumbs
@@ -266,49 +251,42 @@ export function JerseyPage({
         </div>
         <div className="pel-pdp__gallery jersey-gallery">
           <div
-            className={`pel-pdp__stage jersey-stage${showingPhoto ? ' jersey-stage--photo' : ''}`}
+            className={`pel-pdp__stage jersey-stage${view !== 'print' ? ' jersey-stage--photo' : ''}`}
           >
             <div className="jersey-stage-label">
               <span>
-                {referencePhoto
-                  ? 'ON THE PITCH · REFERENCE'
-                  : bundle
-                    ? 'YOUR TWO JERSEYS'
-                    : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
+                {view === 'print'
+                  ? 'YOUR NAME + NUMBER'
+                  : view === 'shorts' || view === 'detail'
+                    ? 'MATCHING SHORTS'
+                    : bundle
+                      ? 'YOUR TWO JERSEYS'
+                      : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
               </span>
               <span>POR EL DEPORTE</span>
             </div>
-            {referencePhoto ? (
-              <img
-                src={
-                  view === 'club'
-                    ? '/jersey/club-reference.png'
-                    : '/jersey/home-reference.png'
-                }
-                alt={
-                  view === 'club'
-                    ? 'Por El Deporte players wearing the orange home kit — reference photograph'
-                    : 'The orange home jersey on the pitch in Key Biscayne — reference photograph'
-                }
-                loading="eager"
-              />
-            ) : image && view !== 'back' ? (
-              <Image
-                data={image}
-                sizes="(min-width: 60em) 640px, 100vw"
-                loading="eager"
-              />
-            ) : (
+            {view === 'print' ? (
               <KitArtwork
                 styles={styles}
-                back={view === 'back'}
-                shorts={withShorts}
+                back
+                shorts={false}
                 personalize={selection.personalize}
                 name={name.toUpperCase()}
                 number={number}
               />
+            ) : (
+              <JerseyPhotos
+                styles={styles}
+                view={view === 'front' && withShorts ? 'kit' : view}
+                sizes={
+                  bundle
+                    ? '(min-width: 60em) 20vw, 50vw'
+                    : '(min-width: 60em) 40vw, 100vw'
+                }
+                priority
+              />
             )}
-            {!showingPhoto && (
+            {view === 'print' && (
               <span className="jersey-artwork-note">
                 Illustration · final details may vary
               </span>
@@ -318,73 +296,54 @@ export function JerseyPage({
             className="pel-pdp__thumbs jersey-thumbs"
             aria-label="Jersey views"
           >
-            {preview && !away && !bundle && (
+            {(
+              [
+                ['front', withShorts ? 'Full kit' : 'Front'],
+                ['back', 'Back'],
+                ['shorts', 'Shorts'],
+                ['detail', 'Detail'],
+                ...(canPersonalize ? [['print', 'Print'] as const] : []),
+              ] as const
+            ).map(([option, label]) => (
               <button
+                key={option}
                 type="button"
-                className={`pel-pdp__thumb${view === 'photo' ? ' is-active' : ''}`}
-                aria-label="On the pitch"
-                aria-pressed={view === 'photo'}
-                onClick={() => setView('photo')}
+                className={`pel-pdp__thumb${view === option ? ' is-active' : ''}`}
+                aria-label={
+                  option === 'print' ? 'Your name & number preview' : label
+                }
+                aria-pressed={view === option}
+                onClick={() => setView(option)}
               >
-                <img src="/jersey/home-reference.png" alt="" loading="lazy" />
-                <span className="jersey-thumb-label">On the pitch</span>
+                <span className="jersey-thumb-image" aria-hidden="true">
+                  {option === 'print' ? (
+                    <KitArtwork
+                      styles={styles}
+                      back
+                      shorts={false}
+                      personalize={selection.personalize}
+                      name={name.toUpperCase()}
+                      number={number}
+                    />
+                  ) : (
+                    <JerseyPhotos
+                      styles={styles}
+                      view={option === 'front' && withShorts ? 'kit' : option}
+                      sizes={bundle ? '60px' : '120px'}
+                      decorative
+                    />
+                  )}
+                </span>
+                <span className="jersey-thumb-label">{label}</span>
               </button>
-            )}
-            {preview && !away && !bundle && (
-              <button
-                type="button"
-                className={`pel-pdp__thumb${view === 'club' ? ' is-active' : ''}`}
-                aria-label="The club"
-                aria-pressed={view === 'club'}
-                onClick={() => setView('club')}
-              >
-                <img src="/jersey/club-reference.png" alt="" loading="lazy" />
-                <span className="jersey-thumb-label">The club</span>
-              </button>
-            )}
-            <button
-              type="button"
-              className={`pel-pdp__thumb${view === 'front' ? ' is-active' : ''}`}
-              aria-label="Front"
-              aria-pressed={view === 'front'}
-              onClick={() => setView('front')}
-            >
-              <span aria-hidden="true">
-                <KitArtwork
-                  styles={styles}
-                  back={false}
-                  shorts={withShorts}
-                  personalize={false}
-                  name=""
-                  number=""
-                />
-              </span>
-              <span className="jersey-thumb-label">Front</span>
-            </button>
-            <button
-              type="button"
-              className={`pel-pdp__thumb${view === 'back' ? ' is-active' : ''}`}
-              aria-label="Your name & number"
-              aria-pressed={view === 'back'}
-              onClick={() => setView('back')}
-            >
-              <span aria-hidden="true">
-                <KitArtwork
-                  styles={styles}
-                  back
-                  shorts={withShorts}
-                  personalize={selection.personalize}
-                  name={name.toUpperCase()}
-                  number={number}
-                />
-              </span>
-              <span className="jersey-thumb-label">Back</span>
-            </button>
+            ))}
           </div>
           <p className="jersey-gallery-caption">
-            {preview
-              ? 'A first look at the new kit. Official product photography coming soon.'
-              : 'Your club. Your colors. Your jersey.'}
+            {view === 'print'
+              ? 'Your personalization preview. See Back for the official jersey photo.'
+              : (view === 'shorts' || view === 'detail') && !withShorts
+                ? 'Matching shorts are optional. Add them to your jersey below.'
+                : 'Official product photos. Name and number shown are an example.'}
           </p>
         </div>
 
@@ -421,10 +380,7 @@ export function JerseyPage({
             >
               {secondStyle ? (
                 <div className="jersey-addon-row jersey-bundle-item">
-                  <StylePicture
-                    style={secondStyle}
-                    image={secondChoice?.image}
-                  />
+                  <StylePicture style={secondStyle} />
                   <div className="jersey-addon-copy">
                     <h2 id="jersey-bundle-heading">
                       {secondStyle.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}{' '}
@@ -580,7 +536,7 @@ export function JerseyPage({
                         value={name}
                         onChange={(event) => {
                           setName(event.target.value);
-                          setView('back');
+                          setView('print');
                         }}
                         placeholder="YOUR NAME"
                         required={Boolean(number.trim())}
@@ -601,7 +557,7 @@ export function JerseyPage({
                         value={number}
                         onChange={(event) => {
                           setNumber(event.target.value);
-                          setView('back');
+                          setView('print');
                         }}
                         placeholder="10"
                         required={Boolean(name.trim())}
@@ -613,7 +569,7 @@ export function JerseyPage({
                     Leave both blank for a plain back. Names print in uppercase.
                   </p>
                   <details className="jersey-print-preview">
-                    <summary>View back preview</summary>
+                    <summary>Preview your name + number</summary>
                     <div className="jersey-mobile-preview">
                       <KitArtwork
                         styles={styles}
@@ -641,7 +597,13 @@ export function JerseyPage({
               aria-labelledby="jersey-shorts-heading"
             >
               <div className="jersey-addon-row">
-                <PhotoPlaceholder label="Shorts" />
+                <span className="jersey-extra-picture">
+                  <JerseyPhotos
+                    styles={styles}
+                    view="shorts"
+                    sizes={bundle ? '36px' : '72px'}
+                  />
+                </span>
                 <div className="jersey-addon-copy">
                   <h2 id="jersey-shorts-heading">
                     Matching shorts{bundle ? ' · 2 pairs' : ''}
@@ -670,7 +632,10 @@ export function JerseyPage({
                   }
                   aria-expanded={withShorts}
                   aria-controls="jersey-shorts-size"
-                  onClick={() => setWithShorts(!withShorts)}
+                  onClick={() => {
+                    setWithShorts(!withShorts);
+                    setView('front');
+                  }}
                 >
                   {withShorts ? 'Remove' : 'Add'}
                 </button>
@@ -1007,7 +972,6 @@ function StyleChoice({
   choices: {
     style: JerseyStyle;
     price: Price | null;
-    image?: ComponentProps<typeof Image>['data'];
   }[];
   unavailable?: string;
   unavailableLabel: string;
@@ -1018,12 +982,12 @@ function StyleChoice({
     <fieldset className="pel-pdp__opt jersey-style-choice">
       <legend className="pel-pdp__opt-label">{label}</legend>
       <div className="jersey-style-grid">
-        {choices.map(({style, price, image}) => {
+        {choices.map(({style, price}) => {
           const disabled = style.value === unavailable || !price;
           const className = `jersey-style-option${style.value === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`;
           const content = (
             <>
-              <StylePicture style={style} image={image} />
+              <StylePicture style={style} />
               <span className="jersey-style-copy">
                 <strong>
                   {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}
@@ -1074,31 +1038,10 @@ function StyleChoice({
   );
 }
 
-function StylePicture({
-  style,
-  image,
-}: {
-  style: JerseyStyle;
-  image?: ComponentProps<typeof Image>['data'];
-}) {
+function StylePicture({style}: {style: JerseyStyle}) {
   return (
     <span className="jersey-style-picture" aria-hidden="true">
-      {image ? (
-        <Image data={image} sizes="72px" alt="" />
-      ) : (
-        <>
-          <JerseyArtwork
-            away={style.color === JERSEY_COLORS[1]}
-            longSleeve={style.sleeve === 'Long sleeve'}
-            back={false}
-            shorts={false}
-            personalize={false}
-            name=""
-            number=""
-          />
-          <small>Preview</small>
-        </>
-      )}
+      <JerseyPhotos styles={[style]} view="front" sizes="72px" decorative />
     </span>
   );
 }
