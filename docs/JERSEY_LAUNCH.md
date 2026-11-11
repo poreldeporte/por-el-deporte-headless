@@ -8,8 +8,10 @@ Shopify Oxygen storefront `1000157315` at `https://poreldeporte.com`.
 
 The page keeps the existing gallery, four release facts, brand fonts/colors,
 header/footer, size pills, and product detail cards.
-The Story includes a small “Jersey design by Sergio Gomez” credit below its
-paragraphs. The shorts option and The Details both mention the pockets.
+The main introduction connects the jersey to the club’s friendships and
+community, led by “We came for the game. We stayed for the people.” A visible
+“Jersey design by Sergio Gomez” byline follows, with his name in the brand’s
+display font. The shorts option and The Details both mention the pockets.
 
 On desktop, the product gallery and four release facts share one sticky container.
 They stay aligned while the buying column scrolls and leave the viewport together
