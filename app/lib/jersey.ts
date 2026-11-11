@@ -38,6 +38,8 @@ export const JERSEY_SHORTS_VALUE = {
 } as const;
 export const JERSEY_BUNDLE_SAVING = 20;
 export const JERSEY_SHORTS_PRICE = 15;
+export const JERSEY_SHORTS_SAVING =
+  Number(JERSEY_SHORTS_VALUE.amount) - JERSEY_SHORTS_PRICE;
 export const NAME_LIMIT = 14;
 const PERSONALIZATION_DURATION = 7 * 24 * 60 * 60 * 1000;
 
@@ -400,7 +402,10 @@ export function jerseyQuote(
   preview: boolean,
   shortsVariants: PricedVariant[] = [],
 ) {
-  const shortsPriceFor = (
+  const jerseyPriceFor = (jersey: JerseySelection['jerseys'][number]) =>
+    variants.find((item) => matchesJerseyVariant(item.selectedOptions, jersey))
+      ?.price ?? (preview ? jerseyPreviewPrice(jersey.style, false) : null);
+  const shortsValueFor = (
     jersey: JerseySelection['jerseys'][number],
   ): Price | null => {
     const shortsSize =
@@ -410,14 +415,15 @@ export function jerseyQuote(
     return (
       shortsVariants.find((item) =>
         matchesShortsVariant(item.selectedOptions, jersey, shortsSize),
-      )?.price ??
-      (preview
-        ? {
-            amount: String(JERSEY_SHORTS_PRICE),
-            currencyCode: 'USD' as const,
-          }
-        : null)
+      )?.price ?? (preview ? JERSEY_SHORTS_VALUE : null)
     );
+  };
+  const shortsPriceFor = (jersey: JerseySelection['jerseys'][number]) => {
+    const price = subtractPrices(shortsValueFor(jersey), {
+      amount: String(JERSEY_SHORTS_SAVING),
+      currencyCode: 'USD',
+    });
+    return price && Number(price.amount) >= 0 ? price : null;
   };
   const priceFor = (
     jerseys: JerseySelection['jerseys'],
@@ -427,11 +433,7 @@ export function jerseyQuote(
     if (!JERSEY_STYLE_OPTIONS.includes(style)) return null;
     const total = sumPrices(
       jerseys.flatMap((jersey) => {
-        const jerseyPrice =
-          variants.find((item) =>
-            matchesJerseyVariant(item.selectedOptions, jersey),
-          )?.price ??
-          (preview ? jerseyPreviewPrice(jersey.style, false) : null);
+        const jerseyPrice = jerseyPriceFor(jersey);
         if (!withShorts) return [jerseyPrice];
         return [jerseyPrice, shortsPriceFor(jersey)];
       }),
@@ -479,19 +481,39 @@ export function jerseyQuote(
   const base = priceFor(jerseys, false);
   const kit = priceFor(jerseys, true);
   const shorts = subtractPrices(kit, base);
-  const shortsValue = {
-    ...JERSEY_SHORTS_VALUE,
-    amount: (Number(JERSEY_SHORTS_VALUE.amount) * jerseys.length).toFixed(2),
-  };
-  const jersey = selection.jerseys.some(({shortsSize}) => shortsSize !== 'None')
-    ? kit
-    : base;
+  const shortsValues = jerseys.map(shortsValueFor);
+  const shortsValue = sumPrices(shortsValues);
+  const withShorts = selection.jerseys.some(
+    ({shortsSize}) => shortsSize !== 'None',
+  );
+  const jersey = withShorts ? kit : base;
   const socks = socksQuote(selection.socks, socksVariants, preview);
+  const total = socks.quantity ? sumPrices([jersey, socks.total]) : jersey;
+  const jerseyValues = jerseys.map(jerseyPriceFor);
+  // The native Home + Away rule allocates its $20 to Away, regardless of pick order.
+  const jerseyPrices = jerseyValues.map((price, index) =>
+    jerseys.length === 2 && jerseys[index].style.startsWith(JERSEY_COLORS[1])
+      ? subtractPrices(price, {
+          amount: String(JERSEY_BUNDLE_SAVING),
+          currencyCode: 'USD',
+        })
+      : price,
+  );
+  const original = sumPrices([
+    ...jerseyValues,
+    ...(withShorts ? shortsValues : []),
+    ...(socks.quantity ? [socks.subtotal] : []),
+  ]);
   return {
     choices,
-    total: socks.quantity ? sumPrices([jersey, socks.total]) : jersey,
+    total,
+    original,
+    savings: positivePrice(subtractPrices(original, total)),
+    jerseyValues,
+    jerseyPrices,
     shorts,
     shortsValue,
+    shortsValues,
     shortsPrices: jerseys.map(shortsPriceFor),
     shortsSavings: positivePrice(subtractPrices(shortsValue, shorts)),
     socks,
@@ -557,6 +579,7 @@ export function socksQuote(
   return {
     prices,
     quantity,
+    subtotal,
     total,
     savings: positivePrice(savings),
     offer,

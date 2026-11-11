@@ -1,0 +1,1 @@
+{% assign has_club_jersey = false %}{% for line in subtotal_line_items %}{% if line.product.handle == 'club-jersey' %}{% assign has_club_jersey = true %}{% endif %}{% endfor %}{% if has_club_jersey %}Your Club Jersey preorder is in — {{ order_name }}{% else %}Order {{ order_name }} is in{% endif %}

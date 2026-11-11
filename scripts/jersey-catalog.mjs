@@ -3,7 +3,6 @@ import {
   jerseyPreviewPrice,
   JERSEY_HANDLE,
   JERSEY_SHORTS_HANDLE,
-  JERSEY_SHORTS_PRICE,
   JERSEY_SHORTS_VALUE,
   JERSEY_SIZES,
   JERSEY_STORY,
@@ -49,8 +48,8 @@ const shorts = ['Home (Cream)', 'Away (Black)'].flatMap((color) =>
     'Option1 name': 'Color',
     'Option1 value': color,
     'Option2 value': size,
-    Price: JERSEY_SHORTS_PRICE.toFixed(2),
-    'Compare-at price': JERSEY_SHORTS_VALUE.amount,
+    Price: JERSEY_SHORTS_VALUE.amount,
+    'Compare-at price': '',
   })),
 );
 Object.assign(shorts[0], {

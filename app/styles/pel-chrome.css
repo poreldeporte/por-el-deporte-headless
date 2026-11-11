@@ -193,17 +193,6 @@ main h1 {
   line-height: 1.02;
   margin: 0 0 14px;
 }
-.product-price,
-.product-main .product-price {
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: 26px;
-  color: var(--pel-ink);
-}
-.product-price s {
-  color: var(--text-muted);
-  margin-left: 10px;
-}
 .product-options {
   margin-bottom: 18px;
 }

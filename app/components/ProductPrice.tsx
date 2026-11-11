@@ -4,24 +4,39 @@ import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
 export function ProductPrice({
   price,
   compareAtPrice,
+  additional = false,
 }: {
-  price?: MoneyV2;
+  price?: MoneyV2 | null;
   compareAtPrice?: MoneyV2 | null;
+  additional?: boolean;
 }) {
+  const onSale =
+    price &&
+    compareAtPrice &&
+    price.currencyCode === compareAtPrice.currencyCode &&
+    Number(compareAtPrice.amount) > Number(price.amount);
   return (
-    <div aria-label="Price" className="product-price" role="group">
-      {compareAtPrice ? (
-        <div className="product-price-on-sale">
-          {price ? <Money data={price} /> : null}
+    <span className="product-price">
+      {onSale ? (
+        <span className="product-price-on-sale">
+          <span className="sr-only">Originally </span>
           <s>
-            <Money data={compareAtPrice} />
+            <Money data={compareAtPrice} as="span" />
           </s>
-        </div>
+          <span className="sr-only">Now </span>
+          <span>
+            {additional ? '+' : ''}
+            <Money data={price} as="span" />
+          </span>
+        </span>
       ) : price ? (
-        <Money data={price} />
+        <span>
+          {additional ? '+' : ''}
+          <Money data={price} as="span" />
+        </span>
       ) : (
         <span>&nbsp;</span>
       )}
-    </div>
+    </span>
   );
 }

@@ -226,6 +226,10 @@ aside .aside__body:has(.cart-main) {
   font: 600 13px/1.3 var(--font-body);
   color: var(--text-muted);
 }
+.cart-row--saving {
+  color: var(--pel-orange-ink);
+  font: 600 13px/1.3 var(--font-body);
+}
 .cart-row--total {
   font-family: var(--font-display);
   font-weight: 650;
@@ -442,6 +446,15 @@ aside .aside__body:has(.cart-main) {
 .cart-line__price * {
   margin: 0;
   font: inherit;
+}
+.cart-line__price .product-price-on-sale {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.cart-line__price s {
+  font-size: 12px;
+  font-weight: 500;
 }
 .cart-line__opts {
   margin: 6px 0 0;

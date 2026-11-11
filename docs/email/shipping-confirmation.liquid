@@ -47,6 +47,13 @@
   {% assign ship_line = "Some of your order has left us. The rest follows in its own shipment, with its own tracking." %}
 {% endif %}
 
+{% assign shipment_has_jersey = false %}
+{% for line in fulfillment.fulfillment_line_items %}
+  {% if line.line_item.product.handle == 'club-jersey' %}
+    {% assign shipment_has_jersey = true %}
+  {% endif %}
+{% endfor %}
+
 {% comment %} Primary link: the carrier if we have it, the order page if not. {% endcomment %}
 {% if fulfillment.tracking_url %}
   {% assign primary_url = fulfillment.tracking_url %}
@@ -71,7 +78,7 @@
       <tr>
         <td align="center" style="padding:28px 12px 40px 12px;">
 
-          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#f7f0de; border:2px solid #171717; border-radius:18px; overflow:hidden;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background-color:#f7f0de; border:2px solid #171717; border-radius:18px; overflow:hidden;">
 
             <!-- Crest + order number -->
             <tr>
@@ -99,6 +106,13 @@
                 <p style="margin:18px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#4a463d;">
                   {{ ship_line }}
                 </p>
+                {% if shipment_has_jersey %}
+                <p style="margin:14px 0 0 0; font-family:Helvetica,Arial,sans-serif; font-size:16px; line-height:1.6; color:#4a463d;">
+                  Your Club Jersey is in this shipment. Thank you for waiting, for
+                  supporting the club, and for making this release possible. We hope
+                  you love wearing it as much as we loved making it.
+                </p>
+                {% endif %}
               </td>
             </tr>
 
@@ -178,7 +192,6 @@
                 </p>
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   {% for line in fulfillment.fulfillment_line_items %}
-                  {% unless line.line_item.nested_line_child? %}
                   <tr>
                     <td width="84" valign="top" style="padding:0 16px 18px 0;">
                       {% if line.line_item.image %}
@@ -197,6 +210,12 @@
                       {% if line.line_item.variant.title != 'Default Title' %}
                       <p style="margin:0 0 4px 0; font-size:14px; line-height:1.4; color:#6b665b;">{{ line.line_item.variant.title }}</p>
                       {% endif %}
+                      {% for property in line.line_item.properties %}
+                        {% assign property_first_character = property.first | slice: 0 %}
+                        {% if property.last != blank and property_first_character != '_' %}
+                        <p style="margin:4px 0 0 0; font-size:13px; line-height:1.4; color:#4a463d;">{{ property.first | escape }}: {{ property.last | escape }}</p>
+                        {% endif %}
+                      {% endfor %}
                       {% comment %}
                         line.quantity is what is in THIS box, which can be fewer
                         than the customer ordered when a shipment is split.
@@ -210,7 +229,6 @@
                       </p>
                     </td>
                   </tr>
-                  {% endunless %}
                   {% endfor %}
                 </table>
               </td>
@@ -249,7 +267,7 @@
 
           </table>
 
-          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px;">
             <tr>
               <td align="center" style="padding:24px 24px 0 24px; font-family:Helvetica,Arial,sans-serif; font-size:12px; line-height:1.7; color:#8a8577;">
                 <a href="https://poreldeporte.com" style="color:#8a8577; text-decoration:underline;">Por El Deporte</a>

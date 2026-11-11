@@ -10,7 +10,7 @@ is one-way.
 | File | Notification | Subject line |
 |---|---|---|
 | `abandoned-checkout.liquid` | Abandoned checkout | You left something in your bag |
-| `order-confirmation.liquid` | Order confirmation | Order {{ order_name }} is in |
+| `order-confirmation.liquid` | Order confirmation | Paste `order-confirmation.subject.liquid` (jersey-specific with standard-order fallback) |
 | `shipping-confirmation.liquid` | Shipping confirmation | Your order {{ order_name }} is on the way |
 | `account-activation.liquid` | Customer account activation | Activate your Por El Deporte account |
 | `account-welcome.liquid` | Customer account welcome | Welcome to Por El Deporte |
@@ -24,7 +24,8 @@ law without sending it to every customer.
 
 ## After pasting
 
-**Send a test on each.** Preview cannot prove the links, because
+**Preview each changed template.** Sending a test requires the merchant's
+authorization and a confirmed recipient. Preview cannot prove event links, because
 `{{ invoice_url }}` and `{{ customer.account_activation_url }}` are only
 populated for real events. Check the button lands where it should.
 
@@ -47,8 +48,12 @@ Shopify's variable names differ per template and are not guessable. Getting one
 wrong produces an email that looks right in preview and fails in an inbox.
 
 - Abandoned checkout uses **`{{ invoice_url }}`**, not `{{ url }}`.
-- Line items are **`subtotal_line_items`**, not `line_items`, and the price is
+- Order receipt rows use **`subtotal_line_items`**, and the price is
   **`line.final_line_price`**, not `line.line_price`.
+- Show every row, including `nested_line_child?` shorts. Keep each variant,
+  quantity, public line property (name/number), original price and native discount.
+  Never expose properties beginning with `_`. The subtotal already includes
+  discounts; label it accordingly instead of appearing to deduct savings twice.
 - Shipping confirmation iterates **`fulfillment.fulfillment_line_items`**, where
   each entry wraps the real line as **`line.line_item`**, and `line.quantity` is
   the amount in *that shipment* — lower than `line.line_item.quantity` when a
@@ -57,3 +62,20 @@ wrong produces an email that looks right in preview and fails in an inbox.
   fails at render, not preview. Assign first.
 - Anything that loops over transactions must build a **capture** before printing
   a heading, or an order paid by gift card plus card prints it twice.
+
+## Club Jersey release
+
+Order confirmation detects `line.product.handle == 'club-jersey'`. Its subject,
+thank-you and next steps address the jersey preorder, supporters and community.
+Shipping remains **date to be confirmed**; no production or arrival date is
+promised. Pending payment and charge-at-fulfillment states retain their actual
+payment instructions. Buyers are asked to check sizes and custom print promptly.
+
+Shipping confirmation uses the same product check **inside the current
+fulfillment**, so a socks-only partial shipment never claims the jersey shipped.
+Tracking and partial-shipment quantities remain native Shopify values.
+
+Validation uses synthetic paid/pending/deferred jersey orders, a standard order,
+both nested shorts, separate custom names, mixed socks, discounted receipt totals,
+escaped properties and partial jersey/socks shipments. Preview without sending
+or resending customer emails. Template changes apply to future notifications.

@@ -29,6 +29,7 @@ export type CartLineFragment = Pick<
     | {discountedAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>}
   >;
   cost: {
+    subtotalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
     totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
     amountPerQuantity: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
     compareAtAmountPerQuantity?: StorefrontAPI.Maybe<
@@ -77,6 +78,7 @@ export type CartLineComponentFragment = Pick<
     | {discountedAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>}
   >;
   cost: {
+    subtotalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
     totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
     amountPerQuantity: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
     compareAtAmountPerQuantity?: StorefrontAPI.Maybe<
@@ -123,6 +125,7 @@ export type CartLineComponentFragment = Pick<
           }
       >;
       cost: {
+        subtotalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
         totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
         amountPerQuantity: Pick<
           StorefrontAPI.MoneyV2,
@@ -206,6 +209,10 @@ export type CartApiQueryFragment = Pick<
               }
           >;
           cost: {
+            subtotalAmount: Pick<
+              StorefrontAPI.MoneyV2,
+              'currencyCode' | 'amount'
+            >;
             totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
             amountPerQuantity: Pick<
               StorefrontAPI.MoneyV2,
@@ -264,6 +271,10 @@ export type CartApiQueryFragment = Pick<
               }
           >;
           cost: {
+            subtotalAmount: Pick<
+              StorefrontAPI.MoneyV2,
+              'currencyCode' | 'amount'
+            >;
             totalAmount: Pick<StorefrontAPI.MoneyV2, 'currencyCode' | 'amount'>;
             amountPerQuantity: Pick<
               StorefrontAPI.MoneyV2,
@@ -322,6 +333,10 @@ export type CartApiQueryFragment = Pick<
                   }
               >;
               cost: {
+                subtotalAmount: Pick<
+                  StorefrontAPI.MoneyV2,
+                  'currencyCode' | 'amount'
+                >;
                 totalAmount: Pick<
                   StorefrontAPI.MoneyV2,
                   'currencyCode' | 'amount'

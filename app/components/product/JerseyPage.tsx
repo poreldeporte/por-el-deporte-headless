@@ -5,6 +5,7 @@ import type {JerseyPreorderQuery} from 'storefrontapi.generated';
 import type {action} from '~/routes/products.club-jersey';
 import {Breadcrumbs} from '~/components/Breadcrumbs';
 import {useAside} from '~/components/Aside';
+import {ProductPrice} from '~/components/ProductPrice';
 import {
   JERSEY_COLORS,
   JERSEY_STYLES,
@@ -15,7 +16,6 @@ import {
   type Price,
   type JerseySelection,
   JERSEY_SIZES,
-  JERSEY_SHORTS_VALUE,
   JERSEY_STORY,
   JERSEY_TITLE,
   NAME_LIMIT,
@@ -150,6 +150,10 @@ export function JerseyPage({
     );
     return {
       ...item,
+      original: withShorts
+        ? (quote.choices.find((choice) => choice.style === item.style.value)
+            ?.kitPrice ?? null)
+        : item.price,
       price: subtractPrices(
         (withShorts ? choice?.kitPrice : choice?.price) ?? null,
         withShorts ? firstChoice.kitPrice : firstChoice.price,
@@ -302,9 +306,18 @@ export function JerseyPage({
             Jersey design by <strong>Sergio Gomez</strong>
           </p>
           <div className="pel-pdp__price" aria-live="polite">
-            {price ? <Money data={price} /> : <span>Select your kit</span>}
+            {price ? (
+              <ProductPrice price={price} compareAtPrice={quote.original} />
+            ) : (
+              <span>Select your kit</span>
+            )}
             <span className="jersey-price-label">Your kit total</span>
           </div>
+          {quote.savings && (
+            <p className="jersey-total-saving">
+              You save <Money data={quote.savings} as="span" />
+            </p>
+          )}
           <p className="jersey-launch-offer">
             {canPersonalize
               ? 'Name + number included · first 7 days of preorder'
@@ -443,7 +456,11 @@ export function JerseyPage({
             >
               <div className="jersey-item">
                 {!editingFirst && (
-                  <SelectedJersey style={firstStyle}>
+                  <SelectedJersey
+                    style={firstStyle}
+                    price={quote.jerseyPrices[0]}
+                    original={quote.jerseyValues[0]}
+                  >
                     <button
                       ref={editFirstRef}
                       type="button"
@@ -526,7 +543,11 @@ export function JerseyPage({
                   <div className="jersey-item jersey-item--removable">
                     {removeSecondButton}
                     {!editingSecond && (
-                      <SelectedJersey style={secondStyle}>
+                      <SelectedJersey
+                        style={secondStyle}
+                        price={quote.jerseyPrices[1]}
+                        original={quote.jerseyValues[1]}
+                      >
                         <button
                           type="button"
                           className="jersey-text-button"
@@ -644,9 +665,11 @@ export function JerseyPage({
                     </span>
                     <span className="jersey-bundle-price">
                       {secondOffer.price ? (
-                        <>
-                          +<Money data={secondOffer.price} as="span" />
-                        </>
+                        <ProductPrice
+                          price={secondOffer.price}
+                          compareAtPrice={secondOffer.original}
+                          additional
+                        />
                       ) : (
                         'Unavailable'
                       )}
@@ -704,6 +727,7 @@ export function JerseyPage({
                       }
                       size={shortsSizes[style.color] || ''}
                       price={quote.shortsPrices[index]}
+                      original={quote.shortsValues[index]}
                       onChange={(value) =>
                         setShortsSizes((current) => ({
                           ...current,
@@ -749,16 +773,22 @@ export function JerseyPage({
                         : 'Add matching shorts'}
                     </strong>
                     <small>
-                      With pockets ·{' '}
-                      <Money data={JERSEY_SHORTS_VALUE} as="span" /> value per
-                      pair
+                      With pockets
+                      {quote.shortsSavings && (
+                        <>
+                          {' '}
+                          · Save <Money data={quote.shortsSavings} as="span" />
+                        </>
+                      )}
                     </small>
                   </span>
                   <span className="jersey-bundle-price">
                     {quote.shorts && (
-                      <>
-                        +<Money data={quote.shorts} as="span" />
-                      </>
+                      <ProductPrice
+                        price={quote.shorts}
+                        compareAtPrice={quote.shortsValue}
+                        additional
+                      />
                     )}
                   </span>
                 </button>
@@ -799,11 +829,12 @@ export function JerseyPage({
                   >
                     <strong>Socks total</strong>
                     {quote.socks.total ? (
-                      <Money
-                        data={quote.socks.total}
-                        as="strong"
-                        className="jersey-socks-price"
-                      />
+                      <strong className="jersey-socks-price">
+                        <ProductPrice
+                          price={quote.socks.total}
+                          compareAtPrice={quote.socks.subtotal}
+                        />
+                      </strong>
                     ) : (
                       <strong>—</strong>
                     )}
@@ -1000,7 +1031,11 @@ export function JerseyPage({
           <section className="jersey-mobile-bar" aria-label="Jersey preorder">
             <div className="jersey-mobile-total">
               <span aria-live="polite">
-                {price ? <Money data={price} as="span" /> : '—'}
+                {price ? (
+                  <ProductPrice price={price} compareAtPrice={quote.original} />
+                ) : (
+                  '—'
+                )}
               </span>
               <button
                 type="button"
@@ -1039,7 +1074,7 @@ export function JerseyPage({
             dialogRef={kitPreviewRef}
             styles={styles}
             selection={selection}
-            price={price}
+            quote={quote}
           />
         </>
       )}
@@ -1172,9 +1207,13 @@ function PrintFields({
 
 function SelectedJersey({
   style,
+  price,
+  original,
   children,
 }: {
   style: JerseyStyle;
+  price: Price | null;
+  original: Price | null;
   children: ReactNode;
 }) {
   return (
@@ -1190,6 +1229,9 @@ function SelectedJersey({
           {style.color === JERSEY_COLORS[0] ? 'Orange' : 'Black'} ·{' '}
           {style.sleeve}
         </small>
+        <small>
+          <ProductPrice price={price} compareAtPrice={original} />
+        </small>
         {children}
       </div>
     </div>
@@ -1201,12 +1243,14 @@ function ShortsCard({
   name,
   size,
   price,
+  original,
   onChange,
 }: {
   style: JerseyStyle;
   name: string;
   size: string;
   price: Price | null;
+  original: Price | null;
   onChange: (size: string) => void;
 }) {
   const [editing, setEditing] = useState(!size);
@@ -1228,11 +1272,7 @@ function ShortsCard({
           <small>{side === 'Home' ? 'Cream' : 'Black'} · With pockets</small>
           <small>
             {!editing && <>Size {size} · </>}
-            {price && (
-              <>
-                +<Money data={price} as="span" />
-              </>
-            )}
+            {price && <ProductPrice price={price} compareAtPrice={original} />}
           </small>
         </div>
         {!editing && (
@@ -1292,6 +1332,7 @@ function StyleChoice({
   choices: {
     style: JerseyStyle;
     price: Price | null;
+    original?: Price | null;
   }[];
   additional?: boolean;
   onChange: (style: JerseyStyle) => void;
@@ -1300,7 +1341,7 @@ function StyleChoice({
     <fieldset className="pel-pdp__opt jersey-style-choice">
       <legend className="pel-pdp__opt-label">{label}</legend>
       <div className="jersey-style-grid">
-        {choices.map(({style, price}) => {
+        {choices.map(({style, price, original}) => {
           const disabled = !price;
           const className = `jersey-style-option${style.value === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`;
           const content = (
@@ -1313,10 +1354,11 @@ function StyleChoice({
                 <span>{style.sleeve}</span>
                 <small>
                   {price ? (
-                    <>
-                      {additional ? '+' : ''}
-                      <Money data={price} as="span" />
-                    </>
+                    <ProductPrice
+                      price={price}
+                      compareAtPrice={original}
+                      additional={additional}
+                    />
                   ) : (
                     'Unavailable'
                   )}
