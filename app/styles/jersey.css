@@ -196,11 +196,6 @@
 .jersey-selected-jersey + .jersey-first-choice {
   margin-top: 12px;
 }
-.jersey-form .jersey-bundle--selected {
-  padding-top: 0;
-  margin-top: 12px;
-  border-top: 0;
-}
 .jersey-eyebrow {
   display: flex;
   align-items: center;
@@ -319,14 +314,12 @@
   color: var(--text-muted);
   margin: 8px 0 0;
 }
-.jersey-bundle,
 .jersey-shorts,
 .jersey-socks {
   padding: 16px 0 0;
   margin-top: 24px;
   border-top: 1px solid var(--border-soft);
 }
-.jersey-bundle-offer,
 .jersey-option-heading {
   display: flex;
   align-items: center;
@@ -350,6 +343,42 @@
 }
 .jersey-addon-copy {
   min-width: 0;
+}
+.jersey-bundle {
+  margin-top: 12px;
+}
+.jersey-bundle-offer {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--pel-ink);
+  text-align: left;
+  cursor: pointer;
+}
+.jersey-bundle-offer:hover:not(:disabled) {
+  border-color: var(--pel-ink);
+  background: var(--pel-sand);
+}
+.jersey-bundle-offer:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.jersey-bundle-offer .jersey-style-picture {
+  width: 44px;
+  height: 48px;
+}
+.jersey-bundle-offer strong,
+.jersey-bundle-price {
+  font: 600 14px/1.5 var(--font-body);
+}
+.jersey-bundle-price {
+  white-space: nowrap;
 }
 .jersey-socks-photo {
   display: block;
@@ -405,11 +434,6 @@
 .jersey-addon-copy .jersey-addon-saving {
   color: var(--pel-orange-ink);
   font-weight: 600;
-}
-.jersey-form .jersey-extra-toggle {
-  min-width: 76px;
-  min-height: 44px;
-  padding: 12px;
 }
 .jersey-item-actions {
   display: grid;
@@ -480,25 +504,6 @@
 .jersey-personalization .jersey-option-heading {
   flex-wrap: wrap;
   gap: 4px 12px;
-}
-.jersey-print-sharing {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 8px;
-}
-.jersey-print-sharing .jersey-hint {
-  margin: 0;
-}
-.jersey-print-sharing strong {
-  display: block;
-  color: var(--pel-ink);
-  overflow-wrap: anywhere;
-}
-.jersey-print-sharing .jersey-text-button {
-  flex: none;
-  max-width: 45%;
 }
 .jersey-shorts > .jersey-option-heading h4,
 .jersey-socks > .jersey-option-heading h4 {
