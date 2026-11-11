@@ -228,8 +228,9 @@ export function JerseyPage({
   const removeSecondButton = (
     <button
       type="button"
-      className="jersey-text-button"
+      className="jersey-remove-button"
       aria-label={`Remove ${secondSide.toLowerCase()} jersey`}
+      title={`Remove ${secondSide.toLowerCase()} jersey`}
       onClick={() => {
         setSecondStyle(null);
         setEditingFirst(false);
@@ -239,7 +240,7 @@ export function JerseyPage({
         );
       }}
     >
-      Remove
+      <span aria-hidden="true">×</span>
     </button>
   );
 
@@ -522,7 +523,8 @@ export function JerseyPage({
 
               <div className="jersey-bundle">
                 {secondStyle ? (
-                  <div className="jersey-item">
+                  <div className="jersey-item jersey-item--removable">
+                    {removeSecondButton}
                     {!editingSecond && (
                       <SelectedJersey style={secondStyle}>
                         <button
@@ -540,7 +542,6 @@ export function JerseyPage({
                         >
                           Edit
                         </button>
-                        {removeSecondButton}
                       </SelectedJersey>
                     )}
                     {editingSecond && (
@@ -556,7 +557,6 @@ export function JerseyPage({
                         <StyleChoice
                           label={`${secondSide} sleeve length`}
                           name="secondStyle"
-                          action={removeSecondButton}
                           value={secondStyle.value}
                           choices={secondChoices.filter(
                             (item) => item.style.color !== firstStyle.color,
@@ -778,11 +778,48 @@ export function JerseyPage({
               >
                 {quote.socks.offer && (
                   <p className="jersey-socks-offer">
-                    Mix colors · Any 3 pairs for{' '}
-                    <Money data={quote.socks.offer} as="span" />
+                    {quote.socks.nextPair ? (
+                      <>
+                        Add one more pair for{' '}
+                        <Money data={quote.socks.nextPair} as="span" />
+                      </>
+                    ) : (
+                      <>
+                        Mix colors · Any 3 pairs for{' '}
+                        <Money data={quote.socks.offer} as="span" />
+                      </>
+                    )}
                   </p>
                 )}
-                <div className="jersey-item-list">
+                <div className="jersey-item jersey-socks-card">
+                  <div
+                    className="jersey-socks-total"
+                    role="status"
+                    aria-atomic="true"
+                  >
+                    <strong>Socks total</strong>
+                    {quote.socks.total ? (
+                      <Money
+                        data={quote.socks.total}
+                        as="strong"
+                        className="jersey-socks-price"
+                      />
+                    ) : (
+                      <strong>—</strong>
+                    )}
+                    <span>
+                      {quote.socks.quantity}{' '}
+                      {quote.socks.quantity === 1 ? 'pair' : 'pairs'}
+                    </span>
+                    <span className="jersey-socks-saving">
+                      {quote.socks.savings && (
+                        <>
+                          You save{' '}
+                          <Money data={quote.socks.savings} as="span" />
+                        </>
+                      )}
+                    </span>
+                  </div>
                   {sockChoices.map(({color, price: sockPrice, available}) => {
                     const quantity = sockQuantities[color];
                     const changeQuantity = (delta: number) =>
@@ -796,7 +833,7 @@ export function JerseyPage({
                     return (
                       <div
                         key={color}
-                        className={`jersey-item jersey-addon-row jersey-sock-row${quantity ? ' is-added' : ''}`}
+                        className="jersey-addon-row jersey-sock-row"
                       >
                         <SocksPhoto color={color} />
                         <div className="jersey-addon-copy">
@@ -851,32 +888,6 @@ export function JerseyPage({
                     );
                   })}
                 </div>
-                <p className="jersey-hint jersey-sock-status" role="status">
-                  {quote.socks.quantity > 0 && (
-                    <>
-                      {quote.socks.quantity}{' '}
-                      {quote.socks.quantity === 1 ? 'pair' : 'pairs'}
-                      {quote.socks.total && (
-                        <>
-                          {' '}
-                          · <Money data={quote.socks.total} as="span" />
-                        </>
-                      )}
-                    </>
-                  )}
-                  {quote.socks.savings && (
-                    <>
-                      {' '}
-                      · You save <Money data={quote.socks.savings} as="span" />
-                    </>
-                  )}
-                  {quote.socks.nextPair && (
-                    <>
-                      {' · '}Add one more for{' '}
-                      <Money data={quote.socks.nextPair} as="span" />
-                    </>
-                  )}
-                </p>
               </BuilderStep>
             )}
 
@@ -1179,8 +1190,8 @@ function SelectedJersey({
           {style.color === JERSEY_COLORS[0] ? 'Orange' : 'Black'} ·{' '}
           {style.sleeve}
         </small>
+        {children}
       </div>
-      <div className="jersey-item-actions">{children}</div>
     </div>
   );
 }
@@ -1273,7 +1284,6 @@ function StyleChoice({
   value,
   choices,
   additional,
-  action,
   onChange,
 }: {
   label: string;
@@ -1284,22 +1294,11 @@ function StyleChoice({
     price: Price | null;
   }[];
   additional?: boolean;
-  action?: ReactNode;
   onChange: (style: JerseyStyle) => void;
 }) {
   return (
     <fieldset className="pel-pdp__opt jersey-style-choice">
-      <legend className={action ? 'sr-only' : 'pel-pdp__opt-label'}>
-        {label}
-      </legend>
-      {action && (
-        <div className="jersey-choice-heading">
-          <span className="pel-pdp__opt-label" aria-hidden="true">
-            {label}
-          </span>
-          {action}
-        </div>
-      )}
+      <legend className="pel-pdp__opt-label">{label}</legend>
       <div className="jersey-style-grid">
         {choices.map(({style, price}) => {
           const disabled = !price;

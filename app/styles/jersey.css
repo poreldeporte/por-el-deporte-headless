@@ -156,8 +156,51 @@
   border-radius: var(--radius-md);
   background: var(--pel-sand);
 }
-.jersey-selected-jersey {
+.jersey-addon-row.jersey-selected-jersey {
   min-height: 76px;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: start;
+  padding-right: 36px;
+}
+.jersey-selected-jersey .jersey-text-button {
+  min-width: 44px;
+  justify-content: flex-start;
+  padding-inline: 0;
+}
+.jersey-item--removable {
+  position: relative;
+}
+.jersey-item--removable .jersey-first-choice .pel-pdp__opt-label,
+.jersey-item--removable .jersey-first-choice > .jersey-hint {
+  padding-right: 36px;
+}
+.jersey-remove-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--error);
+  cursor: pointer;
+}
+.jersey-remove-button > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font: 500 20px/1 var(--font-body);
+}
+.jersey-remove-button:hover > span {
+  color: var(--pel-cream);
+  background: var(--error);
 }
 .jersey-step {
   padding: 24px 0 0;
@@ -201,11 +244,31 @@
   gap: 12px;
 }
 .jersey-sock-row {
-  background: transparent;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid var(--border-soft);
 }
-.jersey-sock-row.is-added {
-  background: var(--pel-sand);
-  border-color: var(--pel-ink);
+.jersey-socks-total {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  font: 600 14px/1.5 var(--font-body);
+}
+.jersey-socks-total > :nth-child(even) {
+  text-align: right;
+}
+.jersey-socks-price {
+  font: 650 28px/1 var(--font-display);
+}
+.jersey-socks-total > span {
+  min-height: 18px;
+  font: 500 12px/1.5 var(--font-body);
+  color: var(--text-muted);
+}
+.jersey-socks-total > .jersey-socks-saving {
+  color: var(--pel-orange-ink);
+  font-weight: 600;
 }
 .jersey-quantity {
   display: grid;
@@ -230,20 +293,6 @@
 .jersey-quantity output {
   text-align: center;
   font: 600 14px/1 var(--font-body);
-}
-.jersey-sock-status {
-  min-height: 3.2em;
-}
-
-.jersey-choice-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.jersey-choice-heading .pel-pdp__opt-label {
-  margin: 0;
 }
 .jersey-eyebrow {
   display: flex;
@@ -463,9 +512,6 @@
 .jersey-addon-copy .jersey-addon-saving {
   color: var(--pel-orange-ink);
   font-weight: 600;
-}
-.jersey-item-actions {
-  display: grid;
 }
 .jersey-text-button {
   display: inline-flex;
@@ -802,6 +848,9 @@ body:has(.jersey-kit-preview[open]) {
   .jersey-bundle-offer {
     grid-template-columns: 48px minmax(0, 1fr) auto;
     gap: 8px;
+  }
+  .jersey-addon-row.jersey-selected-jersey {
+    grid-template-columns: 48px minmax(0, 1fr);
   }
   .jersey-addon-row > .jersey-style-picture,
   .jersey-addon-row > .jersey-extra-picture,
