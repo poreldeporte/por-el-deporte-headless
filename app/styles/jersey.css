@@ -467,6 +467,47 @@
   font: 500 12px/1.3 var(--font-body);
   letter-spacing: 0;
 }
+.jersey-release-note {
+  margin: 12px 0 0;
+  font: 500 13px/1.6 var(--font-body);
+  color: var(--text-muted);
+}
+.jersey-personalization {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+}
+.jersey-personalization .jersey-option-heading {
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.jersey-print-sharing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+.jersey-print-sharing .jersey-hint {
+  margin: 0;
+}
+.jersey-print-sharing strong {
+  display: block;
+  color: var(--pel-ink);
+  overflow-wrap: anywhere;
+}
+.jersey-print-sharing .jersey-text-button {
+  flex: none;
+  max-width: 45%;
+}
+.jersey-shorts > .jersey-option-heading h4,
+.jersey-socks > .jersey-option-heading h4 {
+  font: 600 22px/1.3 var(--font-display);
+}
+.jersey-socks {
+  padding-top: 24px;
+  border-top-color: var(--pel-ink);
+}
 .jersey-print-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 96px;
@@ -493,10 +534,10 @@
   border-radius: var(--radius-sm);
   background: var(--pel-cream);
 }
-#jersey-name {
+.jersey-print-name {
   text-transform: uppercase;
 }
-#jersey-number {
+.jersey-print-number {
   text-align: center;
 }
 .jersey-print-note {
@@ -627,6 +668,7 @@ body:has(.jersey-kit-preview[open]) {
 .jersey-kit-item p {
   margin: 4px 0;
   font: 500 12px/1.5 var(--font-body);
+  overflow-wrap: anywhere;
 }
 .jersey-kit-footer {
   padding: 16px 20px calc(16px + env(safe-area-inset-bottom));

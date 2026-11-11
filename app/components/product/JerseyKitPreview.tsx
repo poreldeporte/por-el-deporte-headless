@@ -40,34 +40,41 @@ export function JerseyKitPreview({
       </div>
       <div className="jersey-kit-content">
         <div className="jersey-kit-jerseys">
-          {styles.map((style, index) => (
-            <div key={style.value} className="jersey-kit-item">
-              <div className="jersey-kit-photo">
-                <JerseyPhotos
-                  styles={[style]}
-                  view={withShorts ? 'kit' : 'front'}
-                  sizes={styles.length === 2 ? '45vw' : '90vw'}
-                />
-              </div>
-              <h3>
-                {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} jersey
-              </h3>
-              <p>
-                {style.sleeve} ·{' '}
-                {selection.jerseys[index]?.size
-                  ? `Size ${selection.jerseys[index].size}`
-                  : 'Choose a size'}
-              </p>
-              {withShorts && (
+          {styles.map((style, index) => {
+            const {size, print} = selection.jerseys[index];
+            return (
+              <div key={style.value} className="jersey-kit-item">
+                <div className="jersey-kit-photo">
+                  <JerseyPhotos
+                    styles={[style]}
+                    view={withShorts ? 'kit' : 'front'}
+                    sizes={styles.length === 2 ? '45vw' : '90vw'}
+                  />
+                </div>
+                <h3>
+                  {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} jersey
+                </h3>
                 <p>
-                  Matching shorts ·{' '}
-                  {selection.shortsSize
-                    ? `Size ${selection.shortsSize}`
-                    : 'Choose a size'}
+                  {style.sleeve} · {size ? `Size ${size}` : 'Choose a size'}
                 </p>
-              )}
-            </div>
-          ))}
+                <p>
+                  {print.name || print.number
+                    ? print.name && print.number
+                      ? `Back: ${print.name} / ${print.number}`
+                      : 'Add both a name and number, or leave both blank.'
+                    : 'Plain back'}
+                </p>
+                {withShorts && (
+                  <p>
+                    Matching shorts ·{' '}
+                    {selection.shortsSize
+                      ? `Size ${selection.shortsSize}`
+                      : 'Choose a size'}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
         {selection.socksColor !== 'None' && (
           <div className="jersey-gallery-addon">
@@ -81,14 +88,7 @@ export function JerseyKitPreview({
             </div>
           </div>
         )}
-        <p className="jersey-hint">
-          {selection.personalize
-            ? selection.name && selection.number
-              ? `Name + number: ${selection.name} / ${selection.number}.`
-              : 'Add both a name and number, or leave both blank.'
-            : 'Plain back · no personalization.'}{' '}
-          Photos show an example name and number.
-        </p>
+        <p className="jersey-hint">Photos show an example name and number.</p>
       </div>
       <div className="jersey-kit-footer">
         {price && (

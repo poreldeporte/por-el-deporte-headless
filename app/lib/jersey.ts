@@ -47,12 +47,14 @@ export type JerseyItem = {
   size: string;
 };
 
-export type JerseySelection = {
-  jerseys: JerseyItem[];
-  shortsSize: string;
-  personalize: boolean;
+export type JerseyPrint = {
   name: string;
   number: string;
+};
+
+export type JerseySelection = {
+  jerseys: (JerseyItem & {print: JerseyPrint})[];
+  shortsSize: string;
   socksColor: string;
   socksPack: string;
   socksSize: string;
@@ -84,22 +86,36 @@ export function personalizationWindow(
 export function readJerseySelection(form: FormData): JerseySelection {
   const text = (key: string) => String(form.get(key) ?? '').trim();
   const socksColor = form.has('socksColor') ? text('socksColor') : 'None';
-  const name = text('name').normalize('NFC').toUpperCase();
-  const number = text('number');
+  const print = jerseyPrint(text('name'), text('number'));
+  // Tabs opened before per-jersey printing still submit one print for both.
+  const secondPrint =
+    form.has('secondName') || form.has('secondNumber')
+      ? jerseyPrint(text('secondName'), text('secondNumber'))
+      : print;
   return {
     jerseys: [
-      {style: text('firstStyle'), size: text('firstSize')},
+      {style: text('firstStyle'), size: text('firstSize'), print},
       ...(form.has('secondStyle')
-        ? [{style: text('secondStyle'), size: text('secondSize')}]
+        ? [
+            {
+              style: text('secondStyle'),
+              size: text('secondSize'),
+              print: secondPrint,
+            },
+          ]
         : []),
     ],
     shortsSize: form.get('addShorts') === 'on' ? text('shortsSize') : 'None',
-    personalize: Boolean(name || number),
-    name,
-    number,
     socksColor,
     socksPack: socksColor === 'None' ? '1 pair' : text('socksPack'),
     socksSize: socksColor === 'None' ? '' : text('socksSize'),
+  };
+}
+
+export function jerseyPrint(name: string, number: string): JerseyPrint {
+  return {
+    name: name.trim().normalize('NFC').toUpperCase(),
+    number: number.trim(),
   };
 }
 
@@ -107,7 +123,7 @@ export function validateJerseySelection(
   selection: JerseySelection,
   canPersonalize: boolean,
 ) {
-  const {jerseys, shortsSize, personalize, name, number} = selection;
+  const {jerseys, shortsSize} = selection;
   if (
     jerseys.some(
       ({style}) => !JERSEY_STYLES.some(({value}) => value === style),
@@ -141,29 +157,36 @@ export function validateJerseySelection(
     !PED_SOCKS_PACKS.some(({value}) => value === selection.socksPack)
   )
     return 'Choose one pair or three pairs of PED socks.';
-  if (!personalize) return null;
-  if (!canPersonalize)
-    return 'The personalization window has closed. Choose a jersey without personalization.';
-  if (!name || !number)
-    return 'Add both a name and number, or leave both blank for a plain back.';
-  if (
-    !/\p{L}/u.test(name) ||
-    [...name].length > NAME_LIMIT ||
-    !/^[\p{L}\p{M} .’'-]+$/u.test(name)
-  ) {
-    return `Enter a name with up to ${NAME_LIMIT} letters, spaces, apostrophes, periods, or hyphens.`;
+  for (const {
+    style,
+    print: {name, number},
+  } of jerseys) {
+    if (!name && !number) continue;
+    if (!canPersonalize)
+      return 'The personalization window has closed. Choose a jersey without personalization.';
+    const side = style.startsWith('Home') ? 'Home' : 'Away';
+    if (!name || !number)
+      return `${side} jersey: add both a name and number, or leave both blank for a plain back.`;
+    if (
+      !/\p{L}/u.test(name) ||
+      [...name].length > NAME_LIMIT ||
+      !/^[\p{L}\p{M} .’'-]+$/u.test(name)
+    ) {
+      return `${side} jersey: enter a name with up to ${NAME_LIMIT} letters, spaces, apostrophes, periods, or hyphens.`;
+    }
+    if (!/^\d{1,2}$/.test(number))
+      return `${side} jersey: enter a number from 0 to 99.`;
   }
-  if (!/^\d{1,2}$/.test(number)) return 'Enter a jersey number from 0 to 99.';
   return null;
 }
 
-export function jerseyAttributes(selection: JerseySelection) {
+export function jerseyAttributes(print: JerseyPrint) {
   return [
     {key: 'Order type', value: 'Preorder'},
-    ...(selection.personalize
+    ...(print.name || print.number
       ? [
-          {key: 'Name on back', value: selection.name},
-          {key: 'Number on back', value: selection.number},
+          {key: 'Name on back', value: print.name},
+          {key: 'Number on back', value: print.number},
         ]
       : []),
   ];
@@ -284,7 +307,7 @@ export function jerseyCartLines(
         {
           merchandiseId: jersey!.id,
           quantity: 1,
-          attributes: jerseyAttributes(selection),
+          attributes: jerseyAttributes(selection.jerseys[index].print),
         },
         ...(matchingShorts[index]
           ? [
