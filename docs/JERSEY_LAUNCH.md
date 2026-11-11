@@ -39,6 +39,10 @@ The “Build your kit” column follows:
 
 All three steps use the same heading, divider, card spacing, photo alignment,
 body labels and Edit/Remove controls. The existing brand and gallery remain.
+The price label stays “Your kit total” and the socks status reserves two lines,
+so quantity updates do not move the controls. On mobile, selected socks appear
+in their builder rows and kit preview; the repeated gallery rows stay desktop-only
+to avoid inserting content above the active controls.
 The purchase button and shipping note follow, without another order summary.
 
 A two-jersey set always contains one Home and one Away. Each style editor then

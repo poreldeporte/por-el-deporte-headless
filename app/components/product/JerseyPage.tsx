@@ -122,7 +122,6 @@ export function JerseyPage({
     shorts?.variants.nodes ?? [],
   );
   const price = quote.total;
-  const withSocks = quote.socks.quantity > 0;
   const sockChoices = quote.socks.prices.map((item) => ({
     ...item,
     available:
@@ -303,13 +302,7 @@ export function JerseyPage({
           </p>
           <div className="pel-pdp__price" aria-live="polite">
             {price ? <Money data={price} /> : <span>Select your kit</span>}
-            <span className="jersey-price-label">
-              {bundle ? '2 jerseys' : '1 jersey'}
-              {withShorts ? ` + ${bundle ? '2 pairs of ' : ''}shorts` : ''}
-              {withSocks
-                ? ` + ${quote.socks.quantity} ${quote.socks.quantity === 1 ? 'pair' : 'pairs'} of socks`
-                : ''}
-            </span>
+            <span className="jersey-price-label">Your kit total</span>
           </div>
           <p className="jersey-launch-offer">
             {canPersonalize
