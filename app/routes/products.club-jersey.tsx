@@ -2,9 +2,11 @@ import {data, useLoaderData, type HeadersFunction} from 'react-router';
 import type {Route} from './+types/products.club-jersey';
 import {JerseyPage} from '~/components/product/JerseyPage';
 import {loadJerseyVariants} from '~/lib/jersey-catalog';
+import {seoMeta, siteOrigin} from '~/lib/seo';
 import {
   JERSEY_HANDLE,
   JERSEY_TITLE,
+  JERSEY_SHORTS_HANDLE,
   PED_SOCKS_HANDLE,
   jerseyCartLines,
   personalizationWindow,
@@ -18,16 +20,15 @@ export const links: Route.LinksFunction = () => [
   {rel: 'stylesheet', href: productStyles},
   {rel: 'stylesheet', href: jerseyStyles},
 ];
-export const meta: Route.MetaFunction = () => [
-  {title: `${JERSEY_TITLE} | Por El Deporte`},
-  {
-    name: 'description',
-    content:
+export const meta: Route.MetaFunction = ({data, location, matches}) =>
+  seoMeta({
+    title: `${JERSEY_TITLE} | Por El Deporte`,
+    description:
       'The official Por El Deporte jersey. Released every two years. Home in orange, away in black. Name and number included during the first 7 days of preorder.',
-  },
-  // Keep the launch out of search until the merchant approves publication.
-  {name: 'robots', content: 'noindex, nofollow'},
-];
+    url: `${siteOrigin(matches)}${location.pathname}`,
+    image: data?.product?.images.nodes[0]?.url,
+    type: 'product',
+  });
 export const headers: HeadersFunction = ({actionHeaders, loaderHeaders}) => {
   const headers = new Headers(actionHeaders);
   headers.set(
@@ -38,18 +39,18 @@ export const headers: HeadersFunction = ({actionHeaders, loaderHeaders}) => {
 };
 
 export async function loader({context}: Route.LoaderArgs) {
-  const {product, socks} = await loadCatalog(context);
+  const {product, socks, shorts} = await loadCatalog(context);
   const preview = import.meta.env.DEV && !product;
   if (!product && !preview) throw new Response(null, {status: 404});
   return data(
-    {product, socks, preview, now: Date.now()},
+    {product, socks, shorts, preview, now: Date.now()},
     {headers: {'Cache-Control': 'no-store'}},
   );
 }
 
 export async function action({request, context}: Route.ActionArgs) {
   const selection = readJerseySelection(await request.formData());
-  const {product, socks} = await loadCatalog(context);
+  const {product, socks, shorts} = await loadCatalog(context);
   const preview = import.meta.env.DEV && !product;
   const window = personalizationWindow(product?.startsAt?.value, Date.now());
   const error = validateJerseySelection(
@@ -68,6 +69,7 @@ export async function action({request, context}: Route.ActionArgs) {
     selection,
     product.variants.nodes,
     socks?.variants.nodes ?? [],
+    shorts?.variants.nodes ?? [],
   );
   if (order.error)
     return data(
@@ -102,7 +104,12 @@ export default function Jersey() {
 async function loadCatalog(context: Route.LoaderArgs['context']) {
   const readPage = (after: string | null) =>
     context.storefront.query(JERSEY_QUERY, {
-      variables: {handle: JERSEY_HANDLE, socksHandle: PED_SOCKS_HANDLE, after},
+      variables: {
+        handle: JERSEY_HANDLE,
+        socksHandle: PED_SOCKS_HANDLE,
+        shortsHandle: JERSEY_SHORTS_HANDLE,
+        after,
+      },
       cache: context.storefront.CacheNone(),
     });
   const catalog = await readPage(null);
@@ -115,7 +122,7 @@ async function loadCatalog(context: Route.LoaderArgs['context']) {
 }
 
 const JERSEY_QUERY = `#graphql
-  query JerseyPreorder($handle: String!, $socksHandle: String!, $after: String, $country: CountryCode, $language: LanguageCode)
+  query JerseyPreorder($handle: String!, $socksHandle: String!, $shortsHandle: String!, $after: String, $country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     product(handle: $handle) {
       id
@@ -133,6 +140,16 @@ const JERSEY_QUERY = `#graphql
           selectedOptions { name value }
           price { amount currencyCode }
           image { id url altText width height }
+        }
+      }
+    }
+    shorts: product(handle: $shortsHandle) {
+      variants(first: 8) {
+        nodes {
+          id
+          availableForSale
+          selectedOptions { name value }
+          price { amount currencyCode }
         }
       }
     }

@@ -26,6 +26,7 @@ export const JERSEY_STYLE_OPTIONS = [
   ),
 ];
 export const PED_SOCKS_HANDLE = 'ped-socks';
+export const JERSEY_SHORTS_HANDLE = 'club-shorts';
 export const PED_SOCKS_COLORS = ['Black', 'White'] as const;
 export const PED_SOCKS_PACKS = [
   {value: '1 pair', price: {amount: '10.00', currencyCode: 'USD'}},
@@ -159,14 +160,6 @@ export function validateJerseySelection(
 export function jerseyAttributes(selection: JerseySelection) {
   return [
     {key: 'Order type', value: 'Preorder'},
-    ...(selection.shortsSize !== 'None'
-      ? [
-          {
-            key: 'Includes',
-            value: `1 pair of matching shorts · Size ${selection.shortsSize}`,
-          },
-        ]
-      : []),
     ...(selection.personalize
       ? [
           {key: 'Name on back', value: selection.name},
@@ -179,11 +172,10 @@ export function jerseyAttributes(selection: JerseySelection) {
 export function matchesJerseyVariant(
   options: {name: string; value: string}[],
   jersey: JerseyItem,
-  shortsSize: string,
 ) {
-  const selectedOptions = jerseyOptionValues(jersey, shortsSize);
+  const selectedOptions = jerseyOptionValues(jersey);
   return (
-    options.length === 3 &&
+    options.length === 2 &&
     options.every(
       ({name, value}) =>
         value === selectedOptions[name as keyof typeof selectedOptions],
@@ -191,12 +183,30 @@ export function matchesJerseyVariant(
   );
 }
 
-export function jerseyOptionValues(jersey: JerseyItem, shortsSize: string) {
+export function jerseyOptionValues(jersey: JerseyItem) {
   return {
     Style: jersey.style,
     Size: jersey.size,
-    'Shorts size': shortsSize,
   };
+}
+
+export function matchesShortsVariant(
+  options: {name: string; value: string}[],
+  jersey: JerseyItem,
+  size: string,
+) {
+  const color = JERSEY_STYLES.find(({value}) => value === jersey.style)?.color;
+  const expected = {
+    Color: color === JERSEY_COLORS[0] ? 'Home (Cream)' : 'Away (Black)',
+    Size: size,
+  };
+  return (
+    Boolean(color) &&
+    options.length === 2 &&
+    options.every(
+      ({name, value}) => value === expected[name as keyof typeof expected],
+    )
+  );
 }
 
 export function matchesSocksVariant(
@@ -216,28 +226,43 @@ export function matchesSocksVariant(
   );
 }
 
+type PurchasableVariant = {
+  id: string;
+  availableForSale: boolean;
+  selectedOptions: {name: string; value: string}[];
+};
+
 export function jerseyCartLines(
   selection: JerseySelection,
-  variants: {
-    id: string;
-    availableForSale: boolean;
-    selectedOptions: {name: string; value: string}[];
-  }[],
-  socks: {
-    id: string;
-    availableForSale: boolean;
-    selectedOptions: {name: string; value: string}[];
-  }[],
+  variants: PurchasableVariant[],
+  socks: PurchasableVariant[],
+  shorts: PurchasableVariant[] = [],
 ) {
   const jerseys = selection.jerseys.map((jersey) =>
-    variants.find((item) =>
-      matchesJerseyVariant(item.selectedOptions, jersey, selection.shortsSize),
-    ),
+    variants.find((item) => matchesJerseyVariant(item.selectedOptions, jersey)),
   );
   if (!jerseys.length || jerseys.some((jersey) => !jersey?.availableForSale))
     return {
       error:
         'This jersey selection is unavailable. Try another size or jersey.',
+      lines: [],
+    };
+  const matchingShorts =
+    selection.shortsSize === 'None'
+      ? []
+      : selection.jerseys.map((jersey) =>
+          shorts.find((item) =>
+            matchesShortsVariant(
+              item.selectedOptions,
+              jersey,
+              selection.shortsSize,
+            ),
+          ),
+        );
+  if (matchingShorts.some((item) => !item?.availableForSale))
+    return {
+      error:
+        'These matching shorts are unavailable. Choose another size or remove the shorts.',
       lines: [],
     };
   const sock =
@@ -255,11 +280,23 @@ export function jerseyCartLines(
   return {
     error: null,
     lines: [
-      ...jerseys.map((jersey) => ({
-        merchandiseId: jersey!.id,
-        quantity: 1,
-        attributes: jerseyAttributes(selection),
-      })),
+      ...jerseys.flatMap((jersey, index) => [
+        {
+          merchandiseId: jersey!.id,
+          quantity: 1,
+          attributes: jerseyAttributes(selection),
+        },
+        ...(matchingShorts[index]
+          ? [
+              {
+                merchandiseId: matchingShorts[index]!.id,
+                quantity: 1,
+                parent: {merchandiseId: jersey!.id},
+                attributes: [{key: 'Order type', value: 'Preorder'}],
+              },
+            ]
+          : []),
+      ]),
       ...(sock ? [{merchandiseId: sock.id, quantity: 1}] : []),
     ],
   };
@@ -301,6 +338,7 @@ export function jerseyQuote(
   variants: PricedVariant[],
   socksPrice: Price | null,
   preview: boolean,
+  shortsVariants: PricedVariant[] = [],
 ) {
   const shortsSize =
     selection.shortsSize === 'None'
@@ -310,14 +348,25 @@ export function jerseyQuote(
     const style = jerseyStyleValue(jerseys.map(({style}) => style));
     if (!JERSEY_STYLE_OPTIONS.includes(style)) return null;
     const total = sumPrices(
-      jerseys.map((jersey) => {
+      jerseys.flatMap((jersey) => {
         const variant = variants.find((item) =>
-          matchesJerseyVariant(item.selectedOptions, jersey, shorts),
+          matchesJerseyVariant(item.selectedOptions, jersey),
         );
-        return (
+        const jerseyPrice =
           variant?.price ??
-          (preview ? jerseyPreviewPrice(jersey.style, shorts !== 'None') : null)
-        );
+          (preview ? jerseyPreviewPrice(jersey.style, false) : null);
+        if (shorts === 'None') return [jerseyPrice];
+        const shortsPrice =
+          shortsVariants.find((item) =>
+            matchesShortsVariant(item.selectedOptions, jersey, shorts),
+          )?.price ??
+          (preview
+            ? {
+                amount: String(JERSEY_SHORTS_PRICE),
+                currencyCode: 'USD' as const,
+              }
+            : null);
+        return [jerseyPrice, shortsPrice];
       }),
     );
     // Shopify's matching automatic discount owns the checkout saving.

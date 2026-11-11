@@ -1,9 +1,8 @@
 # Club jersey preorder
 
-Review route: `/products/club-jersey`. This task branch is local review work.
-Shopify products were created with merchant authorization for checkout testing.
-Keep the release unpublished until merchant approval; no storefront deployment
-has been performed.
+Product route: `/products/club-jersey`. Publication was approved on November 11,
+2026. The existing brand and buying layout are preserved. The release uses
+Shopify Oxygen storefront `1000157315` at `https://poreldeporte.com`.
 
 ## Buying experience
 
@@ -139,14 +138,15 @@ adding, switching and removing both packs, updates the full total, and includes
 the color/pack in the submitted review. Changing a selection hides an outdated
 submitted preview until it is reviewed again. The photo cards use the same selected
 state as the jerseys; choosing a color adds the socks. Removing socks restores
-the one-pair default. No size is invented: the preview marks socks sizing as TBC.
+the one-pair default. The merchant confirmed socks are one size; no size
+selection is required.
 The three-pair price and saving appear before choosing a color. Savings compare
 three actual single-pair prices with the pack price, and are shown before selection
 only when both colors have the same available offer. After choosing a color, its
 own offer applies. Missing prices, mixed currencies and nonpositive savings do
 not produce a savings claim.
 
-The `ped-socks` draft has four color/pack variants. The UI uses actual
+The `ped-socks` product has four color/pack variants. The UI uses actual
 color/pack/size variants and prices; socks resolve to a separate line in the same
 cart mutation. Each pack is a priced SKU with cart quantity **1**. A three-pack
 must resolve its own $25 SKU rather than adding three $10 singles. Unknown or
@@ -159,12 +159,13 @@ Run `npm run dev -- --port 3017` in the task worktree and open
 `http://localhost:3017/products/club-jersey`. While the Shopify jersey is unpublished,
 development shows a marked design preview. Submitting validates the selection
 and shows a preview without changing a cart. Production returns 404 until the
-real jersey product is available to the Storefront API. The route remains
-`noindex, nofollow`.
+real jersey product is available to the Storefront API. The released route uses
+the site’s canonical, Open Graph and social metadata.
+The footer links directly to the kit builder.
 
 Focused domain checks: `node --test tests/jersey.mjs` on Node 24. They cover the
 exact seven-day deadline, print normalization/validation, all 400 builder choices
-fulfilled by 80 individual jersey SKUs, mixed-sleeve bundle prices and increments with shorts, independent sizing,
+fulfilled by 16 jersey and 8 shorts SKUs, mixed-sleeve bundle prices and increments with shorts, independent sizing,
 actual-price quotes, currency mismatches, exact sock color/pack/size resolution,
 canonical style/size association in either selection order, complete bounded
 catalog pagination, and rejection before cart mutation. Blank and partial print
@@ -176,8 +177,8 @@ choice changes, form validation, official photo mapping, and preview submission.
 
 ## Shopify catalog setup
 
-The [draft CSV](./club-jersey-draft.csv) contains one product and **80 individual
-jersey variants**: four styles × four jersey sizes × five shorts choices.
+The [draft CSV](./club-jersey-draft.csv) contains **16 jersey variants**
+(four styles × four sizes) and **8 shorts variants** (two colors × four sizes).
 Regenerate it on Node 24 with:
 
 ```sh
@@ -191,23 +192,25 @@ continue-selling enabled. It omits media and the launch timestamp.
 
 Created products:
 
-- [The Club Jersey](https://admin.shopify.com/store/por-el-deporte/products/8544669630511), handle `club-jersey`, 80 variants and 18 supplied images.
+- [The Club Jersey](https://admin.shopify.com/store/por-el-deporte/products/8544669630511), handle `club-jersey`, 16 variants and 18 supplied images.
+- [Club Shorts](https://admin.shopify.com/store/por-el-deporte/products/8544853360687), handle `club-shorts`, eight variants and four supplied images.
 - [PED Socks](https://admin.shopify.com/store/por-el-deporte/products/8544670548015), handle `ped-socks`, four variants and four supplied images.
 
 | Jersey option | Values |
 | --- | --- |
 | Style | `Home (Orange) / Short sleeve`, `Home (Orange) / Long sleeve`, `Away (Black) / Short sleeve`, `Away (Black) / Long sleeve` |
 | Size | `M`, `L`, `XL`, `XXL` |
-| Shorts size | `None`, `M`, `L`, `XL`, `XXL` |
 
 A Home + Away purchase adds **two individual jersey variants** in one cart
 mutation. Each line has its own sleeve, jersey size, photo, price and print
-properties. When shorts are added, each jersey line includes one matching pair
-in the chosen shorts size. There are no combined bundle SKUs. Inventory and
-manual fulfillment belong to each individual variant.
+properties. Each matching pair of shorts is a separate $15 cart/order line with
+its own
+color, size and photo. Shopify’s native parent relationship attaches it to the
+corresponding jersey and removes it if that jersey is removed. The kit-only
+shorts route redirects to the builder. There are no combined bundle SKUs.
+Inventory and manual fulfillment belong to each individual variant.
 
-Shopify's automatic Buy X get Y rule [Home + Away — Save $20](https://admin.shopify.com/store/por-el-deporte/discounts/1328073998383) must be active
-for launch: buy one of the 40 Home variants, get $20 off one of the 40 Away
+Shopify's automatic Buy X get Y rule [Home + Away — Save $20](https://admin.shopify.com/store/por-el-deporte/discounts/1328073998383) is active: buy one of the eight Home variants, get $20 off one of the eight Away
 variants. The two sets must contain only the corresponding color's variants,
 not the entire product. No per-order limit; one saving per qualifying pair.
 Do not combine this offer with other discounts. Removing either jersey must
@@ -215,13 +218,13 @@ remove the saving. The PDP quotes the same $20 USD offer; Shopify applies and
 recalculates the real cart/checkout discount. The cart shows its allocation.
 
 Socks use native `Color` values `Black`/`White` and `Pack` values `1 pair`/`3 pairs`,
-priced at $10/$25. **Sock sizing still needs merchant confirmation**; no Size
-option or one-size claim has been invented. If needed, add confirmed `Size`
-values before launch. Packs contain one color and size throughout; each pack
-is quantity 1 in the cart.
+priced at $10/$25. Socks are merchant-confirmed **one size**. Packs contain one
+color throughout; each pack is quantity 1 in the cart. A three-pack is one $25
+line clearly labeled “3 pairs,” not three $10 singles.
 
 [Club jersey preorder shipping profile](https://admin.shopify.com/store/por-el-deporte/settings/shipping/profiles/106888233007)
-is limited to these products, the manual location, and the **United States**.
+contains all 28 variants across these three products and is limited to the
+manual location and the **United States**.
 The free rate is “Preorder — shipping date to be confirmed,” with no transit
 estimate. Printful is excluded. Existing products and shipping profiles are
 unchanged. Packed weights remain unset; add accurate weights before buying
@@ -244,19 +247,19 @@ limits, font, and placement with the supplier; the sample photos are not a
 personalized print proof.
 
 The server resolves all exact native options before a single `cart.addLines`
-call. If either jersey or the selected socks are unavailable, it adds nothing.
-Each jersey gets `Order type: Preorder`, optional `Includes: 1 pair of matching
-shorts · Size …`, and optional `Name on back` / `Number on back`. Native variant
+call. If any selected jersey, shorts or socks are unavailable, it adds nothing.
+Each jersey gets `Order type: Preorder` and optional `Name on back` /
+`Number on back`. Shorts get their own preorder property and native size/color.
+Native variant
 options own each jersey's style and size. Shopify carries these into checkout
 and the order. Different personalizations remain separate lines. Fulfillment
 must read each line's properties. Physical orders remain manually fulfilled.
 
 ## Launch review
 
-Before publishing, approve the page/prices and supplied jersey/shorts/socks photos,
-confirm sock sizes and print limits, agree the launch time, and confirm shipping
-language. Checkout testing uses simulated Shopify Payments transactions only.
-The completed tests and restored store state are recorded below.
+The merchant approved publication, prices, photos, one-size socks, U.S.-only
+shipping and a seven-day personalization window beginning at launch. Tests use
+simulated Shopify Payments transactions only; production must have test mode off.
 
 The real product emits Hydrogen's consent-gated `Analytics.ProductView` via the
 existing Shopify/Meta integration. Previews emit no jersey product view, and
@@ -267,11 +270,20 @@ checkout → purchase by device/source after launch. Keep delivery/shipping clai
 accurate; verify the footer's existing free-shipping claim before repeating it
 beside the CTA.
 
-Only after merchant approval: remove `noindex`, add approved promotion/navigation,
-publish the catalog to Hydrogen, and deploy the exact approved revision.
+The jersey is Active on the Por El Deporte Hydrogen channel. Shorts and socks
+are Unlisted on that channel so the builder owns their discovery. The native
+Home + Away discount has no end date. `preorder.starts_at` owns the seven-day
+printing cutoff; it is set to the actual launch instant, not the testing window.
 
-## Checkout evidence · November 11, 2026
+Pushes to `main` run lint, typecheck, the financial/cart contracts and a production
+build, then deploy that same revision to Oxygen using the existing repository
+secret `OXYGEN_DEPLOYMENT_TOKEN_1000157315` and environment branch `main`. Pull
+requests run checks without deploying. The standard public-repository runner
+has a 15-minute cap; no paid runner or new hosting plan is introduced.
 
+## Earlier checkout evidence · November 11, 2026
+
+These two earlier orders preceded the separation of shorts into their own lines.
 Shopify Payments test mode was temporarily enabled with merchant authorization.
 No real payment or shipping label was purchased, and neither order was fulfilled.
 
@@ -291,22 +303,26 @@ pairs save $40; removing Home removes the Away discount. Test cart contents were
 removed after verification. A valid Canadian address was rejected with
 “Shipping not available,” confirming the U.S.-only profile.
 
-Local checks: 19 domain tests, TypeScript, focused ESLint and production build.
-The existing optional bundle-analysis warning about `metafile.server.json`
-remains; the build itself passes. Generated CSV matches the 80-variant generator.
-Implementation and verification were assisted by Codex.
+Both earlier test orders were canceled, their test payments refunded, inventory
+restocked, and the orders archived. No real payment or fulfillment occurred.
 
-After testing, both orders were canceled, their test payments refunded,
-inventory restocked, and the orders archived. Shopify Payments test mode is
-**off**, verified after reload. Both products are **Draft**, have **no sales
-channels selected**, and show zero available inventory after restocking.
-The temporary `preorder.starts_at` value was cleared, so the seven-day clock
-has not started. Storefront API lookups return no jersey or socks product.
-The bundle discount is deactivated (Shopify status **Expired**); the dedicated
-U.S. preorder shipping profile remains configured.
+## Release verification
 
-At the approved launch, set the actual launch timestamp, publish the products
-to the Por El Deporte Hydrogen channel, reactivate the bundle discount with
-no end date, and deploy the approved revision. Recheck the native checkout
-total after activation. No hosted CI, push, pull request or deployment was
-performed during this local review task.
+- 20 domain checks cover the 400 kit combinations, actual prices, separate linked
+  lines, unavailable extras, independent sizing and the exact seven-day cutoff.
+- Ten native Shopify cart checks cover every Home + Away sleeve combination
+  with/without shorts and three-pair socks. Removing Home removes its shorts
+  and the bundle saving. Repeating a jersey with different print and shorts
+  sizes preserves the correct parent and fulfillment properties. Test carts
+  were emptied after verification.
+- A mixed-sleeve full kit with three-pair socks has five lines and a $185 subtotal:
+  Home short $70, Away long $80 less $20, two shorts at $15 each, socks $25.
+- TypeScript, ESLint and the production build pass. The existing optional
+  `metafile.server.json` bundle-analysis warning does not fail the build.
+- [PED#1487](https://admin.shopify.com/store/por-el-deporte/orders/7053827276847)
+  completed from the 390px mobile builder and Shopify checkout with all five
+  separate lines, correct printing, a $185 subtotal, free shipping, $12.95 tax
+  and a $197.95 simulated payment. Admin fulfillment shows each shorts line
+  attached to its correct jersey. The test order was canceled and restocked;
+  Shopify Payments test mode was switched off and verified after reload.
+- Implementation and verification were assisted by Codex.

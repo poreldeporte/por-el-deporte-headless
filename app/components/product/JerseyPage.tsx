@@ -21,6 +21,7 @@ import {
   PED_SOCKS_COLORS,
   PED_SOCKS_PACKS,
   matchesJerseyVariant,
+  matchesShortsVariant,
   matchesSocksVariant,
   personalizationWindow,
   validateJerseySelection,
@@ -34,11 +35,13 @@ type JerseyStyle = (typeof JERSEY_STYLES)[number];
 export function JerseyPage({
   product,
   socks,
+  shorts,
   preview,
   now: serverNow,
 }: {
   product: JerseyPreorderQuery['product'];
   socks: JerseyPreorderQuery['socks'];
+  shorts: JerseyPreorderQuery['shorts'];
   preview: boolean;
   now: number;
 }) {
@@ -94,17 +97,16 @@ export function JerseyPage({
   };
   const variants = selection.jerseys.map((jersey) =>
     product?.variants.nodes.find((item) =>
-      matchesJerseyVariant(item.selectedOptions, jersey, selection.shortsSize),
+      matchesJerseyVariant(item.selectedOptions, jersey),
     ),
   );
   const hasJerseySizes = Boolean(size && (!bundle || secondSize));
   const hasSizes = hasJerseySizes && (!withShorts || Boolean(shortsSize));
   const priceVariant = product?.variants.nodes.find((item) =>
-    matchesJerseyVariant(
-      item.selectedOptions,
-      {...selection.jerseys[0], size: size || JERSEY_SIZES[0]},
-      withShorts ? shortsSize || JERSEY_SIZES[0] : 'None',
-    ),
+    matchesJerseyVariant(item.selectedOptions, {
+      ...selection.jerseys[0],
+      size: size || JERSEY_SIZES[0],
+    }),
   );
   const sockChoices = PED_SOCKS_COLORS.flatMap((color) =>
     PED_SOCKS_PACKS.map((pack) => {
@@ -160,6 +162,7 @@ export function JerseyPage({
     product?.variants.nodes ?? [],
     selectedSocks?.price ?? null,
     preview,
+    shorts?.variants.nodes ?? [],
   );
   const price = quote.total;
   const firstChoice = quote.choices.find(
@@ -204,7 +207,16 @@ export function JerseyPage({
     !withSocks || !socksComplete || Boolean(selectedSocks?.available);
   const busy = fetcher.state !== 'idle';
   const available =
-    preview || variants.every((variant) => variant?.availableForSale);
+    preview ||
+    (variants.every((variant) => variant?.availableForSale) &&
+      (!withShorts ||
+        selection.jerseys.every((jersey) =>
+          shorts?.variants.nodes.some(
+            (item) =>
+              item.availableForSale &&
+              matchesShortsVariant(item.selectedOptions, jersey, shortsSize),
+          ),
+        )));
   const submitDisabled =
     busy || !canOrder || (hasSizes && !available) || !socksAvailable;
   const readyToSubmit =
@@ -822,9 +834,7 @@ export function JerseyPage({
                       </div>
                     </fieldset>
                   )}
-                  {socksPreview && withSocks && (
-                    <p className="jersey-hint">Socks size to be confirmed.</p>
-                  )}
+                  <p className="jersey-hint">One size.</p>
                   {withSocks && socksPack === '3 pairs' && (
                     <p className="jersey-hint">
                       All three pairs in your selected color.

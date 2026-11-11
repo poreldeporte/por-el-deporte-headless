@@ -14,6 +14,9 @@ jobs:
   quality:
     name: Lint · Typecheck · Build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -31,7 +34,16 @@ jobs:
       - name: Typecheck (react-router typegen + tsc)
         run: npm run typecheck
 
+      - name: Jersey pricing and cart contracts
+        run: node --experimental-strip-types --test tests/jersey.mjs
+
       # Codegen + production Oxygen build. Uses the bundled Storefront/Customer
       # Account API schemas, so no store credentials are needed at build time.
       - name: Build
         run: npm run build
+
+      - name: Deploy production to Oxygen
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npx shopify hydrogen deploy --env-branch main --build-command "true"
+        env:
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000157315 }}

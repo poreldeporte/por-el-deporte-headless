@@ -40,6 +40,17 @@ const selection = {
   socksSize: '',
 };
 
+const shorts = ['Home (Cream)', 'Away (Black)'].flatMap((color) =>
+  JERSEY_SIZES.map((size) => ({
+    id: `${color}-${size}`,
+    availableForSale: true,
+    selectedOptions: [
+      {name: 'Color', value: color},
+      {name: 'Size', value: size},
+    ],
+  })),
+);
+
 test('personalization opens at launch and closes exactly seven days later', () => {
   assert.equal(personalizationWindow(startsAt, start - 1).status, 'upcoming');
   assert.equal(personalizationWindow(startsAt, start).status, 'open');
@@ -54,7 +65,7 @@ test('personalization opens at launch and closes exactly seven days later', () =
   }
 });
 
-test('a mixed sleeve bundle adds two real jersey lines with their own fulfillment contents', () => {
+test('a mixed sleeve bundle adds each jersey and matching shorts as separate linked lines', () => {
   const chosen = {
     ...selection,
     jerseys: [
@@ -68,24 +79,30 @@ test('a mixed sleeve bundle adds two real jersey lines with their own fulfillmen
     selectedOptions: [
       {name: 'Style', value: jersey.style},
       {name: 'Size', value: jersey.size},
-      {name: 'Shorts size', value: 'M'},
     ],
   }));
   assert.equal(validateJerseySelection(chosen, true), null);
-  const order = jerseyCartLines(chosen, variants, []);
+  const order = jerseyCartLines(chosen, variants, [], shorts);
   assert.equal(order.error, null);
   assert.deepEqual(
     order.lines,
-    variants.map(({id}) => ({
-      merchandiseId: id,
-      quantity: 1,
-      attributes: [
-        {key: 'Order type', value: 'Preorder'},
-        {key: 'Includes', value: '1 pair of matching shorts · Size M'},
-        {key: 'Name on back', value: 'VIOLA'},
-        {key: 'Number on back', value: '07'},
-      ],
-    })),
+    variants.flatMap(({id}, index) => [
+      {
+        merchandiseId: id,
+        quantity: 1,
+        attributes: [
+          {key: 'Order type', value: 'Preorder'},
+          {key: 'Name on back', value: 'VIOLA'},
+          {key: 'Number on back', value: '07'},
+        ],
+      },
+      {
+        merchandiseId: shorts[index * 4].id,
+        quantity: 1,
+        parent: {merchandiseId: id},
+        attributes: [{key: 'Order type', value: 'Preorder'}],
+      },
+    ]),
   );
   for (const stock of [
     variants.slice(1),
@@ -97,15 +114,39 @@ test('a mixed sleeve bundle adds two real jersey lines with their own fulfillmen
   }
 });
 
+test('unavailable matching shorts reject the whole kit before any cart write', () => {
+  const jersey = {
+    id: 'jersey',
+    availableForSale: true,
+    selectedOptions: [
+      {name: 'Style', value: homeShort},
+      {name: 'Size', value: 'XL'},
+    ],
+  };
+  for (const stock of [
+    [],
+    shorts.filter((item) => item.id !== 'Home (Cream)-M'),
+    shorts.map((item) => ({...item, availableForSale: false})),
+  ]) {
+    const result = jerseyCartLines(selection, [jersey], [], stock);
+    assert.match(result.error, /shorts are unavailable/);
+    assert.deepEqual(result.lines, []);
+  }
+});
+
 test('socks resolve the exact color, pack and size before adding one priced SKU', () => {
-  const chosen = {...selection, socksColor: 'White', socksSize: 'L'};
+  const chosen = {
+    ...selection,
+    shortsSize: 'None',
+    socksColor: 'White',
+    socksSize: 'L',
+  };
   const jersey = {
     id: 'jersey-xl-m',
     availableForSale: true,
     selectedOptions: [
       {name: 'Style', value: homeShort},
       {name: 'Size', value: 'XL'},
-      {name: 'Shorts size', value: 'M'},
     ],
   };
   const sock = {
@@ -178,7 +219,6 @@ test('expired submissions reject custom printing while plain preorders remain va
   );
   assert.deepEqual(jerseyAttributes({...selection, personalize: false}), [
     {key: 'Order type', value: 'Preorder'},
-    {key: 'Includes', value: '1 pair of matching shorts · Size M'},
   ]);
 });
 
@@ -190,7 +230,6 @@ test('server normalizes printed names and preserves leading-zero numbers as line
   assert.equal(validateJerseySelection(parsed, true), null);
   assert.deepEqual(jerseyAttributes(parsed), [
     {key: 'Order type', value: 'Preorder'},
-    {key: 'Includes', value: '1 pair of matching shorts · Size M'},
     {key: 'Name on back', value: 'JOSÉ'},
     {key: 'Number on back', value: '07'},
   ]);
@@ -204,7 +243,6 @@ test('blank print fields order a plain jersey; partial fields and expired person
   assert.equal(validateJerseySelection(plain, false), null);
   assert.deepEqual(jerseyAttributes(plain), [
     {key: 'Order type', value: 'Preorder'},
-    {key: 'Includes', value: '1 pair of matching shorts · Size M'},
   ]);
   form.set('name', 'VIOLA');
   form.set('personalize', 'off');
@@ -280,30 +318,18 @@ test('invalid options and print data are rejected before a cart write', () => {
     );
 });
 
-test('variant matching resolves all three options regardless of Shopify option order', () => {
+test('variant matching resolves style and size regardless of option order', () => {
   const options = [
-    {name: 'Shorts size', value: 'M'},
-    {name: 'Style', value: homeShort},
     {name: 'Size', value: 'XL'},
+    {name: 'Style', value: homeShort},
   ];
+  assert.equal(matchesJerseyVariant(options, selection.jerseys[0]), true);
   assert.equal(
-    matchesJerseyVariant(options, selection.jerseys[0], selection.shortsSize),
-    true,
-  );
-  assert.equal(
-    matchesJerseyVariant(options, selection.jerseys[0], 'None'),
+    matchesJerseyVariant(options, {style: awayShort, size: 'XL'}),
     false,
   );
   assert.equal(
-    matchesJerseyVariant(options, {style: awayShort, size: 'XL'}, 'M'),
-    false,
-  );
-  assert.equal(
-    matchesJerseyVariant(
-      options.slice(1),
-      selection.jerseys[0],
-      selection.shortsSize,
-    ),
+    matchesJerseyVariant(options.slice(1), selection.jerseys[0]),
     false,
   );
 });
@@ -330,21 +356,18 @@ test('shorts size is independent of jersey size and required only when adding sh
   assert.equal(readJerseySelection(form).shortsSize, '');
 });
 
-test('80 individual SKUs fulfill all 400 builder combinations with independent sizes', () => {
+test('16 jerseys and 8 shorts fulfill all 400 builder combinations with independent sizes', () => {
   const variants = [homeShort, homeLong, awayShort, awayLong].flatMap((style) =>
-    JERSEY_SIZES.flatMap((size) =>
-      JERSEY_SHORTS_OPTIONS.map((shortsSize) => ({
-        id: `${style}-${size}-${shortsSize}`,
-        availableForSale: true,
-        selectedOptions: [
-          {name: 'Style', value: style},
-          {name: 'Size', value: size},
-          {name: 'Shorts size', value: shortsSize},
-        ],
-      })),
-    ),
+    JERSEY_SIZES.map((size) => ({
+      id: `${style}-${size}`,
+      availableForSale: true,
+      selectedOptions: [
+        {name: 'Style', value: style},
+        {name: 'Size', value: size},
+      ],
+    })),
   );
-  assert.equal(variants.length, 80);
+  assert.equal(variants.length, 16);
   let count = 0;
   for (const style of JERSEY_STYLE_OPTIONS) {
     const styles = jerseyStyles(style);
@@ -358,11 +381,18 @@ test('80 individual SKUs fulfill all 400 builder combinations with independent s
           for (const ordered of [jerseys, [...jerseys].reverse()]) {
             const chosen = {...selection, jerseys: ordered, shortsSize};
             assert.equal(validateJerseySelection(chosen, true), null);
-            const result = jerseyCartLines(chosen, variants, []);
+            const result = jerseyCartLines(chosen, variants, [], shorts);
             assert.equal(result.error, null);
             assert.deepEqual(
               result.lines.map(({merchandiseId}) => merchandiseId),
-              ordered.map(({style, size}) => `${style}-${size}-${shortsSize}`),
+              ordered.flatMap(({style, size}) => [
+                `${style}-${size}`,
+                ...(shortsSize === 'None'
+                  ? []
+                  : [
+                      `${style.startsWith('Home') ? 'Home (Cream)' : 'Away (Black)'}-${shortsSize}`,
+                    ]),
+              ]),
             );
           }
           count++;
@@ -410,48 +440,57 @@ test('single jerseys and Home + Away sets have the correct sleeve, bundle and sh
   assert.equal(jerseyPreviewPrice(`${awayShort} + ${awayLong}`, true), null);
 });
 
-test('quotes use real SKU prices, include priced socks, and never invent a missing or mixed-currency total', () => {
+test('quotes sum actual separate prices and reject missing or mixed-currency extras', () => {
   const variants = [
     {
       selectedOptions: [
         {name: 'Style', value: homeLong},
         {name: 'Size', value: 'XL'},
-        {name: 'Shorts size', value: 'None'},
       ],
       price: {amount: '83.00', currencyCode: 'USD'},
     },
-    {
-      selectedOptions: [
-        {name: 'Style', value: homeLong},
-        {name: 'Size', value: 'XL'},
-        {name: 'Shorts size', value: 'M'},
-      ],
-      price: {amount: '100.00', currencyCode: 'USD'},
-    },
   ];
+  const pricedShorts = shorts.map((item) => ({
+    ...item,
+    price: {amount: '17.00', currencyCode: 'USD'},
+  }));
   const chosen = {...selection, jerseys: [{style: homeLong, size: 'XL'}]};
-  const quote = jerseyQuote(chosen, variants, null, false);
+  const quote = jerseyQuote(chosen, variants, null, false, pricedShorts);
   assert.equal(quote.total.amount, '100.00');
   assert.equal(quote.shorts.amount, '17.00');
   assert.equal(quote.shortsSavings.amount, '18.00');
   const socks = {...chosen, socksColor: 'Black'};
   assert.equal(
-    jerseyQuote(socks, variants, {amount: '12.50', currencyCode: 'USD'}, false)
-      .total.amount,
+    jerseyQuote(
+      socks,
+      variants,
+      {amount: '12.50', currencyCode: 'USD'},
+      false,
+      pricedShorts,
+    ).total.amount,
     '112.50',
   );
-  assert.equal(jerseyQuote(socks, variants, null, false).total, null);
   assert.equal(
-    jerseyQuote(socks, variants, {amount: '12.50', currencyCode: 'EUR'}, false)
-      .total,
+    jerseyQuote(socks, variants, null, false, pricedShorts).total,
     null,
   );
-  assert.equal(jerseyQuote(chosen, [], null, false).total, null);
-  const euro = variants.map((item) => ({
+  assert.equal(
+    jerseyQuote(
+      socks,
+      variants,
+      {amount: '12.50', currencyCode: 'EUR'},
+      false,
+      pricedShorts,
+    ).total,
+    null,
+  );
+  assert.equal(jerseyQuote(chosen, [], null, false, pricedShorts).total, null);
+  assert.equal(jerseyQuote(chosen, variants, null, false, []).total, null);
+  const euro = pricedShorts.map((item) => ({
     ...item,
     price: {...item.price, currencyCode: 'EUR'},
   }));
-  assert.equal(jerseyQuote(chosen, euro, null, false).shortsSavings, null);
+  assert.equal(jerseyQuote(chosen, variants, null, false, euro).total, null);
 });
 
 test('bundle quotes sum real single prices and require both USD components', () => {
@@ -464,7 +503,7 @@ test('bundle quotes sum real single prices and require both USD components', () 
     ],
   };
   const variants = chosen.jerseys.map((jersey, index) => ({
-    selectedOptions: Object.entries(jerseyOptionValues(jersey, 'None')).map(
+    selectedOptions: Object.entries(jerseyOptionValues(jersey)).map(
       ([name, value]) => ({name, value}),
     ),
     price: {amount: index === 0 ? '73.00' : '82.00', currencyCode: 'USD'},
@@ -538,7 +577,6 @@ test('quotes keep each size attached to its style, including an unchosen first s
     selectedOptions: [
       {name: 'Style', value: style},
       {name: 'Size', value: size},
-      {name: 'Shorts size', value: 'None'},
     ],
     price: {amount, currencyCode: 'USD'},
   }));
@@ -660,12 +698,10 @@ test('different sizes stay attached to their jersey through parsing, canonical o
   const parsed = readJerseySelection(form);
   assert.deepEqual(parsed, chosen);
   assert.deepEqual(
-    parsed.jerseys.map((jersey) =>
-      jerseyOptionValues(jersey, parsed.shortsSize),
-    ),
+    parsed.jerseys.map((jersey) => jerseyOptionValues(jersey)),
     [
-      {Style: awayLong, Size: 'M', 'Shorts size': 'M'},
-      {Style: homeShort, Size: 'XXL', 'Shorts size': 'M'},
+      {Style: awayLong, Size: 'M'},
+      {Style: homeShort, Size: 'XXL'},
     ],
   );
   form.delete('secondSize');
