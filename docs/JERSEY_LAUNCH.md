@@ -49,26 +49,31 @@ unselected, and changing jersey size never changes shorts size. Removing and
 readding an extra preserves its size.
 
 Personalization has no switch. Both fields blank means a plain back; entering
-either field requires both. A mobile back preview shows the selected styles,
-and the fixed mobile purchase bar uses the same total/form as desktop. Both
-buttons use native required-field checks and server validation. The bar hides
+either field requires both. The fixed mobile purchase bar uses the same
+total/form as desktop. Both buttons use native required-field checks and server
+validation. The bar hides
 while the cart is open. Option sections explicitly own their padding to avoid
 the generic section padding in `reset.css`; the print-to-next-divider gap is
 24px. The community floating button is hidden only on this PDP so it cannot
 cover buying controls. No size guide has been added.
 
-The official jersey and shorts photos are in `public/jersey/official`. The
+The official jersey and shorts cutouts are in `public/jersey/cutouts`. The
 gallery, four style choices, second-jersey row, and shorts upsell use these
 photos. Front/back images follow each selected color and sleeve, including
 mixed bundles. Adding shorts switches Front to the matching full-kit photo.
 Shorts and Detail views can be browsed without adding shorts to the order.
-The photos show sample VIOLA/10 printing; Print remains a separately labeled
-illustration of the customer's entered name/number. Socks still use a placeholder
-because the supplied folder contained no socks photos.
+The photos show sample VIOLA/10 printing, as noted beneath the gallery.
+Personalization stays in the name/number fields; there is no illustrated Print
+view or mobile print preview. Socks still use a placeholder because the supplied
+folder contained no socks photos.
 
-The 16 supplied photos were exported with `cwebp -q 88 -m 6 -resize WIDTH 0`
-at widths 160, 640, and 1024 for responsive loading. Originals remain unchanged
-in the supplied `ped-kits/web-product-pictures` folder. File names use
+The 16 supplied photos had their external white backgrounds removed using the
+imagegen edit tool with transparent output. White/cream fabric and printed details
+remain opaque. Cutouts were exported with
+`cwebp -q 88 -alpha_q 100 -m 6 -resize WIDTH 0` at widths 160, 640, and 1024 for
+responsive loading. All exports retain alpha transparency. Image containers
+use the store's existing background. Originals remain unchanged in the supplied
+`ped-kits/web-product-pictures` folder. File names use
 `{home|away}-{short|long}-{front|back|kit}` and `{home|away}-shorts[-detail]`, followed by
 the width and `.webp`. `JerseyPhotos.tsx` owns the mapping used by every surface.
 
@@ -160,7 +165,8 @@ Optional `preorder.shipping_estimate` replaces “Shipping date to be confirmed.
 Name/number are optional and included in the variant price. If either is filled,
 require both a name up to 14 characters and a 1–2 digit number (0–99, leading zeros
 preserved). Names are normalized and uppercased on the server. Confirm print
-limits, font, and placement with the supplier; artwork is not a print proof.
+limits, font, and placement with the supplier; the sample photos are not a
+personalized print proof.
 
 The server resolves exact native options before adding quantity 1. Line
 attributes carry `Order type: Preorder`, bundle `Includes`, and, when selected,

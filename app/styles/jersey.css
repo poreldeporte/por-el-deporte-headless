@@ -40,11 +40,6 @@
   display: grid;
   place-items: center;
 }
-.jersey-stage > svg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
 .jersey-stage-label {
   position: absolute;
   z-index: 1;
@@ -55,9 +50,6 @@
   justify-content: space-between;
   gap: 12px;
   font: 700 12px/1.4 var(--font-body);
-}
-.jersey-stage--photo {
-  background: #fff;
 }
 .jersey-photos {
   display: grid;
@@ -88,12 +80,6 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
-.jersey-artwork-note {
-  position: absolute;
-  bottom: 16px;
-  font: 500 12px/1.5 var(--font-body);
-  color: var(--text-muted);
-}
 .jersey-thumbs {
   grid-template-columns: none;
   grid-auto-flow: column;
@@ -103,28 +89,6 @@
 .jersey-thumb-image {
   position: absolute;
   inset: 0 0 25px;
-  background: #fff;
-}
-.jersey-thumbs svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.jersey-pair {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: center;
-}
-.jersey-pair > svg {
-  position: static;
-  width: 100%;
-  height: 100%;
-}
-.jersey-thumbs .jersey-pair {
-  bottom: 0;
 }
 .jersey-thumb-label {
   position: absolute;
@@ -230,7 +194,6 @@
   flex: none;
   overflow: hidden;
   border-radius: var(--radius-sm);
-  background: #fff;
 }
 .jersey-extra-picture {
   height: 64px;
@@ -454,8 +417,7 @@ body:has(.jersey-page) .pel-fabs .pel-fab--community {
 .jersey-page .pel-pdp__spec-v {
   text-align: right;
 }
-.jersey-mobile-bar,
-.jersey-print-preview {
+.jersey-mobile-bar {
   display: none;
 }
 @media (min-width: 60.01em) {
@@ -482,38 +444,6 @@ body:has(.jersey-page) .pel-fabs .pel-fab--community {
   }
   .jersey-form > .pel-pdp__opt:first-of-type {
     margin-top: 0;
-  }
-  .jersey-print-preview {
-    display: block;
-  }
-  .jersey-print-preview summary {
-    padding: 10px 0;
-    cursor: pointer;
-    font: 600 12px/1.5 var(--font-body);
-    color: var(--text-muted);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-  .jersey-mobile-preview {
-    display: block;
-    padding: 8px 12px 12px;
-    border-radius: var(--radius-md);
-    background: var(--pel-sand);
-    text-align: center;
-  }
-  .jersey-mobile-preview svg {
-    display: block;
-    width: 100%;
-    height: 200px;
-  }
-  .jersey-mobile-preview .jersey-pair {
-    position: static;
-    height: 200px;
-  }
-  .jersey-mobile-preview p {
-    margin: 0;
-    font: 500 12px/1.5 var(--font-body);
-    color: var(--text-muted);
   }
   .jersey-submit--main {
     display: none;

@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState, type ComponentProps} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
 import {Analytics, Money} from '@shopify/hydrogen';
 import type {JerseyPreorderQuery} from 'storefrontapi.generated';
@@ -23,7 +23,6 @@ import {
   personalizationWindow,
   validateJerseySelection,
 } from '~/lib/jersey';
-import {JerseyArtwork} from './JerseyArtwork';
 import {JerseyPhotos, type JerseyPhotoView} from './JerseyPhotos';
 
 type JerseyStyle = (typeof JERSEY_STYLES)[number];
@@ -54,9 +53,7 @@ export function JerseyPage({
   const [shortsSize, setShortsSize] = useState('');
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
-  const [view, setView] = useState<Exclude<JerseyPhotoView, 'kit'> | 'print'>(
-    'front',
-  );
+  const [view, setView] = useState<Exclude<JerseyPhotoView, 'kit'>>('front');
   const [now, setNow] = useState(serverNow);
   const fetcher = useFetcher<typeof action>();
   const feedbackRef = useRef<HTMLDivElement>(null);
@@ -250,47 +247,22 @@ export function JerseyPage({
           </p>
         </div>
         <div className="pel-pdp__gallery jersey-gallery">
-          <div
-            className={`pel-pdp__stage jersey-stage${view !== 'print' ? ' jersey-stage--photo' : ''}`}
-          >
+          <div className="pel-pdp__stage jersey-stage">
             <div className="jersey-stage-label">
               <span>
-                {view === 'print'
-                  ? 'YOUR NAME + NUMBER'
-                  : view === 'shorts' || view === 'detail'
-                    ? 'MATCHING SHORTS'
-                    : bundle
-                      ? 'YOUR TWO JERSEYS'
-                      : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
+                {view === 'shorts' || view === 'detail'
+                  ? 'MATCHING SHORTS'
+                  : bundle
+                    ? 'YOUR TWO JERSEYS'
+                    : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
               </span>
               <span>POR EL DEPORTE</span>
             </div>
-            {view === 'print' ? (
-              <KitArtwork
-                styles={styles}
-                back
-                shorts={false}
-                personalize={selection.personalize}
-                name={name.toUpperCase()}
-                number={number}
-              />
-            ) : (
-              <JerseyPhotos
-                styles={styles}
-                view={view === 'front' && withShorts ? 'kit' : view}
-                sizes={
-                  bundle
-                    ? '(min-width: 60em) 20vw, 50vw'
-                    : '(min-width: 60em) 40vw, 100vw'
-                }
-                priority
-              />
-            )}
-            {view === 'print' && (
-              <span className="jersey-artwork-note">
-                Illustration · final details may vary
-              </span>
-            )}
+            <JerseyPhotos
+              styles={styles}
+              view={view === 'front' && withShorts ? 'kit' : view}
+              priority
+            />
           </div>
           <div
             className="pel-pdp__thumbs jersey-thumbs"
@@ -302,48 +274,34 @@ export function JerseyPage({
                 ['back', 'Back'],
                 ['shorts', 'Shorts'],
                 ['detail', 'Detail'],
-                ...(canPersonalize ? [['print', 'Print'] as const] : []),
               ] as const
             ).map(([option, label]) => (
               <button
                 key={option}
                 type="button"
                 className={`pel-pdp__thumb${view === option ? ' is-active' : ''}`}
-                aria-label={
-                  option === 'print' ? 'Your name & number preview' : label
-                }
+                aria-label={label}
                 aria-pressed={view === option}
                 onClick={() => setView(option)}
               >
                 <span className="jersey-thumb-image" aria-hidden="true">
-                  {option === 'print' ? (
-                    <KitArtwork
-                      styles={styles}
-                      back
-                      shorts={false}
-                      personalize={selection.personalize}
-                      name={name.toUpperCase()}
-                      number={number}
-                    />
-                  ) : (
-                    <JerseyPhotos
-                      styles={styles}
-                      view={option === 'front' && withShorts ? 'kit' : option}
-                      sizes={bundle ? '60px' : '120px'}
-                      decorative
-                    />
-                  )}
+                  <JerseyPhotos
+                    styles={styles}
+                    view={option === 'front' && withShorts ? 'kit' : option}
+                    sizes={bundle ? '60px' : '120px'}
+                    decorative
+                  />
                 </span>
                 <span className="jersey-thumb-label">{label}</span>
               </button>
             ))}
           </div>
           <p className="jersey-gallery-caption">
-            {view === 'print'
-              ? 'Your personalization preview. See Back for the official jersey photo.'
-              : (view === 'shorts' || view === 'detail') && !withShorts
-                ? 'Matching shorts are optional. Add them to your jersey below.'
-                : 'Official product photos. Name and number shown are an example.'}
+            {(view === 'shorts' || view === 'detail') && !withShorts
+              ? 'Matching shorts are optional. Add them to your jersey below.'
+              : canPersonalize
+                ? 'Name and number shown are an example. Add your own below.'
+                : 'Name and number shown are an example.'}
           </p>
         </div>
 
@@ -534,10 +492,7 @@ export function JerseyPage({
                         autoComplete="off"
                         maxLength={NAME_LIMIT}
                         value={name}
-                        onChange={(event) => {
-                          setName(event.target.value);
-                          setView('print');
-                        }}
+                        onChange={(event) => setName(event.target.value)}
                         placeholder="YOUR NAME"
                         required={Boolean(number.trim())}
                         pattern="[\p{L}\p{M} .’'\-]+"
@@ -555,10 +510,7 @@ export function JerseyPage({
                         maxLength={2}
                         pattern="[0-9]{1,2}"
                         value={number}
-                        onChange={(event) => {
-                          setNumber(event.target.value);
-                          setView('print');
-                        }}
+                        onChange={(event) => setNumber(event.target.value)}
                         placeholder="10"
                         required={Boolean(name.trim())}
                         aria-describedby="jersey-print-note"
@@ -568,20 +520,6 @@ export function JerseyPage({
                   <p id="jersey-print-note" className="jersey-print-note">
                     Leave both blank for a plain back. Names print in uppercase.
                   </p>
-                  <details className="jersey-print-preview">
-                    <summary>Preview your name + number</summary>
-                    <div className="jersey-mobile-preview">
-                      <KitArtwork
-                        styles={styles}
-                        back
-                        shorts={false}
-                        personalize={selection.personalize}
-                        name={name.toUpperCase()}
-                        number={number}
-                      />
-                      <p>Illustration · final details may vary</p>
-                    </div>
-                  </details>
                 </>
               ) : (
                 <p className="jersey-hint">
@@ -932,27 +870,6 @@ export function JerseyPage({
         />
       )}
     </div>
-  );
-}
-
-function KitArtwork({
-  styles,
-  ...props
-}: Omit<ComponentProps<typeof JerseyArtwork>, 'away' | 'longSleeve'> & {
-  styles: typeof JERSEY_STYLES;
-}) {
-  const artworks = styles.map((item) => (
-    <JerseyArtwork
-      key={item.value}
-      {...props}
-      away={item.color === JERSEY_COLORS[1]}
-      longSleeve={item.sleeve === 'Long sleeve'}
-    />
-  ));
-  return styles.length === 2 ? (
-    <div className="jersey-pair">{artworks}</div>
-  ) : (
-    artworks[0]
   );
 }
 

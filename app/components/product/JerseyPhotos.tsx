@@ -27,7 +27,7 @@ export function JerseyPhotos({
         const file = shorts
           ? `${color}-shorts${view === 'detail' ? '-detail' : ''}`
           : `${color}-${sleeve}-${view}`;
-        const src = `/jersey/official/${file}`;
+        const src = `/jersey/cutouts/${file}`;
         const alt = shorts
           ? `${home ? 'Cream home' : 'Black away'} shorts${view === 'detail' ? ', diamond panel and crest detail' : ', front'}`
           : `${home ? 'Orange home' : 'Black away'} ${style.sleeve.toLowerCase()} ${view === 'kit' ? 'jersey with matching shorts' : `jersey, ${view}`}${view === 'back' ? ', sample VIOLA 10 personalization' : ''}`;
