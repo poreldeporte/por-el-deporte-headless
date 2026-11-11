@@ -9,9 +9,10 @@ has been performed. Keep the release unpublished until merchant approval.
 The page keeps the existing gallery, four release facts, brand fonts/colors,
 header/footer, size pills, and product detail cards. The “Build your kit” column follows:
 
-1. Four visual choices: home short/long and away short/long, then jersey size.
+1. Four visual choices: home short/long and away short/long.
 2. An inline “Add another jersey” offer with the bundle saving. Add reveals
-   the second style choices; selecting one collapses to an editable item row.
+   the second style choices; selecting one shows matching “Jersey 1” and “Jersey 2”
+   cards with separate Edit controls. The shared jersey size follows these choices.
 3. A selectable matching-shorts photo card. Adding shorts opens its independent
    size choice and switches the gallery to the full-kit photo.
 4. Black/white socks image cards, then one-pair/three-pair pack choices. Selected
@@ -23,8 +24,8 @@ The two-jersey offer mixes any two **different** styles, including short and
 long sleeves of the same color. It is one player's bundle: the jersey size and
 personalization apply to both jerseys. With shorts, it includes two matching
 pairs in one separately selected shorts size. These shared choices are stated
-in the offer before adding. The first style is disabled in the second picker,
-and vice versa, so changing one jersey never silently changes the other.
+in the offer before adding. Each picker excludes the other jersey's style, so
+already-selected jerseys do not look out of stock and edits cannot create duplicates.
 Opening or canceling the picker does not change the order or price. Selecting
 a second style adds it; Edit replaces it and Remove returns to one jersey.
 Size and print choices survive these changes. The second picker shows the
@@ -53,8 +54,13 @@ readding an extra preserves its size.
 Personalization has no switch. Both fields blank means a plain back; entering
 either field requires both. The fixed mobile purchase bar uses the same
 total/form as desktop. Both buttons use native required-field checks and server
-validation. The bar hides
-while the cart is open. Option sections explicitly own their padding to avoid
+validation. Before a jersey size is selected, the mobile action says “Build your
+kit” and moves focus to the builder without submitting. Missing shorts/socks
+sizes get explicit prompts. “View your kit” opens a native modal with the selected
+jersey/shorts photos, socks, sizes, personalization and total. Close, Escape and
+“Continue building” return to the same place; the background is inert while open.
+The modal remains visible and closable when the viewport widens beyond mobile.
+The bar hides while the cart is open. Option sections explicitly own their padding to avoid
 the generic section padding in `reset.css`; the print-to-next-divider gap is
 24px. The community floating button is hidden only on this PDP so it cannot
 cover buying controls. No size guide has been added.
@@ -87,6 +93,11 @@ the color/pack in the submitted review. Changing a selection hides an outdated
 submitted preview until it is reviewed again. The photo cards use the same selected
 state as the jerseys; choosing a color adds the socks. Removing socks restores
 the one-pair default. No size is invented: the preview marks socks sizing as TBC.
+The three-pair price and saving appear before choosing a color. Savings compare
+three actual single-pair prices with the pack price, and are shown before selection
+only when both colors have the same available offer. After choosing a color, its
+own offer applies. Missing prices, mixed currencies and nonpositive savings do
+not produce a savings claim.
 
 No published `ped-socks` product was found. Once configured, the UI uses actual
 color/pack/size variants and prices; socks resolve to a separate line in the same
@@ -108,7 +119,8 @@ exact seven-day deadline, print normalization/validation, all 200 SKU choices,
 mixed-sleeve bundle prices and increments with shorts, independent sizing,
 actual-price quotes, currency mismatches, exact sock color/pack/size resolution,
 and rejection before cart mutation. Blank and partial print fields also cover
-the switch-free flow. Normal lint,
+the switch-free flow. Sock-pack savings cover actual prices and unsupported
+comparisons. Normal lint,
 typecheck, and build commands also apply. Browser review covers desktop/mobile
 choice changes, form validation, official photo mapping, and preview submission.
 

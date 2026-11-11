@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {useFetcher} from 'react-router';
 import {Analytics, Money} from '@shopify/hydrogen';
 import type {JerseyPreorderQuery} from 'storefrontapi.generated';
@@ -12,6 +12,7 @@ import {
   jerseyStyles,
   jerseyQuote,
   subtractPrices,
+  socksPackSavings,
   type Price,
   JERSEY_SIZES,
   JERSEY_STORY,
@@ -24,7 +25,8 @@ import {
   personalizationWindow,
   validateJerseySelection,
 } from '~/lib/jersey';
-import {JerseyPhotos, type JerseyPhotoView} from './JerseyPhotos';
+import {JerseyPhotos, SocksPhoto, type JerseyPhotoView} from './JerseyPhotos';
+import {JerseyKitPreview} from './JerseyKitPreview';
 
 type JerseyStyle = (typeof JERSEY_STYLES)[number];
 
@@ -41,6 +43,7 @@ export function JerseyPage({
 }) {
   const [firstStyle, setFirstStyle] = useState(JERSEY_STYLES[0]);
   const [secondStyle, setSecondStyle] = useState<JerseyStyle | null>(null);
+  const [editingFirst, setEditingFirst] = useState(false);
   const [editingSecond, setEditingSecond] = useState(false);
   const bundle = Boolean(secondStyle);
   const styles = secondStyle ? [firstStyle, secondStyle] : [firstStyle];
@@ -59,6 +62,9 @@ export function JerseyPage({
   const [now, setNow] = useState(serverNow);
   const fetcher = useFetcher<typeof action>();
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const kitPreviewRef = useRef<HTMLDialogElement>(null);
+  const builderRef = useRef<HTMLHeadingElement>(null);
+  const editFirstRef = useRef<HTMLButtonElement>(null);
   const addSecondRef = useRef<HTMLButtonElement>(null);
   const editSecondRef = useRef<HTMLButtonElement>(null);
   const {open, type: asideType} = useAside();
@@ -118,6 +124,29 @@ export function JerseyPage({
   const selectedSocks = sockChoices.find(
     (item) => item.color === socksColor && item.pack === socksPack,
   );
+  const sockOffers = PED_SOCKS_COLORS.map((color) => {
+    const single = sockChoices.find(
+      (item) => item.color === color && item.pack === '1 pair',
+    );
+    const pack = sockChoices.find(
+      (item) => item.color === color && item.pack === '3 pairs',
+    );
+    const saving = socksPackSavings(single?.price ?? null, pack?.price ?? null);
+    if (!single?.available || !pack?.available || !pack.price || !saving)
+      return null;
+    return {color, price: pack.price, saving};
+  });
+  const socksOffer = withSocks
+    ? sockOffers.find((offer) => offer?.color === socksColor)
+    : sockOffers.every(
+          (offer) =>
+            offer &&
+            offer.price.amount === sockOffers[0]?.price.amount &&
+            offer.price.currencyCode === sockOffers[0]?.price.currencyCode &&
+            offer.saving.amount === sockOffers[0]?.saving.amount,
+        )
+      ? sockOffers[0]
+      : null;
   const quote = jerseyQuote(
     selection,
     product?.variants.nodes ?? [],
@@ -189,6 +218,15 @@ export function JerseyPage({
         : preview
           ? 'Review preorder'
           : 'Preorder now';
+  const mobileSubmitLabel = submitDisabled
+    ? submitLabel
+    : !size
+      ? 'Build your kit'
+      : withShorts && !shortsSize
+        ? 'Choose shorts size'
+        : !socksComplete
+          ? 'Choose socks size'
+          : submitLabel;
   const closes = window.endsAt
     ? new Intl.DateTimeFormat('en-US', {
         month: 'short',
@@ -326,7 +364,7 @@ export function JerseyPage({
               role="group"
               aria-label="Socks in your kit"
             >
-              <PhotoPlaceholder label={`${socksColor} socks`} />
+              <SocksPhoto color={socksColor} />
               <div className="jersey-addon-copy">
                 <strong>{socksColor} PED socks</strong>
                 <small>{socksPack} · added to your kit</small>
@@ -343,68 +381,80 @@ export function JerseyPage({
             className="jersey-form"
           >
             <input type="hidden" name="style" value={style} />
-            <h2 className="jersey-builder-title">Build your kit</h2>
-            <StyleChoice
-              label="Choose your jersey"
-              name="firstStyle"
-              value={firstStyle.value}
-              choices={styleChoices}
-              unavailable={secondStyle?.value}
-              unavailableLabel="Second jersey"
-              onChange={(item) => {
-                setFirstStyle(item);
-                setView('front');
-              }}
-            />
-            <SizeChoice
-              name="size"
-              label={bundle ? 'Size · both jerseys' : 'Size'}
-              value={size}
-              onChange={setSize}
-            />
+            <h2 ref={builderRef} tabIndex={-1} className="jersey-builder-title">
+              Build your kit
+            </h2>
+            {secondStyle && (
+              <SelectedJersey number={1} style={firstStyle}>
+                <button
+                  ref={editFirstRef}
+                  type="button"
+                  className="jersey-text-button"
+                  aria-label="Edit jersey 1"
+                  aria-expanded={editingFirst}
+                  aria-controls="jersey-first-options"
+                  onClick={() => {
+                    setEditingFirst(!editingFirst);
+                    setEditingSecond(false);
+                  }}
+                >
+                  {editingFirst ? 'Done' : 'Edit'}
+                </button>
+              </SelectedJersey>
+            )}
+            {(!secondStyle || editingFirst) && (
+              <div id="jersey-first-options" className="jersey-first-choice">
+                <StyleChoice
+                  label={bundle ? 'Change jersey 1' : 'Choose your jersey'}
+                  name="firstStyle"
+                  value={firstStyle.value}
+                  choices={styleChoices.filter(
+                    (item) => item.style.value !== secondStyle?.value,
+                  )}
+                  onChange={(item) => {
+                    setFirstStyle(item);
+                    setEditingFirst(false);
+                    setView('front');
+                    if (bundle)
+                      requestAnimationFrame(() =>
+                        editFirstRef.current?.focus({preventScroll: true}),
+                      );
+                  }}
+                />
+              </div>
+            )}
 
             <section
-              className="jersey-bundle"
+              className={`jersey-bundle${bundle ? ' jersey-bundle--selected' : ''}`}
               aria-labelledby="jersey-bundle-heading"
             >
               {secondStyle ? (
-                <div className="jersey-addon-row jersey-bundle-item">
-                  <StylePicture style={secondStyle} />
-                  <div className="jersey-addon-copy">
-                    <h2 id="jersey-bundle-heading">
-                      {secondStyle.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}{' '}
-                      · {secondStyle.sleeve}
-                    </h2>
-                    <small className="jersey-addon-saving">
-                      {secondChoice?.savings ? (
-                        <>
-                          Bundle ·{' '}
-                          <Money data={secondChoice.savings} as="span" /> saved
-                        </>
-                      ) : (
-                        'Two-jersey bundle'
-                      )}
-                    </small>
-                    <small>Same size and name + number</small>
-                  </div>
-                  <div className="jersey-item-actions">
+                <>
+                  <h2 id="jersey-bundle-heading" className="sr-only">
+                    Your jersey bundle
+                  </h2>
+                  <SelectedJersey number={2} style={secondStyle}>
                     <button
                       type="button"
                       className="jersey-text-button"
                       ref={editSecondRef}
-                      aria-label="Edit second jersey"
+                      aria-label="Edit jersey 2"
                       aria-expanded={editingSecond}
                       aria-controls="jersey-second-options"
-                      onClick={() => setEditingSecond(!editingSecond)}
+                      onClick={() => {
+                        setEditingSecond(!editingSecond);
+                        setEditingFirst(false);
+                      }}
                     >
-                      Edit
+                      {editingSecond ? 'Done' : 'Edit'}
                     </button>
                     <button
                       type="button"
                       className="jersey-text-button"
-                      aria-label="Remove second jersey"
+                      aria-label="Remove jersey 2"
                       onClick={() => {
                         setSecondStyle(null);
+                        setEditingFirst(false);
                         setEditingSecond(false);
                         requestAnimationFrame(() =>
                           addSecondRef.current?.focus({preventScroll: true}),
@@ -413,8 +463,19 @@ export function JerseyPage({
                     >
                       Remove
                     </button>
-                  </div>
-                </div>
+                  </SelectedJersey>
+                  <p className="jersey-hint">
+                    {secondChoice?.savings ? (
+                      <>
+                        Bundle · <Money data={secondChoice.savings} as="span" />{' '}
+                        saved
+                      </>
+                    ) : (
+                      'Two-jersey bundle'
+                    )}{' '}
+                    · Same size and name + number on both.
+                  </p>
+                </>
               ) : (
                 <div className="jersey-bundle-offer">
                   <div className="jersey-addon-copy">
@@ -457,12 +518,12 @@ export function JerseyPage({
                     </p>
                   )}
                   <StyleChoice
-                    label="Choose your second jersey"
+                    label={secondStyle ? 'Change jersey 2' : 'Choose jersey 2'}
                     name="secondStyle"
                     value={secondStyle?.value ?? ''}
-                    choices={secondChoices}
-                    unavailable={firstStyle.value}
-                    unavailableLabel="Your first jersey"
+                    choices={secondChoices.filter(
+                      (item) => item.style.value !== firstStyle.value,
+                    )}
                     additional
                     onChange={(item) => {
                       setSecondStyle(item);
@@ -476,6 +537,13 @@ export function JerseyPage({
                 </div>
               )}
             </section>
+
+            <SizeChoice
+              name="size"
+              label={bundle ? 'Size · both jerseys' : 'Size'}
+              value={size}
+              onChange={setSize}
+            />
 
             <section
               className="jersey-shorts"
@@ -582,6 +650,12 @@ export function JerseyPage({
                 </div>
                 <fieldset className="jersey-sock-options">
                   <legend className="sr-only">Socks color</legend>
+                  {socksOffer && (
+                    <p className="jersey-socks-offer">
+                      3 pairs for <Money data={socksOffer.price} as="span" /> ·
+                      Save <Money data={socksOffer.saving} as="span" />
+                    </p>
+                  )}
                   <div className="jersey-style-grid">
                     {PED_SOCKS_COLORS.map((value) => {
                       const choice = sockChoices.find(
@@ -606,7 +680,7 @@ export function JerseyPage({
                             className="jersey-style-picture"
                             aria-hidden="true"
                           >
-                            <PhotoPlaceholder label={`${value} socks`} />
+                            <SocksPhoto color={value} />
                           </span>
                           <span className="jersey-style-copy">
                             <strong>{value}</strong>
@@ -906,34 +980,52 @@ export function JerseyPage({
         </div>
       </section>
       {asideType === 'closed' && (
-        <section className="jersey-mobile-bar" aria-label="Jersey preorder">
-          <div className="jersey-mobile-total" aria-live="polite">
-            {price ? <Money data={price} as="span" /> : <span>—</span>}
-            <span>
-              {size
-                ? `${bundle ? '2 jerseys' : 'Jersey'} · ${size}`
-                : 'Choose your fit'}
-              {size && withShorts ? ` · Shorts ${shortsSize || 'size?'}` : ''}
-            </span>
-          </div>
-          <button
-            type="submit"
-            form="jersey-preorder-form"
-            className="pel-pdp__cta jersey-submit"
-            disabled={submitDisabled}
-            onClick={(event) => {
-              const form = event.currentTarget.form;
-              if (form && !readyToSubmit && !form.reportValidity()) {
-                event.preventDefault();
-                form
-                  .querySelector<HTMLInputElement>('input:invalid')
-                  ?.scrollIntoView({block: 'center'});
-              }
-            }}
-          >
-            {submitLabel}
-          </button>
-        </section>
+        <>
+          <section className="jersey-mobile-bar" aria-label="Jersey preorder">
+            <div className="jersey-mobile-total">
+              <span aria-live="polite">
+                {price ? <Money data={price} as="span" /> : '—'}
+              </span>
+              <button
+                type="button"
+                className="jersey-kit-trigger"
+                aria-haspopup="dialog"
+                aria-controls="jersey-kit-preview"
+                onClick={() => kitPreviewRef.current?.showModal()}
+              >
+                View your kit
+              </button>
+            </div>
+            <button
+              type={size ? 'submit' : 'button'}
+              form="jersey-preorder-form"
+              className="pel-pdp__cta jersey-submit"
+              disabled={submitDisabled}
+              onClick={(event) => {
+                if (!size) {
+                  builderRef.current?.focus({preventScroll: true});
+                  builderRef.current?.scrollIntoView({block: 'start'});
+                  return;
+                }
+                const form = event.currentTarget.form;
+                if (form && !readyToSubmit && !form.reportValidity()) {
+                  event.preventDefault();
+                  form
+                    .querySelector<HTMLInputElement>('input:invalid')
+                    ?.scrollIntoView({block: 'center'});
+                }
+              }}
+            >
+              {mobileSubmitLabel}
+            </button>
+          </section>
+          <JerseyKitPreview
+            dialogRef={kitPreviewRef}
+            styles={styles}
+            selection={selection}
+            price={price}
+          />
+        </>
       )}
       {!preview && product && priceVariant && (
         <Analytics.ProductView
@@ -956,13 +1048,38 @@ export function JerseyPage({
   );
 }
 
+function SelectedJersey({
+  number,
+  style,
+  children,
+}: {
+  number: number;
+  style: JerseyStyle;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className="jersey-addon-row jersey-selected-jersey"
+      role="group"
+      aria-label={`Jersey ${number}`}
+    >
+      <StylePicture style={style} />
+      <div className="jersey-addon-copy">
+        <h3>Jersey {number}</h3>
+        <small>
+          {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} · {style.sleeve}
+        </small>
+      </div>
+      <div className="jersey-item-actions">{children}</div>
+    </div>
+  );
+}
+
 function StyleChoice({
   label,
   name,
   value,
   choices,
-  unavailable,
-  unavailableLabel,
   additional,
   onChange,
 }: {
@@ -973,8 +1090,6 @@ function StyleChoice({
     style: JerseyStyle;
     price: Price | null;
   }[];
-  unavailable?: string;
-  unavailableLabel: string;
   additional?: boolean;
   onChange: (style: JerseyStyle) => void;
 }) {
@@ -983,7 +1098,7 @@ function StyleChoice({
       <legend className="pel-pdp__opt-label">{label}</legend>
       <div className="jersey-style-grid">
         {choices.map(({style, price}) => {
-          const disabled = style.value === unavailable || !price;
+          const disabled = !price;
           const className = `jersey-style-option${style.value === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`;
           const content = (
             <>
@@ -994,9 +1109,7 @@ function StyleChoice({
                 </strong>
                 <span>{style.sleeve}</span>
                 <small>
-                  {style.value === unavailable ? (
-                    unavailableLabel
-                  ) : price ? (
+                  {price ? (
                     <>
                       {additional ? '+' : ''}
                       <Money data={price} as="span" />
@@ -1079,27 +1192,5 @@ function SizeChoice({
         ))}
       </div>
     </fieldset>
-  );
-}
-
-function PhotoPlaceholder({label}: {label: string}) {
-  return (
-    <span
-      className="jersey-photo-placeholder"
-      aria-label={`${label} photo coming soon`}
-    >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.2"
-        aria-hidden="true"
-      >
-        <rect x="3" y="4" width="18" height="16" rx="2" />
-        <circle cx="8" cy="9" r="1.5" />
-        <path d="m3 17 6-5 4 4 3-3 5 5" />
-      </svg>
-      <small>Photo soon</small>
-    </span>
   );
 }

@@ -329,6 +329,13 @@ export function jerseyQuote(
   };
 }
 
+export function socksPackSavings(single: Price | null, pack: Price | null) {
+  const separate = single
+    ? {...single, amount: (Number(single.amount) * 3).toFixed(2)}
+    : null;
+  return positivePrice(subtractPrices(separate, pack));
+}
+
 function sumPrices(prices: (Price | null)[]): Price | null {
   const first = prices[0];
   if (

@@ -10,6 +10,7 @@ import {
   jerseyPreviewPrice,
   jerseyQuote,
   subtractPrices,
+  socksPackSavings,
   matchesSocksVariant,
   matchesJerseyVariant,
   personalizationWindow,
@@ -404,4 +405,23 @@ test('the second jersey quote includes its matching shorts when shorts are selec
       Number(subtractPrices(mixed.kitPrice, first.kitPrice).amount),
     160,
   );
+});
+
+test('socks pack savings use actual prices and suppress unsupported comparisons', () => {
+  const single = {amount: '10.00', currencyCode: 'USD'};
+  const pack = {amount: '25.00', currencyCode: 'USD'};
+  assert.deepEqual(socksPackSavings(single, pack), {
+    amount: '5.00',
+    currencyCode: 'USD',
+  });
+  assert.equal(
+    socksPackSavings({...single, amount: '12.50'}, {...pack, amount: '32.00'})
+      .amount,
+    '5.50',
+  );
+  assert.equal(socksPackSavings(null, pack), null);
+  assert.equal(socksPackSavings(single, null), null);
+  assert.equal(socksPackSavings(single, {...pack, currencyCode: 'EUR'}), null);
+  assert.equal(socksPackSavings(single, {...pack, amount: '30.00'}), null);
+  assert.equal(socksPackSavings(single, {...pack, amount: '35.00'}), null);
 });
