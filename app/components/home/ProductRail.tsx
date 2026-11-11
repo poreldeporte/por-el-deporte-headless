@@ -4,6 +4,8 @@ import {Image, Money} from '@shopify/hydrogen';
 import type {HomeRailProductFragment} from 'storefrontapi.generated';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
+import {JerseyPhotos} from '~/components/product/JerseyPhotos';
+import {JERSEY_HANDLE, JERSEY_STYLES} from '~/lib/jersey';
 
 /**
  * "Shop Our Signature Gear" — a horizontally-scrolling rail of real products.
@@ -136,9 +138,11 @@ export function ProductRail({products}: {products: HomeRailProductFragment[]}) {
 
 function RailCard({product}: {product: HomeRailProductFragment}) {
   const {open} = useAside();
+  const isJersey = product.handle === JERSEY_HANDLE;
   const to = `/products/${product.handle}`;
   const image = product.featuredImage;
   const variant = product.selectedOrFirstAvailableVariant;
+  const price = isJersey ? product.priceRange.minVariantPrice : variant?.price;
   const available = Boolean(variant?.availableForSale);
   // Any option with more than one value is a decision the shopper has to make.
   const needsChoice = (product.options ?? []).some(
@@ -148,7 +152,13 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
     <div className="pel-card">
       <Link className="pel-card__link" to={to}>
         <div className="pel-card__imgwell">
-          {image ? (
+          {isJersey ? (
+            <JerseyPhotos
+              styles={[JERSEY_STYLES[0]]}
+              view="front"
+              sizes="(min-width: 48em) 260px, 60vw"
+            />
+          ) : image ? (
             <Image
               data={image}
               className="pel-card__img"
@@ -158,9 +168,10 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
           ) : null}
         </div>
         <h3 className="pel-card__title">{product.title}</h3>
-        {variant?.price ? (
+        {price ? (
           <div className="pel-card__price">
-            <Money data={variant.price} />
+            {isJersey ? 'From ' : null}
+            <Money data={price} />
           </div>
         ) : null}
       </Link>
@@ -171,7 +182,11 @@ function RailCard({product}: {product: HomeRailProductFragment}) {
             send you to the page to choose instead. */}
         {needsChoice ? (
           <Link className="pel-btn-outline" to={to}>
-            {available ? 'Choose Options' : 'Sold Out'}
+            {available
+              ? isJersey
+                ? 'Build your kit'
+                : 'Choose Options'
+              : 'Sold Out'}
           </Link>
         ) : (
           <AddToCartButton

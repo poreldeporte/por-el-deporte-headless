@@ -48,7 +48,7 @@ export function PelHeader({floating = false}: {floating?: boolean} = {}) {
 
   return (
     <header className={className}>
-      {/* The regular one-week delivery message does not apply to this preorder. */}
+      {/* Keep the unconfirmed shipping date explicit on the preorder page. */}
       <PelMarquee items={isJerseyPreorder ? JERSEY_MARQUEE_ITEMS : MARQUEE_ITEMS} />
       <div className="pel-siteheader__inner">
         <nav className="pel-siteheader__links" aria-label="Primary">
