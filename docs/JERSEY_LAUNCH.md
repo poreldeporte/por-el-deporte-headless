@@ -7,15 +7,17 @@ has been performed. Keep the release unpublished until merchant approval.
 ## Buying experience
 
 The page keeps the existing gallery, four release facts, brand fonts/colors,
-header/footer, size pills, and product detail cards. The buying column follows:
+header/footer, size pills, and product detail cards. The “Build your kit” column follows:
 
 1. Four visual choices: home short/long and away short/long, then jersey size.
 2. An inline “Add another jersey” offer with the bundle saving. Add reveals
    the second style choices; selecting one collapses to an editable item row.
-3. Optional included name/number during launch week, with both fields visible.
-4. Compact matching shorts and PED socks rows. Adding shorts opens its own
-   size choice directly beneath the row.
-5. The purchase button and shipping note, without an order summary above them.
+3. A selectable matching-shorts photo card. Adding shorts opens its independent
+   size choice and switches the gallery to the full-kit photo.
+4. Black/white socks image cards, then one-pair/three-pair pack choices. Selected
+   socks also appear beside the gallery. Socks images remain labeled placeholders.
+5. Optional included name/number during launch week, with both fields visible.
+6. The purchase button and shipping note, without an order summary above them.
 
 The two-jersey offer mixes any two **different** styles, including short and
 long sleeves of the same color. It is one player's bundle: the jersey size and
@@ -77,14 +79,21 @@ use the store's existing background. Originals remain unchanged in the supplied
 `{home|away}-{short|long}-{front|back|kit}` and `{home|away}-shorts[-detail]`, followed by
 the width and `.webp`. `JerseyPhotos.tsx` owns the mapping used by every surface.
 
-PED socks use direct **Black / White** choices with real prices, followed by
-Remove once selected. Socks price and sizes are still unconfirmed, and no
-published `ped-socks` product was found. Until configured, the preview shows
-one quiet placeholder row without unavailable buying controls. No free or
-guessed sock price is charged. Once the product exists, the UI uses its actual
-color/size variants and prices; socks resolve to a separate line in the same
-cart mutation. Unknown/out-of-stock combinations fail before the cart write.
-Size choices are shown only if needed.
+PED socks use visual **Black / White** choices, followed by a pack choice and
+Remove once selected. Merchant-confirmed prices are **$10 for one pair** and
+**$25 for three pairs**, all in the chosen color. The local preview supports
+adding, switching and removing both packs, updates the full total, and includes
+the color/pack in the submitted review. Changing a selection hides an outdated
+submitted preview until it is reviewed again. The photo cards use the same selected
+state as the jerseys; choosing a color adds the socks. Removing socks restores
+the one-pair default. No size is invented: the preview marks socks sizing as TBC.
+
+No published `ped-socks` product was found. Once configured, the UI uses actual
+color/pack/size variants and prices; socks resolve to a separate line in the same
+cart mutation. Each pack is a priced SKU with cart quantity **1**. A three-pack
+must resolve its own $25 SKU rather than adding three $10 singles. Unknown or
+out-of-stock combinations fail before the cart write. Size choices appear only
+when the product has multiple sizes.
 
 ## Local review and verification
 
@@ -97,8 +106,9 @@ real jersey product exists. The route remains `noindex, nofollow`.
 Focused domain checks: `node --test tests/jersey.mjs` on Node 24. They cover the
 exact seven-day deadline, print normalization/validation, all 200 SKU choices,
 mixed-sleeve bundle prices and increments with shorts, independent sizing,
-actual-price quotes, currency mismatches, sock resolution, and rejection before
-cart mutation. Blank and partial print fields also cover the switch-free flow. Normal lint,
+actual-price quotes, currency mismatches, exact sock color/pack/size resolution,
+and rejection before cart mutation. Blank and partial print fields also cover
+the switch-free flow. Normal lint,
 typecheck, and build commands also apply. Browser review covers desktop/mobile
 choice changes, form validation, official photo mapping, and preview submission.
 
@@ -148,9 +158,12 @@ The UI derives savings from those actual prices and suppresses unsupported
 currency comparisons.
 
 Create the socks product with handle `ped-socks`, exact native `Color` values
-`Black`/`White`, and optional `Size` values matching the confirmed range. No sock
-catalog file is prepared until price/sizing are supplied. A one-value size is
-selected automatically; multiple sizes require a customer choice.
+`Black`/`White`, exact `Pack` values `1 pair`/`3 pairs`, and optional `Size` values
+matching the confirmed range. Price the packs at $10/$25 respectively. Confirm
+sizing before preparing its catalog import. A one-value size is selected
+automatically; multiple sizes require a customer choice. Three-pair packs contain
+the selected color and size throughout; inventory and fulfillment belong to the
+pack SKU.
 
 Create `preorder.starts_at` on the jersey product (date/time with Storefront
 access). Set it only to the approved launch instant with an explicit timezone,
@@ -179,7 +192,7 @@ second real SKU, and all line IDs are validated before one `cart.addLines`.
 ## Launch review
 
 Before publishing, approve the page/prices and supplied jersey/shorts photos,
-provide socks photos, confirm sock price/sizes and print limits, set up all
+provide socks photos, confirm sock sizes and print limits, set up all
 variants, agree the launch time, and confirm shipping language. Verify a real
 personalized mixed-sleeve kit plus socks through cart and Shopify checkout
 without placing a paid order. Verify bundle contents, both sizes, print fields,

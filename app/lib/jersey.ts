@@ -27,6 +27,10 @@ export const JERSEY_STYLE_OPTIONS = [
 ];
 export const PED_SOCKS_HANDLE = 'ped-socks';
 export const PED_SOCKS_COLORS = ['Black', 'White'] as const;
+export const PED_SOCKS_PACKS = [
+  {value: '1 pair', price: {amount: '10.00', currencyCode: 'USD'}},
+  {value: '3 pairs', price: {amount: '25.00', currencyCode: 'USD'}},
+] as const;
 export const JERSEY_SHORTS_OPTIONS = ['None', ...JERSEY_SIZES] as const;
 export const JERSEY_SHORTS_VALUE = {
   amount: '35.00',
@@ -45,6 +49,7 @@ export type JerseySelection = {
   name: string;
   number: string;
   socksColor: string;
+  socksPack: string;
   socksSize: string;
 };
 
@@ -84,6 +89,7 @@ export function readJerseySelection(form: FormData): JerseySelection {
     name,
     number,
     socksColor,
+    socksPack: socksColor === 'None' ? '1 pair' : text('socksPack'),
     socksSize: socksColor === 'None' ? '' : text('socksSize'),
   };
 }
@@ -108,6 +114,11 @@ export function validateJerseySelection(
   ) {
     return 'Choose black or white PED socks, or remove the socks.';
   }
+  if (
+    selection.socksColor !== 'None' &&
+    !PED_SOCKS_PACKS.some(({value}) => value === selection.socksPack)
+  )
+    return 'Choose one pair or three pairs of PED socks.';
   if (!personalize) return null;
   if (!canPersonalize)
     return 'The personalization window has closed. Choose a jersey without personalization.';
@@ -164,10 +175,11 @@ export function matchesJerseyVariant(
 
 export function matchesSocksVariant(
   options: {name: string; value: string}[],
-  selection: Pick<JerseySelection, 'socksColor' | 'socksSize'>,
+  selection: Pick<JerseySelection, 'socksColor' | 'socksPack' | 'socksSize'>,
 ) {
   const expected = {
     Color: selection.socksColor,
+    Pack: selection.socksPack,
     ...(selection.socksSize ? {Size: selection.socksSize} : {}),
   };
   return (

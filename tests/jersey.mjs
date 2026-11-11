@@ -33,6 +33,7 @@ const selection = {
   name: 'VIOLA',
   number: '07',
   socksColor: 'None',
+  socksPack: '1 pair',
   socksSize: '',
 };
 
@@ -75,7 +76,7 @@ test('a mixed sleeve bundle resolves a real SKU with explicit fulfillment conten
   assert.match(jerseyCartLines(chosen, [], []).error, /unavailable/);
 });
 
-test('socks are resolved by exact color and size and never appended with an invalid SKU', () => {
+test('socks resolve the exact color, pack and size before adding one priced SKU', () => {
   const chosen = {...selection, socksColor: 'White', socksSize: 'L'};
   const jersey = {
     id: 'jersey-xl-m',
@@ -91,6 +92,7 @@ test('socks are resolved by exact color and size and never appended with an inva
     availableForSale: true,
     selectedOptions: [
       {name: 'Color', value: 'White'},
+      {name: 'Pack', value: '1 pair'},
       {name: 'Size', value: 'L'},
     ],
   };
@@ -107,6 +109,23 @@ test('socks are resolved by exact color and size and never appended with an inva
     merchandiseId: 'white-socks-l',
     quantity: 1,
   });
+  const threePairs = {...chosen, socksPack: '3 pairs'};
+  const pack = {
+    ...sock,
+    id: 'white-socks-three-pack-l',
+    selectedOptions: sock.selectedOptions.map((option) =>
+      option.name === 'Pack' ? {...option, value: '3 pairs'} : option,
+    ),
+  };
+  assert.equal(matchesSocksVariant(sock.selectedOptions, threePairs), false);
+  assert.deepEqual(jerseyCartLines(threePairs, [jersey], [sock]).lines, []);
+  assert.deepEqual(
+    jerseyCartLines(threePairs, [jersey], [sock, pack]).lines[1],
+    {
+      merchandiseId: 'white-socks-three-pack-l',
+      quantity: 1,
+    },
+  );
   for (const stock of [[], [{...sock, availableForSale: false}]]) {
     const order = jerseyCartLines(chosen, [jersey], stock);
     assert.match(order.error, /socks are not available/);
@@ -115,11 +134,18 @@ test('socks are resolved by exact color and size and never appended with an inva
   const form = new FormData();
   for (const [key, value] of Object.entries(chosen)) form.set(key, value);
   assert.equal(readJerseySelection(form).socksColor, 'White');
+  form.set('socksPack', '3 pairs');
+  assert.equal(readJerseySelection(form).socksPack, '3 pairs');
   form.set('socksColor', 'None');
   assert.equal(readJerseySelection(form).socksColor, 'None');
+  assert.equal(readJerseySelection(form).socksPack, '1 pair');
   assert.match(
     validateJerseySelection({...chosen, socksColor: ''}, true),
     /black or white/,
+  );
+  assert.match(
+    validateJerseySelection({...chosen, socksPack: '2 pairs'}, true),
+    /one pair or three pairs/,
   );
 });
 
