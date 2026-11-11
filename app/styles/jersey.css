@@ -10,6 +10,22 @@
   grid-area: intro;
   min-width: 0;
 }
+.jersey-intro .pel-pdp__lead strong {
+  color: var(--pel-ink);
+}
+.jersey-designer {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 16px 0 0;
+  font: 500 14px/1.5 var(--font-body);
+  color: var(--pel-ink);
+}
+.jersey-designer strong {
+  font: 650 22px/1.2 var(--font-display);
+  text-transform: uppercase;
+}
 .jersey-visual {
   display: contents;
 }

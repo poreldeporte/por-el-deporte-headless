@@ -306,8 +306,14 @@ export function JerseyPage({
           </p>
           <h1 className="pel-pdp__title">{product?.title || JERSEY_TITLE}</h1>
           <p className="pel-pdp__lead">
-            Our official jersey, released once every two years. Made with love
-            for the people who make this club.
+            <strong>We came for the game. We stayed for the people.</strong>{' '}
+            Our official jersey celebrates the friendships, the post-game
+            stories, and the community we’ve built in Key Biscayne and beyond.
+            Made with love and released just once every two years. Wear it with
+            pride, wherever you play.
+          </p>
+          <p className="jersey-designer">
+            Jersey design by <strong>Sergio Gomez</strong>
           </p>
           <div className="pel-pdp__price" aria-live="polite">
             {price ? <Money data={price} /> : <span>Select your kit</span>}
@@ -1030,7 +1036,6 @@ export function JerseyPage({
               <p key={paragraph}>{paragraph}</p>
             ))}
           </div>
-          <p className="jersey-hint">Jersey design by Sergio Gomez</p>
           <div className="pel-pdp__card-foot">Est. 2014 · Key Biscayne</div>
         </div>
         <div className="pel-pdp__card">
