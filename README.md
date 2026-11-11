@@ -18,9 +18,11 @@ Hydrogen stack: React Router, strict TypeScript, Tailwind, and Oxygen.
   → branded cart drawer → Shopify-hosted checkout (`checkoutUrl`).
 - **Branded across all routes**: global `PelHeader` (non-home) + `PelFooter`, and
   the collection (PLP), product (PDP), and cart pages styled to the design system.
-- CI runs lint + typecheck + build on every push/PR (`.github/workflows/ci.yml`).
-- **Next: deploy.** The app is not yet on Oxygen — see "Deploy to Oxygen" below.
-  This step needs Shopify CLI auth and is a go-live decision.
+- **Live on Oxygen** at https://poreldeporte.com. CI checks pull requests;
+  passing `main` builds deploy through the existing Oxygen connection.
+- **Club Jersey preorder**: Home/Away, short/long sleeves, optional matching
+  shorts, one-size sock packs and launch-week personalization. See
+  [the launch guide](docs/JERSEY_LAUNCH.md) for catalog and checkout contracts.
 
 See [docs/BUILD_GUIDE.md](docs/BUILD_GUIDE.md) for the architecture + a
 concept-by-concept tour of how it was built.

@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {Link, NavLink} from 'react-router';
+import {Link, NavLink, useLocation} from 'react-router';
 import {CartButton} from '~/components/home/CartButton';
 import {PelLogoMark} from '~/components/PelLogo';
 import {PelMarquee, MARQUEE_ITEMS} from '~/components/PelMarquee';
@@ -12,7 +12,14 @@ import {PelMarquee, MARQUEE_ITEMS} from '~/components/PelMarquee';
 const navClass = ({isActive}: {isActive: boolean}) =>
   isActive ? 'is-active' : undefined;
 
+const JERSEY_MARQUEE_ITEMS = [
+  {id: 'kit', text: 'The New Club Jersey'},
+  {id: 'btg', text: 'Beyond the Game'},
+  {id: 'preorder', text: 'Preorder · Shipping Date to Be Confirmed'},
+];
+
 export function PelHeader({floating = false}: {floating?: boolean} = {}) {
+  const isJerseyPreorder = useLocation().pathname.replace(/\/$/, '') === '/products/club-jersey';
   // The homepage has no header of its own — its nav is absolutely positioned
   // over the hero and scrolls away, leaving nothing to navigate or reach the
   // cart with. In `floating` mode the same header is fixed off-screen and slides
@@ -41,7 +48,8 @@ export function PelHeader({floating = false}: {floating?: boolean} = {}) {
 
   return (
     <header className={className}>
-      <PelMarquee items={MARQUEE_ITEMS} />
+      {/* The regular one-week delivery message does not apply to this preorder. */}
+      <PelMarquee items={isJerseyPreorder ? JERSEY_MARQUEE_ITEMS : MARQUEE_ITEMS} />
       <div className="pel-siteheader__inner">
         <nav className="pel-siteheader__links" aria-label="Primary">
           <NavLink to="/" end className={navClass}>

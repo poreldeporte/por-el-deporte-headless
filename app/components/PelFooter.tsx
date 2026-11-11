@@ -12,7 +12,7 @@ const FOOTER_COLS: {h: string; items: FooterLink[]}[] = [
   {
     h: 'Shop',
     items: [
-      {t: '“Palmas” Jersey', to: '/products/kit-launch'},
+      {t: 'The Club Jersey', to: '/products/club-jersey'},
       {t: 'Tropical Tees', to: '/collections/all-tees'},
       // "Official Kits" pointed here and the collection has zero products, so
       // every page in the site linked to an empty shelf. Put it back once the

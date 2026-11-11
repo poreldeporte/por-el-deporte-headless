@@ -1,6 +1,6 @@
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
-import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
+import {CartForm, Image, Money, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
@@ -85,6 +85,26 @@ export function CartLineItem({
                   {option.name}: {option.value}
                 </li>
               ))}
+            {line.attributes
+              ?.filter(({key}) => ['Order type', 'Includes', 'Name on back', 'Number on back'].includes(key))
+              .map(({key, value}) => <li key={key}>{key}: {value}</li>)}
+            {line.discountAllocations
+              ?.filter(
+                ({discountedAmount}) => Number(discountedAmount.amount) > 0,
+              )
+              .map((discount) => {
+                const label =
+                  'title' in discount
+                    ? discount.title
+                    : 'code' in discount
+                      ? discount.code
+                      : 'Discount';
+                return (
+                  <li key={label}>
+                    {label}: −<Money data={discount.discountedAmount} />
+                  </li>
+                );
+              })}
           </ul>
           <CartLineQuantity line={line} />
         </div>
