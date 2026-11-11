@@ -7,7 +7,14 @@ has been performed. Keep the release unpublished until merchant approval.
 ## Buying experience
 
 The page keeps the existing gallery, four release facts, brand fonts/colors,
-header/footer, size pills, and product detail cards. The “Build your kit” column follows:
+header/footer, size pills, and product detail cards.
+
+On desktop, the product gallery and four release facts share one sticky container.
+They stay aligned while the buying column scrolls and leave the viewport together
+at the end of that section. Shorter desktop viewports use tighter card spacing
+to keep all four facts visible. Mobile keeps the existing stacked layout.
+
+The “Build your kit” column follows:
 
 1. **Choose your jersey:** four visual style choices with a size for the first jersey.
    “Get Home + Away” offers a $20 saving on both jerseys. Each selected jersey has its

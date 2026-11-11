@@ -312,81 +312,102 @@ export function JerseyPage({
                 : 'Name + number included during launch week'}
           </p>
         </div>
-        <div className="pel-pdp__gallery jersey-gallery">
-          <div className="pel-pdp__stage jersey-stage">
-            <div className="jersey-stage-label">
-              <span>
-                {view === 'shorts' || view === 'detail'
-                  ? 'MATCHING SHORTS'
-                  : view === 'action'
-                    ? `${bundle ? 'HOME + AWAY' : away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ON THE FIELD`
-                    : bundle
-                      ? 'HOME + AWAY'
-                      : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
-              </span>
-              <span>POR EL DEPORTE</span>
-            </div>
-            <JerseyPhotos
-              styles={styles}
-              view={view === 'front' && withShorts ? 'kit' : view}
-              priority
-            />
-          </div>
-          <div
-            className="pel-pdp__thumbs jersey-thumbs"
-            aria-label="Jersey views"
-          >
-            {(
-              [
-                ['front', withShorts ? 'Full kit' : 'Front'],
-                ['back', 'Back'],
-                ['shorts', 'Shorts'],
-                ['detail', 'Detail'],
-                ['action', 'In action'],
-              ] as const
-            ).map(([option, label]) => (
-              <button
-                key={option}
-                type="button"
-                className={`pel-pdp__thumb${view === option ? ' is-active' : ''}`}
-                aria-label={label}
-                aria-pressed={view === option}
-                onClick={() => setView(option)}
-              >
-                <span className="jersey-thumb-image" aria-hidden="true">
-                  <JerseyPhotos
-                    styles={styles}
-                    view={option === 'front' && withShorts ? 'kit' : option}
-                    sizes={bundle ? '60px' : '120px'}
-                    decorative
-                  />
+        <div className="jersey-visual">
+          <div className="pel-pdp__gallery jersey-gallery">
+            <div className="pel-pdp__stage jersey-stage">
+              <div className="jersey-stage-label">
+                <span>
+                  {view === 'shorts' || view === 'detail'
+                    ? 'MATCHING SHORTS'
+                    : view === 'action'
+                      ? `${bundle ? 'HOME + AWAY' : away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ON THE FIELD`
+                      : bundle
+                        ? 'HOME + AWAY'
+                        : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
                 </span>
-                <span className="jersey-thumb-label">{label}</span>
-              </button>
+                <span>POR EL DEPORTE</span>
+              </div>
+              <JerseyPhotos
+                styles={styles}
+                view={view === 'front' && withShorts ? 'kit' : view}
+                priority
+              />
+            </div>
+            <div
+              className="pel-pdp__thumbs jersey-thumbs"
+              aria-label="Jersey views"
+            >
+              {(
+                [
+                  ['front', withShorts ? 'Full kit' : 'Front'],
+                  ['back', 'Back'],
+                  ['shorts', 'Shorts'],
+                  ['detail', 'Detail'],
+                  ['action', 'In action'],
+                ] as const
+              ).map(([option, label]) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={`pel-pdp__thumb${view === option ? ' is-active' : ''}`}
+                  aria-label={label}
+                  aria-pressed={view === option}
+                  onClick={() => setView(option)}
+                >
+                  <span className="jersey-thumb-image" aria-hidden="true">
+                    <JerseyPhotos
+                      styles={styles}
+                      view={option === 'front' && withShorts ? 'kit' : option}
+                      sizes={bundle ? '60px' : '120px'}
+                      decorative
+                    />
+                  </span>
+                  <span className="jersey-thumb-label">{label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="jersey-gallery-caption">
+              {view === 'action'
+                ? 'On the field in our short-sleeve jerseys. Matching shorts are optional.'
+                : (view === 'shorts' || view === 'detail') && !withShorts
+                  ? 'Matching shorts are optional. Add them to your jersey below.'
+                  : canPersonalize
+                    ? 'Name and number shown are an example. Add your own below.'
+                    : 'Name and number shown are an example.'}
+            </p>
+            {withSocks && (
+              <div
+                className="jersey-gallery-addon"
+                role="group"
+                aria-label="Socks in your kit"
+              >
+                <SocksPhoto color={socksColor} />
+                <div className="jersey-addon-copy">
+                  <strong>{socksColor} PED socks</strong>
+                  <small>{socksPack} · added to your kit</small>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="pel-pdp__stats" aria-label="Release details">
+            {[
+              {value: 'Official', label: 'Club jersey'},
+              {value: '2014', label: 'Est. Key Biscayne'},
+              {value: 'Preorder', label: 'Reserve your kit'},
+              {value: 'Yours', label: 'Name + number · first 7 days'},
+            ].map(({value, label}) => (
+              <div key={label} className="pel-pdp__stat">
+                <div
+                  className="pel-pdp__stat-value"
+                  data-len={value.length > 4 ? 'long' : undefined}
+                >
+                  {value}
+                </div>
+                <div className="pel-pdp__stat-rule" />
+                <div className="pel-pdp__stat-label">{label}</div>
+              </div>
             ))}
           </div>
-          <p className="jersey-gallery-caption">
-            {view === 'action'
-              ? 'On the field in our short-sleeve jerseys. Matching shorts are optional.'
-              : (view === 'shorts' || view === 'detail') && !withShorts
-                ? 'Matching shorts are optional. Add them to your jersey below.'
-                : canPersonalize
-                  ? 'Name and number shown are an example. Add your own below.'
-                  : 'Name and number shown are an example.'}
-          </p>
-          {withSocks && (
-            <div
-              className="jersey-gallery-addon"
-              role="group"
-              aria-label="Socks in your kit"
-            >
-              <SocksPhoto color={socksColor} />
-              <div className="jersey-addon-copy">
-                <strong>{socksColor} PED socks</strong>
-                <small>{socksPack} · added to your kit</small>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="pel-pdp__buy">
@@ -980,25 +1001,6 @@ export function JerseyPage({
               )}
             </div>
           </fetcher.Form>
-        </div>
-        <div className="pel-pdp__stats" aria-label="Release details">
-          {[
-            {value: 'Official', label: 'Club jersey'},
-            {value: '2014', label: 'Est. Key Biscayne'},
-            {value: 'Preorder', label: 'Reserve your kit'},
-            {value: 'Yours', label: 'Name + number · first 7 days'},
-          ].map(({value, label}) => (
-            <div key={label} className="pel-pdp__stat">
-              <div
-                className="pel-pdp__stat-value"
-                data-len={value.length > 4 ? 'long' : undefined}
-              >
-                {value}
-              </div>
-              <div className="pel-pdp__stat-rule" />
-              <div className="pel-pdp__stat-label">{label}</div>
-            </div>
-          ))}
         </div>
       </section>
 

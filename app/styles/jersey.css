@@ -1,14 +1,17 @@
 /* Product layout and controls come from product.css. These styles own preorder additions. */
 .jersey-page .pel-pdp__main {
   grid-template-areas:
-    'gallery facts intro'
-    'gallery facts buy';
+    'visual visual intro'
+    'visual visual buy';
   grid-template-rows: auto 1fr;
   row-gap: 0;
 }
 .jersey-intro {
   grid-area: intro;
   min-width: 0;
+}
+.jersey-visual {
+  display: contents;
 }
 .jersey-gallery {
   grid-area: gallery;
@@ -597,7 +600,13 @@ body:has(.jersey-kit-preview[open]) {
   font: 600 16px/1.4 var(--font-body);
 }
 @media (min-width: 60.01em) {
-  .jersey-gallery {
+  .jersey-visual {
+    display: grid;
+    grid-area: visual;
+    grid-template-areas: 'gallery facts';
+    grid-template-columns: minmax(0, 1fr) 168px;
+    column-gap: inherit;
+    align-items: start;
     position: sticky;
     top: 126px;
   }
@@ -606,6 +615,14 @@ body:has(.jersey-kit-preview[open]) {
   }
   .jersey-gallery:has(.jersey-gallery-addon) .jersey-stage {
     max-height: max(260px, calc(100dvh - 430px));
+  }
+}
+@media (min-width: 60.01em) and (max-height: 800px) {
+  .jersey-visual .pel-pdp__stats {
+    gap: 12px;
+  }
+  .jersey-visual .pel-pdp__stat {
+    padding-block: 16px;
   }
 }
 @media (max-width: 60em) {
