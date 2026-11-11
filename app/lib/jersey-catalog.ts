@@ -3,7 +3,7 @@ type VariantPage<T> = {
   pageInfo: {hasNextPage: boolean; endCursor?: string | null};
 };
 
-// The 560-variant draft fits in three Storefront pages of 250.
+// The 400-variant Home + Away draft fits in two Storefront pages of 250.
 export async function loadJerseyVariants<T extends {id: string}>(
   first: VariantPage<T>,
   readNext: (cursor: string) => Promise<VariantPage<T> | null>,
@@ -13,7 +13,7 @@ export async function loadJerseyVariants<T extends {id: string}>(
   const cursors = new Set<string>();
   for (let pages = 1; page.pageInfo.hasNextPage; pages++) {
     const cursor = page.pageInfo.endCursor;
-    if (pages === 3 || !cursor || cursors.has(cursor)) {
+    if (pages === 2 || !cursor || cursors.has(cursor)) {
       throw new Error('The jersey catalog could not be loaded completely.');
     }
     cursors.add(cursor);

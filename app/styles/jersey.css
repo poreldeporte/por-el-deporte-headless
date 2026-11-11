@@ -80,6 +80,10 @@
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
+.jersey-stage > .jersey-photos--action.jersey-photos--pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+}
 .jersey-thumbs {
   grid-template-columns: none;
   grid-auto-flow: column;
@@ -119,8 +123,10 @@
   font: 600 14px/1.5 var(--font-body);
 }
 .jersey-builder-title {
-  margin: 20px 0 16px;
-  font: 600 24px/1.2 var(--font-display);
+  margin: 28px 0 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--pel-ink);
+  font: 700 clamp(34px, 3vw, 42px)/1.05 var(--font-display);
 }
 .jersey-first-choice .jersey-style-choice {
   margin-top: 0;
@@ -156,7 +162,7 @@
 }
 .jersey-step-heading h3 {
   margin: 0;
-  font: 600 24px/1.2 var(--font-display);
+  font: 600 22px/1.2 var(--font-display);
 }
 .jersey-step-heading p {
   margin: 5px 0 0;

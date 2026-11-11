@@ -20,9 +20,9 @@ export const JERSEY_STYLES = JERSEY_COLORS.flatMap((color) =>
 export const JERSEY_STYLE_OPTIONS = [
   ...JERSEY_STYLES.map(({value}) => value),
   ...JERSEY_STYLES.flatMap((first, index) =>
-    JERSEY_STYLES.slice(index + 1).map((second) =>
-      jerseyStyleValue([first.value, second.value]),
-    ),
+    JERSEY_STYLES.slice(index + 1)
+      .filter((second) => second.color !== first.color)
+      .map((second) => jerseyStyleValue([first.value, second.value])),
   ),
 ];
 export const PED_SOCKS_HANDLE = 'ped-socks';
@@ -108,17 +108,24 @@ export function validateJerseySelection(
 ) {
   const {jerseys, shortsSize, personalize, name, number} = selection;
   if (
-    jerseys.length < 1 ||
-    jerseys.length > 2 ||
-    new Set(jerseys.map(({style}) => style)).size !== jerseys.length ||
-    jerseys.some(({style}) => !JERSEY_STYLES.some(({value}) => value === style))
+    jerseys.some(
+      ({style}) => !JERSEY_STYLES.some(({value}) => value === style),
+    ) ||
+    !JERSEY_STYLE_OPTIONS.includes(
+      jerseyStyleValue(jerseys.map(({style}) => style)),
+    )
   ) {
-    return 'Choose one jersey or two different jersey styles.';
+    return 'Choose one jersey or the Home + Away set.';
   }
   const missingSize = jerseys.findIndex(
     ({size}) => !JERSEY_SIZES.some((value) => value === size),
   );
-  if (missingSize !== -1) return `Choose a size for jersey ${missingSize + 1}.`;
+  if (missingSize !== -1) {
+    const jersey = JERSEY_STYLES.find(
+      ({value}) => value === jerseys[missingSize].style,
+    )!;
+    return `Choose a size for your ${jersey.color === JERSEY_COLORS[0] ? 'home' : 'away'} jersey.`;
+  }
   if (!JERSEY_SHORTS_OPTIONS.some((value) => value === shortsSize)) {
     return 'Choose a shorts size, or remove the shorts.';
   }
@@ -240,7 +247,8 @@ export function jerseyCartLines(
   );
   if (!jersey?.availableForSale)
     return {
-      error: 'This combination is unavailable. Please choose another.',
+      error:
+        'This jersey selection is unavailable. Try another size or jersey.',
       lines: [],
     };
   const sock =

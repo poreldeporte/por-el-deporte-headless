@@ -1,6 +1,7 @@
 import {JERSEY_COLORS, type JERSEY_STYLES} from '~/lib/jersey';
 
-export type JerseyPhotoView = 'front' | 'back' | 'kit' | 'shorts' | 'detail';
+export type JerseyPhotoView =
+  'front' | 'back' | 'kit' | 'shorts' | 'detail' | 'action';
 
 export function JerseyPhotos({
   styles,
@@ -17,20 +18,25 @@ export function JerseyPhotos({
 }) {
   return (
     <span
-      className={`jersey-photos${styles.length === 2 ? ' jersey-photos--pair' : ''}`}
+      className={`jersey-photos${styles.length === 2 ? ' jersey-photos--pair' : ''}${view === 'action' ? ' jersey-photos--action' : ''}`}
     >
       {styles.map((style) => {
         const home = style.color === JERSEY_COLORS[0];
         const color = home ? 'home' : 'away';
         const sleeve = style.sleeve === 'Short sleeve' ? 'short' : 'long';
         const shorts = view === 'shorts' || view === 'detail';
-        const file = shorts
-          ? `${color}-shorts${view === 'detail' ? '-detail' : ''}`
-          : `${color}-${sleeve}-${view}`;
-        const src = `/jersey/cutouts/${file}`;
-        const alt = shorts
-          ? `${home ? 'Cream home' : 'Black away'} shorts${view === 'detail' ? ', diamond panel and crest detail' : ', front'}`
-          : `${home ? 'Orange home' : 'Black away'} ${style.sleeve.toLowerCase()} ${view === 'kit' ? 'jersey with matching shorts' : `jersey, ${view}`}${view === 'back' ? ', sample VIOLA 10 personalization' : ''}`;
+        const action = view === 'action';
+        const file = action
+          ? `${color}-action`
+          : shorts
+            ? `${color}-shorts${view === 'detail' ? '-detail' : ''}`
+            : `${color}-${sleeve}-${view}`;
+        const src = `/jersey/${action ? 'action' : 'cutouts'}/${file}`;
+        const alt = action
+          ? `Player wearing the ${home ? 'orange home' : 'black away'} short-sleeve jersey and matching shorts on the field`
+          : shorts
+            ? `${home ? 'Cream home' : 'Black away'} shorts${view === 'detail' ? ', diamond panel and crest detail' : ', front'}`
+            : `${home ? 'Orange home' : 'Black away'} ${style.sleeve.toLowerCase()} ${view === 'kit' ? 'jersey with matching shorts' : `jersey, ${view}`}${view === 'back' ? ', sample VIOLA 10 personalization' : ''}`;
         return (
           <img
             key={style.value}
@@ -38,7 +44,7 @@ export function JerseyPhotos({
             srcSet={`${src}-160.webp 160w, ${src}-640.webp 640w, ${src}-1024.webp 1024w`}
             sizes={sizes}
             width={1024}
-            height={1024}
+            height={action ? 1536 : 1024}
             alt={decorative ? '' : alt}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"

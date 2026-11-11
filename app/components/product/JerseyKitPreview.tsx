@@ -51,17 +51,20 @@ export function JerseyKitPreview({
                 />
               </div>
               <h3>
-                Jersey {index + 1} ·{' '}
-                {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'}
+                {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} jersey
               </h3>
               <p>
                 {style.sleeve} ·{' '}
-                {selection.jerseys[index]?.size || 'Size not selected'}
+                {selection.jerseys[index]?.size
+                  ? `Size ${selection.jerseys[index].size}`
+                  : 'Choose a size'}
               </p>
               {withShorts && (
                 <p>
                   Matching shorts ·{' '}
-                  {selection.shortsSize || 'Size not selected'}
+                  {selection.shortsSize
+                    ? `Size ${selection.shortsSize}`
+                    : 'Choose a size'}
                 </p>
               )}
             </div>
@@ -82,10 +85,10 @@ export function JerseyKitPreview({
         <p className="jersey-hint">
           {selection.personalize
             ? selection.name && selection.number
-              ? `Your print: ${selection.name} / ${selection.number}.`
-              : 'Finish your name and number in the builder.'
+              ? `Name + number: ${selection.name} / ${selection.number}.`
+              : 'Add both a name and number, or leave both blank.'
             : 'Plain back · no personalization.'}{' '}
-          Photos show sample printing.
+          Photos show an example name and number.
         </p>
       </div>
       <div className="jersey-kit-footer">

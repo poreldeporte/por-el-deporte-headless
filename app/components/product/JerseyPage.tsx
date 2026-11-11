@@ -48,6 +48,8 @@ export function JerseyPage({
   const bundle = Boolean(secondStyle);
   const styles = secondStyle ? [firstStyle, secondStyle] : [firstStyle];
   const away = firstStyle.color === JERSEY_COLORS[1];
+  const firstSide = away ? 'Away' : 'Home';
+  const secondSide = away ? 'Home' : 'Away';
   const [size, setSize] = useState('');
   const [secondSize, setSecondSize] = useState('');
   const [withShorts, setWithShorts] = useState(false);
@@ -184,7 +186,7 @@ export function JerseyPage({
     };
   });
   const savings = secondChoices
-    .filter((item) => item.style.value !== firstStyle.value)
+    .filter((item) => item.style.color !== firstStyle.color)
     .map((item) => item.savings);
   const bundleSaving = savings.every(
     (price) =>
@@ -217,7 +219,7 @@ export function JerseyPage({
   const submitLabel = busy
     ? preview
       ? 'Reviewing…'
-      : 'Adding to bag…'
+      : 'Adding to cart…'
     : !canOrder
       ? 'Preorders open soon'
       : (hasSizes && !available) || !socksAvailable
@@ -230,7 +232,7 @@ export function JerseyPage({
     : !size
       ? 'Build your kit'
       : bundle && !secondSize
-        ? 'Choose jersey 2 size'
+        ? `Choose ${secondSide.toLowerCase()} size`
         : withShorts && !shortsSize
           ? 'Choose shorts size'
           : !socksComplete
@@ -304,7 +306,7 @@ export function JerseyPage({
           </div>
           <p className="jersey-launch-offer">
             {canPersonalize
-              ? 'Name + number included · first 7 days only'
+              ? 'Name + number included · first 7 days of preorder'
               : window.status === 'closed'
                 ? 'Plain jersey preorder · personalization has ended'
                 : 'Name + number included during launch week'}
@@ -316,9 +318,11 @@ export function JerseyPage({
               <span>
                 {view === 'shorts' || view === 'detail'
                   ? 'MATCHING SHORTS'
-                  : bundle
-                    ? 'YOUR TWO JERSEYS'
-                    : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
+                  : view === 'action'
+                    ? `${bundle ? 'HOME + AWAY' : away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ON THE FIELD`
+                    : bundle
+                      ? 'HOME + AWAY'
+                      : `${away ? 'AWAY / BLACK' : 'HOME / ORANGE'} · ${firstStyle.sleeve.toUpperCase()}`}
               </span>
               <span>POR EL DEPORTE</span>
             </div>
@@ -338,6 +342,7 @@ export function JerseyPage({
                 ['back', 'Back'],
                 ['shorts', 'Shorts'],
                 ['detail', 'Detail'],
+                ['action', 'In action'],
               ] as const
             ).map(([option, label]) => (
               <button
@@ -361,11 +366,13 @@ export function JerseyPage({
             ))}
           </div>
           <p className="jersey-gallery-caption">
-            {(view === 'shorts' || view === 'detail') && !withShorts
-              ? 'Matching shorts are optional. Add them to your jersey below.'
-              : canPersonalize
-                ? 'Name and number shown are an example. Add your own below.'
-                : 'Name and number shown are an example.'}
+            {view === 'action'
+              ? 'On the field in our short-sleeve jerseys. Matching shorts are optional.'
+              : (view === 'shorts' || view === 'detail') && !withShorts
+                ? 'Matching shorts are optional. Add them to your jersey below.'
+                : canPersonalize
+                  ? 'Name and number shown are an example. Add your own below.'
+                  : 'Name and number shown are an example.'}
           </p>
           {withSocks && (
             <div
@@ -402,17 +409,17 @@ export function JerseyPage({
             </h2>
             <BuilderStep
               number={1}
-              title="Your jerseys"
-              note="Choose a style and size for each jersey."
+              title="Choose your jersey"
+              note="Pick your sleeve length and size."
             >
               <div className={bundle ? 'jersey-item' : undefined}>
                 {secondStyle && (
-                  <SelectedJersey number={1} style={firstStyle}>
+                  <SelectedJersey style={firstStyle}>
                     <button
                       ref={editFirstRef}
                       type="button"
                       className="jersey-text-button"
-                      aria-label="Edit jersey 1"
+                      aria-label={`Edit ${firstSide.toLowerCase()} jersey`}
                       aria-expanded={editingFirst}
                       aria-controls="jersey-first-options"
                       onClick={() => {
@@ -430,16 +437,22 @@ export function JerseyPage({
                     className="jersey-first-choice"
                   >
                     <StyleChoice
-                      label={bundle ? 'Change jersey 1' : 'Choose your jersey'}
+                      label={
+                        bundle ? `${firstSide} sleeve length` : 'Home or Away'
+                      }
                       name="firstStyleChoice"
                       value={firstStyle.value}
                       choices={styleChoices.filter(
-                        (item) => item.style.value !== secondStyle?.value,
+                        (item) =>
+                          !secondStyle ||
+                          item.style.color !== secondStyle.color,
                       )}
                       onChange={(item) => {
                         setFirstStyle(item);
                         setEditingFirst(false);
-                        setView('front');
+                        setView((current) =>
+                          current === 'action' ? current : 'front',
+                        );
                         if (bundle)
                           requestAnimationFrame(() =>
                             editFirstRef.current?.focus({preventScroll: true}),
@@ -450,7 +463,7 @@ export function JerseyPage({
                 )}
                 <SizeChoice
                   name="firstSize"
-                  label={bundle ? 'Jersey 1 size' : 'Jersey size'}
+                  label={`${firstSide} size`}
                   value={size}
                   onChange={setSize}
                 />
@@ -464,14 +477,14 @@ export function JerseyPage({
                   {secondStyle ? (
                     <>
                       <h4 id="jersey-bundle-heading" className="sr-only">
-                        Your jersey bundle
+                        Your Home + Away set
                       </h4>
-                      <SelectedJersey number={2} style={secondStyle}>
+                      <SelectedJersey style={secondStyle}>
                         <button
                           type="button"
                           className="jersey-text-button"
                           ref={editSecondRef}
-                          aria-label="Edit jersey 2"
+                          aria-label={`Edit ${secondSide.toLowerCase()} jersey`}
                           aria-expanded={editingSecond}
                           aria-controls="jersey-second-options"
                           onClick={() => {
@@ -484,7 +497,7 @@ export function JerseyPage({
                         <button
                           type="button"
                           className="jersey-text-button"
-                          aria-label="Remove jersey 2"
+                          aria-label={`Remove ${secondSide.toLowerCase()} jersey`}
                           onClick={() => {
                             setSecondStyle(null);
                             setEditingFirst(false);
@@ -503,18 +516,18 @@ export function JerseyPage({
                   ) : (
                     <div className="jersey-bundle-offer">
                       <div className="jersey-addon-copy">
-                        <h4 id="jersey-bundle-heading">Add another jersey</h4>
+                        <h4 id="jersey-bundle-heading">Get Home + Away</h4>
                         <small className="jersey-addon-saving">
                           {bundleSaving ? (
                             <>
-                              Save <Money data={bundleSaving} as="span" /> · mix
-                              any two styles
+                              Save <Money data={bundleSaving} as="span" /> on
+                              both jerseys
                             </>
                           ) : (
-                            'Mix any two styles'
+                            'One home jersey. One away jersey.'
                           )}
                         </small>
-                        <small>Choose a separate size for each jersey.</small>
+                        <small>Choose sleeves and sizes for each.</small>
                       </div>
                       <button
                         type="button"
@@ -522,14 +535,14 @@ export function JerseyPage({
                         ref={addSecondRef}
                         aria-label={
                           editingSecond
-                            ? 'Cancel adding second jersey'
-                            : 'Add another jersey'
+                            ? `Cancel adding the ${secondSide.toLowerCase()} jersey`
+                            : `Add the ${secondSide.toLowerCase()} jersey`
                         }
                         aria-expanded={editingSecond}
                         aria-controls="jersey-second-options"
                         onClick={() => setEditingSecond(!editingSecond)}
                       >
-                        {editingSecond ? 'Cancel' : 'Add'}
+                        {editingSecond ? 'Cancel' : `Add ${secondSide}`}
                       </button>
                     </div>
                   )}
@@ -537,24 +550,24 @@ export function JerseyPage({
                     <div id="jersey-second-options">
                       {withShorts && (
                         <p className="jersey-hint">
-                          Prices below include a second pair of matching shorts
-                          in your selected shorts size.
+                          The added price includes matching shorts in your
+                          chosen shorts size.
                         </p>
                       )}
                       <StyleChoice
-                        label={
-                          secondStyle ? 'Change jersey 2' : 'Choose jersey 2'
-                        }
+                        label={`${secondSide} sleeve length`}
                         name="secondStyle"
                         value={secondStyle?.value ?? ''}
                         choices={secondChoices.filter(
-                          (item) => item.style.value !== firstStyle.value,
+                          (item) => item.style.color !== firstStyle.color,
                         )}
                         additional
                         onChange={(item) => {
                           setSecondStyle(item);
                           setEditingSecond(false);
-                          setView('front');
+                          setView((current) =>
+                            current === 'action' ? current : 'front',
+                          );
                           requestAnimationFrame(() =>
                             editSecondRef.current?.focus({preventScroll: true}),
                           );
@@ -565,7 +578,7 @@ export function JerseyPage({
                   {secondStyle && (
                     <SizeChoice
                       name="secondSize"
-                      label="Jersey 2 size"
+                      label={`${secondSide} size`}
                       value={secondSize}
                       onChange={setSecondSize}
                     />
@@ -575,11 +588,11 @@ export function JerseyPage({
                   <p className="jersey-hint jersey-addon-saving">
                     {secondChoice?.savings ? (
                       <>
-                        Bundle · <Money data={secondChoice.savings} as="span" />{' '}
-                        saved
+                        Home + Away ·{' '}
+                        <Money data={secondChoice.savings} as="span" /> saved
                       </>
                     ) : (
-                      'Two-jersey bundle'
+                      'Home + Away set'
                     )}
                   </p>
                 )}
@@ -588,15 +601,17 @@ export function JerseyPage({
             <BuilderStep
               number={2}
               title="Complete your kit"
-              note="Optional matching shorts and PED socks."
+              note="Matching shorts and PED socks. Both optional."
             >
               <section
                 className="jersey-shorts"
                 aria-labelledby="jersey-shorts-heading"
               >
                 <div className="jersey-option-heading">
-                  <h4 id="jersey-shorts-heading">Add matching shorts</h4>
-                  <span className="jersey-option-note">Optional</span>
+                  <h4 id="jersey-shorts-heading">Matching shorts</h4>
+                  <span className="jersey-option-note">
+                    {withShorts ? 'Added' : 'Optional'}
+                  </span>
                 </div>
                 <button
                   type="button"
@@ -625,14 +640,14 @@ export function JerseyPage({
                   <span className="jersey-style-copy">
                     <strong>
                       {bundle
-                        ? '2 matching pairs'
+                        ? 'Home + Away shorts'
                         : away
                           ? 'Away shorts'
                           : 'Home shorts'}
                     </strong>
                     <span>
                       {bundle
-                        ? 'One pair for each jersey'
+                        ? 'One matching pair for each jersey'
                         : away
                           ? 'Black'
                           : 'Cream'}
@@ -669,7 +684,7 @@ export function JerseyPage({
                     <p className="jersey-hint">
                       {bundle
                         ? 'Both pairs use this shorts size.'
-                        : 'Choose independently from your jersey size.'}
+                        : 'Your shorts can be a different size from your jersey.'}
                     </p>
                   </div>
                 )}
@@ -681,7 +696,7 @@ export function JerseyPage({
                   aria-labelledby="jersey-socks-heading"
                 >
                   <div className="jersey-option-heading">
-                    <h4 id="jersey-socks-heading">Add PED socks</h4>
+                    <h4 id="jersey-socks-heading">PED socks</h4>
                     {withSocks && (
                       <button
                         type="button"
@@ -828,12 +843,12 @@ export function JerseyPage({
             </BuilderStep>
             <BuilderStep
               number={3}
-              title="Name + number"
+              title="Your name + number"
               note={
                 canPersonalize
                   ? bundle
-                    ? 'Optional · included. The same print goes on both jerseys.'
-                    : 'Optional · included during the first 7 days.'
+                    ? 'Included for the first 7 days. Same name + number on both.'
+                    : 'Included for the first 7 days of preorder.'
                   : window.status === 'closed'
                     ? 'Personalization window closed.'
                     : 'Available at launch.'
@@ -864,7 +879,7 @@ export function JerseyPage({
                     }}
                   >
                     <label htmlFor="jersey-name">
-                      Name <span>Max {NAME_LIMIT}</span>
+                      Name on back <span>Max {NAME_LIMIT}</span>
                       <input
                         id="jersey-name"
                         name="name"
@@ -971,7 +986,7 @@ export function JerseyPage({
             {value: 'Official', label: 'Club jersey'},
             {value: '2014', label: 'Est. Key Biscayne'},
             {value: 'Preorder', label: 'Reserve your kit'},
-            {value: 'Yours', label: 'Name + number at launch'},
+            {value: 'Yours', label: 'Name + number · first 7 days'},
           ].map(({value, label}) => (
             <div key={label} className="pel-pdp__stat">
               <div
@@ -1016,8 +1031,8 @@ export function JerseyPage({
               ['Colors', 'Home (Orange) / Away (Black)'],
               ['Sizes', 'M / L / XL / XXL'],
               ['Sleeves', 'Short / Long'],
-              ['Options', '1 jersey or mix any 2 · optional shorts'],
-              ['Shorts', 'Choose a separate size'],
+              ['Options', 'Home, Away, or both'],
+              ['Shorts', 'Optional · choose a separate size'],
               ['Socks', 'Black / White · 1 pair or 3 pairs'],
               [
                 'Shipping',
@@ -1132,11 +1147,9 @@ function BuilderStep({
 }
 
 function SelectedJersey({
-  number,
   style,
   children,
 }: {
-  number: number;
   style: JerseyStyle;
   children: ReactNode;
 }) {
@@ -1144,13 +1157,14 @@ function SelectedJersey({
     <div
       className="jersey-addon-row jersey-selected-jersey"
       role="group"
-      aria-label={`Jersey ${number}`}
+      aria-label={`${style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} jersey`}
     >
       <StylePicture style={style} />
       <div className="jersey-addon-copy">
-        <h4>Jersey {number}</h4>
+        <h4>{style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} jersey</h4>
         <small>
-          {style.color === JERSEY_COLORS[0] ? 'Home' : 'Away'} · {style.sleeve}
+          {style.color === JERSEY_COLORS[0] ? 'Orange' : 'Black'} ·{' '}
+          {style.sleeve}
         </small>
       </div>
       <div className="jersey-item-actions">{children}</div>
