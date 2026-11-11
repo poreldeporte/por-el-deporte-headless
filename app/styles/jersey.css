@@ -188,11 +188,53 @@
   font: 500 12px/1.5 var(--font-body);
   color: var(--text-muted);
 }
-.jersey-step > .jersey-shorts {
-  padding: 0;
-  margin: 0;
-  border: 0;
+.jersey-step-heading > div {
+  flex: 1;
+  min-width: 0;
 }
+.jersey-step-heading > .jersey-text-button {
+  align-self: flex-start;
+  margin-top: -8px;
+}
+.jersey-item-list {
+  display: grid;
+  gap: 12px;
+}
+.jersey-sock-row {
+  background: transparent;
+}
+.jersey-sock-row.is-added {
+  background: var(--pel-sand);
+  border-color: var(--pel-ink);
+}
+.jersey-quantity {
+  display: grid;
+  grid-template-columns: 44px 24px 44px;
+  align-items: center;
+  border: 1px solid var(--pel-ink);
+  border-radius: var(--radius-pill);
+}
+.jersey-quantity button {
+  min-height: 44px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--pel-ink);
+  cursor: pointer;
+  font: 500 20px/1 var(--font-body);
+}
+.jersey-quantity button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.jersey-quantity output {
+  text-align: center;
+  font: 600 14px/1 var(--font-body);
+}
+.jersey-sock-status:empty {
+  display: none;
+}
+
 .jersey-choice-heading {
   display: flex;
   align-items: center;
@@ -274,15 +316,6 @@
   background: var(--pel-sand);
   box-shadow: inset 0 0 0 1px var(--pel-ink);
 }
-.jersey-style-option.jersey-shorts-card {
-  width: 100%;
-  grid-template-columns: 84px minmax(0, 1fr) auto;
-  margin-top: 12px;
-}
-.jersey-shorts-card .jersey-extra-picture {
-  width: 84px;
-  height: 84px;
-}
 .jersey-style-option.is-disabled,
 .jersey-sizes .is-disabled {
   opacity: 0.45;
@@ -321,12 +354,6 @@
   color: var(--text-muted);
   margin: 8px 0 0;
 }
-.jersey-shorts,
-.jersey-socks {
-  padding: 16px 0 0;
-  margin-top: 24px;
-  border-top: 1px solid var(--border-soft);
-}
 .jersey-option-heading {
   display: flex;
   align-items: center;
@@ -356,7 +383,7 @@
 }
 .jersey-bundle-offer {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   width: 100%;
@@ -377,8 +404,8 @@
   cursor: not-allowed;
 }
 .jersey-bundle-offer .jersey-style-picture {
-  width: 44px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
 }
 .jersey-bundle-offer strong,
 .jersey-bundle-price {
@@ -398,11 +425,6 @@
 .jersey-style-picture .jersey-socks-photo {
   width: 100%;
   height: 100%;
-}
-.jersey-socks-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 .jersey-kit-preview.jersey-socks-gallery {
   width: min(100%, 760px);
@@ -469,34 +491,10 @@
   min-height: 44px;
   padding: 14px 8px;
 }
-.jersey-shorts .pel-pdp__opt {
-  margin-top: 14px;
-}
-.jersey-sock-options {
-  margin-top: 12px;
-}
 .jersey-socks-offer {
   margin: 0 0 12px;
   color: var(--pel-orange-ink);
   font: 600 12px/1.5 var(--font-body);
-}
-.jersey-choice-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.jersey-choice-row .pel-pdp__size {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  min-height: 44px;
-  padding: 12px 8px;
-}
-.jersey-choice-row small {
-  font: 500 12px/1.3 var(--font-body);
-  letter-spacing: 0;
 }
 .jersey-release-note {
   margin: 12px 0 0;
@@ -511,14 +509,6 @@
 .jersey-personalization .jersey-option-heading {
   flex-wrap: wrap;
   gap: 4px 12px;
-}
-.jersey-shorts > .jersey-option-heading h4,
-.jersey-socks > .jersey-option-heading h4 {
-  font: 600 22px/1.3 var(--font-display);
-}
-.jersey-socks {
-  padding-top: 24px;
-  border-top-color: var(--pel-ink);
 }
 .jersey-print-fields {
   display: grid;
@@ -709,6 +699,10 @@ body:has(.jersey-kit-preview[open]) {
   .jersey-gallery:has(.jersey-gallery-addon) .jersey-stage {
     max-height: max(260px, calc(100dvh - 430px));
   }
+  .jersey-gallery:has(.jersey-gallery-addon + .jersey-gallery-addon)
+    .jersey-stage {
+    max-height: max(260px, calc(100dvh - 530px));
+  }
 }
 @media (min-width: 60.01em) and (max-height: 800px) {
   .jersey-visual .pel-pdp__stats {
@@ -794,5 +788,21 @@ body:has(.jersey-kit-preview[open]) {
   .jersey-style-option .jersey-style-picture {
     width: 44px;
     height: 72px;
+  }
+}
+
+@media (max-width: 480px) {
+  .jersey-addon-row,
+  .jersey-bundle-offer {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+  .jersey-addon-row > .jersey-style-picture,
+  .jersey-addon-row > .jersey-extra-picture,
+  .jersey-addon-row > .jersey-socks-photo,
+  .jersey-bundle-offer > .jersey-style-picture,
+  .jersey-bundle-offer > .jersey-extra-picture {
+    width: 48px;
+    height: 56px;
   }
 }

@@ -8,10 +8,9 @@ Shopify Oxygen storefront `1000157315` at `https://poreldeporte.com`.
 
 The page keeps the existing gallery, four release facts, brand fonts/colors,
 header/footer, size pills, and product detail cards.
-The main introduction connects the jersey to the club’s friendships and
-community, led by “We came for the game. We stayed for the people.” A visible
-“Jersey design by Sergio Gomez” byline follows, with his name in the brand’s
-display font. The shorts option and The Details both mention the pockets.
+The main introduction includes players, supporters, and the wider community. A
+visible “Jersey design by Sergio Gomez” byline follows, with his name in the
+brand’s display font. The shorts option and The Details both mention pockets.
 
 On desktop, the product gallery and four release facts share one sticky container.
 They stay aligned while the buying column scrolls and leave the viewport together
@@ -20,33 +19,33 @@ to keep all four facts visible. Mobile keeps the existing stacked layout.
 
 The “Build your kit” column follows:
 
-1. **Choose your jersey:** four visual style choices with a size for the first jersey.
-   “Get Home + Away” offers a $20 saving on both jerseys. Each selected jersey has its
-   own card, Edit control, and required size choice. Sizes start unselected.
-2. **Complete your kit:** optional matching shorts with a separately chosen
-   shorts size, then black/white socks and one-pair/three-pair packs. Selected
-   extras appear in the gallery and kit preview using the supplied product photos.
-3. **Your name + number:** optional included personalization during launch week.
-   Both fields remain visible, and the section states that the same print applies
-   to both jerseys in a bundle.
+1. **Choose your jersey:** four visual style choices, followed by size and optional
+   name/number inside the jersey card. The summary stays hidden during style
+   selection and appears when the picker collapses. Edit reopens the choices.
+   A compact “Add Home/Away” photo row offers the $20 Home + Away saving and
+   opens a second jersey card. Each jersey has its own sleeve, size and print.
+2. **Matching shorts:** one optional add/remove decision. A single jersey adds
+   one matching pair for $15; Home + Away adds both matching pairs for $30.
+   Each pair has a photo card and independent required size, which collapses to
+   a size/price summary with Edit after selection. Sizes are retained by color
+   when removing/readding shorts. Removing the second jersey removes its matching
+   shorts. Adding it while shorts are selected clearly includes the additional
+   pair in the upgrade price and requires its own size.
+3. **Socks:** optional Black and White photo rows, each with a quantity control
+   starting at zero. Mix colors freely. Single pairs cost $10; every group of
+   three saves $5 automatically. One size; no pack or size selector. At two pairs,
+   the page offers the next pair for $5; selected quantity, total and savings
+   appear together beneath the two rows.
 
-The larger “Build your kit” heading introduces the full builder. Smaller numbered
-headings, short explanations and dividers separate its three sections. The
-purchase button and shipping note follow, without a receipt above the button.
+All three steps use the same heading, divider, card spacing, photo alignment,
+body labels and Edit/Remove controls. The existing brand and gallery remain.
+The purchase button and shipping note follow, without another order summary.
 
-The two-jersey offer is one **Home + Away** set, with an independent sleeve length
-and size for each jersey. Same-color pairs are not bundle choices. Choosing,
-editing or removing the other jersey never changes that size. With shorts, the
-bundle includes two matching pairs in one separately selected shorts size; the
-shorts selector explicitly says that both pairs use that size.
-
-In a set, each style picker shows the two sleeve choices for its own color,
-so edits preserve one Home and one Away jersey. Opening or canceling
-a picker does not change the order or price. Selecting a second style adds it;
-Edit replaces its style and Remove returns to one jersey. Sizes, extras and print
-choices survive edits. The second picker shows the incremental price, including
-the second shorts pair when selected. The bundle note confirms the jersey saving;
-the shorts card owns the shorts charge.
+A two-jersey set always contains one Home and one Away. Each style editor then
+shows only its color’s sleeve choices. Adding the second jersey copies the first
+print once; both name/number pairs remain visible and independently editable.
+Sizes start unselected. Choosing the already-selected style also collapses the
+picker. Focus returns to Edit after a selection and to the add row after removal.
 
 Short sleeves are $70 USD; long sleeves are $80 USD. The merchant authorized
 choosing long-sleeve and bundle pricing for review. Home + Away jerseys save $20:
@@ -71,8 +70,8 @@ Personalization has no switch. Both fields blank means a plain back; entering
 either field requires both. The fixed mobile purchase bar uses the same
 total/form as desktop. Both buttons use native required-field checks and server
 validation. Before a jersey size is selected, the mobile action says “Build your
-kit” and moves focus to the builder without submitting. Missing second-jersey,
-shorts and socks sizes get explicit prompts. “View your kit” opens a native modal with the selected
+kit” and moves focus to the builder without submitting. Missing second-jersey
+and shorts sizes get explicit prompts. “View your kit” opens a native modal with the selected
 jersey/shorts photos, socks, sizes, personalization and total. Close, Escape and
 “Continue building” return to the same place; the background is inert while open.
 The modal remains visible and closable when the viewport widens beyond mobile.
@@ -139,27 +138,24 @@ orange island logos, and small markings. Keep both socks fully in frame and
 return a transparent cutout.” Pair exports preserve alpha; detail photos retain
 their original backgrounds and framing. All supplied originals remain unchanged.
 
-PED socks use visual **Black / White** choices, followed by a pack choice and
-Remove once selected. Merchant-confirmed prices are **$10 for one pair** and
-**$25 for three pairs**, all in the chosen color. The local preview supports
-adding, switching and removing both packs, updates the full total, and includes
-the color/pack in the submitted review. Changing a selection hides an outdated
-submitted preview until it is reviewed again. The photo cards use the same selected
-state as the jerseys; choosing a color adds the socks. Removing socks restores
-the one-pair default. The merchant confirmed socks are one size; no size
-selection is required.
-The three-pair price and saving appear before choosing a color. Savings compare
-three actual single-pair prices with the pack price, and are shown before selection
-only when both colors have the same available offer. After choosing a color, its
-own offer applies. Missing prices, mixed currencies and nonpositive savings do
-not produce a savings claim.
+PED socks use Black/White quantity controls, bounded to 99 pairs per color per
+submission. The server rejects invalid quantities, duplicate/unknown colors,
+unavailable variants and incomplete shorts sizes before a single cart write.
+Each color resolves to its native `1 pair` SKU with the selected quantity.
+Shopify may split a color across lines when allocating its automatic discount.
+Each line still identifies the color, quantity and price. The mobile kit
+preview and gallery show both selected colors and their quantities.
 
-The `ped-socks` product has four color/pack variants. The UI uses actual
-color/pack/size variants and prices; socks resolve to a separate line in the same
-cart mutation. Each pack is a priced SKU with cart quantity **1**. A three-pack
-must resolve its own $25 SKU rather than adding three $10 singles. Unknown or
-out-of-stock combinations fail before the cart write. Size choices appear only
-when the product has multiple sizes.
+The native [PED socks — Any 3 for $25](https://admin.shopify.com/store/por-el-deporte/discounts/1328223158319)
+rule buys two single pairs and discounts one single pair by $5,
+with no per-order maximum, so 3 pairs cost $25, 4 cost $35 and 6 cost $50.
+Only Black / 1 pair and White / 1 pair variants qualify in both halves of the
+rule. Legacy $25 three-pair SKUs remain available to existing carts and are
+excluded from the new discount. The sock and Home + Away rules both allow
+product-discount combinations on their separate items, so their savings coexist.
+The quote uses actual single-pair prices; the any-three offer is shown only when
+both colors have matching USD prices. Shopify owns the actual cart/checkout
+allocation and recalculation after quantities or lines change.
 
 ## Local review and verification
 
@@ -172,16 +168,26 @@ the site’s canonical, Open Graph and social metadata.
 The footer links directly to the kit builder.
 
 Focused domain checks: `node --test tests/jersey.mjs` on Node 24. They cover the
-exact seven-day deadline, print normalization/validation, all 400 builder choices
-fulfilled by 16 jersey and 8 shorts SKUs, mixed-sleeve bundle prices and increments with shorts, independent sizing,
-actual-price quotes, currency mismatches, exact sock color/pack/size resolution,
+exact seven-day deadline, print normalization/validation, all 1,168 builder choices
+fulfilled by 16 jersey and 8 shorts SKUs, mixed-sleeve bundle prices and increments
+with shorts, independent sizing, actual-price quotes, currency mismatches,
+exact single-pair color and quantity resolution,
 canonical style/size association in either selection order, complete bounded
 catalog pagination, and rejection before cart mutation. Blank and partial print
-fields also cover
-the switch-free flow. Sock-pack savings cover actual prices and unsupported
-comparisons. Normal lint,
-typecheck, and build commands also apply. Browser review covers desktop/mobile
+fields also cover the switch-free flow. Mixed-color savings cover repeated
+groups of three, actual prices and unsupported comparisons. Legacy open forms
+normalize shared shorts sizes and sock packs into the same new model without
+changing the customer’s selected contents or price. Normal lint, typecheck,
+and build commands also apply. Browser review covers desktop/mobile
 choice changes, form validation, official photo mapping, and preview submission.
+
+The November 11 extras update was checked at 320px, 390px and 1440px, including
+rapid quantity taps. A real Shopify cart and native checkout showed Home short
+sleeve/L ($70), Away long sleeve/M ($60 after the bundle saving), matching shorts
+in M and XL ($15 each), and two Black plus one White sock pairs ($25), for a
+$185 subtotal. Cart quantity changes confirmed 2/3/4/5/6 sock pairs cost
+$20/$25/$35/$45/$50 while retaining the Home + Away discount. No payment or order
+was submitted.
 
 ## Shopify catalog setup
 
@@ -221,14 +227,14 @@ Inventory and manual fulfillment belong to each individual variant.
 Shopify's automatic Buy X get Y rule [Home + Away — Save $20](https://admin.shopify.com/store/por-el-deporte/discounts/1328073998383) is active: buy one of the eight Home variants, get $20 off one of the eight Away
 variants. The two sets must contain only the corresponding color's variants,
 not the entire product. No per-order limit; one saving per qualifying pair.
-Do not combine this offer with other discounts. Removing either jersey must
+Allow product-discount combinations so the separate PED socks saving can apply; order and shipping combinations remain off. Removing either jersey must
 remove the saving. The PDP quotes the same $20 USD offer; Shopify applies and
 recalculates the real cart/checkout discount. The cart shows its allocation.
 
-Socks use native `Color` values `Black`/`White` and `Pack` values `1 pair`/`3 pairs`,
-priced at $10/$25. Socks are merchant-confirmed **one size**. Packs contain one
-color throughout; each pack is quantity 1 in the cart. A three-pack is one $25
-line clearly labeled “3 pairs,” not three $10 singles.
+Socks retain native `Color` values `Black`/`White` and `Pack` values `1 pair`/`3 pairs`,
+priced at $10/$25. The builder now uses the `1 pair` variants exclusively and
+adds each selected color with its real quantity. Existing three-pair cart lines
+remain valid and do not receive the single-pair discount. Socks are one size.
 
 [Club jersey preorder shipping profile](https://admin.shopify.com/store/por-el-deporte/settings/shipping/profiles/106888233007)
 contains all 28 variants across these three products and is limited to the
@@ -260,8 +266,7 @@ length and copies the first jersey's current print once. Both prints are then
 independently editable; leave either pair of fields blank for a plain back.
 The second jersey requires its own size selection. The kit preview and cart
 keep each print with its jersey. Legacy forms that submit only one name/number
-still apply it to both jerseys. Shorts and socks are separate optional sections
-under “Complete your kit.”
+still apply it to both jerseys. Shorts and socks are separate numbered optional steps.
 
 The server resolves all exact native options before a single `cart.addLines`
 call. If any selected jersey, shorts or socks are unavailable, it adds nothing.

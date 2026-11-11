@@ -28,10 +28,9 @@ export const JERSEY_STYLE_OPTIONS = [
 export const PED_SOCKS_HANDLE = 'ped-socks';
 export const JERSEY_SHORTS_HANDLE = 'club-shorts';
 export const PED_SOCKS_COLORS = ['Black', 'White'] as const;
-export const PED_SOCKS_PACKS = [
-  {value: '1 pair', price: {amount: '10.00', currencyCode: 'USD'}},
-  {value: '3 pairs', price: {amount: '25.00', currencyCode: 'USD'}},
-] as const;
+export const PED_SOCKS_PRICE = {amount: '10.00', currencyCode: 'USD'} as const;
+export const PED_SOCKS_SAVING = 5;
+export const MAX_SOCKS_QUANTITY = 99;
 export const JERSEY_SHORTS_OPTIONS = ['None', ...JERSEY_SIZES] as const;
 export const JERSEY_SHORTS_VALUE = {
   amount: '35.00',
@@ -52,12 +51,10 @@ export type JerseyPrint = {
   number: string;
 };
 
+export type SocksItem = {color: string; quantity: number};
 export type JerseySelection = {
-  jerseys: (JerseyItem & {print: JerseyPrint})[];
-  shortsSize: string;
-  socksColor: string;
-  socksPack: string;
-  socksSize: string;
+  jerseys: (JerseyItem & {print: JerseyPrint; shortsSize: string})[];
+  socks: SocksItem[];
 };
 
 export function personalizationWindow(
@@ -87,6 +84,30 @@ export function readJerseySelection(form: FormData): JerseySelection {
   const text = (key: string) => String(form.get(key) ?? '').trim();
   const socksColor = form.has('socksColor') ? text('socksColor') : 'None';
   const print = jerseyPrint(text('name'), text('number'));
+  const shortsSize = (key: string) =>
+    form.get('addShorts') === 'on'
+      ? text(form.has(key) ? key : 'shortsSize')
+      : 'None';
+  // Normalize forms from already-open tabs into quantities of single pairs.
+  const socks =
+    form.has('socksBlack') || form.has('socksWhite')
+      ? PED_SOCKS_COLORS.map((color) => ({
+          color,
+          quantity: Number(text(`socks${color}`)),
+        })).filter(({quantity}) => quantity !== 0)
+      : socksColor === 'None'
+        ? []
+        : [
+            {
+              color: socksColor,
+              quantity:
+                text('socksPack') === '1 pair'
+                  ? 1
+                  : text('socksPack') === '3 pairs'
+                    ? 3
+                    : NaN,
+            },
+          ];
   // Tabs opened before per-jersey printing still submit one print for both.
   const secondPrint =
     form.has('secondName') || form.has('secondNumber')
@@ -94,21 +115,24 @@ export function readJerseySelection(form: FormData): JerseySelection {
       : print;
   return {
     jerseys: [
-      {style: text('firstStyle'), size: text('firstSize'), print},
+      {
+        style: text('firstStyle'),
+        size: text('firstSize'),
+        print,
+        shortsSize: shortsSize('firstShortsSize'),
+      },
       ...(form.has('secondStyle')
         ? [
             {
               style: text('secondStyle'),
               size: text('secondSize'),
               print: secondPrint,
+              shortsSize: shortsSize('secondShortsSize'),
             },
           ]
         : []),
     ],
-    shortsSize: form.get('addShorts') === 'on' ? text('shortsSize') : 'None',
-    socksColor,
-    socksPack: socksColor === 'None' ? '1 pair' : text('socksPack'),
-    socksSize: socksColor === 'None' ? '' : text('socksSize'),
+    socks,
   };
 }
 
@@ -123,7 +147,7 @@ export function validateJerseySelection(
   selection: JerseySelection,
   canPersonalize: boolean,
 ) {
-  const {jerseys, shortsSize} = selection;
+  const {jerseys, socks} = selection;
   if (
     jerseys.some(
       ({style}) => !JERSEY_STYLES.some(({value}) => value === style),
@@ -143,20 +167,33 @@ export function validateJerseySelection(
     )!;
     return `Choose a size for your ${jersey.color === JERSEY_COLORS[0] ? 'home' : 'away'} jersey.`;
   }
-  if (!JERSEY_SHORTS_OPTIONS.some((value) => value === shortsSize)) {
-    return 'Choose a shorts size, or remove the shorts.';
+  const missingShorts = jerseys.find(
+    ({shortsSize}) =>
+      !JERSEY_SHORTS_OPTIONS.some((value) => value === shortsSize),
+  );
+  if (missingShorts) {
+    return `Choose a shorts size for ${missingShorts.style.startsWith('Home') ? 'Home' : 'Away'}, or remove the shorts.`;
   }
   if (
-    selection.socksColor !== 'None' &&
-    !PED_SOCKS_COLORS.some((value) => value === selection.socksColor)
-  ) {
-    return 'Choose black or white PED socks, or remove the socks.';
-  }
-  if (
-    selection.socksColor !== 'None' &&
-    !PED_SOCKS_PACKS.some(({value}) => value === selection.socksPack)
+    jerseys.some(({shortsSize}) => shortsSize === 'None') &&
+    jerseys.some(({shortsSize}) => shortsSize !== 'None')
   )
-    return 'Choose one pair or three pairs of PED socks.';
+    return 'Add matching shorts for each jersey, or remove the shorts.';
+  if (
+    socks.length > 2 ||
+    new Set(socks.map(({color}) => color)).size !== socks.length ||
+    socks.some(({color}) => !PED_SOCKS_COLORS.some((value) => value === color))
+  )
+    return 'Choose black or white PED socks.';
+  if (
+    socks.some(
+      ({quantity}) =>
+        !Number.isInteger(quantity) ||
+        quantity < 1 ||
+        quantity > MAX_SOCKS_QUANTITY,
+    )
+  )
+    return `Choose between 0 and ${MAX_SOCKS_QUANTITY} pairs of each sock color.`;
   for (const {
     style,
     print: {name, number},
@@ -234,15 +271,11 @@ export function matchesShortsVariant(
 
 export function matchesSocksVariant(
   options: {name: string; value: string}[],
-  selection: Pick<JerseySelection, 'socksColor' | 'socksPack' | 'socksSize'>,
+  color: string,
 ) {
-  const expected = {
-    Color: selection.socksColor,
-    Pack: selection.socksPack,
-    ...(selection.socksSize ? {Size: selection.socksSize} : {}),
-  };
+  const expected = {Color: color, Pack: '1 pair'};
   return (
-    options.length === Object.keys(expected).length &&
+    options.length === 2 &&
     options.every(
       ({name, value}) => value === expected[name as keyof typeof expected],
     )
@@ -270,34 +303,35 @@ export function jerseyCartLines(
         'This jersey selection is unavailable. Try another size or jersey.',
       lines: [],
     };
-  const matchingShorts =
-    selection.shortsSize === 'None'
-      ? []
-      : selection.jerseys.map((jersey) =>
-          shorts.find((item) =>
-            matchesShortsVariant(
-              item.selectedOptions,
-              jersey,
-              selection.shortsSize,
-            ),
-          ),
-        );
-  if (matchingShorts.some((item) => !item?.availableForSale))
+  const matchingShorts = selection.jerseys.map((jersey) =>
+    jersey.shortsSize === 'None'
+      ? null
+      : shorts.find((item) =>
+          matchesShortsVariant(item.selectedOptions, jersey, jersey.shortsSize),
+        ),
+  );
+  if (
+    matchingShorts.some(
+      (item, index) =>
+        selection.jerseys[index].shortsSize !== 'None' &&
+        !item?.availableForSale,
+    )
+  )
     return {
       error:
         'These matching shorts are unavailable. Choose another size or remove the shorts.',
       lines: [],
     };
-  const sock =
-    selection.socksColor === 'None'
-      ? null
-      : socks.find((item) =>
-          matchesSocksVariant(item.selectedOptions, selection),
-        );
-  if (selection.socksColor !== 'None' && !sock?.availableForSale)
+  const selectedSocks = selection.socks.map(({color, quantity}) => ({
+    variant: socks.find((item) =>
+      matchesSocksVariant(item.selectedOptions, color),
+    ),
+    quantity,
+  }));
+  if (selectedSocks.some(({variant}) => !variant?.availableForSale))
     return {
       error:
-        'These PED socks are not available. Choose another option or remove the socks.',
+        'These PED socks are not available. Choose another color or remove the socks.',
       lines: [],
     };
   return {
@@ -320,7 +354,10 @@ export function jerseyCartLines(
             ]
           : []),
       ]),
-      ...(sock ? [{merchandiseId: sock.id, quantity: 1}] : []),
+      ...selectedSocks.map(({variant, quantity}) => ({
+        merchandiseId: variant!.id,
+        quantity,
+      })),
     ],
   };
 }
@@ -357,39 +394,46 @@ type PricedVariant = {
 };
 
 export function jerseyQuote(
-  selection: Pick<JerseySelection, 'jerseys' | 'shortsSize' | 'socksColor'>,
+  selection: JerseySelection,
   variants: PricedVariant[],
-  socksPrice: Price | null,
+  socksVariants: PricedVariant[],
   preview: boolean,
   shortsVariants: PricedVariant[] = [],
 ) {
-  const shortsSize =
-    selection.shortsSize === 'None'
-      ? JERSEY_SIZES[0]
-      : selection.shortsSize || JERSEY_SIZES[0];
-  const priceFor = (jerseys: JerseyItem[], shorts: string): Price | null => {
+  const shortsPriceFor = (
+    jersey: JerseySelection['jerseys'][number],
+  ): Price | null => {
+    const shortsSize =
+      jersey.shortsSize && jersey.shortsSize !== 'None'
+        ? jersey.shortsSize
+        : JERSEY_SIZES[0];
+    return (
+      shortsVariants.find((item) =>
+        matchesShortsVariant(item.selectedOptions, jersey, shortsSize),
+      )?.price ??
+      (preview
+        ? {
+            amount: String(JERSEY_SHORTS_PRICE),
+            currencyCode: 'USD' as const,
+          }
+        : null)
+    );
+  };
+  const priceFor = (
+    jerseys: JerseySelection['jerseys'],
+    withShorts: boolean,
+  ): Price | null => {
     const style = jerseyStyleValue(jerseys.map(({style}) => style));
     if (!JERSEY_STYLE_OPTIONS.includes(style)) return null;
     const total = sumPrices(
       jerseys.flatMap((jersey) => {
-        const variant = variants.find((item) =>
-          matchesJerseyVariant(item.selectedOptions, jersey),
-        );
         const jerseyPrice =
-          variant?.price ??
-          (preview ? jerseyPreviewPrice(jersey.style, false) : null);
-        if (shorts === 'None') return [jerseyPrice];
-        const shortsPrice =
-          shortsVariants.find((item) =>
-            matchesShortsVariant(item.selectedOptions, jersey, shorts),
+          variants.find((item) =>
+            matchesJerseyVariant(item.selectedOptions, jersey),
           )?.price ??
-          (preview
-            ? {
-                amount: String(JERSEY_SHORTS_PRICE),
-                currencyCode: 'USD' as const,
-              }
-            : null);
-        return [jerseyPrice, shortsPrice];
+          (preview ? jerseyPreviewPrice(jersey.style, false) : null);
+        if (!withShorts) return [jerseyPrice];
+        return [jerseyPrice, shortsPriceFor(jersey)];
       }),
     );
     // Shopify's matching automatic discount owns the checkout saving.
@@ -402,24 +446,29 @@ export function jerseyQuote(
   };
   const choices = JERSEY_STYLE_OPTIONS.map((style) => {
     const styles = jerseyStyles(style);
-    const jerseys = styles.map(({value}) => {
-      const current = selection.jerseys.find(
-        (jersey) => jersey.style === value,
-      );
-      const size = current
-        ? current.size
-        : selection.jerseys[styles.length === 1 ? 0 : 1]?.size;
-      return {style: value, size: size || JERSEY_SIZES[0]};
+    const jerseys = styles.map(({value, color}, index) => {
+      const current =
+        selection.jerseys.find(
+          (jersey) =>
+            JERSEY_STYLES.find((item) => item.value === jersey.style)?.color ===
+            color,
+        ) ?? selection.jerseys[index];
+      return {
+        style: value,
+        size: current?.size || JERSEY_SIZES[0],
+        shortsSize: current?.shortsSize || '',
+        print: current?.print ?? {name: '', number: ''},
+      };
     });
-    const price = priceFor(jerseys, 'None');
+    const price = priceFor(jerseys, false);
     const separate =
       styles.length === 2
-        ? sumPrices(jerseys.map((jersey) => priceFor([jersey], 'None')))
+        ? sumPrices(jerseys.map((jersey) => priceFor([jersey], false)))
         : null;
     return {
       style,
       price,
-      kitPrice: priceFor(jerseys, shortsSize),
+      kitPrice: priceFor(jerseys, true),
       savings: positivePrice(subtractPrices(separate, price)),
     };
   });
@@ -427,31 +476,92 @@ export function jerseyQuote(
     ...jersey,
     size: jersey.size || JERSEY_SIZES[0],
   }));
-  const base = priceFor(jerseys, 'None');
-  const kit = priceFor(jerseys, shortsSize);
+  const base = priceFor(jerseys, false);
+  const kit = priceFor(jerseys, true);
   const shorts = subtractPrices(kit, base);
   const shortsValue = {
     ...JERSEY_SHORTS_VALUE,
     amount: (Number(JERSEY_SHORTS_VALUE.amount) * jerseys.length).toFixed(2),
   };
-  const jersey = selection.shortsSize === 'None' ? base : kit;
+  const jersey = selection.jerseys.some(({shortsSize}) => shortsSize !== 'None')
+    ? kit
+    : base;
+  const socks = socksQuote(selection.socks, socksVariants, preview);
   return {
     choices,
-    total:
-      selection.socksColor === 'None'
-        ? jersey
-        : sumPrices([jersey, socksPrice]),
+    total: socks.quantity ? sumPrices([jersey, socks.total]) : jersey,
     shorts,
     shortsValue,
+    shortsPrices: jerseys.map(shortsPriceFor),
     shortsSavings: positivePrice(subtractPrices(shortsValue, shorts)),
+    socks,
   };
 }
 
-export function socksPackSavings(single: Price | null, pack: Price | null) {
-  const separate = single
-    ? {...single, amount: (Number(single.amount) * 3).toFixed(2)}
+export function socksQuote(
+  socks: SocksItem[],
+  variants: PricedVariant[],
+  preview = false,
+) {
+  const prices = PED_SOCKS_COLORS.map((color) => ({
+    color,
+    price:
+      variants.find((item) => matchesSocksVariant(item.selectedOptions, color))
+        ?.price ?? (preview ? PED_SOCKS_PRICE : null),
+  }));
+  const quantity = socks.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = quantity
+    ? sumPrices(
+        socks.map((item) => {
+          const price = prices.find(({color}) => color === item.color)?.price;
+          return price
+            ? {
+                ...price,
+                amount: (Number(price.amount) * item.quantity).toFixed(2),
+              }
+            : null;
+        }),
+      )
+    : {amount: '0.00', currencyCode: 'USD' as const};
+  // Native Buy 2 get 1: $5 off the third single pair, repeated per group.
+  const savings = {
+    amount: (Math.floor(quantity / 3) * PED_SOCKS_SAVING).toFixed(2),
+    currencyCode: 'USD' as const,
+  };
+  const total = subtractPrices(subtotal, savings);
+  const samePrice = prices.every(
+    ({price}) =>
+      price &&
+      price.currencyCode === 'USD' &&
+      price.amount === prices[0].price?.amount &&
+      Number(price.amount) >= PED_SOCKS_SAVING,
+  );
+  const offer = samePrice
+    ? {
+        amount: (
+          Number(prices[0].price!.amount) * 3 -
+          PED_SOCKS_SAVING
+        ).toFixed(2),
+        currencyCode: 'USD' as const,
+      }
     : null;
-  return positivePrice(subtractPrices(separate, pack));
+  const nextPair =
+    samePrice && quantity % 3 === 2
+      ? {
+          amount: (Number(prices[0].price!.amount) - PED_SOCKS_SAVING).toFixed(
+            2,
+          ),
+          currencyCode: 'USD' as const,
+        }
+      : null;
+  return {
+    prices,
+    quantity,
+    total,
+    savings: positivePrice(savings),
+    offer,
+    nextPair,
+  };
 }
 
 function sumPrices(prices: (Price | null)[]): Price | null {

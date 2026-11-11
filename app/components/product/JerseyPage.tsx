@@ -12,15 +12,15 @@ import {
   jerseyQuote,
   jerseyPrint,
   subtractPrices,
-  socksPackSavings,
   type Price,
   type JerseySelection,
   JERSEY_SIZES,
+  JERSEY_SHORTS_VALUE,
   JERSEY_STORY,
   JERSEY_TITLE,
   NAME_LIMIT,
   PED_SOCKS_COLORS,
-  PED_SOCKS_PACKS,
+  MAX_SOCKS_QUANTITY,
   matchesJerseyVariant,
   matchesShortsVariant,
   matchesSocksVariant,
@@ -58,11 +58,9 @@ export function JerseyPage({
   const [size, setSize] = useState('');
   const [secondSize, setSecondSize] = useState('');
   const [withShorts, setWithShorts] = useState(false);
-  const [socksColor, setSocksColor] = useState('None');
-  const [socksPack, setSocksPack] = useState<string>(PED_SOCKS_PACKS[0].value);
-  const withSocks = socksColor !== 'None';
-  const [socksSize, setSocksSize] = useState('');
-  const [shortsSize, setShortsSize] = useState('');
+  const [sockQuantities, setSockQuantities] = useState({Black: 0, White: 0});
+  const [shortsSizes, setShortsSizes] = useState<Record<string, string>>({});
+  const addShortsRef = useRef<HTMLButtonElement>(null);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
   const [secondName, setSecondName] = useState('');
@@ -80,11 +78,6 @@ export function JerseyPage({
   const window = personalizationWindow(product?.startsAt?.value, now);
   const canPersonalize = preview || window.status === 'open';
   const canOrder = preview || ['open', 'closed'].includes(window.status);
-  const socksPreview = preview && !socks;
-  const sockSizes =
-    socks?.options.find((option) => option.name === 'Size')?.values ?? [];
-  const selectedSocksSize =
-    socksSize || (sockSizes.length === 1 ? sockSizes[0] : '');
   const firstPrint = jerseyPrint(
     canPersonalize ? name : '',
     canPersonalize ? number : '',
@@ -98,82 +91,50 @@ export function JerseyPage({
       style: item.value,
       size: index === 0 ? size : secondSize,
       print: index === 0 ? firstPrint : secondPrint,
+      shortsSize: withShorts ? shortsSizes[item.color] || '' : 'None',
     })),
-    shortsSize: withShorts ? shortsSize : 'None',
-    socksColor: withSocks ? socksColor : 'None',
-    socksPack,
-    socksSize: withSocks ? selectedSocksSize : '',
+    socks: PED_SOCKS_COLORS.map((color) => ({
+      color,
+      quantity: sockQuantities[color],
+    })).filter(({quantity}) => quantity > 0),
   };
+
   const variants = selection.jerseys.map((jersey) =>
     product?.variants.nodes.find((item) =>
       matchesJerseyVariant(item.selectedOptions, jersey),
     ),
   );
   const hasJerseySizes = Boolean(size && (!bundle || secondSize));
-  const hasSizes = hasJerseySizes && (!withShorts || Boolean(shortsSize));
+  const hasSizes =
+    hasJerseySizes &&
+    selection.jerseys.every(({shortsSize}) => Boolean(shortsSize));
   const priceVariant = product?.variants.nodes.find((item) =>
     matchesJerseyVariant(item.selectedOptions, {
       ...selection.jerseys[0],
       size: size || JERSEY_SIZES[0],
     }),
   );
-  const sockChoices = PED_SOCKS_COLORS.flatMap((color) =>
-    PED_SOCKS_PACKS.map((pack) => {
-      const variants =
-        socks?.variants.nodes.filter((item) =>
-          matchesSocksVariant(item.selectedOptions, {
-            socksColor: color,
-            socksPack: pack.value,
-            socksSize:
-              selectedSocksSize ||
-              item.selectedOptions.find((option) => option.name === 'Size')
-                ?.value ||
-              '',
-          }),
-        ) ?? [];
-      return {
-        color,
-        pack: pack.value,
-        price: variants[0]?.price ?? (socksPreview ? pack.price : null),
-        available:
-          socksPreview || variants.some((item) => item.availableForSale),
-      };
-    }),
-  );
-  const selectedSocks = sockChoices.find(
-    (item) => item.color === socksColor && item.pack === socksPack,
-  );
-  const sockOffers = PED_SOCKS_COLORS.map((color) => {
-    const single = sockChoices.find(
-      (item) => item.color === color && item.pack === '1 pair',
-    );
-    const pack = sockChoices.find(
-      (item) => item.color === color && item.pack === '3 pairs',
-    );
-    const saving = socksPackSavings(single?.price ?? null, pack?.price ?? null);
-    if (!single?.available || !pack?.available || !pack.price || !saving)
-      return null;
-    return {color, price: pack.price, saving};
-  });
-  const socksOffer = withSocks
-    ? sockOffers.find((offer) => offer?.color === socksColor)
-    : sockOffers.every(
-          (offer) =>
-            offer &&
-            offer.price.amount === sockOffers[0]?.price.amount &&
-            offer.price.currencyCode === sockOffers[0]?.price.currencyCode &&
-            offer.saving.amount === sockOffers[0]?.saving.amount,
-        )
-      ? sockOffers[0]
-      : null;
   const quote = jerseyQuote(
     selection,
     product?.variants.nodes ?? [],
-    selectedSocks?.price ?? null,
+    socks?.variants.nodes ?? [],
     preview,
     shorts?.variants.nodes ?? [],
   );
   const price = quote.total;
+  const withSocks = quote.socks.quantity > 0;
+  const sockChoices = quote.socks.prices.map((item) => ({
+    ...item,
+    available:
+      preview ||
+      Boolean(
+        socks?.variants.nodes.some(
+          (variant) =>
+            variant.availableForSale &&
+            matchesSocksVariant(variant.selectedOptions, item.color),
+        ),
+      ),
+  }));
   const firstChoice = quote.choices.find(
     (item) => item.style === firstStyle.value,
   )!;
@@ -204,10 +165,9 @@ export function JerseyPage({
   const secondChoice = secondChoices.find(
     (item) => item.style.value === secondStyle?.value,
   );
-  const socksComplete =
-    !withSocks || !sockSizes.length || Boolean(selectedSocksSize);
-  const socksAvailable =
-    !withSocks || !socksComplete || Boolean(selectedSocks?.available);
+  const socksAvailable = selection.socks.every(
+    ({color}) => sockChoices.find((item) => item.color === color)?.available,
+  );
   const busy = fetcher.state !== 'idle';
   const available =
     preview ||
@@ -217,13 +177,16 @@ export function JerseyPage({
           shorts?.variants.nodes.some(
             (item) =>
               item.availableForSale &&
-              matchesShortsVariant(item.selectedOptions, jersey, shortsSize),
+              matchesShortsVariant(
+                item.selectedOptions,
+                jersey,
+                jersey.shortsSize,
+              ),
           ),
         )));
   const submitDisabled =
     busy || !canOrder || (hasSizes && !available) || !socksAvailable;
-  const readyToSubmit =
-    socksComplete && !validateJerseySelection(selection, canPersonalize);
+  const readyToSubmit = !validateJerseySelection(selection, canPersonalize);
   const previewSelection = fetcher.data?.preview;
   const previewIsCurrent =
     previewSelection &&
@@ -249,11 +212,9 @@ export function JerseyPage({
       ? 'Build your kit'
       : bundle && !secondSize
         ? `Choose ${secondSide.toLowerCase()} size`
-        : withShorts && !shortsSize
-          ? 'Choose shorts size'
-          : !socksComplete
-            ? 'Choose socks size'
-            : submitLabel;
+        : withShorts && !hasSizes
+          ? 'Choose shorts sizes'
+          : submitLabel;
   const closes = window.endsAt
     ? new Intl.DateTimeFormat('en-US', {
         month: 'short',
@@ -345,7 +306,9 @@ export function JerseyPage({
             <span className="jersey-price-label">
               {bundle ? '2 jerseys' : '1 jersey'}
               {withShorts ? ` + ${bundle ? '2 pairs of ' : ''}shorts` : ''}
-              {withSocks ? ` + ${socksPack} of socks` : ''}
+              {withSocks
+                ? ` + ${quote.socks.quantity} ${quote.socks.quantity === 1 ? 'pair' : 'pairs'} of socks`
+                : ''}
             </span>
           </div>
           <p className="jersey-launch-offer">
@@ -423,19 +386,18 @@ export function JerseyPage({
                     ? 'Name and number shown are an example. Add your own below.'
                     : 'Name and number shown are an example.'}
             </p>
-            {withSocks && (
-              <div
-                className="jersey-gallery-addon"
-                role="group"
-                aria-label="Socks in your kit"
-              >
-                <SocksPhoto color={socksColor} />
+            {selection.socks.map(({color, quantity}) => (
+              <div className="jersey-gallery-addon" key={color}>
+                <SocksPhoto color={color} />
                 <div className="jersey-addon-copy">
-                  <strong>{socksColor} PED socks</strong>
-                  <small>{socksPack} · added to your kit</small>
+                  <strong>{color} PED socks</strong>
+                  <small>
+                    {quantity} {quantity === 1 ? 'pair' : 'pairs'} · added to
+                    your kit
+                  </small>
                 </div>
               </div>
-            )}
+            ))}
           </div>
           <div className="pel-pdp__stats" aria-label="Release details">
             {[
@@ -717,248 +679,213 @@ export function JerseyPage({
             </BuilderStep>
             <BuilderStep
               number={2}
-              title="Complete your kit"
-              note="Add what you like. Both extras are optional."
+              title="Matching shorts"
+              note="Optional · Choose your shorts size separately."
+              action={
+                withShorts ? (
+                  <button
+                    type="button"
+                    className="jersey-text-button"
+                    aria-label="Remove matching shorts"
+                    onClick={() => {
+                      setWithShorts(false);
+                      requestAnimationFrame(() =>
+                        addShortsRef.current?.focus({preventScroll: true}),
+                      );
+                    }}
+                  >
+                    Remove
+                  </button>
+                ) : undefined
+              }
             >
-              <section
-                className="jersey-shorts"
-                aria-labelledby="jersey-shorts-heading"
-              >
-                <div className="jersey-option-heading">
-                  <h4 id="jersey-shorts-heading">Add shorts</h4>
-                  <span className="jersey-option-note">
-                    {withShorts ? 'Added' : 'Optional'}
-                  </span>
+              {withShorts ? (
+                <div className="jersey-item-list" id="jersey-shorts-sizes">
+                  <input type="hidden" name="addShorts" value="on" />
+                  {styles.map((style, index) => (
+                    <ShortsCard
+                      key={style.color}
+                      style={style}
+                      name={
+                        index === 0 ? 'firstShortsSize' : 'secondShortsSize'
+                      }
+                      size={shortsSizes[style.color] || ''}
+                      price={quote.shortsPrices[index]}
+                      onChange={(value) =>
+                        setShortsSizes((current) => ({
+                          ...current,
+                          [style.color]: value,
+                        }))
+                      }
+                    />
+                  ))}
                 </div>
+              ) : (
                 <button
                   type="button"
-                  className={`jersey-style-option jersey-shorts-card${withShorts ? ' is-active' : ''}`}
-                  aria-label={
-                    withShorts
-                      ? 'Remove matching shorts'
-                      : 'Add matching shorts'
-                  }
-                  aria-pressed={withShorts}
-                  aria-expanded={withShorts}
-                  aria-controls="jersey-shorts-size"
-                  aria-describedby="jersey-shorts-price"
+                  className="jersey-bundle-offer"
+                  ref={addShortsRef}
+                  aria-label="Add matching shorts"
+                  aria-expanded={false}
+                  aria-controls="jersey-shorts-sizes"
+                  disabled={!quote.shorts}
                   onClick={() => {
-                    setWithShorts(!withShorts);
+                    setWithShorts(true);
                     setView('front');
+                    requestAnimationFrame(() =>
+                      document
+                        .querySelector<HTMLElement>(
+                          '#jersey-shorts-sizes input[type=radio], #jersey-shorts-sizes button',
+                        )
+                        ?.focus({preventScroll: true}),
+                    );
                   }}
                 >
-                  <span className="jersey-extra-picture">
+                  <span className="jersey-extra-picture" aria-hidden="true">
                     <JerseyPhotos
                       styles={styles}
                       view="shorts"
-                      sizes={bundle ? '36px' : '72px'}
+                      sizes="64px"
+                      decorative
                     />
                   </span>
-                  <span className="jersey-style-copy">
+                  <span className="jersey-addon-copy">
                     <strong>
                       {bundle
-                        ? 'Home + Away shorts'
-                        : away
-                          ? 'Away shorts'
-                          : 'Home shorts'}
+                        ? 'Add both matching shorts'
+                        : 'Add matching shorts'}
                     </strong>
-                    <span>
-                      {bundle
-                        ? 'One matching pair for each jersey'
-                        : away
-                          ? 'Black'
-                          : 'Cream'}
-                      {' · With pockets'}
-                    </span>
-                    <small id="jersey-shorts-price">
-                      {quote.shorts && (
-                        <>
-                          +<Money data={quote.shorts} as="span" />
-                          {quote.shortsSavings && (
-                            <>
-                              {' '}
-                              · <Money data={quote.shortsValue} as="s" /> value
-                            </>
-                          )}
-                        </>
-                      )}
+                    <small>
+                      With pockets ·{' '}
+                      <Money data={JERSEY_SHORTS_VALUE} as="span" /> value per
+                      pair
                     </small>
                   </span>
-                  <span className="jersey-text-button" aria-hidden="true">
-                    {withShorts ? 'Remove' : 'Add'}
+                  <span className="jersey-bundle-price">
+                    {quote.shorts && (
+                      <>
+                        +<Money data={quote.shorts} as="span" />
+                      </>
+                    )}
                   </span>
                 </button>
-                {withShorts && (
-                  <div id="jersey-shorts-size">
-                    <input type="hidden" name="addShorts" value="on" />
-                    <SizeChoice
-                      name="shortsSize"
-                      label={
-                        bundle ? 'Shorts size · both pairs' : 'Shorts size'
-                      }
-                      value={shortsSize}
-                      onChange={setShortsSize}
-                    />
-                    <p className="jersey-hint">
-                      {bundle
-                        ? 'Both pairs use this shorts size.'
-                        : 'Your shorts can be a different size from your jersey.'}
-                    </p>
-                  </div>
-                )}
-              </section>
-
-              {(preview || socks) && (
-                <section
-                  className="jersey-socks"
-                  aria-labelledby="jersey-socks-heading"
-                >
-                  <div className="jersey-option-heading">
-                    <h4 id="jersey-socks-heading">Add socks</h4>
-                    <div className="jersey-socks-actions">
-                      <SocksGallery selectedColor={socksColor} />
-                      {withSocks ? (
-                        <button
-                          type="button"
-                          className="jersey-text-button"
-                          aria-label="Remove PED socks"
-                          onClick={() => {
-                            setSocksColor('None');
-                            setSocksPack(PED_SOCKS_PACKS[0].value);
-                          }}
-                        >
-                          Remove
-                        </button>
-                      ) : (
-                        <span className="jersey-option-note">Optional</span>
-                      )}
-                    </div>
-                  </div>
-                  <fieldset className="jersey-sock-options">
-                    <legend className="sr-only">Socks color</legend>
-                    {socksOffer && (
-                      <p className="jersey-socks-offer">
-                        3 pairs for <Money data={socksOffer.price} as="span" />{' '}
-                        · Save <Money data={socksOffer.saving} as="span" />
-                      </p>
-                    )}
-                    <div className="jersey-style-grid">
-                      {PED_SOCKS_COLORS.map((value) => {
-                        const choice = sockChoices.find(
-                          (item) =>
-                            item.color === value && item.pack === socksPack,
-                        );
-                        const disabled = !choice?.available;
-                        return (
-                          <label
-                            key={value}
-                            className={`jersey-style-option${socksColor === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
-                          >
-                            <input
-                              type="radio"
-                              name="socksColor"
-                              value={value}
-                              checked={socksColor === value}
-                              disabled={disabled}
-                              onChange={() => setSocksColor(value)}
-                            />
-                            <span
-                              className="jersey-style-picture"
-                              aria-hidden="true"
-                            >
-                              <SocksPhoto color={value} />
-                            </span>
-                            <span className="jersey-style-copy">
-                              <strong>{value}</strong>
-                              <span>{socksPack}</span>
-                              {choice?.price && (
-                                <small>
-                                  +<Money data={choice.price} as="span" />
-                                </small>
-                              )}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </fieldset>
-                  {withSocks && (
-                    <fieldset className="jersey-sock-options">
-                      <legend className="sr-only">Socks pack</legend>
-                      <div className="jersey-sizes jersey-choice-row">
-                        {PED_SOCKS_PACKS.map(({value}) => {
-                          const choice = sockChoices.find(
-                            (item) =>
-                              item.color === socksColor && item.pack === value,
-                          );
-                          const disabled = !choice?.available;
-                          return (
-                            <label
-                              key={value}
-                              className={`pel-pdp__size${socksPack === value ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
-                            >
-                              <input
-                                type="radio"
-                                name="socksPack"
-                                value={value}
-                                checked={socksPack === value}
-                                disabled={disabled}
-                                onChange={() => setSocksPack(value)}
-                                required
-                              />
-                              {value}
-                              {choice?.price && (
-                                <small>
-                                  +<Money data={choice.price} as="span" />
-                                </small>
-                              )}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </fieldset>
-                  )}
-                  <p className="jersey-hint">One size.</p>
-                  {withSocks && socksPack === '3 pairs' && (
-                    <p className="jersey-hint">
-                      All three pairs in your selected color.
-                    </p>
-                  )}
-                  {withSocks &&
-                    (sockSizes.length > 1 ? (
-                      <fieldset className="pel-pdp__opt">
-                        <legend className="pel-pdp__opt-label">
-                          Socks size
-                        </legend>
-                        <div className="pel-pdp__sizes jersey-sizes">
-                          {sockSizes.map((value) => (
-                            <label
-                              key={value}
-                              className={`pel-pdp__size${selectedSocksSize === value ? ' is-active' : ''}`}
-                            >
-                              <input
-                                type="radio"
-                                name="socksSize"
-                                value={value}
-                                checked={selectedSocksSize === value}
-                                onChange={() => setSocksSize(value)}
-                                required
-                              />
-                              {value}
-                            </label>
-                          ))}
-                        </div>
-                      </fieldset>
-                    ) : (
-                      <input
-                        type="hidden"
-                        name="socksSize"
-                        value={selectedSocksSize}
-                      />
-                    ))}
-                </section>
               )}
             </BuilderStep>
+
+            {(preview || socks) && (
+              <BuilderStep
+                number={3}
+                title="Socks"
+                note="Optional · One size"
+                action={
+                  <SocksGallery
+                    selectedColor={selection.socks[0]?.color ?? 'Black'}
+                  />
+                }
+              >
+                {quote.socks.offer && (
+                  <p className="jersey-socks-offer">
+                    Mix colors · Any 3 pairs for{' '}
+                    <Money data={quote.socks.offer} as="span" />
+                  </p>
+                )}
+                <div className="jersey-item-list">
+                  {sockChoices.map(({color, price: sockPrice, available}) => {
+                    const quantity = sockQuantities[color];
+                    const changeQuantity = (delta: number) =>
+                      setSockQuantities((current) => ({
+                        ...current,
+                        [color]: Math.max(
+                          0,
+                          Math.min(MAX_SOCKS_QUANTITY, current[color] + delta),
+                        ),
+                      }));
+                    return (
+                      <div
+                        key={color}
+                        className={`jersey-item jersey-addon-row jersey-sock-row${quantity ? ' is-added' : ''}`}
+                      >
+                        <SocksPhoto color={color} />
+                        <div className="jersey-addon-copy">
+                          <h4>{color}</h4>
+                          <small>
+                            {!available
+                              ? 'Unavailable'
+                              : sockPrice && (
+                                  <>
+                                    <Money data={sockPrice} as="span" /> per
+                                    pair
+                                  </>
+                                )}
+                          </small>
+                        </div>
+                        <div
+                          className="jersey-quantity"
+                          role="group"
+                          aria-label={`${color} socks quantity`}
+                        >
+                          <button
+                            type="button"
+                            disabled={quantity === 0}
+                            aria-label={`Remove one pair of ${color.toLowerCase()} socks`}
+                            onClick={() => changeQuantity(-1)}
+                          >
+                            −
+                          </button>
+                          <output
+                            aria-live="polite"
+                            aria-label={`${color} pairs`}
+                          >
+                            {quantity}
+                          </output>
+                          <button
+                            type="button"
+                            disabled={
+                              !available || quantity >= MAX_SOCKS_QUANTITY
+                            }
+                            aria-label={`Add one pair of ${color.toLowerCase()} socks`}
+                            onClick={() => changeQuantity(1)}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <input
+                          type="hidden"
+                          name={`socks${color}`}
+                          value={quantity}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="jersey-hint jersey-sock-status" role="status">
+                  {quote.socks.quantity > 0 && (
+                    <>
+                      {quote.socks.quantity}{' '}
+                      {quote.socks.quantity === 1 ? 'pair' : 'pairs'}
+                      {quote.socks.total && (
+                        <>
+                          {' '}
+                          · <Money data={quote.socks.total} as="span" />
+                        </>
+                      )}
+                    </>
+                  )}
+                  {quote.socks.savings && (
+                    <>
+                      {' '}
+                      · You save <Money data={quote.socks.savings} as="span" />
+                    </>
+                  )}
+                  {quote.socks.nextPair && (
+                    <>
+                      {' · '}Add one more for{' '}
+                      <Money data={quote.socks.nextPair} as="span" />
+                    </>
+                  )}
+                </p>
+              </BuilderStep>
+            )}
 
             <button
               type="submit"
@@ -991,21 +918,20 @@ export function JerseyPage({
                         : ' · Plain back'}
                     </p>
                   ))}
-                  <p>
-                    {fetcher.data.preview.shortsSize === 'None'
-                      ? 'No shorts'
-                      : `${fetcher.data.preview.jerseys.length === 2 ? '2 pairs of shorts' : 'Shorts'}, size ${fetcher.data.preview.shortsSize}`}
-                  </p>
-                  {fetcher.data.preview.socksColor !== 'None' && (
-                    <p>
-                      PED socks: {fetcher.data.preview.socksColor} ·{' '}
-                      {fetcher.data.preview.socksPack}
-                      {fetcher.data.preview.socksSize
-                        ? ` · ${fetcher.data.preview.socksSize}`
-                        : ''}
-                      {socksPreview ? ' · size TBC' : ''}
+                  {fetcher.data.preview.jerseys
+                    .filter(({shortsSize}) => shortsSize !== 'None')
+                    .map((jersey) => (
+                      <p key={jersey.style}>
+                        {jersey.style.startsWith('Home') ? 'Home' : 'Away'}{' '}
+                        shorts · Size {jersey.shortsSize}
+                      </p>
+                    ))}
+                  {fetcher.data.preview.socks.map(({color, quantity}) => (
+                    <p key={color}>
+                      {color} PED socks · {quantity}{' '}
+                      {quantity === 1 ? 'pair' : 'pairs'}
                     </p>
-                  )}
+                  ))}
                   <small>
                     Preview only. No item added to your cart and no order
                     placed.
@@ -1048,7 +974,7 @@ export function JerseyPage({
               ['Sleeves', 'Short / Long'],
               ['Options', 'Home, Away, or both'],
               ['Shorts', 'With pockets · optional · choose a separate size'],
-              ['Socks', 'Black / White · 1 pair or 3 pairs'],
+              ['Socks', 'Black / White · Mix colors · One size'],
               [
                 'Shipping',
                 product?.shippingEstimate?.value || 'Date to be confirmed',
@@ -1138,11 +1064,13 @@ function BuilderStep({
   number,
   title,
   note,
+  action,
   children,
 }: {
   number: number;
   title: string;
   note: string;
+  action?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -1155,6 +1083,7 @@ function BuilderStep({
           <h3 id={`jersey-step-${number}`}>{title}</h3>
           <p>{note}</p>
         </div>
+        {action}
       </div>
       {children}
     </section>
@@ -1259,6 +1188,88 @@ function SelectedJersey({
         </small>
       </div>
       <div className="jersey-item-actions">{children}</div>
+    </div>
+  );
+}
+
+function ShortsCard({
+  style,
+  name,
+  size,
+  price,
+  onChange,
+}: {
+  style: JerseyStyle;
+  name: string;
+  size: string;
+  price: Price | null;
+  onChange: (size: string) => void;
+}) {
+  const [editing, setEditing] = useState(!size);
+  const editRef = useRef<HTMLButtonElement>(null);
+  const side = style.color === JERSEY_COLORS[0] ? 'Home' : 'Away';
+  return (
+    <div className="jersey-item">
+      <div className="jersey-addon-row">
+        <span className="jersey-extra-picture" aria-hidden="true">
+          <JerseyPhotos
+            styles={[style]}
+            view="shorts"
+            sizes="64px"
+            decorative
+          />
+        </span>
+        <div className="jersey-addon-copy">
+          <h4>{side} shorts</h4>
+          <small>{side === 'Home' ? 'Cream' : 'Black'} · With pockets</small>
+          <small>
+            {!editing && <>Size {size} · </>}
+            {price && (
+              <>
+                +<Money data={price} as="span" />
+              </>
+            )}
+          </small>
+        </div>
+        {!editing && (
+          <button
+            type="button"
+            ref={editRef}
+            className="jersey-text-button"
+            aria-label={`Edit ${side.toLowerCase()} shorts size`}
+            aria-expanded={false}
+            aria-controls={`${name}-options`}
+            onClick={() => {
+              setEditing(true);
+              requestAnimationFrame(() =>
+                document
+                  .querySelector<HTMLElement>(`#${name}-options input:checked`)
+                  ?.focus({preventScroll: true}),
+              );
+            }}
+          >
+            Edit
+          </button>
+        )}
+      </div>
+      {editing ? (
+        <div id={`${name}-options`}>
+          <SizeChoice
+            name={name}
+            label={`${side} shorts size`}
+            value={size}
+            onChange={(value) => {
+              onChange(value);
+              setEditing(false);
+              requestAnimationFrame(() =>
+                editRef.current?.focus({preventScroll: true}),
+              );
+            }}
+          />
+        </div>
+      ) : (
+        <input type="hidden" name={name} value={size} />
+      )}
     </div>
   );
 }
@@ -1398,6 +1409,9 @@ function SizeChoice({
               value={size}
               checked={value === size}
               onChange={() => onChange(size)}
+              onClick={() => {
+                if (value === size) onChange(size);
+              }}
               required
             />
             {size}

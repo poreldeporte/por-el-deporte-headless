@@ -13,7 +13,8 @@ import {
   jerseyPreviewPrice,
   jerseyQuote,
   subtractPrices,
-  socksPackSavings,
+  socksQuote,
+  MAX_SOCKS_QUANTITY,
   matchesSocksVariant,
   matchesJerseyVariant,
   personalizationWindow,
@@ -32,11 +33,8 @@ const bundleStyle = jerseyStyleValue([homeShort, awayLong]);
 const print = {name: 'VIOLA', number: '07'};
 const plainPrint = {name: '', number: ''};
 const selection = {
-  jerseys: [{style: homeShort, size: 'XL', print}],
-  shortsSize: 'M',
-  socksColor: 'None',
-  socksPack: '1 pair',
-  socksSize: '',
+  jerseys: [{style: homeShort, size: 'XL', print, shortsSize: 'M'}],
+  socks: [],
 };
 
 const shorts = ['Home (Cream)', 'Away (Black)'].flatMap((color) =>
@@ -68,8 +66,8 @@ test('a mixed sleeve bundle adds each jersey and matching shorts as separate lin
   const chosen = {
     ...selection,
     jerseys: [
-      {style: homeShort, size: 'XL', print},
-      {style: awayLong, size: 'M', print},
+      {style: homeShort, size: 'XL', print, shortsSize: 'M'},
+      {style: awayLong, size: 'M', print, shortsSize: 'M'},
     ],
   };
   const variants = chosen.jerseys.map((jersey, index) => ({
@@ -133,79 +131,106 @@ test('unavailable matching shorts reject the whole kit before any cart write', (
   }
 });
 
-test('socks resolve the exact color, pack and size before adding one priced SKU', () => {
+const socks = ['Black', 'White'].map((color) => ({
+  id: `${color}-single`,
+  availableForSale: true,
+  selectedOptions: [
+    {name: 'Color', value: color},
+    {name: 'Pack', value: '1 pair'},
+  ],
+  price: {amount: '10.00', currencyCode: 'USD'},
+}));
+
+test('mixed socks add exact single-pair variants with a quantity per color', () => {
   const chosen = {
     ...selection,
-    shortsSize: 'None',
-    socksColor: 'White',
-    socksSize: 'L',
-  };
-  const jersey = {
-    id: 'jersey-xl-m',
-    availableForSale: true,
-    selectedOptions: [
-      {name: 'Style', value: homeShort},
-      {name: 'Size', value: 'XL'},
+    socks: [
+      {color: 'Black', quantity: 2},
+      {color: 'White', quantity: 1},
     ],
   };
-  const sock = {
-    id: 'white-socks-l',
+  const jerseys = chosen.jerseys.map((jersey) => ({
+    id: 'jersey',
     availableForSale: true,
-    selectedOptions: [
-      {name: 'Color', value: 'White'},
-      {name: 'Pack', value: '1 pair'},
-      {name: 'Size', value: 'L'},
-    ],
-  };
-  assert.equal(matchesSocksVariant(sock.selectedOptions, chosen), true);
-  assert.equal(
-    matchesSocksVariant(sock.selectedOptions, {...chosen, socksColor: 'Black'}),
-    false,
-  );
-  assert.equal(
-    matchesSocksVariant(sock.selectedOptions, {...chosen, socksSize: ''}),
-    false,
-  );
-  assert.deepEqual(jerseyCartLines(chosen, [jersey], [sock]).lines[1], {
-    merchandiseId: 'white-socks-l',
-    quantity: 1,
-  });
-  const threePairs = {...chosen, socksPack: '3 pairs'};
-  const pack = {
-    ...sock,
-    id: 'white-socks-three-pack-l',
-    selectedOptions: sock.selectedOptions.map((option) =>
-      option.name === 'Pack' ? {...option, value: '3 pairs'} : option,
+    selectedOptions: Object.entries(jerseyOptionValues(jersey)).map(
+      ([name, value]) => ({name, value}),
     ),
-  };
-  assert.equal(matchesSocksVariant(sock.selectedOptions, threePairs), false);
-  assert.deepEqual(jerseyCartLines(threePairs, [jersey], [sock]).lines, []);
+  }));
+  assert.equal(validateJerseySelection(chosen, true), null);
   assert.deepEqual(
-    jerseyCartLines(threePairs, [jersey], [sock, pack]).lines[1],
-    {
-      merchandiseId: 'white-socks-three-pack-l',
-      quantity: 1,
-    },
+    jerseyCartLines(chosen, jerseys, socks, shorts).lines.slice(-2),
+    [
+      {merchandiseId: 'Black-single', quantity: 2},
+      {merchandiseId: 'White-single', quantity: 1},
+    ],
   );
-  for (const stock of [[], [{...sock, availableForSale: false}]]) {
-    const order = jerseyCartLines(chosen, [jersey], stock);
-    assert.match(order.error, /socks are not available/);
-    assert.deepEqual(order.lines, []);
+  assert.equal(matchesSocksVariant(socks[0].selectedOptions, 'Black'), true);
+  assert.equal(matchesSocksVariant(socks[0].selectedOptions, 'White'), false);
+  assert.equal(
+    matchesSocksVariant(
+      [
+        {name: 'Color', value: 'Black'},
+        {name: 'Pack', value: '3 pairs'},
+      ],
+      'Black',
+    ),
+    false,
+  );
+  for (const stock of [
+    [],
+    socks.slice(0, 1),
+    socks.map((item) => ({...item, availableForSale: false})),
+  ]) {
+    const result = jerseyCartLines(chosen, jerseys, stock, shorts);
+    assert.match(result.error, /socks are not available/);
+    assert.deepEqual(result.lines, []);
   }
-  const form = formFor(chosen);
-  assert.equal(readJerseySelection(form).socksColor, 'White');
-  form.set('socksPack', '3 pairs');
-  assert.equal(readJerseySelection(form).socksPack, '3 pairs');
-  form.set('socksColor', 'None');
-  assert.equal(readJerseySelection(form).socksColor, 'None');
-  assert.equal(readJerseySelection(form).socksPack, '1 pair');
+});
+
+test('sock quantities parse independently and reject invalid, duplicate or unbounded selections', () => {
+  const form = formFor(selection);
+  form.set('socksBlack', '2');
+  form.set('socksWhite', '1');
+  assert.deepEqual(readJerseySelection(form).socks, [
+    {color: 'Black', quantity: 2},
+    {color: 'White', quantity: 1},
+  ]);
+  form.set('socksBlack', '0');
+  form.set('socksWhite', '0');
+  assert.deepEqual(readJerseySelection(form).socks, []);
+  for (const quantity of [-1, 0.5, Infinity, NaN, MAX_SOCKS_QUANTITY + 1]) {
+    form.set('socksBlack', String(quantity));
+    assert.match(
+      validateJerseySelection(readJerseySelection(form), true),
+      /pairs of each sock color/,
+    );
+  }
   assert.match(
-    validateJerseySelection({...chosen, socksColor: ''}, true),
+    validateJerseySelection(
+      {...selection, socks: [{color: 'Blue', quantity: 1}]},
+      true,
+    ),
     /black or white/,
   );
   assert.match(
-    validateJerseySelection({...chosen, socksPack: '2 pairs'}, true),
-    /one pair or three pairs/,
+    validateJerseySelection(
+      {
+        ...selection,
+        socks: [
+          {color: 'Black', quantity: 1},
+          {color: 'Black', quantity: 2},
+        ],
+      },
+      true,
+    ),
+    /black or white/,
+  );
+  assert.equal(
+    validateJerseySelection(
+      {...selection, socks: [{color: 'White', quantity: MAX_SOCKS_QUANTITY}]},
+      true,
+    ),
+    null,
   );
 });
 
@@ -275,28 +300,28 @@ test('invalid options and print data are rejected before a cart write', () => {
     {jerseys: []},
     {jerseys: [{style: homeShort, size: '', print}]},
     {jerseys: [{style: homeShort, size: 'S', print}]},
-    {jerseys: [{style: 'Blue', size: 'M', print}]},
+    {jerseys: [{style: 'Blue', size: 'M', print, shortsSize: 'M'}]},
     {
       jerseys: [
-        {style: homeShort, size: 'M', print},
-        {style: homeShort, size: 'XL', print},
+        {style: homeShort, size: 'M', print, shortsSize: 'M'},
+        {style: homeShort, size: 'XL', print, shortsSize: 'M'},
       ],
     },
     {
       jerseys: [
-        {style: homeShort, size: 'M', print},
-        {style: homeLong, size: 'XL', print},
+        {style: homeShort, size: 'M', print, shortsSize: 'M'},
+        {style: homeLong, size: 'XL', print, shortsSize: 'M'},
       ],
     },
     {
       jerseys: [
-        {style: awayShort, size: 'M', print},
-        {style: awayLong, size: 'XL', print},
+        {style: awayShort, size: 'M', print, shortsSize: 'M'},
+        {style: awayLong, size: 'XL', print, shortsSize: 'M'},
       ],
     },
     {
       jerseys: [
-        {style: homeShort, size: 'M', print},
+        {style: homeShort, size: 'M', print, shortsSize: 'M'},
         {style: awayLong, size: '', print},
       ],
     },
@@ -306,8 +331,8 @@ test('invalid options and print data are rejected before a cart write', () => {
         size: 'M',
       })),
     },
-    {shortsSize: ''},
-    {shortsSize: 'S'},
+    {jerseys: [{...selection.jerseys[0], shortsSize: ''}]},
+    {jerseys: [{...selection.jerseys[0], shortsSize: 'S'}]},
   ])
     assert.equal(
       typeof validateJerseySelection({...selection, ...patch}, true),
@@ -342,7 +367,12 @@ test('variant matching resolves style and size regardless of option order', () =
   ];
   assert.equal(matchesJerseyVariant(options, selection.jerseys[0]), true);
   assert.equal(
-    matchesJerseyVariant(options, {style: awayShort, size: 'XL', print}),
+    matchesJerseyVariant(options, {
+      style: awayShort,
+      size: 'XL',
+      print,
+      shortsSize: 'M',
+    }),
     false,
   );
   assert.equal(
@@ -351,29 +381,47 @@ test('variant matching resolves style and size regardless of option order', () =
   );
 });
 
-test('shorts size is independent of jersey size and required only when adding shorts', () => {
-  assert.equal(validateJerseySelection(selection, true), null);
-  assert.equal(
-    validateJerseySelection({...selection, shortsSize: 'None'}, true),
-    null,
+test('shorts sizes are independent per jersey and required only after adding matching shorts', () => {
+  const chosen = {
+    ...selection,
+    jerseys: [
+      selection.jerseys[0],
+      {style: awayLong, size: 'XXL', print, shortsSize: 'L'},
+    ],
+  };
+  assert.equal(validateJerseySelection(chosen, true), null);
+  const form = formFor(chosen);
+  assert.deepEqual(
+    readJerseySelection(form).jerseys.map(({shortsSize}) => shortsSize),
+    ['M', 'L'],
   );
+  form.delete('secondShortsSize');
   assert.match(
-    validateJerseySelection({...selection, shortsSize: ''}, true),
-    /shorts size/i,
+    validateJerseySelection(readJerseySelection(form), true),
+    /shorts size for Away/,
   );
+  form.delete('addShorts');
+  assert.deepEqual(
+    readJerseySelection(form).jerseys.map(({shortsSize}) => shortsSize),
+    ['None', 'None'],
+  );
+  assert.equal(validateJerseySelection(readJerseySelection(form), true), null);
   assert.match(
-    validateJerseySelection({...selection, shortsSize: 'S'}, true),
-    /shorts size/i,
+    validateJerseySelection(
+      {
+        ...chosen,
+        jerseys: [
+          chosen.jerseys[0],
+          {...chosen.jerseys[1], shortsSize: 'None'},
+        ],
+      },
+      true,
+    ),
+    /each jersey/,
   );
-  const form = formFor(selection);
-  assert.equal(readJerseySelection(form).shortsSize, 'None');
-  form.set('addShorts', 'on');
-  assert.equal(readJerseySelection(form).shortsSize, 'M');
-  form.delete('shortsSize');
-  assert.equal(readJerseySelection(form).shortsSize, '');
 });
 
-test('16 jerseys and 8 shorts fulfill all 400 builder combinations with independent sizes', () => {
+test('16 jerseys and 8 shorts fulfill all 1168 combinations with independent jersey and shorts sizes', () => {
   const variants = [homeShort, homeLong, awayShort, awayLong].flatMap((style) =>
     JERSEY_SIZES.map((size) => ({
       id: `${style}-${size}`,
@@ -390,35 +438,41 @@ test('16 jerseys and 8 shorts fulfill all 400 builder combinations with independ
     const styles = jerseyStyles(style);
     for (const firstSize of JERSEY_SIZES) {
       for (const secondSize of styles.length === 2 ? JERSEY_SIZES : ['']) {
-        for (const shortsSize of JERSEY_SHORTS_OPTIONS) {
-          const jerseys = styles.map((item, index) => ({
-            style: item.value,
-            size: index === 0 ? firstSize : secondSize,
-            print,
-          }));
-          for (const ordered of [jerseys, [...jerseys].reverse()]) {
-            const chosen = {...selection, jerseys: ordered, shortsSize};
-            assert.equal(validateJerseySelection(chosen, true), null);
-            const result = jerseyCartLines(chosen, variants, [], shorts);
-            assert.equal(result.error, null);
-            assert.deepEqual(
-              result.lines.map(({merchandiseId}) => merchandiseId),
-              ordered.flatMap(({style, size}) => [
-                `${style}-${size}`,
-                ...(shortsSize === 'None'
-                  ? []
-                  : [
-                      `${style.startsWith('Home') ? 'Home (Cream)' : 'Away (Black)'}-${shortsSize}`,
-                    ]),
-              ]),
-            );
+        for (const firstShorts of JERSEY_SHORTS_OPTIONS) {
+          for (const secondShorts of styles.length === 2 &&
+          firstShorts !== 'None'
+            ? JERSEY_SIZES
+            : [firstShorts]) {
+            const jerseys = styles.map((item, index) => ({
+              style: item.value,
+              size: index === 0 ? firstSize : secondSize,
+              print,
+              shortsSize: index === 0 ? firstShorts : secondShorts,
+            }));
+            for (const ordered of [jerseys, [...jerseys].reverse()]) {
+              const chosen = {...selection, jerseys: ordered};
+              assert.equal(validateJerseySelection(chosen, true), null);
+              const result = jerseyCartLines(chosen, variants, [], shorts);
+              assert.equal(result.error, null);
+              assert.deepEqual(
+                result.lines.map(({merchandiseId}) => merchandiseId),
+                ordered.flatMap(({style, size, shortsSize}) => [
+                  `${style}-${size}`,
+                  ...(shortsSize === 'None'
+                    ? []
+                    : [
+                        `${style.startsWith('Home') ? 'Home (Cream)' : 'Away (Black)'}-${shortsSize}`,
+                      ]),
+                ]),
+              );
+            }
+            count++;
           }
-          count++;
         }
       }
     }
   }
-  assert.equal(count, 400);
+  assert.equal(count, 1168);
 });
 
 test('single jerseys and Home + Away sets have the correct sleeve, bundle and shorts prices', () => {
@@ -438,9 +492,17 @@ test('single jerseys and Home + Away sets have the correct sleeve, bundle and sh
     assert.equal(jerseyPreviewPrice(style, false).amount, plain);
     assert.equal(jerseyPreviewPrice(style, true).amount, kit);
     const quote = jerseyQuote(
-      {...selection, jerseys: styles.map((style) => ({style, size: 'XL'}))},
+      {
+        ...selection,
+        jerseys: styles.map((style) => ({
+          style,
+          size: 'XL',
+          print,
+          shortsSize: 'M',
+        })),
+      },
       [],
-      null,
+      [],
       true,
     );
     assert.equal(quote.total.amount, kit);
@@ -474,53 +536,62 @@ test('quotes sum actual separate prices and reject missing or mixed-currency ext
   }));
   const chosen = {
     ...selection,
-    jerseys: [{style: homeLong, size: 'XL', print}],
+    jerseys: [{style: homeLong, size: 'XL', print, shortsSize: 'M'}],
   };
-  const quote = jerseyQuote(chosen, variants, null, false, pricedShorts);
+  const quote = jerseyQuote(chosen, variants, [], false, pricedShorts);
   assert.equal(quote.total.amount, '100.00');
   assert.equal(quote.shorts.amount, '17.00');
   assert.equal(quote.shortsSavings.amount, '18.00');
-  const socks = {...chosen, socksColor: 'Black'};
+  const withSocks = {...chosen, socks: [{color: 'Black', quantity: 1}]};
+  assert.equal(
+    jerseyQuote(withSocks, variants, socks, false, pricedShorts).total.amount,
+    '110.00',
+  );
   assert.equal(
     jerseyQuote(
-      socks,
+      withSocks,
       variants,
-      {amount: '12.50', currencyCode: 'USD'},
+      socks.map((item) => ({
+        ...item,
+        price: {amount: '12.50', currencyCode: 'USD'},
+      })),
       false,
       pricedShorts,
     ).total.amount,
     '112.50',
   );
   assert.equal(
-    jerseyQuote(socks, variants, null, false, pricedShorts).total,
+    jerseyQuote(withSocks, variants, [], false, pricedShorts).total,
     null,
   );
   assert.equal(
     jerseyQuote(
-      socks,
+      withSocks,
       variants,
-      {amount: '12.50', currencyCode: 'EUR'},
+      socks.map((item) => ({
+        ...item,
+        price: {...item.price, currencyCode: 'EUR'},
+      })),
       false,
       pricedShorts,
     ).total,
     null,
   );
-  assert.equal(jerseyQuote(chosen, [], null, false, pricedShorts).total, null);
-  assert.equal(jerseyQuote(chosen, variants, null, false, []).total, null);
+  assert.equal(jerseyQuote(chosen, [], [], false, pricedShorts).total, null);
+  assert.equal(jerseyQuote(chosen, variants, [], false, []).total, null);
   const euro = pricedShorts.map((item) => ({
     ...item,
     price: {...item.price, currencyCode: 'EUR'},
   }));
-  assert.equal(jerseyQuote(chosen, variants, null, false, euro).total, null);
+  assert.equal(jerseyQuote(chosen, variants, [], false, euro).total, null);
 });
 
 test('bundle quotes sum real single prices and require both USD components', () => {
   const chosen = {
     ...selection,
-    shortsSize: 'None',
     jerseys: [
-      {style: homeShort, size: 'XL', print},
-      {style: awayLong, size: 'M', print},
+      {style: homeShort, size: 'XL', print, shortsSize: 'None'},
+      {style: awayLong, size: 'M', print, shortsSize: 'None'},
     ],
   };
   const variants = chosen.jerseys.map((jersey, index) => ({
@@ -529,16 +600,13 @@ test('bundle quotes sum real single prices and require both USD components', () 
     ),
     price: {amount: index === 0 ? '73.00' : '82.00', currencyCode: 'USD'},
   }));
-  assert.equal(
-    jerseyQuote(chosen, variants, null, false).total.amount,
-    '135.00',
-  );
-  assert.equal(jerseyQuote(chosen, variants.slice(1), null, false).total, null);
+  assert.equal(jerseyQuote(chosen, variants, [], false).total.amount, '135.00');
+  assert.equal(jerseyQuote(chosen, variants.slice(1), [], false).total, null);
   assert.equal(
     jerseyQuote(
       chosen,
       variants.map((v) => ({...v, price: {...v.price, currencyCode: 'EUR'}})),
-      null,
+      [],
       false,
     ).total,
     null,
@@ -550,7 +618,7 @@ test('bundle quotes sum real single prices and require both USD components', () 
         variants[0],
         {...variants[1], price: {...variants[1].price, currencyCode: 'EUR'}},
       ],
-      null,
+      [],
       false,
     ).total,
     null,
@@ -558,7 +626,7 @@ test('bundle quotes sum real single prices and require both USD components', () 
 });
 
 test('the second jersey quote includes its matching shorts when shorts are selected', () => {
-  const quote = jerseyQuote(selection, [], null, true);
+  const quote = jerseyQuote(selection, [], [], true);
   const first = quote.choices.find((item) => item.style === homeShort);
   const mixed = quote.choices.find((item) => item.style === bundleStyle);
   assert.equal(subtractPrices(mixed.price, first.price).amount, '60.00');
@@ -570,23 +638,121 @@ test('the second jersey quote includes its matching shorts when shorts are selec
   );
 });
 
-test('socks pack savings use actual prices and suppress unsupported comparisons', () => {
-  const single = {amount: '10.00', currencyCode: 'USD'};
-  const pack = {amount: '25.00', currencyCode: 'USD'};
-  assert.deepEqual(socksPackSavings(single, pack), {
-    amount: '5.00',
-    currencyCode: 'USD',
-  });
+test('any three single pairs save $5, repeating across colors and larger quantities', () => {
+  for (const [black, white, expected, nextPair] of [
+    [0, 0, '0.00', null],
+    [1, 0, '10.00', null],
+    [0, 1, '10.00', null],
+    [1, 1, '20.00', '5.00'],
+    [2, 1, '25.00', null],
+    [1, 2, '25.00', null],
+    [3, 0, '25.00', null],
+    [0, 3, '25.00', null],
+    [2, 2, '35.00', null],
+    [3, 2, '45.00', '5.00'],
+    [3, 3, '50.00', null],
+    [2, 4, '50.00', null],
+    [5, 2, '60.00', null],
+    [8, 8, '135.00', null],
+  ]) {
+    const chosen = [
+      {color: 'Black', quantity: black},
+      {color: 'White', quantity: white},
+    ].filter((item) => item.quantity);
+    const quote = socksQuote(chosen, socks);
+    assert.equal(quote.quantity, black + white);
+    assert.equal(quote.total.amount, expected);
+    assert.equal(quote.offer.amount, '25.00');
+    assert.equal(quote.nextPair?.amount ?? null, nextPair);
+  }
+  assert.equal(socksQuote([{color: 'Black', quantity: 3}], []).total, null);
+  assert.equal(socksQuote([], socks.slice(1)).offer, null);
   assert.equal(
-    socksPackSavings({...single, amount: '12.50'}, {...pack, amount: '32.00'})
-      .amount,
-    '5.50',
+    socksQuote(
+      [],
+      socks.map((item) => ({
+        ...item,
+        price: {...item.price, currencyCode: 'EUR'},
+      })),
+    ).offer,
+    null,
   );
-  assert.equal(socksPackSavings(null, pack), null);
-  assert.equal(socksPackSavings(single, null), null);
-  assert.equal(socksPackSavings(single, {...pack, currencyCode: 'EUR'}), null);
-  assert.equal(socksPackSavings(single, {...pack, amount: '30.00'}), null);
-  assert.equal(socksPackSavings(single, {...pack, amount: '35.00'}), null);
+  assert.equal(
+    socksQuote(
+      [],
+      [socks[0], {...socks[1], price: {amount: '12.00', currencyCode: 'USD'}}],
+    ).offer,
+    null,
+  );
+  assert.equal(
+    socksQuote([{color: 'Black', quantity: 3}], [], true).total.amount,
+    '25.00',
+  );
+});
+
+test('mixed socks and both kits quote the exact combined discount and independent sizes', () => {
+  const chosen = {
+    jerseys: [
+      {style: homeShort, size: 'XL', print, shortsSize: 'M'},
+      {style: awayLong, size: 'M', print: plainPrint, shortsSize: 'XXL'},
+    ],
+    socks: [
+      {color: 'Black', quantity: 2},
+      {color: 'White', quantity: 1},
+    ],
+  };
+  const quote = jerseyQuote(chosen, [], [], true);
+  assert.equal(quote.total.amount, '185.00');
+  assert.equal(
+    jerseyQuote({...chosen, jerseys: [chosen.jerseys[0]]}, [], [], true).total
+      .amount,
+    '110.00',
+  );
+  assert.equal(
+    jerseyQuote(
+      {
+        ...chosen,
+        jerseys: chosen.jerseys.map((item) => ({...item, shortsSize: 'None'})),
+      },
+      [],
+      [],
+      true,
+    ).total.amount,
+    '155.00',
+  );
+});
+
+test('already-open forms normalize shared shorts and single-color packs without changing their order', () => {
+  const form = formFor({
+    jerseys: [
+      selection.jerseys[0],
+      {style: awayLong, size: 'L', print, shortsSize: 'M'},
+    ],
+    socks: [],
+  });
+  form.delete('firstShortsSize');
+  form.delete('secondShortsSize');
+  form.set('shortsSize', 'XL');
+  form.delete('socksBlack');
+  form.delete('socksWhite');
+  form.set('socksColor', 'White');
+  form.set('socksPack', '3 pairs');
+  const parsed = readJerseySelection(form);
+  assert.deepEqual(
+    parsed.jerseys.map(({shortsSize}) => shortsSize),
+    ['XL', 'XL'],
+  );
+  assert.deepEqual(parsed.socks, [{color: 'White', quantity: 3}]);
+  assert.equal(validateJerseySelection(parsed, true), null);
+  form.set('socksPack', '1 pair');
+  assert.deepEqual(readJerseySelection(form).socks, [
+    {color: 'White', quantity: 1},
+  ]);
+  form.set('socksPack', '2 pairs');
+  assert.match(
+    validateJerseySelection(readJerseySelection(form), true),
+    /pairs of each sock color/,
+  );
 });
 
 test('quotes keep each size attached to its style, including an unchosen first size', () => {
@@ -604,12 +770,11 @@ test('quotes keep each size attached to its style, including an unchosen first s
   const chosen = {
     ...selection,
     jerseys: [
-      {style: homeShort, size: '', print},
-      {style: awayLong, size: 'XL', print},
+      {style: homeShort, size: '', print, shortsSize: 'None'},
+      {style: awayLong, size: 'XL', print, shortsSize: 'None'},
     ],
-    shortsSize: 'None',
   };
-  const quote = jerseyQuote(chosen, variants, null, false);
+  const quote = jerseyQuote(chosen, variants, [], false);
   assert.equal(quote.total.amount, '135.00');
   assert.equal(
     quote.choices.find(({style}) => style === bundleStyle).price.amount,
@@ -623,7 +788,7 @@ test('quotes keep each size attached to its style, including an unchosen first s
     jerseyQuote(
       {...chosen, jerseys: [...chosen.jerseys].reverse()},
       variants,
-      null,
+      [],
       false,
     ).total.amount,
     '135.00',
@@ -635,7 +800,7 @@ test('quotes keep each size attached to its style, including an unchosen first s
         jerseys: chosen.jerseys.map((jersey) => ({...jersey, size: 'XL'})),
       },
       variants,
-      null,
+      [],
       false,
     ).total.amount,
     '140.00',
@@ -710,8 +875,8 @@ test('different sizes stay attached to their jersey through parsing, canonical o
   const chosen = {
     ...selection,
     jerseys: [
-      {style: awayLong, size: 'M', print},
-      {style: homeShort, size: 'XXL', print},
+      {style: awayLong, size: 'M', print, shortsSize: 'M'},
+      {style: homeShort, size: 'XXL', print, shortsSize: 'M'},
     ],
   };
   const form = formFor(chosen);
@@ -742,10 +907,11 @@ test('each jersey keeps its own normalized print through cart fulfillment', () =
   const chosen = {
     ...selection,
     jerseys: [
-      {style: awayLong, size: 'M', print},
+      {style: awayLong, size: 'M', print, shortsSize: 'M'},
       {
         style: homeShort,
         size: 'XXL',
+        shortsSize: 'M',
         print: {name: '  Jose\u0301  ', number: '09'},
       },
     ],
@@ -818,7 +984,10 @@ test('each jersey keeps its own normalized print through cart fulfillment', () =
 test('open legacy forms keep the shared print, while explicit blank second fields mean a plain back', () => {
   const form = formFor({
     ...selection,
-    jerseys: [selection.jerseys[0], {style: awayLong, size: 'M', print}],
+    jerseys: [
+      selection.jerseys[0],
+      {style: awayLong, size: 'M', print, shortsSize: 'M'},
+    ],
   });
   form.delete('secondName');
   form.delete('secondNumber');
@@ -836,12 +1005,19 @@ test('open legacy forms keep the shared print, while explicit blank second field
 
 function formFor(value) {
   const form = new FormData();
-  const {jerseys, ...extras} = value;
-  for (const [key, item] of Object.entries(extras)) form.set(key, String(item));
+  const {jerseys, socks} = value;
+  if (jerseys.some(({shortsSize}) => shortsSize !== 'None'))
+    form.set('addShorts', 'on');
+  for (const color of ['Black', 'White'])
+    form.set(
+      `socks${color}`,
+      String(socks.find((item) => item.color === color)?.quantity ?? 0),
+    );
   jerseys.forEach((jersey, index) => {
     const prefix = index === 0 ? 'first' : 'second';
     form.set(`${prefix}Style`, jersey.style);
     form.set(`${prefix}Size`, jersey.size);
+    form.set(`${prefix}ShortsSize`, jersey.shortsSize);
     form.set(index === 0 ? 'name' : 'secondName', jersey.print.name);
     form.set(index === 0 ? 'number' : 'secondNumber', jersey.print.number);
   });
