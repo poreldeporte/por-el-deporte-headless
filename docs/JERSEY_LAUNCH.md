@@ -24,6 +24,9 @@ The “Build your kit” column follows:
    selection and appears when the picker collapses. Edit reopens the choices.
    A compact “Add Home/Away” photo row offers the $20 Home + Away saving and
    opens a second jersey card. Each jersey has its own sleeve, size and print.
+   Edit sits beneath the selected style. A small red circled × at the second
+   card's top-right removes it and remains available while choosing sleeves.
+   Its accessible label names the jersey, and its touch target is 44px.
 2. **Matching shorts:** one optional add/remove decision. A single jersey adds
    one matching pair for $15; Home + Away adds both matching pairs for $30.
    Each pair has a photo card and independent required size, which collapses to
@@ -34,12 +37,12 @@ The “Build your kit” column follows:
 3. **Socks:** optional Black and White photo rows, each with a quantity control
    starting at zero. Mix colors freely. Single pairs cost $10; every group of
    three saves $5 automatically. One size; no pack or size selector. At two pairs,
-   the page offers the next pair for $5; selected quantity, total and savings
-   appear together beneath the two rows.
+   the page offers the next pair for $5. Both colors share one card whose header
+   shows the total for all selected pairs, with savings appearing at three pairs.
 
 All three steps use the same heading, divider, card spacing, photo alignment,
-body labels and Edit/Remove controls. The existing brand and gallery remain.
-The price label stays “Your kit total” and the socks status reserves two lines,
+body labels and accessible controls. The existing brand and gallery remain.
+The price label stays “Your kit total” and the socks header reserves two rows,
 so quantity updates do not move the controls. On mobile, selected socks appear
 in their builder rows and kit preview; the repeated gallery rows stay desktop-only
 to avoid inserting content above the active controls.
