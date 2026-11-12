@@ -8,6 +8,7 @@ import {
   JERSEY_TITLE,
   JERSEY_SHORTS_HANDLE,
   PED_SOCKS_HANDLE,
+  jerseyCartError,
   jerseyCartLines,
   personalizationWindow,
   readJerseySelection,
@@ -80,16 +81,11 @@ export async function action({request, context}: Route.ActionArgs) {
   const headers = result.cart
     ? context.cart.setCartId(result.cart.id)
     : new Headers();
-  const messages = [...(result.errors ?? []), ...(result.warnings ?? [])].map(
-    (item) => item.message,
-  );
-  const added =
-    Boolean(result.cart) && !result.errors?.length && !result.warnings?.length;
+  const cartError = jerseyCartError(result);
+  const added = !cartError;
   return data(
     {
-      error:
-        messages.join(' ') ||
-        (added ? null : 'Your jersey could not be added. Please try again.'),
+      error: cartError,
       preview: null,
       added,
     },

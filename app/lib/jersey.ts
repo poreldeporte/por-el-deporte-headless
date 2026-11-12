@@ -364,6 +364,25 @@ export function jerseyCartLines(
   };
 }
 
+export function jerseyCartError(result: {
+  cart?: unknown;
+  errors?: {message: string}[];
+  warnings?: {code: string; message: string}[];
+}) {
+  // A shared discount link can include a code for a different jersey variant.
+  // Shopify still adds the selected items when that unused code cannot apply.
+  const warnings = (result.warnings ?? []).filter(
+    ({code}) => code !== 'DISCOUNT_NO_ENTITLED_LINE_ITEMS',
+  );
+  if (result.cart && !result.errors?.length && !warnings.length) return null;
+  const messages = [...(result.errors ?? []), ...warnings].map(
+    ({message}) => message,
+  );
+  return (
+    messages.join(' ') || 'Your jersey could not be added. Please try again.'
+  );
+}
+
 export function jerseyStyleValue(styles: readonly string[]) {
   return [...styles].sort(compareJerseyStyles).join(' + ');
 }
