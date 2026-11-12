@@ -2,7 +2,7 @@ import {redirect} from 'react-router';
 import type {Route} from './+types/discount.$code';
 
 /**
- * Automatically applies a discount found on the url
+ * Automatically applies comma-separated discount codes found in the URL.
  * If a cart exists it's updated with the discount, otherwise a cart is created with the discount already applied
  *
  * @example
@@ -35,7 +35,7 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
     return redirect(redirectUrl);
   }
 
-  const result = await cart.updateDiscountCodes([code]);
+  const result = await cart.updateDiscountCodes(code.split(','));
   const headers = cart.setCartId(result.cart.id);
 
   // Using set-cookie on a 303 redirect will not work if the domain origin have port number (:3000)
