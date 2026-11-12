@@ -3,6 +3,7 @@ import {test} from 'node:test';
 import {loadJerseyVariants} from '../app/lib/jersey-catalog.ts';
 import {
   jerseyAttributes,
+  jerseyCartError,
   jerseyCartLines,
   JERSEY_STYLE_OPTIONS,
   JERSEY_SIZES,
@@ -47,6 +48,40 @@ const shorts = ['Home (Cream)', 'Away (Black)'].flatMap((color) =>
     ],
   })),
 );
+
+test('unused variant discounts do not fail cart additions; item and mutation failures still do', () => {
+  const unused = {
+    code: 'DISCOUNT_NO_ENTITLED_LINE_ITEMS',
+    message: 'The other sleeve discount does not apply.',
+  };
+  assert.equal(jerseyCartError({cart: {}, warnings: [unused]}), null);
+  assert.equal(
+    jerseyCartError({
+      cart: {},
+      warnings: [
+        unused,
+        {code: 'MERCHANDISE_NOT_ENOUGH_STOCK', message: 'Only one remains.'},
+      ],
+    }),
+    'Only one remains.',
+  );
+  assert.equal(
+    jerseyCartError({
+      cart: {},
+      errors: [{message: 'Cart update failed.'}],
+      warnings: [unused],
+    }),
+    'Cart update failed.',
+  );
+  assert.equal(
+    jerseyCartError({cart: null, warnings: [unused]}),
+    'Your jersey could not be added. Please try again.',
+  );
+  assert.equal(
+    jerseyCartError({cart: {}, errors: [{message: ''}]}),
+    'Your jersey could not be added. Please try again.',
+  );
+});
 
 test('personalization opens at launch and closes exactly seven days later', () => {
   assert.equal(personalizationWindow(startsAt, start - 1).status, 'upcoming');
