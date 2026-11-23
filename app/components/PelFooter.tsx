@@ -1,5 +1,6 @@
 import {Link, useFetcher} from 'react-router';
 import {PelLogoMark} from '~/components/PelLogo';
+import oceanBankLogo from '~/assets/partners/ocean-bank-white.png';
 
 /**
  * The Por El Deporte site footer: scallop top edge, the big "Become Part of the
@@ -177,6 +178,24 @@ export function PelFooter() {
             </div>
           ))}
         </nav>
+
+        <div className="pel-footer__partner">
+          <a
+            href="https://www.oceanbank.com/"
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+          >
+            <span>Powered by</span>
+            <img
+              src={oceanBankLogo}
+              alt="Ocean Bank"
+              width={335}
+              height={54}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+        </div>
 
         <div className="pel-footer__copy">
           ©2026 Por El Deporte. All Rights Reserved.
