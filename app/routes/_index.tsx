@@ -10,7 +10,7 @@ import {FunctionSection} from '~/components/home/FunctionSection';
 import {InstagramFeed} from '~/components/home/InstagramFeed';
 import {Testimonials} from '~/components/home/Testimonials';
 import {AsSeenOn} from '~/components/home/AsSeenOn';
-import {PelLogoMark} from '~/components/PelLogo';
+import {PelPartnerLogo} from '~/components/PelPartnerLogo';
 import {seoMeta, siteOrigin} from '~/lib/seo';
 import {HERO_SRC, HERO_SRCSET} from '~/lib/hero';
 import {JERSEY_HANDLE} from '~/lib/jersey';
@@ -274,9 +274,7 @@ function Hero() {
           <Link to="/collections/all-products">Shop</Link>
         </div>
         <div className="pel-nav__logo">
-          <Link to="/" aria-label="Por El Deporte home">
-            <PelLogoMark height={46} />
-          </Link>
+          <PelPartnerLogo light />
         </div>
         <div className="pel-nav__actions">
           <Link to="/account" className="pel-pill pel-hide-mobile">

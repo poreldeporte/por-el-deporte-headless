@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Link, NavLink, useLocation} from 'react-router';
 import {CartButton} from '~/components/home/CartButton';
-import {PelLogoMark} from '~/components/PelLogo';
+import {PelPartnerLogo} from '~/components/PelPartnerLogo';
 import {PelMarquee, MARQUEE_ITEMS} from '~/components/PelMarquee';
 
 /**
@@ -62,9 +62,9 @@ export function PelHeader({floating = false}: {floating?: boolean} = {}) {
             Shop
           </NavLink>
         </nav>
-        <Link to="/" className="pel-siteheader__logo" aria-label="Por El Deporte home">
-          <PelLogoMark height={46} />
-        </Link>
+        <div className="pel-siteheader__logo">
+          <PelPartnerLogo />
+        </div>
         <div className="pel-siteheader__actions">
           <Link to="/account" className="pel-pill pel-hide-mobile">
             Account
