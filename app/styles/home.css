@@ -148,12 +148,16 @@ body:has(.pel-home) {
   left: 0;
   right: 0;
   z-index: 5;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: 'links brand actions';
   align-items: center;
-  justify-content: space-between;
+  gap: 8px 24px;
   padding: 26px 48px;
 }
 .pel-nav__links {
+  grid-area: links;
+  justify-self: start;
   display: flex;
   align-items: center;
   gap: 34px;
@@ -178,22 +182,13 @@ body:has(.pel-home) {
   text-decoration-thickness: 2px;
 }
 .pel-nav__logo {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.pel-home .pel-nav__logo a {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 650;
-  font-size: 26px;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  grid-area: brand;
+  justify-self: center;
   color: var(--pel-cream);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 .pel-nav__actions {
+  grid-area: actions;
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1280,13 +1275,13 @@ a.pel-footer__link:hover {
 }
 .pel-footer__partner a {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 12px 16px;
   min-height: 44px;
   color: var(--pel-cream);
-  font: 700 12px/1.5 var(--font-body);
+  font: 700 13px/1.5 var(--font-body);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
@@ -1297,7 +1292,8 @@ a.pel-footer__link:hover {
 }
 .pel-footer__partner img {
   display: block;
-  width: 168px;
+  width: 248px;
+  max-width: 100%;
   height: auto;
 }
 .pel-footer__copy {
@@ -1518,10 +1514,21 @@ body:has(.overlay.expanded) .pel-fab {
   gap: 11px;
 }
 
+@media (max-width: 64em) {
+  .pel-nav {
+    padding-inline: 32px;
+  }
+}
+
 /* Mobile */
 @media (max-width: 48em) {
   .pel-nav {
-    padding: 18px 20px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'brand brand'
+      'links actions';
+    column-gap: 12px;
+    padding: 12px 20px;
   }
   .pel-ig {
     padding: 64px 0;
@@ -1546,14 +1553,11 @@ body:has(.overlay.expanded) .pel-fab {
     margin-top: 40px;
   }
   .pel-nav__links {
-    gap: 16px;
+    gap: 12px;
     font-size: 12px;
   }
-  .pel-nav__logo {
-    display: none;
-  }
   .pel-hero__content {
-    padding: 104px 16px 48px;
+    padding: 164px 16px 48px;
     align-items: center;
   }
   .pel-hero__title {
